@@ -19,10 +19,10 @@
 !Only print out the f array
 !There is no sinking...needs a sinking mechanism
 
-!----------------------------------
+!-----------------------------------
       Subroutine CGEM(input_filename,BASE_NETCDF_OUTPUT_FILE_NAME)
-!----------------------------------
-
+!-----------------------------------
+ 
 !------------------------------------------------------------------------
 !     Written  by :: Lisa L. Lowe/EMVL, lowe.lisa@epa.gov 
 !                    D.S.Ko/NRL
