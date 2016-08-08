@@ -76,6 +76,7 @@ error
 *.pdf
 *.txt
 !Model_dim.txt
+!InitialConditions.txt
 *.out
 
 # Customized runtime files
