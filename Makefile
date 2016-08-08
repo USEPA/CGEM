@@ -18,8 +18,8 @@ SOL_LIBS  = -L/usr/local/apps/pnetcdf-1.5.0/intel-15.0/lib -lpnetcdf
 IRIS_INC  = -I. -I/usr/local/apps/netcdf-4.3.3/intel-15.0/include/
 IRIS_LIBS = -L. -L/usr/local/apps/netcdf-4.3.3/intel-15.0/lib/ -lnetcdf -lnetcdff
 
-OTHER_INC   = -I.
-OTHER_LIBS  = -L/usr/local/apps/pnetcdf-1.5.0/intel-15.0/lib -lpnetcdf
+OTHER_INC   = -I. -I/usr/local/include
+OTHER_LIBS  = -L/usr/local/lib -lnetcdff -L/usr/local/bin -lnetcdf -lnetcdf
 
 ### =============== End User Modifiable Section  =============== ####
 include cgem_source
@@ -42,7 +42,7 @@ else
   INC      = $(OTHER_INC)
   LIBS     = $(OTHER_LIBS)
   F90     = gfortran 
-  FFLAGS = -I/usr/local/apps/pnetcdf-1.5.0/pgi-14.7/include/ -lgfortran -traceback -byteswapio -I. -V -Mfree 
+  FFLAGS = -lgfortran 
 endif
 endif
 
