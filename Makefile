@@ -12,14 +12,14 @@
 
 ### Build options for specific platforms. 
 ### LIBS has path to pnetCDF
-SOL_INC	  = -I.
-SOL_LIBS  = -L/usr/local/apps/pnetcdf-1.5.0/intel-15.0/lib -lpnetcdf
+SOL_INC	  = -I. -I/usr/local/apps/netcdf-4.3.3/intel-15.0/include/
+SOL_LIBS  = -L/usr/local/apps/netcdf-4.3.3/intel-15.0/lib -lnetcdf -lnetcdff
 
 IRIS_INC  = -I. -I/usr/local/apps/netcdf-4.3.3/intel-15.0/include/
 IRIS_LIBS = -L. -L/usr/local/apps/netcdf-4.3.3/intel-15.0/lib/ -lnetcdf -lnetcdff
 
 OTHER_INC   = -I. -I/usr/local/include
-OTHER_LIBS  = -L/usr/local/lib -lnetcdff -L/usr/local/bin -lnetcdf -lnetcdf
+OTHER_LIBS  = -L/usr/local/lib -lnetcdff -L/usr/local/bin -lnetcdf 
 
 ### =============== End User Modifiable Section  =============== ####
 include cgem_source
