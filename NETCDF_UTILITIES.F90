@@ -1,0 +1,468 @@
+!******************************************************************************
+! PURPOSE: NETCDF_UTILITIES.F90 - Helper routines for writing to a NetCDF file.
+! NOTES:   Non-ADT module.
+! HISTORY: 2010/04/26, Todd Plessel, plessel.todd@epa.gov, Created.
+!******************************************************************************
+
+MODULE NETCDF_UTILITIES
+
+!  USE netcdf
+
+  IMPLICIT NONE
+
+PUBLIC CHKERR, DEFDIM, &
+       DEFVI1, DEFVR1, DEFVD1, DEFVI2, DEFVR2, DEFVI3, DEFVR3, DEFVR4, &
+       DEFVAR, DEFIAT, DEFRAT, DEFRAT2, DEFRAT6, DEFRAT8, DEFRATX, DEFTAT, &
+       READIAT, CONVERT_LONGITUDES
+
+PRIVATE
+CONTAINS
+
+  ! Public
+
+  ! Commands:
+
+  ! CHKERR: Check error status and if not ok, print explanation & stop (UGLY).
+  !
+  SUBROUTINE CHKERR( ERR, MESSAGE )
+    IMPLICIT NONE
+    INTEGER,INTENT(IN):: ERR
+    CHARACTER(LEN=*),INTENT(IN):: MESSAGE
+    ! Externals:
+    CHARACTER*(80) NF_STRERROR
+    EXTERNAL NF_STRERROR
+
+    IF ( ERR .NE. 0 ) THEN
+      PRINT *, 'PROBLEM: Failed to ', MESSAGE
+      PRINT *, NF_STRERROR( ERR )
+      STOP
+    END IF
+
+    RETURN
+  END SUBROUTINE CHKERR
+
+
+
+  ! Define dimensions in a NetCDF file.
+  !
+  SUBROUTINE DEFDIM( FILEID, DIM_ID, NAME, VALUE )
+    IMPLICIT NONE
+    INTEGER,INTENT(IN):: FILEID, VALUE
+    INTEGER,INTENT(OUT):: DIM_ID
+    CHARACTER(LEN=*),INTENT(IN):: NAME
+    ! Externals:
+    INTEGER NF_DEF_DIM
+    EXTERNAL NF_DEF_DIM
+    ! Locals:
+    INTEGER ERR
+
+    ERR = NF_DEF_DIM( FILEID, NAME, VALUE, DIM_ID )
+    CALL CHKERR( ERR, 'create dimension ' // NAME )
+    RETURN
+  END SUBROUTINE DEFDIM
+
+
+
+  ! Define a integer 1D variable in a NetCDF file.
+  !
+  SUBROUTINE DEFVI1( FILEID, DIMID, VARID, VARNAM, VARDES, UNITS )
+    IMPLICIT NONE
+    INTEGER,INTENT(IN):: FILEID, DIMID
+    INTEGER,INTENT(OUT):: VARID
+    CHARACTER(LEN=*),INTENT(IN):: VARNAM, VARDES, UNITS
+    ! Externals:
+    INTEGER NF_DEF_VAR
+    EXTERNAL NF_DEF_VAR
+    ! Locals:
+    INTEGER ERR
+
+    ERR = NF_DEF_VAR( FILEID, VARNAM, 4, 1, DIMID, VARID )
+    CALL CHKERR( ERR, 'create variable ' // VARNAM )
+    CALL DEFVAR( FILEID, VARID, VARNAM, VARDES, UNITS )
+    RETURN
+  END SUBROUTINE DEFVI1
+
+
+
+  ! Define a real 1D variable in a NetCDF file.
+  !
+  SUBROUTINE DEFVR1( FILEID, DIMID, VARID, VARNAM, VARDES, UNITS )
+    IMPLICIT NONE
+    INTEGER,INTENT(IN):: FILEID, DIMID
+    INTEGER,INTENT(OUT):: VARID
+    CHARACTER(LEN=*),INTENT(IN):: VARNAM, VARDES, UNITS
+    ! Externals:
+    INTEGER NF_DEF_VAR
+    EXTERNAL NF_DEF_VAR
+    ! Locals:
+    INTEGER ERR
+
+    ERR = NF_DEF_VAR( FILEID, VARNAM, 5, 1, DIMID, VARID )
+    CALL CHKERR( ERR, 'create variable ' // VARNAM )
+    CALL DEFVAR( FILEID, VARID, VARNAM, VARDES, UNITS )
+    RETURN
+  END SUBROUTINE DEFVR1
+
+
+
+  ! Define a double 1D variable in a NetCDF file.
+  !
+  SUBROUTINE DEFVD1( FILEID, DIMID, VARID, VARNAM, VARDES, UNITS )
+    IMPLICIT NONE
+    INTEGER,INTENT(IN):: FILEID, DIMID
+    INTEGER,INTENT(OUT):: VARID
+    CHARACTER(LEN=*),INTENT(IN):: VARNAM, VARDES, UNITS
+    ! Externals:
+    INTEGER NF_DEF_VAR
+    EXTERNAL NF_DEF_VAR
+    ! Locals:
+    INTEGER ERR
+
+    ERR = NF_DEF_VAR( FILEID, VARNAM, 6, 1, DIMID, VARID )
+    CALL CHKERR( ERR, 'create variable ' // VARNAM )
+    CALL DEFVAR( FILEID, VARID, VARNAM, VARDES, UNITS )
+    RETURN
+  END SUBROUTINE DEFVD1
+
+
+
+  ! Define an integer 2D variable in a NetCDF file.
+  !
+  SUBROUTINE DEFVI2( FILEID, DIMID1, DIMID2, VARID, VARNAM, VARDES, UNITS )
+    IMPLICIT NONE
+    INTEGER,INTENT(IN):: FILEID, DIMID1, DIMID2
+    INTEGER,INTENT(OUT):: VARID
+    CHARACTER(LEN=*),INTENT(IN):: VARNAM, VARDES, UNITS
+    ! Externals:
+    INTEGER NF_DEF_VAR
+    EXTERNAL NF_DEF_VAR
+    ! Locals:
+    INTEGER ERR, DIM_IDS( 2 )
+
+    DIM_IDS( 1 ) = DIMID1
+    DIM_IDS( 2 ) = DIMID2
+    ERR = NF_DEF_VAR( FILEID, VARNAM, 4, 2, DIM_IDS, VARID )
+    CALL CHKERR( ERR, 'create variable ' // VARNAM )
+    CALL DEFVAR( FILEID, VARID, VARNAM, VARDES, UNITS )
+    RETURN
+  END SUBROUTINE DEFVI2
+
+
+
+  ! Define a real 2D variable in a NetCDF file.
+  !
+  SUBROUTINE DEFVR2( FILEID, DIMID1, DIMID2, VARID, VARNAM, VARDES, UNITS )
+    IMPLICIT NONE
+    INTEGER,INTENT(IN):: FILEID, DIMID1, DIMID2
+    INTEGER,INTENT(OUT):: VARID
+    CHARACTER(LEN=*),INTENT(IN):: VARNAM, VARDES, UNITS
+    ! Externals:
+    INTEGER NF_DEF_VAR
+    EXTERNAL NF_DEF_VAR
+    ! Locals:
+    INTEGER ERR, DIM_IDS( 2 )
+
+    DIM_IDS( 1 ) = DIMID1
+    DIM_IDS( 2 ) = DIMID2
+    ERR = NF_DEF_VAR( FILEID, VARNAM, 5, 2, DIM_IDS, VARID )
+    CALL CHKERR( ERR, 'create variable ' // VARNAM )
+    CALL DEFVAR( FILEID, VARID, VARNAM, VARDES, UNITS )
+    RETURN
+  END SUBROUTINE DEFVR2
+
+
+
+  ! Define an integer 3D variable in a NetCDF file.
+  !
+  SUBROUTINE DEFVI3( FILEID, DIMID1, DIMID2, DIMID3, VARID, VARNAM, VARDES, UNITS )
+    IMPLICIT NONE
+    INTEGER,INTENT(IN):: FILEID, DIMID1, DIMID2, DIMID3
+    INTEGER,INTENT(OUT):: VARID
+    CHARACTER(LEN=*),INTENT(IN):: VARNAM, VARDES, UNITS
+    ! Externals:
+    INTEGER NF_DEF_VAR
+    EXTERNAL NF_DEF_VAR
+    ! Locals:
+    INTEGER ERR, DIM_IDS( 3 )
+
+    DIM_IDS( 1 ) = DIMID1
+    DIM_IDS( 2 ) = DIMID2
+    DIM_IDS( 3 ) = DIMID3
+    ERR = NF_DEF_VAR( FILEID, VARNAM, 4, 3, DIM_IDS, VARID )
+    CALL CHKERR( ERR, 'create variable ' // VARNAM )
+    CALL DEFVAR( FILEID, VARID, VARNAM, VARDES, UNITS )
+    RETURN
+  END SUBROUTINE DEFVI3
+
+
+
+  ! Define a real 3D variable in a NetCDF file.
+  !
+  SUBROUTINE DEFVR3( FILEID, DIMID1, DIMID2, DIMID3, VARID, VARNAM, VARDES, &
+                     UNITS )
+    IMPLICIT NONE
+    INTEGER,INTENT(IN):: FILEID, DIMID1, DIMID2, DIMID3
+    INTEGER,INTENT(OUT):: VARID
+    CHARACTER(LEN=*),INTENT(IN):: VARNAM, VARDES, UNITS
+    ! Externals:
+    INTEGER NF_DEF_VAR
+    EXTERNAL NF_DEF_VAR
+    ! Locals:
+    INTEGER ERR, DIM_IDS( 3 )
+
+    DIM_IDS( 1 ) = DIMID1
+    DIM_IDS( 2 ) = DIMID2
+    DIM_IDS( 3 ) = DIMID3
+    ERR = NF_DEF_VAR( FILEID, VARNAM, 5, 3, DIM_IDS, VARID )
+    CALL CHKERR( ERR, 'create variable ' // VARNAM )
+    CALL DEFVAR( FILEID, VARID, VARNAM, VARDES, UNITS )
+    RETURN
+  END SUBROUTINE DEFVR3
+
+
+
+  ! Define a real 4D variable in a NetCDF file.
+  !
+  SUBROUTINE DEFVR4( FILEID, DIMIDS, VARID, VARNAM, VARDES, UNITS )
+    IMPLICIT NONE
+    INTEGER,INTENT(IN):: FILEID
+    INTEGER,DIMENSION(4),INTENT(IN):: DIMIDS
+    INTEGER,INTENT(OUT):: VARID
+    CHARACTER(LEN=*),INTENT(IN):: VARNAM, VARDES, UNITS
+    ! Externals:
+    INTEGER NF_DEF_VAR
+    EXTERNAL NF_DEF_VAR
+    ! Locals:
+    INTEGER ERR
+
+    ERR = NF_DEF_VAR( FILEID, VARNAM, 5, 4, DIMIDS, VARID )
+    CALL CHKERR( ERR, 'create variable ' // VARNAM )
+    CALL DEFVAR( FILEID, VARID, VARNAM, VARDES, UNITS )
+    RETURN
+  END SUBROUTINE DEFVR4
+
+
+
+  ! Define rest of a real variable in a NetCDF file.
+  !
+  SUBROUTINE DEFVAR( FILEID, VARID, VARNAM, VARDES, UNITS )
+    IMPLICIT NONE
+    INTEGER ,INTENT(IN):: FILEID, VARID
+    CHARACTER(LEN=*),INTENT(IN):: VARNAM, VARDES, UNITS
+    ! Externals:
+    INTEGER NF_PUT_ATT_TEXT
+    EXTERNAL NF_PUT_ATT_TEXT
+    ! Locals:
+    INTEGER ERR
+
+    ERR = NF_PUT_ATT_TEXT( FILEID, VARID, 'description', LEN( VARDES ), VARDES)
+    CALL CHKERR( ERR, 'create description attribute for ' // VARNAM )
+
+    IF ( LEN( UNITS ) > 0 ) THEN
+      ERR = NF_PUT_ATT_TEXT( FILEID, VARID, 'units', LEN( UNITS ), UNITS )
+      CALL CHKERR( ERR, 'create units attribute for ' // VARNAM )
+    END IF
+
+    RETURN
+  END SUBROUTINE DEFVAR
+
+
+
+  ! Define an integer attribute in a NetCDF file.
+  !
+  SUBROUTINE DEFIAT( FILEID, NAME, VALUE )
+    IMPLICIT NONE
+    INTEGER ,INTENT(IN):: FILEID
+    CHARACTER(LEN=*),INTENT(IN):: NAME
+    INTEGER,INTENT(IN):: VALUE
+    ! Externals:
+    INTEGER NF_PUT_ATT_INT
+    EXTERNAL NF_PUT_ATT_INT
+    ! Locals:
+    INTEGER ERR
+
+    ERR = NF_PUT_ATT_INT( FILEID, 0, NAME, 4, 1, VALUE )
+    CALL CHKERR( ERR, 'create integer attribute ' // NAME )
+
+    RETURN
+  END SUBROUTINE DEFIAT
+
+
+
+  ! Define a real attribute in a NetCDF file.
+  !
+  SUBROUTINE DEFRAT( FILEID, NAME, VALUE )
+    IMPLICIT NONE
+    INTEGER ,INTENT(IN):: FILEID
+    CHARACTER(LEN=*),INTENT(IN):: NAME
+    REAL,INTENT(IN):: VALUE
+    ! Externals:
+    INTEGER NF_PUT_ATT_REAL
+    EXTERNAL NF_PUT_ATT_REAL
+    ! Locals:
+    INTEGER ERR
+
+    ERR = NF_PUT_ATT_REAL( FILEID, 0, NAME, 5, 1, VALUE )
+    CALL CHKERR( ERR, 'create integer attribute ' // NAME )
+
+    RETURN
+  END SUBROUTINE DEFRAT
+
+
+! Define a real attribute of 2 values in a NetCDF file.
+  !
+  SUBROUTINE DEFRAT2( FILEID, NAME, VALUE )
+    IMPLICIT NONE
+    INTEGER,INTENT(IN):: FILEID
+    CHARACTER(LEN=*),INTENT(IN):: NAME
+    REAL,INTENT(IN):: VALUE(2)
+    ! Externals:
+    INTEGER NF_PUT_ATT_REAL
+    EXTERNAL NF_PUT_ATT_REAL
+    ! Locals:
+    INTEGER TWO
+    INTEGER ERR
+    REAL TEMP(2)
+
+    TWO = 2
+    TEMP = VALUE ! Must copy for NetCDF call.
+    ERR = NF_PUT_ATT_REAL( FILEID, 0, TRIM( NAME ), 5, TWO, TEMP )
+    CALL CHKERR( ERR, 'create 2 real attributes ' // NAME )
+
+    RETURN
+  END SUBROUTINE DEFRAT2
+
+
+  ! Define a real attribute of 6 values in a NetCDF file.
+  !
+  SUBROUTINE DEFRAT6( FILEID, NAME, VALUE )
+    IMPLICIT NONE
+    INTEGER,INTENT(IN):: FILEID
+    CHARACTER(LEN=*),INTENT(IN):: NAME
+    REAL,INTENT(IN):: VALUE(6)
+    ! Externals:
+    INTEGER NF_PUT_ATT_REAL
+    EXTERNAL NF_PUT_ATT_REAL
+    ! Locals:
+    INTEGER SIX
+    INTEGER ERR
+    REAL TEMP(6)
+
+    SIX = 6
+    TEMP = VALUE ! Must copy for NetCDF call.
+    ERR = NF_PUT_ATT_REAL( FILEID, 0, TRIM( NAME ), 5, SIX, TEMP )
+    CALL CHKERR( ERR, 'create 6 real attributes ' // NAME )
+
+    RETURN
+  END SUBROUTINE DEFRAT6
+
+
+ ! Define a real attribute of 8 values in a NetCDF file.
+  !
+  SUBROUTINE DEFRAT8( FILEID, NAME, VALUE )
+    IMPLICIT NONE
+    INTEGER,INTENT(IN):: FILEID
+    CHARACTER(LEN=*),INTENT(IN):: NAME
+    REAL,INTENT(IN):: VALUE(8)
+    ! Externals:
+    INTEGER NF_PUT_ATT_REAL
+    EXTERNAL NF_PUT_ATT_REAL
+    ! Locals:
+    INTEGER EIGHT
+    INTEGER ERR
+    REAL TEMP(8)
+
+    EIGHT = 8
+    TEMP = VALUE ! Must copy for NetCDF call.
+    ERR = NF_PUT_ATT_REAL( FILEID, 0, TRIM( NAME ), 5, EIGHT, TEMP )
+    CALL CHKERR( ERR, 'create 8 real attributes ' // NAME )
+
+    RETURN
+  END SUBROUTINE DEFRAT8
+
+ ! Define a real attribute of X values in a NetCDF file.
+  !
+  SUBROUTINE DEFRATX( FILEID, NAME, VALUE, X )
+    IMPLICIT NONE
+    INTEGER,INTENT(IN):: FILEID,X
+    CHARACTER(LEN=*),INTENT(IN):: NAME
+    REAL,INTENT(IN):: VALUE(X)
+    ! Externals:
+    INTEGER NF_PUT_ATT_REAL
+    EXTERNAL NF_PUT_ATT_REAL
+    ! Locals:
+    INTEGER EIGHT
+    INTEGER ERR
+    REAL TEMP(X)
+
+    TEMP = VALUE ! Must copy for NetCDF call.
+    ERR = NF_PUT_ATT_REAL( FILEID, 0, TRIM( NAME ), 5, X, TEMP )
+    CALL CHKERR( ERR, 'create 8 real attributes ' // NAME )
+
+    RETURN
+  END SUBROUTINE DEFRATX
+
+
+
+  ! Define a text attribute in a NetCDF file.
+  !
+  SUBROUTINE DEFTAT( FILEID,  NAME, VALUE )
+    IMPLICIT NONE
+    INTEGER ,INTENT(IN):: FILEID
+    CHARACTER(LEN=*),INTENT(IN):: NAME, VALUE
+    ! Externals:
+    INTEGER NF_PUT_ATT_TEXT
+    EXTERNAL NF_PUT_ATT_TEXT
+    ! Locals:
+    INTEGER ERR
+
+    ERR = NF_PUT_ATT_TEXT( FILEID, 0, NAME, LEN( VALUE) , VALUE )
+    CALL CHKERR( ERR, 'create text attribute ' // NAME )
+
+    RETURN
+  END SUBROUTINE DEFTAT
+
+
+  ! Read an integer attribute from a NetCDF file.
+  !
+  FUNCTION READIAT( FILEID, NAME ) RESULT( RES )
+    IMPLICIT NONE
+    INTEGER,INTENT(IN):: FILEID
+    CHARACTER(LEN=*),INTENT(IN):: NAME
+    INTEGER RES
+    INTEGER NF_GET_ATT_INT
+    EXTERNAL NF_GET_ATT_INT
+    ! Locals:
+    INTEGER ERR, TEMP(1)
+
+    ERR = NF_GET_ATT_INT( FILEID, 0, TRIM( NAME ), TEMP )
+    CALL CHKERR( ERR, 'read integer attribute ' // NAME )
+    RES = TEMP( 1 )
+    RETURN
+  END FUNCTION READIAT
+
+
+  ! CONVERT_LONGITUDE: Convert longitudes from [0, 360] to [-180, 180].
+  !
+  SUBROUTINE CONVERT_LONGITUDES( COUNT, LONGITUDES )
+    IMPLICIT NONE
+    INTEGER,INTENT(IN):: COUNT
+    REAL,DIMENSION(COUNT),INTENT(INOUT):: LONGITUDES
+    ! Locals:
+    INTEGER INDEX
+
+    DO INDEX = 1, COUNT
+
+      IF ( LONGITUDES( INDEX ) .GT. 180.0 ) THEN
+        LONGITUDES( INDEX ) = LONGITUDES( INDEX ) - 360.0
+      END IF
+    END DO
+
+    RETURN
+  END SUBROUTINE CONVERT_LONGITUDES
+
+
+
+END MODULE NETCDF_UTILITIES 
+
+

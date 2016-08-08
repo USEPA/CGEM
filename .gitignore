@@ -1,0 +1,61 @@
+# These are simple regular expression (glob) patterns
+# for files and directories that Git should ignore
+
+# Editor (e.g., Emacs) temp files
+*~
+\#*\#
+
+# Compiled code and objects
+*.exe
+*.EXE
+*.a
+*.so
+*.o
+*__genmod.f90
+*__genmod.mod
+
+# Binary data files
+*.bin
+*.2001-2008
+
+# modules implicitly created by ifort
+ave_netcdf_1d.mod
+ave_netcdf.mod
+calc_chla.mod
+epa_gem_params.mod
+input_vars.mod
+light_vars.mod
+mod_epacom_gem_utilities_1d.mod
+mod_epacom_gem_utilities.mod
+model_dim.mod
+mpi_dim.mod
+output_netcdf_1d.mod
+output_netcdf.mod
+rkvectormod.mod
+temp_vars.mod
+which_flux.mod
+
+# Keep directories but not contents. [Not sure if this works.]
+NETCDF/**
+output/**
+
+# Subversion
+.svn/
+
+# log and output files
+logfile*
+out
+out.time
+error
+*.pdf
+*.txt
+*.out
+
+# Customized runtime files
+submit.sh
+my_submit.sh
+GEM_InputFile
+
+# Misc
+tags
+TAGS
