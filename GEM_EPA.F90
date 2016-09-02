@@ -534,13 +534,7 @@
          if (MOD(istep, StepsPerDay) .eq. 0) then ! If last time step of day
             ! Convert summed irradiance from quanta/cm2/s to mol quanta/m2/s
             ! and store for next day's processing
-            aDailyRad_k(:) = aRadSum_k(:) * RADCONV
-#ifdef LCO_DEBUG
-            write(6,*) "End of day. istep = ", istep
-            write(6, "(4X, 'k', 7X, 'aRadSum', 7X, 'aDailyRad')")
-            WRITE(6, "(I5, E20.12, E20.12)") (k, aRadSum_k(k), aDailyRad_k(k), k=1,nz)
-            WRITE(6,"(' ')")
-#endif
+            aDailyRad_k(:) = aRadSum_k(:) * RADCONV * dT
             aRadSum_k(:) = 0.0
          endif ! if (MOD(istep, StepsPerDay) .eq. 0)
 
@@ -1320,5 +1314,5 @@ enddo
 
 
    return
-   END Subroutine GEM_EPA  ! End of subroutine GEM_EPA
+   END Subroutine GEM_EPA 
 !---------------------------------------------------------------------- 

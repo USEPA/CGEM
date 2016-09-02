@@ -59,36 +59,32 @@ CONTAINS
 
     ! Local variables
     integer :: k, isp
-    real :: temp_carbon ! Temporary value
-    real :: mu ! Growth rate from most limited nutrient
-    real, dimension(nospA) :: f_N, f_P, f_Si  ! Nutrient growth functions
-    real :: f_E
-    real :: Tadj(nospA+nospZ) !Temperature adjustment factor
+    real :: A_carbon ! Total Carbon, mg
+    real, dimension(nospA) :: f_N, f_P, f_Si  ! Nutrient growth functions 
+    real :: mu  ! Growth factor from most limited nutrient
+    real :: f_E ! Light factor
 
     DO k = 1, nz
        ! Get nutrient limited growth rates. Copied from calc_Agrow()
        call func_S( Qn_k(:,k), Qp_k(:,k), Si_k(k), f_N, f_P, f_Si )
-       call func_T(T_k(k), Tadj) ! Get adjusted temperature
 
        Chla_tot(k) = 0.0
+
        DO isp = 1, nospA
-!OLD CLOERN          mu = AMIN1( f_N(isp), f_P(isp), f_Si(isp) ) * Tadj(isp)
-          mu = N_k(k) / (Kn(isp) + N_k(k))
-
+          ! Nutrient dependence, limiting nutrient
+          mu = AMIN1( f_N(isp), f_P(isp), f_Si(isp) ) 
+          ! Light dependence
+          f_E = exp(-0.059*aRad(k))
           ! This is the Cloern expression
-!OLD CLOERN          Chl_C(isp,k) = 0.003 + 0.0154*exp(0.050*T_k(k)) * mu*exp(-0.059*aRad(k))
-          f_E = ( 1.0 - exp(-alphad(isp) * aRad(k)) )
-
-          Chl_C(isp,k) = 0.003 + 0.0154*exp(0.050*T_k(k)) * f_E * mu
-
-          ! mg carbon = #cells * mmol C/cell * 12 mg C/mmol
-          temp_carbon = A_k(isp,k) * Qc(isp) * 12.
+          Chl_C(isp,k) = 0.003 + 0.0154*exp(0.050*T_k(k)) * mu * f_E
+         ! Total Carbon = cells/m3 * mmol C/cell * 12mg C/mmol C
+          A_carbon = A_k(isp,k) * Qc(isp) * 12.
           ! mg chl-a = Chl:C * mg carbon
-          Chla_tot(k) =  Chla_tot(k) + (Chl_C(isp,k) * temp_carbon)
+          Chla_tot(k) =  Chla_tot(k) + (Chl_C(isp,k) * A_carbon)
        ENDDO ! isp = 1, nospA
+
     ENDDO ! k = 1, nz
 
-      !write(6,*) Chla_tot(1),Chl_C(1,1),A_k(1,1),Qc(1)
 
     RETURN
   END FUNCTION Chla_Cloern

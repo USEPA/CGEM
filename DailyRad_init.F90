@@ -1,7 +1,7 @@
 ! This routine initializes the previous day's irradiance for use by the
 ! Cloern Chl:C algorithm.
 Subroutine DailyRad_init(TC_8, lat, lon, d, d_sfc, A_k, CDOM_k, &
-           & OM1A_k, OM1G_k, OM1R_k, OM1BC_k, aDailyRad_k)
+           & OM1A_k, OM1Z_k, OM1R_k, OM1BC_k, aDailyRad_k)
 
   USE Model_dim ! For iYr0, etc.
   USE DATE_TIME ! For SECONDS_PER_DAY, TOTAL_SECONDS, DATE_TIMESTAMP
@@ -18,7 +18,7 @@ Subroutine DailyRad_init(TC_8, lat, lon, d, d_sfc, A_k, CDOM_k, &
   real, intent(in) :: A_k(nospA, nsl) !phytoplankton density in cells/m3
   real, intent(in) :: CDOM_k(nsl)
   real, intent(in) :: OM1A_k(nsl)
-  real, intent(in) :: OM1G_k(nsl)
+  real, intent(in) :: OM1Z_k(nsl)
   real, intent(in) :: OM1R_k(nsl)
   real, intent(in) :: OM1BC_k(nsl)
 
@@ -85,7 +85,7 @@ Subroutine DailyRad_init(TC_8, lat, lon, d, d_sfc, A_k, CDOM_k, &
 
      if(SfcRad .gt. 0.) then
         Call Call_IOP_PAR(SfcRad, Zenith, CDOM_k, Chla_tot_k, &
-             & OM1A_k, OM1G_k, OM1R_k, OM1BC_k, bottom_depth, nz, d_sfc, aIOPpar, &
+             & OM1A_k, OM1Z_k, OM1R_k, OM1BC_k, bottom_depth, nz, d_sfc, aIOPpar, &
              & aRadBot, aRadMid)
         ! Add to running total
         aRadSum(:) = aRadSum(:) + aRadMid(:)
@@ -93,7 +93,7 @@ Subroutine DailyRad_init(TC_8, lat, lon, d, d_sfc, A_k, CDOM_k, &
   enddo
 
   ! Copy result to return variable
-  ! Need to onvert from quanta/cm2/s to mole quanta/m2/s
-  aDailyRad_k(:) = aRadSum(:) * RADCONV
+  ! Need to convert from quanta/cm2/s to average mol quanta/m2/d
+  aDailyRad_k(:) = aRadSum(:) * RADCONV * dT
 
 END Subroutine DailyRad_init

@@ -165,6 +165,7 @@ read(999,*) KG_bot
 !---------------------------------------------------
 close(999)
 
+
  if(icent_jcent_units.eq.0) then
    IF(i_in < 0.0) THEN
       i_in  = i_in + 360.0

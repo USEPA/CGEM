@@ -101,24 +101,24 @@ MODULE OUTPUT_NETCDF
     .TRUE.   &
   /)
   CHARACTER(LEN=*),PARAMETER,DIMENSION(VARIABLES):: VARIABLE_DESCRIPTIONS = (/&
-    'Phytoplantkton group 1 number density.                              ', &
-    'Phytoplantkton group 2 number density.                              ', &
-    'Phytoplantkton group 3 number density.                              ', &
-    'Phytoplantkton group 4 number density.                              ', &
-    'Phytoplantkton group 5 number density.                              ', &
-    'Phytoplantkton group 6 number density.                              ', &
-    'Phytoplantkton group 1 nitrogen quota.                              ', &
-    'Phytoplantkton group 2 nitrogen quota.                              ', &
-    'Phytoplantkton group 3 nitrogen quota.                              ', &
-    'Phytoplantkton group 4 nitrogen quota.                              ', &
-    'Phytoplantkton group 5 nitrogen quota.                              ', &
-    'Phytoplantkton group 6 nitrogen quota.                              ', &
-    'Phytoplantkton group 1 phosphorus quota.                            ', &
-    'Phytoplantkton group 2 phosphorus quota.                            ', &
-    'Phytoplantkton group 3 phosphorus quota.                            ', &
-    'Phytoplantkton group 4 phosphorus quota.                            ', &
-    'Phytoplantkton group 5 phosphorus quota.                            ', &
-    'Phytoplantkton group 6 phosphorus quota.                            ', &
+    'Phytoplankton group 1 number density.                              ', &
+    'Phytoplankton group 2 number density.                              ', &
+    'Phytoplankton group 3 number density.                              ', &
+    'Phytoplankton group 4 number density.                              ', &
+    'Phytoplankton group 5 number density.                              ', &
+    'Phytoplankton group 6 number density.                              ', &
+    'Phytoplankton group 1 nitrogen quota.                              ', &
+    'Phytoplankton group 2 nitrogen quota.                              ', &
+    'Phytoplankton group 3 nitrogen quota.                              ', &
+    'Phytoplankton group 4 nitrogen quota.                              ', &
+    'Phytoplankton group 5 nitrogen quota.                              ', &
+    'Phytoplankton group 6 nitrogen quota.                              ', &
+    'Phytoplankton group 1 phosphorus quota.                            ', &
+    'Phytoplankton group 2 phosphorus quota.                            ', &
+    'Phytoplankton group 3 phosphorus quota.                            ', &
+    'Phytoplankton group 4 phosphorus quota.                            ', &
+    'Phytoplankton group 5 phosphorus quota.                            ', &
+    'Phytoplankton group 6 phosphorus quota.                            ', &
     'Zooplantkton group 1 number density.                                ', &
     'Zooplantkton group 2 number density.                                ', &
     'Nitrate.                                                            ', &
