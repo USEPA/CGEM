@@ -37,8 +37,6 @@ read(999,*)  !Comment line
 read(999,*) Which_temperature
 read(999,*) Which_uptake
 read(999,*) Which_quota
-read(999,*) Calibration
-read(999,*) Out_1D
 read(999,*) Which_irradiance 
 read(999,*) Which_chlaC
 read(999,*) Which_photosynthesis 
@@ -165,6 +163,7 @@ read(999,*) KG_bot
 !---------------------------------------------------
 close(999)
 
+ call Check_InputFile()
 
  if(icent_jcent_units.eq.0) then
    IF(i_in < 0.0) THEN
@@ -176,9 +175,6 @@ close(999)
    icent = int(i_in)
    jcent = int(j_in)
  endif
-
- if(Which_growth.eq.3) Which_photosynthesis = 3
- if(Which_photosynthesis.eq.3) Which_growth = 3
 
 stoich_z1R = 1.
 stoich_z2R = 1.

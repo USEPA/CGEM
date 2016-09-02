@@ -33,9 +33,9 @@
     else if (Which_uptake.eq.3) then !Flynn(2003)
         f_Qn(:) = QmaxN(:)/Qn(:) 
         f_Qp(:) = QmaxP(:)/Qp(:)
-    else  !Default is Michaelis-Menten 
-        f_Qn(:) = 1. 
-        f_Qp(:) = 1. 
+    else  
+        write(6,*) "Error in func_Qs"
+        stop
     endif
 
 

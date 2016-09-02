@@ -40,9 +40,9 @@
      &           ( Qn(:) - QminN(:) + KQn(:)*( QmaxN(:) - QminN(:) ) )
         f_P(:) = ( 1. + KQp(:) ) * ( Qp(:) - QminP(:) ) /        &
      &           ( Qp(:) - QminP(:) + KQp(:)*( QmaxP(:) - QminP(:) ) )
-    else  !Default is Droop
-        f_N(:) = ( Qn(:) - QminN(:) ) / Qn(:)
-        f_P(:) = ( Qp(:) - QminP(:) ) / Qp(:)
+    else 
+        write(6,*) "Error in func_S"
+        stop
     endif
 
     f_Si(:) = Si / ( Si + Ksi(:) ) !Monod 

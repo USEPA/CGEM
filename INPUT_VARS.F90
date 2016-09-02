@@ -14,8 +14,6 @@ integer icent,jcent
 integer Which_fluxes(8)
 integer Which_uptake
 integer Which_quota
-integer Calibration
-integer Out_1D
 integer Which_irradiance 
 integer Which_chlaC
 integer Which_photosynthesis 
@@ -104,6 +102,7 @@ real rcSi
 integer Which_VMix
 real KH_coeff 
 integer Which_Outer_BC
+real wt_l, wt_o
 real m_OM_init,m_OM_BC,m_OM_sh
 real Stoich_x1A_init,Stoich_y1A_init,Stoich_z1A_init
 real Stoich_x2A_init,Stoich_y2A_init,Stoich_z2A_init

@@ -28,8 +28,6 @@ write(999,*) "Which_fluxes",Which_fluxes
 write(999,*) "Which_temperature",Which_temperature
 write(999,*) "Which_uptake",Which_uptake
 write(999,*) "Which_quota",Which_quota
-write(999,*) "Calibration",Calibration
-write(999,*) "Out_1D",Out_1D
 write(999,*) "Which_irradiance",Which_irradiance
 write(999,*) "Which_chlaC",Which_chlaC
 write(999,*) "Which_photosynthesis",Which_photosynthesis

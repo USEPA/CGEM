@@ -162,8 +162,6 @@ CONTAINS
     CALL DEFIAT( FILE_ID, 'Which_temperature', Which_temperature )
     CALL DEFIAT( FILE_ID, 'Which_uptake', Which_uptake  )
     CALL DEFIAT( FILE_ID, 'Which_quota', Which_quota  )
-    CALL DEFIAT( FILE_ID, 'Calibration', Calibration  )
-    CALL DEFIAT( FILE_ID, 'Out_1D', Out_1D  )
     CALL DEFIAT( FILE_ID, 'Which_irradiance', Which_irradiance  )
     CALL DEFIAT( FILE_ID, 'Which_chlaC', Which_chlaC  )
     CALL DEFIAT( FILE_ID, 'Which_photosynthesis', Which_photosynthesis  )

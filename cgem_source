@@ -60,6 +60,7 @@ OBJ  =  Model_dim.o\
 	Set_Initial_Conditions.o\
 	Read_InputFile.o\
 	Write_InputFile.o\
+	Check_InputFile.o\
         Call_IOP_PAR.o\
 	Flux.o\
 	JWMod.o\

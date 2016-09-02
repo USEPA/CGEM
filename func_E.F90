@@ -30,8 +30,9 @@
         f_E(:) = ( 1.0 - exp(-alphad(:) * E) )
     else if (Which_photosynthesis.eq.3) then    !Nutrient dependent
         f_E(:) = ( 1.0 - exp(-alphad(:) * E / min_S) )
-    else                            !With photoinhibition is default
-        f_E(:) = ( 1.0 - exp(-alphad(:) * E) ) * exp(-betad(:)*E)
+    else   
+        write(6,*) "Error in func_E"
+        stop
     endif
  
     RETURN
