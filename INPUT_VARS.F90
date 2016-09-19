@@ -21,11 +21,14 @@ integer Which_growth
 integer SolarRad
 integer InitializeHow
 integer Which_hydro
+integer Which_Output
+integer MC
 !--Optics-----------------------
 real Kw
 real Kcdom
 real Kspm
 real Kchla
+real PARfac
 !---Phytoplankton 
 real, allocatable :: ediblevector(:,:)
 real, allocatable :: umax(:) 
@@ -51,6 +54,7 @@ real, allocatable :: volcell(:)
 real, allocatable :: Qc(:)
 real, allocatable :: Athresh(:)
 real, allocatable :: mA(:)
+real, allocatable :: A_wt(:)
 !---Zooplankton
 real, allocatable :: Zeffic(:)
 real, allocatable :: Zslop(:)
@@ -103,6 +107,7 @@ integer Which_VMix
 real KH_coeff 
 integer Which_Outer_BC
 real wt_l, wt_o
+real wt_pl, wt_po
 real m_OM_init,m_OM_BC,m_OM_sh
 real Stoich_x1A_init,Stoich_y1A_init,Stoich_z1A_init
 real Stoich_x2A_init,Stoich_y2A_init,Stoich_z2A_init

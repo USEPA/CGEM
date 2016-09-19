@@ -47,6 +47,7 @@ write(999,*) "astarOMA",astarOMA
 write(999,*) "astarOMZ",astarOMZ
 write(999,*) "astarOMR",astarOMR
 write(999,*) "astarOMBC",astarOMBC
+write(999,*) "PARfac",PARfac
 write(999,*) "ws(iCDOM)",ws(iCDOM)
 write(999,*)
 !--Temperature-------------------
@@ -84,6 +85,7 @@ write(999,*) "Qc",Qc
 write(999,*) "Athresh",Athresh
 write(999,*) "ws(iA1:iA(nospA))",ws(iA(1):iA(nospA))
 write(999,*) "mA",mA
+write(999,*) "A_wt",A_wt
 write(999,*)
 !--Zooplankton---------------------
 write(999,*)
@@ -144,12 +146,16 @@ write(999,*)
 write(999,*) "Which_VMix",Which_VMix     
 write(999,*) "KH_coeff",KH_coeff         
 write(999,*) "Which_Outer_BC",Which_Outer_BC
+write(999,*) "wt_pl, wt_po",wt_pl, wt_po
+write(999,*) "wt_l, wt_o",wt_l, wt_o
 write(999,*) "m_OM_init,m_OM_BC,m_OM_sh",m_OM_init,m_OM_BC,m_OM_sh
 write(999,*) "Stoich_x1A_init,Stoich_y1A_init",Stoich_x1A_init,Stoich_y1A_init
 write(999,*) "Stoich_x2A_init,Stoich_y2A_init",Stoich_x2A_init,Stoich_y2A_init
 write(999,*) "Stoich_x1Z_init,Stoich_y1Z_init",Stoich_x1Z_init,Stoich_y1Z_init
 write(999,*) "Stoich_x2Z_init,Stoich_y2Z_init",Stoich_x2Z_init,Stoich_y2Z_init
 write(999,*) "KG_bot",KG_bot
+write(999,*) "MC",MC
+write(999,*) "Which_Output",Which_Output
 write(999,*)
 write(999,*) "stoich_z1R,stoich_z1R",stoich_z1R,stoich_z1R
 write(999,*) "stoich_z2BC,stoich_z2BC",stoich_z2BC,stoich_z2BC

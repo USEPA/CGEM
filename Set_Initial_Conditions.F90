@@ -13,7 +13,7 @@ Subroutine Set_Initial_Conditions(f,S,T,D,fm,lat)
   real, intent(inout) :: f(im,jm,nsl,nf)
   real, intent(in)    :: S(im,jm,nsl),D(im,jm,nsl)!S=Salinity,D=Depth
   real, intent(in)    :: T(im,jm,nsl),lat(jm) !Temperature, latitude
-  real temp,temp_OM1,temp_OM2,total_chl,total_chl_cells
+  real temp,temp_OM1,temp_OM2,total_chl
   real, dimension(1) :: pdbar, rhois !pressure, density
   integer, intent(in) :: fm(im,jm)
   integer i,j,k,isp
@@ -34,14 +34,14 @@ Subroutine Set_Initial_Conditions(f,S,T,D,fm,lat)
             ! C2_chla_mg defined in Conversions module
             ! Convert total Chl to cells
             ! Divide by number of groups
-            total_chl_cells = total_chl * C2_chla_mg_inv / nospA
             do isp=1,nospA
-             f( i, j, k, iA(isp) ) = total_chl_cells
+             f( i, j, k, iA(isp) ) = total_chl * C2_chla_mg_inv * A_wt(isp)
             enddo
 
             ! Zooplankton based on E&R ratio (1000 zooplankton)
-            do isp=1,nospZ
-             f( i, j, k, iZ(isp) ) = 2.e-6 * f( i, j, k, iA(1) ) * 10.**(isp-1)
+            f( i, j, k, iZ(1) ) = 2.e-6 * f( i, j, k, iA(1) )   
+            do isp=2,nospZ
+             f( i, j, k, iZ(isp) ) = 2.e-5 * f( i, j, k, iA(1) ) 
             enddo
 
             !NO3

@@ -83,6 +83,7 @@ error
 submit.sh
 my_submit.sh
 GEM_InputFile
+modules.sh
 
 # Misc
 tags

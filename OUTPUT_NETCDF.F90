@@ -11,7 +11,7 @@ MODULE OUTPUT_NETCDF
   USE NETCDF_UTILITIES ! For CHKERR, DEFDIM, DEFVI1, CONVERT_LONGITUDES, etc.
   USE DATE_TIME ! For TOTAL_SECONDS
 
-  USE Model_dim, ONLY: nf,nospA
+  USE Model_dim, ONLY: nospA,nospZ
   USE INPUT_VARS
   USE CGEM_vars
   USE LIGHT_VARS
@@ -19,354 +19,19 @@ MODULE OUTPUT_NETCDF
   USE TEMP_VARS
 
   IMPLICIT NONE
-  INCLUDE 'mpif.h' ! For MPI_*
 
   ! Private
 
-  INTEGER,PARAMETER:: VARIABLES = 36 
-  CHARACTER(LEN=*),PARAMETER,DIMENSION(VARIABLES):: VARIABLE_NAMES = (/ &
-    'A1    ', &
-    'A2    ', &
-    'A3    ', &
-    'A4    ', &
-    'A5    ', &
-    'A6    ', &
-    'Qn1   ', &
-    'Qn2   ', &
-    'Qn3   ', &
-    'Qn4   ', &
-    'Qn5   ', &
-    'Qn6   ', &
-    'Qp1   ', &
-    'Qp2   ', &
-    'Qp3   ', &
-    'Qp4   ', &
-    'Qp5   ', &
-    'Qp6   ', &
-    'Z1    ', &
-    'Z2    ', &
-    'NO3   ', &
-    'NH4   ', &
-    'PO4   ', &
-    'DIC   ', &
-    'O2    ', &
-    'OM1_A ', &
-    'OM2_A ', &
-    'OM1_Z', &
-    'OM2_Z', &
-    'OM1_R', &
-    'OM2_R', &
-    'CDOM  ', &
-    'Si    ', &
-    'OM1_BC', &
-    'OM2_BC', &
-    'ALK   '  &
-  /)
-  LOGICAL,PARAMETER,DIMENSION(VARIABLES):: WRITE_VARIABLE = (/ &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE.   &
-  /)
-  CHARACTER(LEN=*),PARAMETER,DIMENSION(VARIABLES):: VARIABLE_DESCRIPTIONS = (/&
-    'Phytoplankton group 1 number density.                              ', &
-    'Phytoplankton group 2 number density.                              ', &
-    'Phytoplankton group 3 number density.                              ', &
-    'Phytoplankton group 4 number density.                              ', &
-    'Phytoplankton group 5 number density.                              ', &
-    'Phytoplankton group 6 number density.                              ', &
-    'Phytoplankton group 1 nitrogen quota.                              ', &
-    'Phytoplankton group 2 nitrogen quota.                              ', &
-    'Phytoplankton group 3 nitrogen quota.                              ', &
-    'Phytoplankton group 4 nitrogen quota.                              ', &
-    'Phytoplankton group 5 nitrogen quota.                              ', &
-    'Phytoplankton group 6 nitrogen quota.                              ', &
-    'Phytoplankton group 1 phosphorus quota.                            ', &
-    'Phytoplankton group 2 phosphorus quota.                            ', &
-    'Phytoplankton group 3 phosphorus quota.                            ', &
-    'Phytoplankton group 4 phosphorus quota.                            ', &
-    'Phytoplankton group 5 phosphorus quota.                            ', &
-    'Phytoplankton group 6 phosphorus quota.                            ', &
-    'Zooplantkton group 1 number density.                                ', &
-    'Zooplantkton group 2 number density.                                ', &
-    'Nitrate.                                                            ', &
-    'Ammonium.                                                           ', &
-    'Phosphate.                                                          ', &
-    'Dissolved inorganic carbon.                                         ', &
-    'Molecular oxygen.                                                   ', &
-    'Particulate organic matter derived from dead algae.                 ', &
-    'Dissolved organic matter derived from dead algae.                   ', &
-    'Particulate organic matter derived from zooplankton fecal pellets.  ', &
-    'Dissolved organic matter derived from zooplankton fecal pellets.    ', &
-    'Particulate organic matter derived from river outflow.              ', &
-    'Dissolved organic matter derived from river outflow.                ', &
-    'Colored dissolved organic matter.                                   ', &
-    'Silica.                                                             ', &
-    'Fast reacting organic matter in the initial and boundary conditions ', &
-    'Slow reacting organic matter in the initial and boundary conditions ', &
-    'Alkalinity.                                                         '  &
-  /)
-  CHARACTER(LEN=*),PARAMETER,DIMENSION(VARIABLES):: VARIABLE_UNITS = (/ &
-    'cells/m3                        ', &
-    'cells/m3                        ', &
-    'cells/m3                        ', &
-    'cells/m3                        ', &
-    'cells/m3                        ', &
-    'cells/m3                        ', &
-    'mmol-N/cell                     ', &
-    'mmol-N/cell                     ', &
-    'mmol-N/cell                     ', &
-    'mmol-N/cell                     ', &
-    'mmol-N/cell                     ', &
-    'mmol-N/cell                     ', &
-    'mmol-P/cell                     ', &
-    'mmol-P/cell                     ', &
-    'mmol-P/cell                     ', &
-    'mmol-P/cell                     ', &
-    'mmol-P/cell                     ', &
-    'mmol-P/cell                     ', &
-    'organisms/m3                    ', &
-    'organisms/m3                    ', &
-    'mmol-N/m3                       ', &
-    'mmol-N/m3                       ', &
-    'mmol-P/m3                       ', &
-    'mmol-C/m3                       ', &
-    'mmol-O2/m3                      ', &
-    'mmol-C/m3                       ', &
-    'mmol-C/m3                       ', &
-    'mmol-C/m3                       ', &
-    'mmol-C/m3                       ', &
-    'mmol-C/m3                       ', &
-    'mmol-C/m3                       ', &
-    'ppb                             ', &
-    'mmol-Si/m3                      ', &
-    'mmol-C/m3                       ', &
-    'mmol-C/m3                       ', &
-    'mmol/m3                         '  &
-  /)
-  INTEGER,PARAMETER:: EXTRA_VARIABLES = 42
-  CHARACTER(LEN=*),PARAMETER,DIMENSION(EXTRA_VARIABLES):: &
-    EXTRA_VARIABLE_NAMES = (/ &
-    'irradiance                      ', &
-    'irradiance_fraction             ', &
-    'uN1                             ', &
-    'uN2                             ', &
-    'uN3                             ', &
-    'uN4                             ', &
-    'uN5                             ', &
-    'uN6                             ', &
-    'uP1                             ', &
-    'uP2                             ', &
-    'uP3                             ', &
-    'uP4                             ', &
-    'uP5                             ', &
-    'uP6                             ', &
-    'uE1                             ', &
-    'uE2                             ', &
-    'uE3                             ', &
-    'uE4                             ', &
-    'uE5                             ', &
-    'uE6                             ', &
-    'uA1                             ', &
-    'uA2                             ', &
-    'uA3                             ', &
-    'uA4                             ', &
-    'uA5                             ', &
-    'uA6                             ', &
-    'Chla_mg_tot                     ', &
-    's_x1A                           ', &
-    's_y1A                           ', &
-    's_x2A                           ', &
-    's_y2A                           ', &
-    's_x1Z                           ', &
-    's_x2Z                           ', &
-    's_y1Z                           ', &
-    's_y2Z                           ', &
-    'uSi1                            ', &
-    'uSi2                            ', &
-    'uSi3                            ', &
-    'uSi4                            ', &
-    'uSi5                            ', &
-    'uSi6                            ', &
-    'pH                              '  &
-  /)
-  LOGICAL,PARAMETER,DIMENSION(EXTRA_VARIABLES):: WRITE_EXTRA_VARIABLE = (/ &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE. , &
-    .TRUE.   &
-  /)
-  CHARACTER(LEN=*),PARAMETER,DIMENSION(EXTRA_VARIABLES):: &
-    EXTRA_VARIABLE_DESCRIPTIONS = (/ &
-    'Irradiance at depth.                                                ', &
-    'Fraction of surface irradiance                                      ', &
-    'nitrogen-dependent growth rate for A1                               ', &
-    'nitrogen-dependent growth rate for A2                               ', &
-    'nitrogen-dependent growth rate for A3                               ', &
-    'nitrogen-dependent growth rate for A4                               ', &
-    'nitrogen-dependent growth rate for A5                               ', &
-    'nitrogen-dependent growth rate for A6                               ', &
-    'phosphorus-dependent growth rate for A1                             ', &
-    'phosphorus-dependent growth rate for A2                             ', &
-    'phosphorus-dependent growth rate for A3                             ', &
-    'phosphorus-dependent growth rate for A4                             ', &
-    'phosphorus-dependent growth rate for A5                             ', &
-    'phosphorus-dependent growth rate for A6                             ', &
-    'light-dependent growth rate for A1                                  ', &
-    'light-dependent growth rate for A2                                  ', &
-    'light-dependent growth rate for A3                                  ', &
-    'light-dependent growth rate for A4                                  ', &
-    'light-dependent growth rate for A5                                  ', &
-    'light-dependent growth rate for A6                                  ', &
-    'specific growth rate for A1                                         ', &
-    'specific growth rate for A2                                         ', &
-    'specific growth rate for A3                                         ', &
-    'specific growth rate for A4                                         ', &
-    'specific growth rate for A5                                         ', &
-    'specific growth rate for A6                                         ', &
-    'Total Chla from all phytoplankton                                   ', &
-    'Stoichiometry C:P for OM1_A                                         ', &
-    'Stoichiometry N:P for OM1_A                                         ', &
-    'Stoichiometry C:P for OM2_A                                         ', &
-    'Stoichiometry N:P for OM2_A                                         ', &
-    'Stoichiometry C:P for OM1_Z                                         ', &
-    'Stoichiometry N:P for OM1_Z                                         ', &
-    'Stoichiometry C:P for OM2_Z                                         ', &
-    'Stoichiometry N:P for OM2_Z                                         ', &
-    'silica-dependent growth rate for A1                                 ', &
-    'silica-dependent growth rate for A2                                 ', &
-    'silica-dependent growth rate for A3                                 ', &
-    'silica-dependent growth rate for A4                                 ', &
-    'silica-dependent growth rate for A5                                 ', &
-    'silica-dependent growth rate for A6                                 ', &
-    'pH                                                                  '  &
-  /)
-  CHARACTER(LEN=*),PARAMETER,DIMENSION(EXTRA_VARIABLES):: &
-    EXTRA_VARIABLE_UNITS = (/ &
-    'photons/cm2/s                   ', &
-    '%                               ', &
-    'd-1                             ', &
-    'd-1                             ', &
-    'd-1                             ', &
-    'd-1                             ', &
-    'd-1                             ', &
-    'd-1                             ', &
-    'd-1                             ', &
-    'd-1                             ', &
-    'd-1                             ', &
-    'd-1                             ', &
-    'd-1                             ', &
-    'd-1                             ', &
-    'd-1                             ', &
-    'd-1                             ', &
-    'd-1                             ', &
-    'd-1                             ', &
-    'd-1                             ', &
-    'd-1                             ', &
-    'd-1                             ', &
-    'd-1                             ', &
-    'd-1                             ', &
-    'd-1                             ', &
-    'd-1                             ', &
-    'd-1                             ', &
-    'mg-Chla/m3                      ', &
-    'C:P (mmol/mmol)                 ', &
-    'N:P (mmol/mmol)                 ', &
-    'C:P (mmol/mmol)                 ', &
-    'N:P (mmol/mmol)                 ', &
-    'C:P (mmol/mmol)                 ', &
-    'N:P (mmol/mmol)                 ', &
-    'C:P (mmol/mmol)                 ', &
-    'N:P (mmol/mmol)                 ', &
-    'd-1                             ', &
-    'd-1                             ', &
-    'd-1                             ', &
-    'd-1                             ', &
-    'd-1                             ', &
-    'd-1                             ', &
-    's.u.                            '  &
-  /)
-  INTEGER,DIMENSION(EXTRA_VARIABLES):: EXTRA_VAR ! NetCDF IDs for extra vars.
-  INTEGER,DIMENSION(VARIABLES):: F_VAR ! NetCDF IDs for each variable.
   INTEGER TIME_VAR ! NetCDF ID for time array variable.
   INTEGER FILE_ID ! NetCDF ID for file.
   INTEGER FILE_FIRST_TIMESTEP ! 0-based model timestep number of current file.
   INTEGER SECONDS_PER_TIMESTEP ! Output timestep size in seconds.
   INTEGER(8) SECONDS0 ! Seconds since Model_dim::iYr0.
 
-PUBLIC OUTPUT_VARIABLE_COUNT, WRITE_VARIABLE, CREATE_FILE, OPEN_FILE, &
+
+PUBLIC CREATE_FILE, OPEN_FILE, &
        WRITE_DATA, CLOSE_FILE, FLUSH_FILE, &
-       WRITE_EXTRA_VARIABLE, WRITE_EXTRA_DATA
+       WRITE_EXTRA_DATA
 
 PRIVATE
 CONTAINS
@@ -375,41 +40,22 @@ CONTAINS
 
   ! Commands:
 
-  ! Return number of variables to be written:
-
-  FUNCTION OUTPUT_VARIABLE_COUNT() RESULT( RES )
-    IMPLICIT NONE
-    INTEGER RES
-    INTEGER VARIABLE
-
-    RES = 0
-
-    DO VARIABLE = 1, VARIABLES
-
-      IF ( WRITE_VARIABLE( VARIABLE ) ) THEN
-        RES = RES + 1
-      END IF
-    END DO
-
-    RETURN
-  END FUNCTION OUTPUT_VARIABLE_COUNT
-
-
-
   ! CREATE_FILE: Create output NetCDF file with given header data.
   ! In a concurrent program, only one process should call this routine
   ! then call CLOSE_FILE then
   ! worker processes should call OPEN_FILE, WRITE_DATA, CLOSE_FILE.
   !
-  SUBROUTINE CREATE_FILE( NAME, IM, JM, NSL, NSTEP, &
-                          IYR0, &
+  SUBROUTINE CREATE_FILE( NAME, IM, JM, NSL, NSTEP, VARIABLES,    &
+                          EXTRA_VARIABLES, IYR0, &
                           IYRS, IMONS, IDAYS, IHRS, IMINS, ISECS, &
                           IYRE, IMONE, IDAYE, IHRE, IMINE, ISECE, &
                           DT_OUT, RLON, RLAT, H, FM, DZ)
+    USE Test_Mod
     IMPLICIT NONE
     CHARACTER(LEN=*),INTENT(IN):: NAME
     INTEGER,INTENT(IN):: IM, JM, NSL
     INTEGER,INTENT(IN):: NSTEP
+    INTEGER,INTENT(IN):: VARIABLES, EXTRA_VARIABLES
     INTEGER,INTENT(IN):: IYR0 ! Reference year (before start of model run).
     INTEGER,INTENT(IN):: IYRS, IMONS, IDAYS, IHRS, IMINS, ISECS ! Run start.
     INTEGER,INTENT(IN):: IYRE, IMONE, IDAYE, IHRE, IMINE, ISECE ! Run end.
@@ -427,23 +73,22 @@ CONTAINS
     INTEGER IM_DIM, JM_DIM, NSL_DIM, NSTEPP1_DIM
     INTEGER RLON_VAR, RLAT_VAR, H_VAR, FM_VAR
     INTEGER DZ_VAR
-    INTEGER K
+    INTEGER K, i
     INTEGER ERR, VARIABLE, DIM_IDS( 4 )
     REAL,DIMENSION(IM):: RLON_COPY
     CHARACTER(LEN=40):: TIME_UNITS
+    CHARACTER(LEN=14):: var
     FILE_ID = -1
 
     ! Create/overwrite NetCDF output file:
     ERR = NF_CREATE( trim(NAME), 770, FILE_ID) 
     CALL CHKERR( ERR, 'create NetCDF output file ' // NAME )
-
     ! Create dimensions:
     CALL DEFDIM( FILE_ID, IM_DIM, 'longitude', IM )
     CALL DEFDIM( FILE_ID, JM_DIM, 'latitude', JM )
     CALL DEFDIM( FILE_ID, NSL_DIM, 'k', NSL )
 !!  CALL DEFDIM( FILE_ID, NSTEPP1_DIM, 'time', NSTEP )
     CALL DEFDIM( FILE_ID, NSTEPP1_DIM, 'time', 0 ) ! 0 Means UNLIMITED size.
-
     ! Write global scalar attributes:
 
     CALL DEFTAT( FILE_ID, 'Run_Identifier', TRIM(CODE_ID) )
@@ -536,54 +181,58 @@ CONTAINS
     CALL DEFRAT( FILE_ID, 'astarOMR', astarOMR  )
     CALL DEFRAT( FILE_ID, 'astarOMBC', astarOMBC  )
     CALL DEFRAT( FILE_ID, 'sink CDOM', ws(iCDOM)  )
+    CALL DEFRAT( FILE_ID, 'PARfac', PARfac  )
 !Temperature
     CALL DEFTAT( FILE_ID, 'Calibration3', 'Temperature in GEM.')
-    CALL DEFRAT8( FILE_ID, 'Tref', Tref )
-    CALL DEFRAT8( FILE_ID, 'KTg1', KTg1 )
-    CALL DEFRAT8( FILE_ID, 'KTg2', KTg2 )
-    CALL DEFRAT8( FILE_ID, 'Ea_R', Ea_R )
+    CALL DEFRATX( FILE_ID, 'Tref', Tref, nospA+nospZ )
+    CALL DEFRATX( FILE_ID, 'KTg1', KTg1, nospA+nospZ )
+    CALL DEFRATX( FILE_ID, 'KTg2', KTg2, nospA+nospZ )
+    CALL DEFRATX( FILE_ID, 'Ea_R', Ea_R, nospA+nospZ )
 !Phytoplankton
     CALL DEFTAT( FILE_ID, 'Calibration4', 'Phytoplankton in GEM.')
-    CALL DEFRAT6( FILE_ID, 'ediblevector1', ediblevector(1,:) )
-    CALL DEFRAT6( FILE_ID, 'ediblevector2', ediblevector(2,:) )
-    CALL DEFRAT6( FILE_ID, 'umax', umax )
-    CALL DEFRAT6( FILE_ID, 'alpha', alpha )
-    CALL DEFRAT6( FILE_ID, 'beta', beta )
-    CALL DEFRAT6( FILE_ID, 'respg', respg )
-    CALL DEFRAT6( FILE_ID, 'respb', respb )
-    CALL DEFRAT6( FILE_ID, 'QminN', QminN  )
-    CALL DEFRAT6( FILE_ID, 'QminP', QminP )
-    CALL DEFRAT6( FILE_ID, 'QmaxN', QmaxN )
-    CALL DEFRAT6( FILE_ID, 'QmaxP', QmaxP  )
-    CALL DEFRAT6( FILE_ID, 'Kn', Kn  )
-    CALL DEFRAT6( FILE_ID, 'Kp', Kp  )
-    CALL DEFRAT6( FILE_ID, 'Ksi', Ksi  )
-    CALL DEFRAT6( FILE_ID, 'KQn', KQn )
-    CALL DEFRAT6( FILE_ID, 'KQp', KQp  )
-    CALL DEFRAT6( FILE_ID, 'nfQs', nfQs )
-    CALL DEFRAT6( FILE_ID, 'vmaxN', vmaxN  )
-    CALL DEFRAT6( FILE_ID, 'vmaxP', vmaxP  )
-    CALL DEFRAT6( FILE_ID, 'vmaxSi', vmaxSi  )
-    CALL DEFRAT6( FILE_ID, 'aN', aN )
-    CALL DEFRAT6( FILE_ID, 'volcell', volcell  )
-    CALL DEFRAT6( FILE_ID, 'Qc', Qc  )
-    CALL DEFRAT6( FILE_ID, 'Athresh', Athresh )
-    CALL DEFRAT6( FILE_ID, 'sink A', ws(iA(1):iA(nospA))  )
-    CALL DEFRAT6( FILE_ID, 'mA', mA )
+    do i=1,nospZ
+       write(var,'(A12,i2)') 'ediblevector',i
+       CALL DEFRATX( FILE_ID, var, ediblevector(i,:), nospA )
+    enddo
+    CALL DEFRATX( FILE_ID, 'umax', umax, nospA )
+    CALL DEFRATX( FILE_ID, 'alpha', alpha, nospA )
+    CALL DEFRATX( FILE_ID, 'beta', beta, nospA )
+    CALL DEFRATX( FILE_ID, 'respg', respg, nospA )
+    CALL DEFRATX( FILE_ID, 'respb', respb, nospA )
+    CALL DEFRATX( FILE_ID, 'QminN', QminN, nospA  )
+    CALL DEFRATX( FILE_ID, 'QminP', QminP, nospA )
+    CALL DEFRATX( FILE_ID, 'QmaxN', QmaxN, nospA )
+    CALL DEFRATX( FILE_ID, 'QmaxP', QmaxP, nospA  )
+    CALL DEFRATX( FILE_ID, 'Kn', Kn, nospA  )
+    CALL DEFRATX( FILE_ID, 'Kp', Kp, nospA  )
+    CALL DEFRATX( FILE_ID, 'Ksi', Ksi, nospA  )
+    CALL DEFRATX( FILE_ID, 'KQn', KQn, nospA )
+    CALL DEFRATX( FILE_ID, 'KQp', KQp, nospA  )
+    CALL DEFRATX( FILE_ID, 'nfQs', nfQs, nospA )
+    CALL DEFRATX( FILE_ID, 'vmaxN', vmaxN, nospA  )
+    CALL DEFRATX( FILE_ID, 'vmaxP', vmaxP, nospA  )
+    CALL DEFRATX( FILE_ID, 'vmaxSi', vmaxSi, nospA  )
+    CALL DEFRATX( FILE_ID, 'aN', aN, nospA )
+    CALL DEFRATX( FILE_ID, 'volcell', volcell, nospA  )
+    CALL DEFRATX( FILE_ID, 'Qc', Qc, nospA  )
+    CALL DEFRATX( FILE_ID, 'Athresh', Athresh, nospA )
+    CALL DEFRATX( FILE_ID, 'sink A', ws(iA(1):iA(nospA)), nospA  )
+    CALL DEFRATX( FILE_ID, 'mA', mA, nospA )
+    CALL DEFRATX( FILE_ID, 'A_wt', A_wt, nospA )
 
 !Zooplankton
     CALL DEFTAT( FILE_ID, 'Calibration5', 'Zooplankton in GEM.')
-    CALL DEFRAT2( FILE_ID, 'Zeffic', Zeffic )
-    CALL DEFRAT2( FILE_ID, 'Zslop', Zslop )
-    CALL DEFRAT2( FILE_ID, 'Zvolcell', Zvolcell )
-    CALL DEFRAT2( FILE_ID, 'ZQc', ZQc )
-    CALL DEFRAT2( FILE_ID, 'ZQn', ZQn )
-    CALL DEFRAT2( FILE_ID, 'ZQp', ZQp )
-    CALL DEFRAT2( FILE_ID, 'ZKa', ZKa )
-    CALL DEFRAT2( FILE_ID, 'Zrespg', Zrespg )
-    CALL DEFRAT2( FILE_ID, 'Zrespb', Zrespb )
-    CALL DEFRAT2( FILE_ID, 'Zumax', Zumax )
-    CALL DEFRAT2( FILE_ID, 'Zm', Zm )
+    CALL DEFRATX( FILE_ID, 'Zeffic', Zeffic, nospZ )
+    CALL DEFRATX( FILE_ID, 'Zslop', Zslop, nospZ )
+    CALL DEFRATX( FILE_ID, 'Zvolcell', Zvolcell, nospZ )
+    CALL DEFRATX( FILE_ID, 'ZQc', ZQc, nospZ )
+    CALL DEFRATX( FILE_ID, 'ZQn', ZQn, nospZ )
+    CALL DEFRATX( FILE_ID, 'ZQp', ZQp, nospZ )
+    CALL DEFRATX( FILE_ID, 'ZKa', ZKa, nospZ )
+    CALL DEFRATX( FILE_ID, 'Zrespg', Zrespg, nospZ )
+    CALL DEFRATX( FILE_ID, 'Zrespb', Zrespb, nospZ )
+    CALL DEFRATX( FILE_ID, 'Zumax', Zumax, nospZ )
+    CALL DEFRATX( FILE_ID, 'Zm', Zm, nospZ )
 
 !Organic Matter
     CALL DEFTAT( FILE_ID, 'Calibration6', 'Optics in GEM.')
@@ -593,7 +242,8 @@ CONTAINS
     CALL DEFRAT( FILE_ID, 'KG2_R', KG2_R  )
     CALL DEFRAT( FILE_ID, 'KG1_BC', KG1_BC  )
     CALL DEFRAT( FILE_ID, 'KG2_BC', KG2_BC  )
-    CALL DEFRAT( FILE_ID, 'k11', k11 )
+    CALL DEFRAT( FILE_ID, 'KNH4', KNH4 )
+    CALL DEFRAT( FILE_ID, 'nitmax', nitmax )
     CALL DEFRAT( FILE_ID, 'KO2', KO2 )
     CALL DEFRAT( FILE_ID, 'KstarO2', KstarO2  )
     CALL DEFRAT( FILE_ID, 'KNO3', KNO3  )
@@ -627,6 +277,10 @@ CONTAINS
     CALL DEFIAT( FILE_ID, 'Which_VMix', Which_VMix  )
     CALL DEFRAT( FILE_ID, 'KH_coeff', KH_coeff )
     CALL DEFIAT( FILE_ID, 'Which_Outer_BC', Which_Outer_BC  )
+    CALL DEFRAT( FILE_ID, 'wt_pl', wt_pl  )
+    CALL DEFRAT( FILE_ID, 'wt_po', wt_po  )
+    CALL DEFRAT( FILE_ID, 'wt_l', wt_l  )
+    CALL DEFRAT( FILE_ID, 'wt_o', wt_o  )
     CALL DEFRAT( FILE_ID, 'm_OM_init', m_OM_init )
     CALL DEFRAT( FILE_ID, 'm_OM_BC', m_OM_BC )
     CALL DEFRAT( FILE_ID, 'm_OM_sh', m_OM_sh )
@@ -639,6 +293,8 @@ CONTAINS
     CALL DEFRAT( FILE_ID, 'Stoich_x2Z_init', Stoich_x2Z_init  )
     CALL DEFRAT( FILE_ID, 'Stoich_y2Z_init', Stoich_y2Z_init  )
     CALL DEFRAT( FILE_ID, 'KG_bot', KG_bot  )
+    CALL DEFIAT( FILE_ID, 'MC', MC   )
+    CALL DEFIAT( FILE_ID, 'Which_Output', Which_Output   )
 
     ! Define non-time-varying array variables:
 
@@ -652,7 +308,6 @@ CONTAINS
                  'Mask: 0 = land, 1 = water.', 'none' )
     CALL DEFVR3( FILE_ID, IM_DIM, JM_DIM, NSL_DIM, DZ_VAR, 'dz', &
                  'Thickness of cell.', 'none' )
-
     ! Define time array variable as each output data's seconds since IYR0:
 
     WRITE ( TIME_UNITS, '(A,I4.4,A)' ) &
@@ -673,7 +328,6 @@ CONTAINS
     DIM_IDS( 4 ) = NSTEPP1_DIM
 
     DO VARIABLE = 1, VARIABLES
-
       IF ( WRITE_VARIABLE( VARIABLE ) ) THEN
         CALL DEFVR4( FILE_ID, DIM_IDS, F_VAR( VARIABLE ), &
                      TRIM( VARIABLE_NAMES( VARIABLE ) ), &
@@ -681,7 +335,6 @@ CONTAINS
                      TRIM( VARIABLE_UNITS( VARIABLE ) ) )
       END IF
     END DO
-
 
     ! Define extra time-varying array variables:
 
@@ -735,6 +388,8 @@ CONTAINS
     ERR = NF_PUT_VAR_REAL( FILE_ID, DZ_VAR, DZ )
     CALL CHKERR( ERR, 'write output variable dz' )
 
+
+
     CALL FLUSH_FILE()
 
 
@@ -748,10 +403,12 @@ CONTAINS
   ! OPEN_FILE, WRITE_DATA, CLOSE_FILE.
   ! FIRST_TIMESTEP is 0-based timestep number to begin writing.
   !
-  SUBROUTINE OPEN_FILE( NAME, FIRST_TIMESTEP )
+  SUBROUTINE OPEN_FILE( NAME, VARIABLES, EXTRA_VARIABLES, FIRST_TIMESTEP )
+    USE Test_Mod
     IMPLICIT NONE
     CHARACTER(LEN=*),INTENT(IN):: NAME
     INTEGER,INTENT(IN):: FIRST_TIMESTEP
+    INTEGER,INTENT(IN):: VARIABLES, EXTRA_VARIABLES
     ! External NetCDF routines:
     INTEGER NF__OPEN, NF_INQ_VARID, NF_GET_ATT_INT, NF_GET_ATT_REAL
     EXTERNAL NF__OPEN, NF_INQ_VARID, NF_GET_ATT_INT, NF_GET_ATT_REAL
@@ -798,7 +455,7 @@ CONTAINS
     DO VARIABLE = 1, VARIABLES
 
       IF ( WRITE_VARIABLE( VARIABLE ) ) THEN
-        ERR = NF_INQ_VARID( FILE_ID, VARIABLE_NAMES( VARIABLE ), &
+        ERR = NF_INQ_VARID( FILE_ID, TRIM(VARIABLE_NAMES( VARIABLE )), &
                                F_VAR( VARIABLE ) )
         CALL CHKERR( ERR, 'inquire NetCDF variable ID ' )
       END IF
@@ -809,7 +466,7 @@ CONTAINS
     DO VARIABLE = 1, EXTRA_VARIABLES
 
       IF ( WRITE_EXTRA_VARIABLE( VARIABLE ) ) THEN
-        ERR = NF_INQ_VARID( FILE_ID, EXTRA_VARIABLE_NAMES( VARIABLE ), &
+        ERR = NF_INQ_VARID( FILE_ID, TRIM(EXTRA_VARIABLE_NAMES( VARIABLE )), &
                                EXTRA_VAR( VARIABLE ) )
         CALL CHKERR( ERR, 'inquire NetCDF variable ID ' )
       END IF
@@ -840,9 +497,10 @@ CONTAINS
   ! Called by non-concurrent programs to write all data per timestep.
   !
 
-  SUBROUTINE WRITE_DATA( IM, JM, NSL, TIMESTEP, F ) 
+  SUBROUTINE WRITE_DATA( IM, JM, NSL, VARIABLES, TIMESTEP, F ) 
+    USE Test_Mod
     IMPLICIT NONE
-    INTEGER,INTENT(IN):: IM, JM, NSL, TIMESTEP ! Model TIMESTEP is 0-based.
+    INTEGER,INTENT(IN):: IM, JM, NSL, VARIABLES, TIMESTEP ! Model TIMESTEP is 0-based.
     REAL,DIMENSION(IM, JM, NSL, VARIABLES):: F
     ! External NetCDF routines:
     INTEGER NF_PUT_VARA_REAL, NF_PUT_VARA_DOUBLE, NF_SYNC
@@ -893,13 +551,14 @@ CONTAINS
   ! WRITE_EXTRA_DATA: Write current timestep data to output file.
   ! Called by concurrent programs to write all data per timestep
   !
-  SUBROUTINE WRITE_EXTRA_DATA( IM, JM, NSL, SPECIES, &
+  SUBROUTINE WRITE_EXTRA_DATA( IM, JM, NSL, EXTRA_VARIABLES, SPECIES, &
                                TIMESTEP, IRRADIANCE, IRRADIANCE_FRACTION,    &
                                UN, UP, UE, UA, CHLA_MG_TOT,                  &
                                S_X1A, S_Y1A, S_X2A, S_Y2A,                   &
-                               S_X1FP, S_Y1FP, S_X2FP, S_Y2FP, USI, pH )
+                               S_X1FP, S_Y1FP, S_X2FP, S_Y2FP, USI, ChlC, pH, R_11 )
+    USE Test_Mod
     IMPLICIT NONE
-    INTEGER,INTENT(IN):: IM, JM, NSL, SPECIES, TIMESTEP
+    INTEGER,INTENT(IN):: IM, JM, NSL, EXTRA_VARIABLES, SPECIES, TIMESTEP
     REAL,DIMENSION(IM, JM, NSL):: IRRADIANCE
     REAL,DIMENSION(IM, JM, NSL):: IRRADIANCE_FRACTION
     REAL,DIMENSION(IM, JM, NSL, SPECIES):: UN
@@ -907,10 +566,12 @@ CONTAINS
     REAL,DIMENSION(IM, JM, NSL, SPECIES):: UE
     REAL,DIMENSION(IM, JM, NSL, SPECIES):: UA
     REAL,DIMENSION(IM, JM, NSL, SPECIES):: USI
+    REAL,DIMENSION(IM, JM, NSL, SPECIES):: ChlC 
     REAL,DIMENSION(IM, JM, NSL):: CHLA_MG_TOT
     REAL,DIMENSION(IM, JM, NSL):: S_X1A, S_Y1A, S_X2A, S_Y2A
     REAL,DIMENSION(IM, JM, NSL):: S_X1FP, S_Y1FP, S_X2FP, S_Y2FP
     REAL,DIMENSION(IM, JM, NSL):: pH
+    REAL,DIMENSION(IM, JM, NSL):: R_11
     ! External NetCDF routines:
     INTEGER NF_PUT_VARA_REAL, NF_SYNC
     EXTERNAL NF_PUT_VARA_REAL, NF_SYNC
@@ -1104,12 +765,35 @@ CONTAINS
       END IF
     END DO
 
+    DO INDEX = 1, SPECIES ! ChlC(:,:,:,SPECIES):
+      VARIABLE = VARIABLE + 1
+
+      IF ( WRITE_EXTRA_VARIABLE( VARIABLE ) ) THEN
+        ERR = NF_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
+                                    STARTS, COUNTS, &
+                                    ChlC( 1, 1, 1, INDEX ))
+        CALL CHKERR( ERR, 'write output variable  ' &
+                     // EXTRA_VARIABLE_NAMES( VARIABLE ) )
+      END IF
+    END DO
+
+
     VARIABLE = VARIABLE + 1 ! pH:
 
     IF ( WRITE_EXTRA_VARIABLE( VARIABLE ) ) THEN
       ERR = NF_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
                                   STARTS, COUNTS, &
                                    pH( 1, 1, 1 ))
+      CALL CHKERR( ERR, 'write output variable  ' &
+                   // EXTRA_VARIABLE_NAMES( VARIABLE ) )
+    END IF
+
+    VARIABLE = VARIABLE + 1 ! R_11:
+
+    IF ( WRITE_EXTRA_VARIABLE( VARIABLE ) ) THEN
+      ERR = NF_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
+                                  STARTS, COUNTS, &
+                                   R_11( 1, 1, 1 ))
       CALL CHKERR( ERR, 'write output variable  ' &
                    // EXTRA_VARIABLE_NAMES( VARIABLE ) )
     END IF
@@ -1135,7 +819,6 @@ CONTAINS
     INTEGER NF_PUT_VARA_REAL, NF_SYNC
     EXTERNAL NF_PUT_VARA_REAL, NF_SYNC
     INTEGER ERR
-
     ERR = NF_SYNC( FILE_ID )
     CALL CHKERR( ERR, 'flush buffers to disk ' )
 

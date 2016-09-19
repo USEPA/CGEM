@@ -37,7 +37,7 @@ OBJ  =  Model_dim.o\
 	DATE_TIME.o\
 	MOD_EPACOM_GEM_UTILITIES.o\
 	NETCDF_UTILITIES.o\
-	OUTPUT_NETCDF_2.o\
+	OUTPUT_NETCDF.o\
 	OUTPUT_NETCDF_allocate.o\
 	DailyRad.o\
 	DailyRad_allocate.o\

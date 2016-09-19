@@ -11,7 +11,7 @@ IMPLICIT NONE
 
 integer i,icent_jcent_units
 integer iFijn,isp,isz
-real rlat(jm),rlon(im),i_in,j_in
+real rlat(jm),rlon(im),i_in,j_in,tot
 character*120 filename
 
 ws = 0.
@@ -56,6 +56,7 @@ read(999,*) astarOMA
 read(999,*) astarOMZ
 read(999,*) astarOMR
 read(999,*) astarOMBC
+read(999,*) PARfac
 read(999,*) ws(iCDOM)
 read(999,*)
 !--Temperature-------------------
@@ -94,6 +95,7 @@ read(999,*) (Qc(i), i=1,nospA)
 read(999,*) (Athresh(i), i=1,nospA)
 read(999,*) (ws(i), i=1,nospA)
 read(999,*) (mA(i), i=1,nospA)
+read(999,*) (A_wt(i), i=1,nospA)
 read(999,*)
 !--Zooplankton---------------------
 read(999,*)
@@ -154,12 +156,17 @@ read(999,*)
 read(999,*) Which_Vmix   
 read(999,*) KH_coeff  
 read(999,*) Which_Outer_BC 
+read(999,*) !Comment Line
+read(999,*) wt_pl,wt_po
+read(999,*) wt_l,wt_o
 read(999,*) m_OM_init,m_OM_BC,m_OM_sh 
 read(999,*) Stoich_x1A_init,Stoich_y1A_init
 read(999,*) Stoich_x2A_init,Stoich_y2A_init
 read(999,*) Stoich_x1Z_init,Stoich_y1Z_init
 read(999,*) Stoich_x2Z_init,Stoich_y2Z_init
 read(999,*) KG_bot
+read(999,*) MC
+read(999,*) Which_Output
 !---------------------------------------------------
 close(999)
 
@@ -189,6 +196,16 @@ Athresh  = Athresh*volcell   ! Threshold for grazing, um^3/m3
 do isp=1,nospA
    alphad(isp) = alpha(isp)/umax(isp) ! Initial slope of photosynthesis-irradiance curve / Vmax
    betad(isp)  = beta(isp)/umax(isp)  ! Photoinhibition constant / Vmax
+enddo
+
+!Convert relative proportions of phytoplankton to percentage of total chlA
+tot = SUM(A_wt)
+if(tot.le.0) then
+ write(6,*) "Error in A_wt, A_wt.le.0"
+ stop
+endif
+do isp=1,nospA
+   A_wt(isp) = A_wt(isp)/tot
 enddo
 
 return

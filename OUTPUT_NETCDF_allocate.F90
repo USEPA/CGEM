@@ -129,8 +129,8 @@ Subroutine OUTPUT_NETCDF_allocate
     VARIABLE_DESCRIPTIONS(counter+11) = 'Dissolved organic matter derived from river outflow.                '
     VARIABLE_DESCRIPTIONS(counter+12) = 'Colored dissolved organic matter.                                   '
     VARIABLE_DESCRIPTIONS(counter+13) = 'Silica.                                                             '
-    VARIABLE_DESCRIPTIONS(counter+14) = 'Fast reacting organic matter in the initial and boundary conditions '
-    VARIABLE_DESCRIPTIONS(counter+15) = 'Slow reacting organic matter in the initial and boundary conditions '
+    VARIABLE_DESCRIPTIONS(counter+14) = 'Particulate organic matter in the initial and boundary conditions '
+    VARIABLE_DESCRIPTIONS(counter+15) = 'Dissolved organic matter in the initial and boundary conditions '
     VARIABLE_DESCRIPTIONS(counter+16) = 'Alkalinity.                                                         '
 
   ALLOCATE(VARIABLE_UNITS(nf))
@@ -342,7 +342,7 @@ endif
   enddo
 endif
     EXTRA_VARIABLE_DESCRIPTIONS(counter+1) = 'pH                            '  
-    EXTRA_VARIABLE_DESCRIPTIONS(counter+2) = 'RNO3 Denitrification Term       '
+    EXTRA_VARIABLE_DESCRIPTIONS(counter+2) = 'RN2 Denitrification Term       '
 
   ALLOCATE(EXTRA_VARIABLE_UNITS(EXTRA_VARIABLES))
     EXTRA_VARIABLE_UNITS(1) = 'photons/cm2/s                   '

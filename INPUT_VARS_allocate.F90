@@ -30,6 +30,7 @@ ALLOCATE( volcell(nospA) )
 ALLOCATE( Qc(nospA) )
 ALLOCATE( Athresh(nospA) )
 ALLOCATE( mA(nospA) )
+ALLOCATE( A_wt(nospA) )
 !---Zooplankton
 ALLOCATE( Zeffic(nospZ) )
 ALLOCATE( Zslop(nospZ) )
