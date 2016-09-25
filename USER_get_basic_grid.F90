@@ -1,10 +1,11 @@
-      subroutine USER_get_basic_grid(dz,d,d_sfc)
+      subroutine USER_get_basic_grid(dz,d,d_sfc,Vol)
 
       USE Model_dim
 
       real, intent (out) :: dz(im,jm,nsl)
       real, intent (out) :: d(im,jm,nsl)
       real, intent (out) :: d_sfc(im,jm,nsl)
+      real, intent (out) :: Vol(im,jm,nsl)
 
 !      dz = 25.             !Thickness of cell
 !      d  = 25.             !Depth from surface to bottom of cell
@@ -27,6 +28,10 @@
       read (19,*) d_sfc 
       close(19)
 
+      open (19,file='./data/Vol.dat',status='old')
+      read (19,*)    !Assumes header file
+      read (19,*) Vol 
+      close(19)
 
       return
 

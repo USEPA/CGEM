@@ -46,18 +46,25 @@
       integer c_count
 
       character*120 input_filename !Input file
+      character*6 Which_code
 !------------------------------------------------ 
 
 ! --- Command Line Arguments for file names ---
        c_count = command_argument_count()
+         Which_code = "CGEM" 
          input_filename = "GEM_InputFile"
          BASE_NETCDF_OUTPUT_FILE_NAME = './NETCDF/output.'
        if (c_count.eq.1) then
-         call get_command_argument(1,input_filename)  !User selects input file name
+         call get_command_argument(1,Which_code)  !User selects which code 
        elseif (c_count.eq.2) then
-         call get_command_argument(1,input_filename)
-         call get_command_argument(2,BASE_NETCDF_OUTPUT_FILE_NAME) !User selects output file name
+         call get_command_argument(1,Which_code)   
+         call get_command_argument(2,input_filename)  !User selects input file name
+       elseif (c_count.eq.3) then
+         call get_command_argument(1,Which_code)  
+         call get_command_argument(2,input_filename) 
+         call get_command_argument(3,BASE_NETCDF_OUTPUT_FILE_NAME) !User selects output file name
        endif
+       write(6,*) "Biogeochem equations are: ",Which_code
        write(6,*) "Base Outputfile Name will be: ",trim(BASE_NETCDF_OUTPUT_FILE_NAME)
        write(6,*) "Inputfile will be: ",trim(input_filename)
 
@@ -70,32 +77,33 @@
       read(19,*) nsl 
       read(19,*) nospA
       read(19,*) nospZ
-      !read(19,*) nf
       close(19)
 
-      !if(nospA*3+nospZ+16.ne.nf) then
-      !  write(6,*) "Wrong number of variables."
-      !  write(6,*) "Variables should be nospA*3 + nospZ + 16"
-      !  write(6,*) "I am going to change your nf to ",nospA*3+nospZ+16
-        nf = nospA*3+nospZ+16
-      !endif
-
-!Calculate EXTRA_VARIABLES for netCDF:
-     !ir,irfrac,uN(nospA),uP(nospA),uE(nospA),uA(nospA),Chla,s_xy(8),uSi(nospA),pH,ChlC(nospA),R_11
-      EXTRA_VARIABLES = 13 + 6*nospA
- 
-      call CGEM_vars_allocate()
-      call INPUT_VARS_allocate()
-      call TEMP_VARS_allocate()
-      call STOICH_VARS_allocate()
-      call MASS_BALANCE_allocate()
-      call DailyRad_allocate()
-      call SDM_allocate()
-      call JWMod_allocate()
-      call OUTPUT_NETCDF_allocate()
-
-! --- Call CGEM
-      call CGEM(input_filename,BASE_NETCDF_OUTPUT_FILE_NAME)
+      if(Which_code.eq."GOMDOM") then !CGEM
+         nf = 19
+         EXTRA_VARIABLES = 5
+         call OUTPUT_NETCDF_GD_allocate()
+         call INPUT_VARS_GD_allocate()
+         call eut_allocate()
+         call InRemin_allocate()
+         call MASS_BALANCE_GD_allocate()
+         call GoMDOM(input_filename,BASE_NETCDF_OUTPUT_FILE_NAME)
+      else
+         nf = nospA*3+nospZ+16
+        !Calculate EXTRA_VARIABLES for netCDF:
+        !ir,irfrac,uN(nospA),uP(nospA),uE(nospA),uA(nospA),Chla,s_xy(8),uSi(nospA),pH,ChlC(nospA),R_11
+         EXTRA_VARIABLES = 13 + 6*nospA
+         call CGEM_vars_allocate()
+         call INPUT_VARS_allocate()
+         call TEMP_VARS_allocate()
+         call STOICH_VARS_allocate()
+         call MASS_BALANCE_allocate()
+         call DailyRad_allocate()
+         call SDM_allocate()
+         call JWMod_allocate()
+         call OUTPUT_NETCDF_allocate()
+         call CGEM(input_filename,BASE_NETCDF_OUTPUT_FILE_NAME)
+      endif
 
 !----------------------------------------------------------------
 ! If we get here, there will be a normal exit from the program and

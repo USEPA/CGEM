@@ -8,7 +8,7 @@
 ### =============== User Modifiable Section =============== ###
 
 ### Uncomment the next line to enable debugging
-#DFLAGS = -warn -debug all -g -check all -ftrapuv #-DDEBUG -mcmodel=medium -shared-intel 
+#DFLAGS = -warn -debug all -g -check all -ftrapuv  #-DDEBUG -mcmodel=medium -shared-intel 
 
 ### Build options for specific platforms. 
 ### LIBS has path to pnetCDF
@@ -30,7 +30,7 @@ MY_HOST	  = $(shell hostname)
 ifeq (iris,$(findstring iris,$(MY_HOST)))
   INC	   = $(IRIS_INC)
   LIBS	   = $(IRIS_LIBS)
-  F90      = gfortran #ifort
+  F90      = ifort #gfortran #ifort
   FFLAGS = #-Warn all -traceback #-check -debug -g       #-g -fbacktrace -Wall 
 else 
 ifeq (sol,$(findstring sol,$(MY_HOST)))

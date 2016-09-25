@@ -85,7 +85,35 @@ OBJ  =  Model_dim.o\
 	USER_output_data.o\
 	USER_Read_Solar.o\
 	USER_Read_Wind.o\
-	USER_Set_Initial_Conditions.o
+	USER_Set_Initial_Conditions.o\
+	INPUT_VARS_GD.o\
+	INPUT_VARS_GD_allocate.o\
+	states.o\
+	eut.o\
+	eut_allocate.o\
+	flags.o\
+	Test_Mod_GD.o\
+	OUTPUT_NETCDF_GD_allocate.o\
+	InRemin.o\
+	InRemin_allocate.o\
+	OUTPUT_NETCDF_GD.o\
+	GoMDOM.o\
+	Read_InputFile_GD.o\
+	USER_Set_Initial_Conditions_GD.o\
+	Flux_GD.o\
+	Set_Initial_Conditions_GD.o\
+	eutro.o\
+	zoo.o\
+	diatoms.o\
+	greens.o\
+	MASS_BALANCE_GD.o\
+	MASS_BALANCE_GD_allocate.o\
+	carbon.o\
+	phosph.o\
+	nitrog.o\
+	silica.o\
+	dissolved_oxygen.o\
+	exchange.o
 
 # implicitnone on compile line must be disabled for these diagenesis
 # related files. If IMPLICIT NONE is used, it is declared within the

@@ -77,10 +77,11 @@ if(InitializeHow.ne.0.and.InitializeHow.ne.1.and.InitializeHow.ne.2.and.Initiali
 endif
 
 ! When InitializeHow = 3, RESTART_FILE_TIMESTEP needs to be specified.
-if((InitializeHow.eq.3) .and. (RESTART_FILE_TIMESTEP.eq.0)) then
-  write(6,*) "RESTART_FILE_TIMESTEP should be a non-zero value when InitilaizeHow = 3."
-  stop
-endif
+!Do not use for FishTank
+!if((InitializeHow.eq.3) .and. (RESTART_FILE_TIMESTEP.eq.0)) then
+!  write(6,*) "RESTART_FILE_TIMESTEP should be a non-zero value when InitilaizeHow = 3."
+!  stop
+!endif
 
 
 !read(999,*) Which_Vmix   

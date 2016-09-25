@@ -98,22 +98,22 @@ Subroutine OUTPUT_NETCDF_allocate
    counter = 0
   do i=1,nospA
     counter = counter + 1
-    write(var2,'(A21,i3,A15)') 'Phytoplantkton group ',i," number density"
+    write(var2,'(A21,i3,A15)') 'Phytoplankton group ',i," number density"
     VARIABLE_DESCRIPTIONS(counter) = var2
   enddo
   do i=1,nospA
     counter = counter + 1
-    write(var2,'(A22,i3,A20)') 'Phytoplantkton group ',i," nitrogen quota."
+    write(var2,'(A22,i3,A20)') 'Phytoplankton group ',i," nitrogen quota."
     VARIABLE_DESCRIPTIONS(counter) = var2
   enddo
   do i=1,nospA
     counter = counter + 1
-    write(var2,'(A22,i3,A20)') 'Phytoplantkton group ',i," phosphorus quota." 
+    write(var2,'(A22,i3,A20)') 'Phytoplankton group ',i," phosphorus quota." 
     VARIABLE_DESCRIPTIONS(counter) = var2
   enddo
    do i=1,nospZ
     counter = counter + 1
-    write(var2,'(A22,i3,A20)') 'Zooplantkton group ',i," number density."
+    write(var2,'(A22,i3,A20)') 'Zooplankton group ',i," number density."
     VARIABLE_DESCRIPTIONS(counter) = var2
   enddo
     VARIABLE_DESCRIPTIONS(counter+1) = 'Nitrate.  '
@@ -385,8 +385,8 @@ endif
     EXTRA_VARIABLE_UNITS(counter+1) = 's.u.                            '  
     EXTRA_VARIABLE_UNITS(counter+2) = 'mmol-N/m3                       '
 
-  ALLOCATE(EXTRA_VAR(EXTRA_VARIABLES))  ! NetCDF IDs for extra vars.
   ALLOCATE(F_VAR(nf)) ! NetCDF IDs for each variable.
+  ALLOCATE(EXTRA_VAR(EXTRA_VARIABLES))  ! NetCDF IDs for extra vars.
 
 END Subroutine OUTPUT_NETCDF_allocate
 

@@ -59,7 +59,14 @@ nparray.mod
 sdm.mod
 stoich_vars.mod
 test_mod.mod
-
+input_vars_gd.mod
+test_mod_gd.mod
+output_netcdf_gd.mod
+mass_balance_gd.mod
+eut.mod
+inremin.mod
+states.mod
+flags.mod
 #
 # Keep directories but not contents. [Not sure if this works.]
 NETCDF/**
