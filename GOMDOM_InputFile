@@ -8,8 +8,8 @@
 -92.39 29.03		!- Cell i,j coord (if grid-units) or longcent,latcent vals (if long-lat)
 
 !Switches in GEM
-1 1 0 0 0 0 0 0	0 !Which_Fluxes: Toggle on(1) off(0): O2surf, DICsurf, SOD, MPB, Nutrient Exchange, CMAQ, Instant Remineralization, Sediment Diagenesis, Silica
-1		!SolarRadKo: 0==Calculate Solar, 1==Read Solar Files
+0 0 0 0 0 0 0 0	0 !Which_Fluxes: Toggle on(1) off(0): O2surf, DICsurf, SOD, MPB, Nutrient Exchange, CMAQ, Instant Remineralization, Sediment Diagenesis, Silica
+0		!SolarRadKo: 0==Calculate Solar, 1==Read Solar Files
 1		!InitializeHow: 0==Salinity Regression, 1==User Input
 
 !River Loads - used in 3D only

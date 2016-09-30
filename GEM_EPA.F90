@@ -416,7 +416,7 @@
          ! and is multiplied by SWtoPAR: ratio of PAR to
          ! shortwave radiation (hardcoded 4/30/14 to 0.43).
          ! Hardcoded to 0.47 on 2/11/16, Re: Tsubo and Walker, 2005
-                    PARsurf = 0.47 * Rad(i,j)
+                    PARsurf = (0.47 * Rad(i,j)) * PARfac
  !--End Calculate atmospheric model ---------------------------------------------
 
 !----------------------------------------------------------------------------

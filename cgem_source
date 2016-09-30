@@ -97,6 +97,7 @@ OBJ  =  Model_dim.o\
 	InRemin.o\
 	InRemin_allocate.o\
 	OUTPUT_NETCDF_GD.o\
+	MASS_BALANCE_GD.o\
 	GoMDOM.o\
 	Read_InputFile_GD.o\
 	USER_Set_Initial_Conditions_GD.o\
@@ -106,7 +107,6 @@ OBJ  =  Model_dim.o\
 	zoo.o\
 	diatoms.o\
 	greens.o\
-	MASS_BALANCE_GD.o\
 	MASS_BALANCE_GD_allocate.o\
 	carbon.o\
 	phosph.o\
