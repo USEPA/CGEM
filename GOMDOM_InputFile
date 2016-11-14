@@ -10,7 +10,7 @@
 !Switches in GEM
 0 0 0 0 0 0 0 0	0 !Which_Fluxes: Toggle on(1) off(0): O2surf, DICsurf, SOD, MPB, Nutrient Exchange, CMAQ, Instant Remineralization, Sediment Diagenesis, Silica
 0		!SolarRadKo: 0==Calculate Solar, 1==Read Solar Files
-1		!InitializeHow: 0==Salinity Regression, 1==User Input
+0		!InitializeHow: 0==Salinity Regression, 1==User Input
 
 !River Loads - used in 3D only
 1		!rcNO3  - factor multiplying NO3 river load
