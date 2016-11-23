@@ -64,7 +64,7 @@ read(999,*)
 read(999,*) (Tref(i), i=1,nospA+nospZ)
 read(999,*) (KTg1(i), i=1,nospA+nospZ)
 read(999,*) (KTg2(i), i=1,nospA+nospZ)
-read(999,*) (Ea_R(i), i=1,nospA+nospZ)
+read(999,*) (Ea(i), i=1,nospA+nospZ)
 read(999,*)
 !--Phytoplankton-----------------
 read(999,*)
@@ -207,6 +207,16 @@ endif
 do isp=1,nospA
    A_wt(isp) = A_wt(isp)/tot
 enddo
+
+!Diatom/non-Diatom array
+do isp=1,nospA
+   if(KSi(isp).eq.0.) then
+      is_diatom(isp) = 0
+   else
+      is_diatom(isp) = 1
+   endif
+enddo
+
 
 return
 END SUBROUTINE Read_InputFile

@@ -66,7 +66,7 @@ CONTAINS
 
     DO k = 1, nz
        ! Get nutrient limited growth rates. Copied from calc_Agrow()
-       call func_S( Qn_k(:,k), Qp_k(:,k), Si_k(k), f_N, f_P, f_Si )
+       call func_S( Qn_k(:,k), Qp_k(:,k), N_k(k), P_k(k), Si_k(k), f_N, f_P, f_Si )
 
        Chla_tot(k) = 0.0
 

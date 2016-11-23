@@ -187,7 +187,7 @@ CONTAINS
     CALL DEFRATX( FILE_ID, 'Tref', Tref, nospA+nospZ )
     CALL DEFRATX( FILE_ID, 'KTg1', KTg1, nospA+nospZ )
     CALL DEFRATX( FILE_ID, 'KTg2', KTg2, nospA+nospZ )
-    CALL DEFRATX( FILE_ID, 'Ea_R', Ea_R, nospA+nospZ )
+    CALL DEFRATX( FILE_ID, 'Ea', Ea, nospA+nospZ )
 !Phytoplankton
     CALL DEFTAT( FILE_ID, 'Calibration4', 'Phytoplankton in GEM.')
     do i=1,nospZ

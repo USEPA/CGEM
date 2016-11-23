@@ -119,4 +119,7 @@ real KG_bot
 real, allocatable :: alphad(:) ! Initial slope of photosynthesis-irradiance curve / Vmax
 real, allocatable :: betad(:)  ! Photoinhibition constant / Vmax
 
+!Diatom array
+integer, allocatable :: is_diatom(:)
+
 END MODULE INPUT_VARS

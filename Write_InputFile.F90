@@ -55,7 +55,7 @@ write(999,*)
 write(999,*) "Tref",Tref
 write(999,*) "KTg1",KTg1
 write(999,*) "KTg2",KTg2
-write(999,*) "Ea_R",Ea_R
+write(999,*) "Ea",Ea
 write(999,*)
 !--Phytoplankton-----------------
 write(999,*)

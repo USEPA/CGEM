@@ -50,4 +50,7 @@ ALLOCATE( ws(nf) )
 ALLOCATE( alphad(nospA) ) ! Initial slope of photosynthesis-irradiance curve / Vmax
 ALLOCATE( betad(nospA) )  ! Photoinhibition constant / Vmax
 
+!Diatom array
+ALLOCATE( is_diatom(nospA) )
+
 END Subroutine INPUT_VARS_allocate

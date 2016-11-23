@@ -1,5 +1,5 @@
 ! ------------------------------------------------------------------------
-      Subroutine calc_Agrow( E, T_k, Qn, Qp, Si, A_k, Agrow_k, &
+      Subroutine calc_Agrow( E, T_k, Qn, Qp, N, P, Si, A_k, Agrow_k, &
      & uA_k, Aresp_k, uN_k, uP_k, uE_k, uSi_k )       
 ! ------------------------------------------------------------------------
 
@@ -19,7 +19,9 @@
       real,intent(in)  ::  T_k(nsl)      ! Water temperature in Celsius
 
       real,intent(in)  ::  Qn(nospA,nsl) ! Phytoplankton Nitrogen Quota (mmol-N/cell)         
-      real,intent(in)  ::  Qp(nospA,nsl) ! Phytoplankton Phosphorous Quota (mmol-P/cell)      
+      real,intent(in)  ::  Qp(nospA,nsl) ! Phytoplankton Phosphorous Quota (mmol-P/cell)     
+      real,intent(in)  ::  N(nsl)        ! Nitrogen (mmol-N/m3)
+      real,intent(in)  ::  P(nsl)        ! Phosphorus (mmol-P/m3) 
       real,intent(in)  ::  Si(nsl)       ! Silica (mmol-Si/m3)
       
       real,intent(in)  ::  A_k(nospA,nsl)      ! Number density of phytoplankton group isp 
@@ -53,7 +55,7 @@
        do k = 1, nz
 
           call func_T( T_k(k), Tadj ) ! Temperature adjustment
-          call func_S( Qn(:,k), Qp(:,k), Si(k), f_N, f_P, f_Si ) ! Nutrient dependent growth function
+          call func_S( Qn(:,k), Qp(:,k), N(k), P(k), Si(k), f_N, f_P, f_Si ) ! Nutrient dependent growth function
           do isp = 1, nospA
              min_S(isp) = AMIN1( f_N(isp), f_P(isp), f_Si(isp) )
           enddo

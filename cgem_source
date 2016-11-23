@@ -30,6 +30,8 @@ OBJ  =  Model_dim.o\
 	LIGHT_VARS.o\
 	TEMP_VARS.o\
 	TEMP_VARS_allocate.o\
+	T_GoMDOM.o\
+	Light_GoMDOM.o\
 	STOICH_VARS.o\
 	STOICH_VARS_allocate.o\
 	MASS_BALANCE.o\

@@ -92,6 +92,7 @@
 !------------------------------------------------------------------
 ! Zooplankton parameters
  !Zooplankton uptake and growth
+    real, dimension(nospZ,nsl)   :: Z_k      ! Zooplankton number density (indv./m3)
     real, dimension(nospZ)       :: optNP    ! Optimal nutrient ratio for zooplankton
     real, dimension(nospZ)       :: Z        ! Zooplankton
     real, dimension(nospZ)       :: Zgrow    ! Zooplankton growth (indv./m3/d)
@@ -333,6 +334,11 @@
                Qn_k(isp,k) = f(i,j,k,iQn(1)-1+isp)
                Qp_k(isp,k) = f(i,j,k,iQp(1)-1+isp)
              enddo 
+         !Save Zooplanton to k array
+             do isp = 1,nospZ
+                Z_k(isp,k) = f(i,j,k,iZ(isp)) ! Zooplankton in group isp, ind./m3
+             enddo
+
          ! Save Temperature (celsius) and Salinity in columns
            T_k(k)       = T(i,j,k)
            S_k(k)     = S(i,j,k)
@@ -433,6 +439,11 @@
 !                 represents. PARsurf is the downward irradiance
 !                 (photons/cm2/sec) just below the sea surface.
 !-------------------------------------------------------------------------
+        if(PARsurf.le.0.) then
+         PAR_percent_k    = 0.0
+         PARbot = 0.0
+         PARdepth_k = 0.0
+        else
 
          select case (Which_irradiance)
 
@@ -441,7 +452,6 @@
                  ! developed by Brad Penta of NRL is used
                  !--------------------------------------------
 
-                if(PARsurf.gt.0.) then
                  call Call_IOP_PAR(                                    &
                  & PARsurf    , SunZenithAtm,                          &
                  & CDOM_k     , Chla_tot_k,                            &
@@ -450,16 +460,7 @@
                  & nz         , d_sfc(i,j,:),                          &
                  & PAR_percent_k,                                      &
                  & PARbot     , PARdepth_k                         )
-                else
-                 PAR_percent_k=0.
-                 Parbot=0.
-                 PARdepth_k=0.
-                endif
 
-               ! Save Output Arrays for netCDF
-                 PAR_percent_ijk(i,j,1:nz) = PAR_percent_k(1:nz)
-                 PARdepth_ijk(i,j,1:nz) = PARdepth_k(1:nz)
-                 PARbot_ij(i,j) = Parbot
 
                  !-------------------------------------------------
          case (2)! Upgraded form of the original underwater light
@@ -467,12 +468,6 @@
                  ! light attenuation in each k layer rather than for the whole
                  ! mixed layer as in the Eldridge & Roelke(2010) code 
                  !-------------------------------------------------
-
-                 PAR_percent_k    = 0.0
-                 PARbot = 0.0
-                 PARdepth_k = 0.0
-
-             if(PARsurf /= 0.0) then 
 
                  PARbotkm1 = PARsurf             ! initialize at top of
                                                  ! column i,j., i.e.
@@ -503,30 +498,28 @@
 
                  enddo 
 
-             endif     !"End of "if(PARsurf /= 0.0)" 
 
-                   ! Save array values for netCDF
-                     PAR_percent_ijk(i,j,1:nz) = PAR_percent_k(1:nz)
-                     PARdepth_ijk(i,j,1:nz) = PARdepth_k(1:nz)
-                     PARbot_ij(i,j) = Parbot
+
+                 !-------------------------------------------------
+         case (3)! Light Model from GoMDOM, case with no wind speed
+                 !-------------------------------------------------
+                  !GoMDOM's light model, no wind
+                  call Light_GoMDOM(PARsurf, S_k, A_k, Z_k,    &
+     &               OM1A_k, OM1Z_k, OM1SPM_k, OM1BC_k,        &
+     &               dz(i,j,:), PAR_percent_k, PARbot, PARdepth_k  )
 
          case default
-           WRITE(6, "(' ')")
-           WRITE(6, "('You have chosen Which_irradiance = ', I2)") Which_irradiance
-           WRITE(6, "('which is not supported. ')")
-           WRITE(6, "('Only Which_irradiance = 1 and 2 are supported where: ')")
-           WRITE(6, "(' ')")
-           WRITE(6, "('w_light_m = 1: ')")
-           WRITE(6, "('Underwater light model developed by Brad Penta of NRL ')")
-           WRITE(6, "(' ')")
-           WRITE(6, "('w_light_m = 2: ')")
-           WRITE(6, "('Upgraded form of the original underwater light ')")
-           WRITE(6, "('model of Pete Eldridge is used. ')")
-           WRITE(6, "(' ')")
-           WRITE(6, "('Abort Run.')")
-           WRITE(6, "(' ')")
-           STOP
+             write(6,*) "Error in irradiance switch"
+             stop
          end select
+
+        endif
+
+         ! Save array values for netCDF
+           PAR_percent_ijk(i,j,1:nz) = PAR_percent_k(1:nz)
+           PARdepth_ijk(i,j,1:nz) = PARdepth_k(1:nz)
+           PARbot_ij(i,j) = Parbot
+
 !---------------------End Underwater Light Model-----------------------------------
 
 ! Update running total of current day's irradiance
@@ -549,7 +542,7 @@
 ! vertical grid column (i,j) at cell (i,j,k).
 !-----------------------------------------------------------------------
        call calc_Agrow(  PARdepth_k,    T_k,                    &
-     & Qn_k   , Qp_k, Si_k , A_k     , Agrow_k,                  &
+     & Qn_k   , Qp_k, N_k, P_k, Si_k , A_k     , Agrow_k,                  &
      & uA_k, Aresp_k, uN_k, uP_k, uE_k, uSi_k  )
 
 ! Save arrays to output to netCDF

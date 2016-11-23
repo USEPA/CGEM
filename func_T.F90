@@ -22,19 +22,10 @@
     REAL, PARAMETER  :: r     = 0.3
     REAL, PARAMETER  :: f1    = 1.0/f0 - 1.0  
     REAL, PARAMETER  :: r1    = r*(46.5/18.0) 
+    REAL, PARAMETER  :: k_b    = 8.6173303e-5 !Boltzmann constant in eV/K
     REAL             :: denom(nospA+nospZ)
     REAL             :: T_in_K,Tref_in_K(nospA+nospZ)
     INTEGER          :: i
-    INTEGER, save    :: init=0
-
-    if(init.eq.0) then !Find normalizing factor for Arrhenius:
-     if (Which_temperature.eq.3) then !Decrease in growth rate at threshold T (Arrhenius form, Geider 1997)
-      T_in_K  = 34. + 273.15 !Temp. in Kelvin of approximate highest temp in GOM
-      Tref_in_K(:) = Tref(:) + 273.15 !Temp. in Kelvin
-      N(:) = exp ( -Ea_R(:) * ( 1./T_in_K - 1./Tref_in_K(:) ) )
-     endif
-     init=1
-    endif
 
 
     if (Which_temperature.eq.1) then !Sigmoidal 
@@ -51,7 +42,9 @@
     else if (Which_temperature.eq.3) then !Decrease in growth rate at threshold T (Arrhenius form, Geider 1997)
       T_in_K  = T + 273.15 !Temp. in Kelvin
       Tref_in_K(:) = Tref(:) + 273.15 !Temp. in Kelvin 
-      Tadj(:) = exp ( -Ea_R(:) * ( 1./T_in_K - 1./Tref_in_K(:) ) ) 
+      Tadj(:) = exp ( -(Ea(:)/k_b) * ( 1./T_in_K - 1./Tref_in_K(:) ) ) 
+    else if (Which_temperature.eq.4) then !GoMDOM temperature functions
+      call T_GoMDOM(T, Tadj)
     else  
       write(6,*) "Error in func_T"
       stop

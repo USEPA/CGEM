@@ -14,7 +14,23 @@
     REAL, INTENT(IN) :: TEMP
     REAL, INTENT(OUT):: R_11  
 
-    R_11 = nitmax* O2/(KO2+O2) * NH4/(KNH4+NH4)
+    REAL :: FACTOR
+    REAL :: TQ1
+    REAL :: TQ2
+    REAL :: RQ1
+    REAL :: RQ11
+!-------------------------------------------------
+    ! Use the Q10 relationship to determine the rates.
+
+    TQ1  = 25.0
+    TQ2  = TEMP
+    FACTOR = LOG10( 2.0 ) * 0.1 * ( TQ1 - TQ2 )
+
+    RQ1  = nitmax
+    RQ11 = LOG10( RQ1 ) - FACTOR
+    RQ11 = 10.0 ** RQ11
+
+    R_11 = RQ11 * O2/(KO2+O2) * NH4/(KNH4+NH4)
 
     RETURN
   END SUBROUTINE Nitrification 

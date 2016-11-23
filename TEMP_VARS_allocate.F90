@@ -8,7 +8,7 @@ IMPLICIT NONE
 ALLOCATE (KTg1(nospA+nospZ)) 
 ALLOCATE (KTg2(nospA+nospZ))
 ALLOCATE (Tref(nospA+nospZ))
-ALLOCATE (Ea_R(nospA+nospZ))
+ALLOCATE (Ea(nospA+nospZ))
 ALLOCATE (N(nospA+nospZ))
 
 End Subroutine TEMP_VARS_allocate

@@ -22,20 +22,20 @@
 ! Error checking
       do ii = 1,nospA
         if(f(1,1,1,iQn(ii)).lt.QminN(ii)) then
-           f(1,1,1,iQn(ii)) = QminN(ii)
-           write(6,*) "Phytoplankton group ",ii,"initial Qn reset to ",QminN(ii)
+           write(6,*) "For Qn ",ii,"initial Qn less than QminN" 
+           stop
         endif
         if(f(1,1,1,iQp(ii)).lt.QminP(ii)) then
-           f(1,1,1,iQp(ii)) = QminP(ii)
-           write(6,*) "Phytoplankton group ",ii,"initial Qp reset to ",QminP(ii)
+           write(6,*) "For Qp ",ii,"initial Qp less than QminP" 
+           stop
         endif
         if(f(1,1,1,iQn(ii)).gt.QmaxN(ii)) then
-           f(1,1,1,iQn(ii)) = QmaxN(ii)
-           write(6,*) "Phytoplankton group ",ii,"initial Qn reset to ",QmaxN(ii)
+           write(6,*) "For Qn ",ii,"initial Qn greater than QmaxN" 
+           stop
         endif
         if(f(1,1,1,iQp(ii)).gt.QmaxP(ii)) then
-           f(1,1,1,iQp(ii)) = QmaxP(ii)
-           write(6,*) "Phytoplankton group ",ii,"initial Qp reset to ",QmaxP(ii)
+           write(6,*) "For Qp ",ii,"initial Qp greater than QmaxP" 
+           stop
         endif
 
       enddo

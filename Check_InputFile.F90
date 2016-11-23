@@ -6,107 +6,68 @@ USE TEMP_VARS
 
 IMPLICIT NONE
 
-
-integer isp
+integer isp, mpierr
 
 !read(999,*) Which_fluxes
 
 !read(999,*) Which_temperature
-if(Which_temperature.ne.1.and.Which_temperature.ne.2.and.Which_temperature.ne.3) then
-  write(6,*) "Using Sigmoidal temperature function"
-  Which_temperature=1
+if(Which_temperature.ne.1.and.Which_temperature.ne.2.and.Which_temperature.ne.3.and.Which_temperature.ne.4) then
+  write(6,*) "Which_temperature is outside of range 1-4"
+  stop 
 endif
 
 !read(999,*) Which_uptake
 if(Which_uptake.ne.1.and.Which_uptake.ne.2.and.Which_uptake.ne.3) then
-  write(6,*) "Using Michaelis-Menten uptake"
-  Which_uptake=1
+  write(6,*) "Which_uptake is outside of range 1-3"
+  stop
 endif
 
 !read(999,*) Which_quota
-if(Which_quota.ne.1.and.Which_quota.ne.2.and.Which_quota.ne.3) then
-  write(6,*) "Using Droop"
-  Which_quota=1
+if(Which_quota.ne.1.and.Which_quota.ne.2.and.Which_quota.ne.3.and.Which_quota.ne.4) then
+  write(6,*) "Which_quota is outside of range 1-4"
+  stop
 endif
 
 
 !read(999,*) Which_irradiance 
-if(Which_irradiance.ne.1.and.Which_irradiance.ne.2) then
-  write(6,*) "Using Penta Light Model"
-  Which_irradiance=1
+if(Which_irradiance.ne.1.and.Which_irradiance.ne.2.and.Which_irradiance.ne.3) then
+  write(6,*) "Which_irradiance is outside of range 1-3"
+  stop
 endif
 
 !read(999,*) Which_chlaC
 if(Which_chlaC.ne.1.and.Which_chlaC.ne.2) then
-  write(6,*) "Using Regression for chlA:C"
-  Which_chlaC=1
+  write(6,*) "Which_chlaC is outside of range 1-2"
+  stop
 endif
 
 !read(999,*) Which_photosynthesis 
-if(Which_photosynthesis.ne.1.and.Which_photosynthesis.ne.2.and.Which_photosynthesis.ne.3) then
-  write(6,*) "Using photoinhibition"
-  Which_photosynthesis=1
+if(Which_photosynthesis.ne.1.and.Which_photosynthesis.ne.2.and.Which_photosynthesis.ne.3.and.Which_photosynthesis.ne.4) then
+  write(6,*) "Which_photosynthesis is outside of range 1-4"
+  stop
 endif
 
 if(Which_photosynthesis.eq.3.and.Which_growth.ne.3) then
-   write(6,*) "Setting Which_growth=3 to match Which_photosynthesis option"
-   Which_growth = 3
+  write(6,*) "If Which_photosynthese=3 then Which_growth should = 3"
+  stop
 endif
 
 !read(999,*) Which_growth
 if(Which_growth.ne.1.and.Which_growth.ne.2.and.Which_growth.ne.3) then
-  write(6,*) "Using law of minimum growth formulation"
-  Which_growth=1
+  write(6,*) "Which_growth is outside of range 1-3"
+  stop
 endif
 
 if(Which_growth.eq.3.and.Which_photosynthesis.ne.3) then
-   write(6,*) "Setting Which_growth=3 to match Which_photosynthesis option"
-   Which_photosynthesis = 3
+  write(6,*) "If Which_growth=3 then Which_photosynthesis should =3"
+  stop
 endif
 
 !read(999,*) SolarRad
-if(SolarRad.ne.0.and.SolarRad.ne.1) then
-  write(6,*) "Using COAMPS Solar Radiation"
-  SolarRad=1
+if(SolarRad.ne.0) then
+  write(6,*) "SolarRad will be calculated, currently the only option"
 endif
 
-!read(999,*) InitializeHow
-if(InitializeHow.ne.0.and.InitializeHow.ne.1.and.InitializeHow.ne.2.and.InitializeHow.ne.3) then
-  write(6,*) "Initializing using Salinity regression equations"
-  InitializeHow=0
-endif
-
-! When InitializeHow = 3, RESTART_FILE_TIMESTEP needs to be specified.
-!Do not use for FishTank
-!if((InitializeHow.eq.3) .and. (RESTART_FILE_TIMESTEP.eq.0)) then
-!  write(6,*) "RESTART_FILE_TIMESTEP should be a non-zero value when InitilaizeHow = 3."
-!  stop
-!endif
-
-
-!read(999,*) Which_Vmix   
-if(Which_VMix.ne.0.and.Which_Vmix.ne.1) then
-  write(6,*) "Using Vertical Mixing"
-  Which_Vmix=1
-endif
-
-!read(999,*) Which_Outer_BC
-if(Which_Outer_BC.ne.0.and.Which_Outer_BC.ne.1.and.Which_Outer_BC.ne.2.and.Which_Outer_BC.ne.3.and.Which_Outer_BC.ne.5) then
-  write(6,*) "Using Salinity Boundary Conditions"
-  Which_Outer_BC=0
-endif
-
-!read(999,*) wt_l,wt_o 
-!Test to make sure weights are between 0 and 1:
-if(wt_l.gt.1.or.wt_l.lt.0) then
-  write(6,*) "wt_l must be between 0 and 1"
-  stop
-endif
-
-if(wt_o.gt.1.or.wt_o.lt.0) then
-  write(6,*) "wt_o must be between 0 and 1"
-  stop
-endif
 
 !Do a test to make sure Qmax is greater than Qmin:
 do isp=1,nospA
@@ -123,8 +84,19 @@ enddo
 ! An hour (3600 secs) must be divisible by dT:
 if(mod(3600,dT).ne.0) then
   write(6,*) "Please pick a dT that is a divisor of 3600 seconds (an hour)."
-!  stop
 endif
+
+! Diatom/Non Diatom check:
+do isp=1,nospA
+   if(KSi(isp).eq.0.and.vmaxSi(isp).ne.0) then
+     write(6,*) "If KSi=0, then vmaxSi must =0 (designates non-diatoms)"
+     stop
+   endif
+   if(vmaxSi(isp).eq.0.and.KSi(isp).ne.0) then
+     write(6,*) "If vmaxSi=0, then KSi must =0 (designates non-diatoms)"
+     stop
+   endif
+enddo
 
 
 return

@@ -23,6 +23,7 @@
     REAL, INTENT(IN) :: E    ! Irradiance (quanta/cm**2/sec)
     REAL, INTENT(IN),  DIMENSION(nospA) :: min_S ! Function of rate limiting nutrient
     REAL, INTENT(OUT),DIMENSION(nospA)  :: f_E   ! Growth rate factor (dimensionless) 
+    REAL, parameter :: alpha = 1.93e-16
 
     if (Which_photosynthesis.eq.1) then         !With photoinhibition 
         f_E(:) = ( 1.0 - exp(-alphad(:) * E) ) * exp(-betad(:)*E)
@@ -30,7 +31,9 @@
         f_E(:) = ( 1.0 - exp(-alphad(:) * E) )
     else if (Which_photosynthesis.eq.3) then    !Nutrient dependent
         f_E(:) = ( 1.0 - exp(-alphad(:) * E / min_S) )
-    else   
+    else if (Which_photosynthesis.eq.4) then !GoMDOM
+        f_E(:) = tanh(alpha * E)
+    else
         write(6,*) "Error in func_E"
         stop
     endif
