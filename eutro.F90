@@ -8,6 +8,7 @@ USE INPUT_VARS_GD, ONLY : Which_Fluxes
 USE EUT
 USE Which_Flux
 USE InRemin
+USE FLAGS, ONLY : DoDroop
 
 IMPLICIT NONE
 
@@ -64,39 +65,74 @@ Rad_Watts = Rad/3.021948e14
  enddo      ! end of do j block do loop
 
 
+if(DoDroop.eq.1) then
  do j = 1,jm
      do i = 1,im 
        if(fm(i,j).eq.1) then
       do k = 1, nz
          DTM(i,j,k,:) = 0.
          CALL ZOO(f(i,j,k,:),DTM(i,j,k,:),T(i,j,k),i,j,k)                ! Zooplankton kinetics
-         CALL DIATOMS(f(i,j,k,:),DTM(i,j,k,:),T(i,j,k),IOPpar(i,j,k),i,j,k)            ! Diatom kinetics
-         CALL GREENS(f(i,j,k,:),DTM(i,j,k,:),T(i,j,k),IOPpar(i,j,k),i,j,k)             ! Greens kinetics
-         CALL CARBON(f(i,j,k,:),DTM(i,j,k,:),T(i,j,k),i,j,k,i)         ! Carbon (detritus) kinetics
-         CALL PHOSPH(f(i,j,k,:),DTM(i,j,k,:),i,j,k)                      ! Phosphorous kinetics
-         CALL NITROG(f(i,j,k,:),DTM(i,j,k,:),T(i,j,k),i,j,k,i)         ! Nitrogen kinetics
+         CALL DIATOMS_droop(f(i,j,k,:),DTM(i,j,k,:),T(i,j,k),IOPpar(i,j,k),i,j,k)            ! Diatom kinetics
+         CALL GREENS_droop(f(i,j,k,:),DTM(i,j,k,:),T(i,j,k),IOPpar(i,j,k),i,j,k)             ! Greens kinetics
+         CALL CARBON(f(i,j,k,:),DTM(i,j,k,:),T(i,j,k),i,j,k)         ! Carbon (detritus) kinetics
+         CALL PHOSPH_droop(f(i,j,k,:),DTM(i,j,k,:),i,j,k)                      ! Phosphorous kinetics
+         CALL NITROG_droop(f(i,j,k,:),DTM(i,j,k,:),T(i,j,k),i,j,k)         ! Nitrogen kinetics
          CALL SILICA(f(i,j,k,:),DTM(i,j,k,:),T(i,j,k),i,j,k)             ! Silica kinetics
          CALL DISSOLVED_OXYGEN(f(i,j,k,:),DTM(i,j,k,:),T(i,j,k),i,j,k)   ! Dissolved Oxygen
       enddo
        endif !End of if(fm(ij) statement
    enddo      ! end of do i block do loop
  enddo      ! end of do j block do loop
-
+else
+ do j = 1,jm
+     do i = 1,im
+       if(fm(i,j).eq.1) then
+      do k = 1, nz
+         DTM(i,j,k,:) = 0.
+         CALL ZOO(f(i,j,k,:),DTM(i,j,k,:),T(i,j,k),i,j,k)                !  Zooplankton kinetics
+         CALL DIATOMS(f(i,j,k,:),DTM(i,j,k,:),T(i,j,k),IOPpar(i,j,k),i,j,k) ! Diatom kinetics
+         CALL GREENS(f(i,j,k,:),DTM(i,j,k,:),T(i,j,k),IOPpar(i,j,k),i,j,k) ! Greens kinetics
+         CALL CARBON(f(i,j,k,:),DTM(i,j,k,:),T(i,j,k),i,j,k)         ! Carbon (detritus) kinetics
+         CALL PHOSPH(f(i,j,k,:),DTM(i,j,k,:),i,j,k)                      !  Phosphorous kinetics
+         CALL NITROG(f(i,j,k,:),DTM(i,j,k,:),T(i,j,k),i,j,k)         ! Nitrogen kinetics
+         CALL SILICA(f(i,j,k,:),DTM(i,j,k,:),T(i,j,k),i,j,k)             !  Silica kinetics
+         CALL DISSOLVED_OXYGEN(f(i,j,k,:),DTM(i,j,k,:),T(i,j,k),i,j,k)   !  Dissolved Oxygen
+      enddo
+       endif !End of if(fm(ij) statement
+   enddo      ! end of do i block do loop
+ enddo      ! end of do j block do loop
+endif
 
 
 if(Which_Fluxes(iInRemin).eq.1) then
+
+if(DoDroop.eq.1) then
 !Do settling fluxes for instant remineralization
  do j = 1,jm
      do i = 1,im
        if(fm(i,j).eq.1.and.wsm(i,j).eq.0.) then !If on shelf
          area = Vol(i,j,nz)/dz(i,j,nz)
-         CALL EXCHANGE(f(i,j,nz,:),area,Vol(i,j,nz),dT,i,j,SETRATE(:))      ! Calculate IR fluxes and settling rates
+         CALL EXCHANGE_droop(f(i,j,nz,:),area,Vol(i,j,nz),dT,i,j,SETRATE(:))      ! Calculate IR fluxes and settling rates
          TSOD(i,j) = TSOD(i,j)/Vol(i,j,nz)
          SED_NO3_RATE(i,j) = SED_NO3_RATE(i,j)/Vol(i,j,nz)
          SED_NH3_RATE(i,j) = SED_NH3_RATE(i,j)/Vol(i,j,nz)
        endif !End of if(fm(ij) statement
    enddo      ! end of do i block do loop
  enddo      ! end of do j block do loop
+else
+!Do settling fluxes for instant remineralization
+ do j = 1,jm
+     do i = 1,im
+       if(fm(i,j).eq.1.and.wsm(i,j).eq.0.) then !If on shelf
+         area = Vol(i,j,nz)/dz(i,j,nz)
+         CALL EXCHANGE(f(i,j,nz,:),area,Vol(i,j,nz),dT,i,j,SETRATE(:))      !  Calculate IR fluxes and settling rates
+         TSOD(i,j) = TSOD(i,j)/Vol(i,j,nz)
+         SED_NO3_RATE(i,j) = SED_NO3_RATE(i,j)/Vol(i,j,nz)
+         SED_NH3_RATE(i,j) = SED_NH3_RATE(i,j)/Vol(i,j,nz)
+       endif !End of if(fm(ij) statement
+   enddo      ! end of do i block do loop
+ enddo      ! end of do j block do loop
+endif
 endif
 
 

@@ -203,6 +203,84 @@ REAL,ALLOCATABLE :: IFG(:,:,:)       ! Light limitation for greens
 
 REAL,ALLOCATABLE :: TFG(:,:,:)       ! Temperature limitation for greens
 
+!New for Droop
+!diatoms
+REAL,ALLOCATABLE :: QND(:,:,:)       !
+REAL,ALLOCATABLE :: QPD(:,:,:)       !
+REAL :: QminND = 0.003
+REAL :: QminPD = 0.003
+!greens
+REAL,ALLOCATABLE :: QNG(:,:,:)       !
+REAL,ALLOCATABLE :: QPG(:,:,:)       !
+REAL :: QminNG = 0.003
+REAL :: QminPG = 0.003
+!nitrog
+REAL :: QmaxND = 1.0
+REAL :: QmaxNG = 1.0
+REAL :: QmaxPD = 1.0
+REAL :: QmaxPG = 1.0
+REAL :: KhIntND = 2.0E-05
+REAL :: KhIntNG = 2.0E-05
+REAL :: KhIntPD = 2.0E-05
+REAL :: KhIntPG = 2.0E-05
+!eut.F90
+REAL :: FIntNID = 0.0     ! Fraction of inorganic nitrogen produced by algal metabolism
+REAL :: FIntNIG = 0.0     ! Fraction of inorganic nitrogen produced by algal metabolism
+REAL :: FIntNDD = 0.0     ! Fraction of dissolved nitrogen produced by algal metabolism
+REAL :: FIntNDG = 0.0     ! Fraction of dissolved nitrogen produced by algal metabolism
+REAL :: FIntNLD = 0.0     ! Fraction of labile nitrogen produced by algal metabolism
+REAL :: FIntNLG = 0.0     ! Fraction of labile nitrogen produced by algal metabolism
+REAL :: FIntNRD = 0.0     ! Fraction of refractory nitrogen produced by algal metabolism
+REAL :: FIntNRG = 0.0     ! Fraction of refractory nitrogen produced by algal metabolism
+REAL :: FIntPID = 0.0     ! Fraction of inorganic phosphorus produced by algal metabolism
+REAL :: FIntPIG = 0.0     ! Fraction of inorganic phosphorus produced by algal metabolism
+REAL :: FIntPDD = 0.0     ! Fraction of dissolved phosphorus produced by algal metabolism
+REAL :: FIntPDG = 0.0     ! Fraction of dissolved phosphorus produced by algal metabolism
+REAL :: FIntPLD = 0.0     ! Fraction of labile phosphorus produced by algal metabolism
+REAL :: FIntPLG = 0.0     ! Fraction of labile phosphorus produced by algal metabolism
+REAL :: FIntPRD = 0.0     ! Fraction of refractory phosphorus produced by algal metabolism
+REAL :: FIntPRG = 0.0     ! Fraction of refractory phosphorus produced by algal metabolism
+REAL :: FIntLuxNIP = 0.0  ! Fraction of luxury inorganic nitrogen produced by predation
+REAL :: FIntLuxNDP = 0.0  ! Fraction of luxury dissolved organic nitrogen produced by predation
+REAL :: FIntLuxNLP = 0.0  ! Fraction of luxury labile nitrogen produced by predation
+REAL :: FIntLuxNRP = 0.0  ! Fraction of luxury refractory nitrogen produced by predation
+REAL :: FIntStrNIP = 0.0  ! Fraction of structural inorganic nitrogen produced by predation
+REAL :: FIntStrNDP = 0.0  ! Fraction of structural dissolved organic nitrogen produced by predation
+REAL :: FIntStrNLP = 0.0  ! Fraction of structural labile nitrogen produced by predation
+REAL :: FIntStrNRP = 0.0  ! Fraction of structural refractory nitrogen produced by predation
+REAL :: FIntLuxPIP = 0.0  ! Fraction of luxury inorganic phosphorus produced by predation
+REAL :: FIntLuxPDP = 0.0  ! Fraction of luxury dissolved organic phosphorus produced by predation
+REAL :: FIntLuxPLP = 0.0  ! Fraction of luxury labile phosphorus produced by predation
+REAL :: FIntLuxPRP = 0.0  ! Fraction of luxury refractory phosphorus produced by predation
+REAL :: FIntStrPIP = 0.0  ! Fraction of structural inorganic phosphorus produced by predation
+REAL :: FIntStrPDP = 0.0  ! Fraction of structural dissolved organic phosphorus produced by predation
+REAL :: FIntStrPLP = 0.0  ! Fraction of structural labile phosphorus produced by predation
+REAL :: FIntStrPRP = 0.0  ! Fraction of structural refractory phosphorus produced by predation
+!------------------------------------------------------------------------------
+! Maximum uptake rate of nitrogen by diatoms.
+! Units: g N / (g algal C) / s
+!------------------------------------------------------------------------------
+REAL :: UpNMaxD = 2.315E-06
+
+!------------------------------------------------------------------------------
+! Maximum uptake rate of nitrogen by greens.
+! Units: g N / (g algal C) / s
+!------------------------------------------------------------------------------
+REAL :: UpNMaxG = 2.315E-06
+
+!------------------------------------------------------------------------------
+! Maximum uptake rate of phosphorus by diatoms.
+! Units: g P / (g algal C) / s
+!------------------------------------------------------------------------------
+REAL :: UpPMaxD = 2.315E-06
+
+!------------------------------------------------------------------------------
+! Maximum uptake rate of phosphorus by greens.
+! Units: g P / (g algal C) / s
+!------------------------------------------------------------------------------
+REAL :: UpPMaxG = 2.315E-06
+
+
 
 !------------------------------------------------------------------------------
 !  Eutro parameter declarations

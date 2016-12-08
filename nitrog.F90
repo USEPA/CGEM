@@ -1,4 +1,4 @@
-SUBROUTINE NITROG(f,DTM,TEMP,i,j,k,myi)
+SUBROUTINE NITROG(f,DTM,TEMP,i,j,k)
 !------------------------------------------------------------------------------
 !-
 !-   $Id: nitrog.F90,v 1.0.6.1 2014/08/26 22:54:04 wmelende Exp wmelende $
@@ -143,7 +143,7 @@ IMPLICIT NONE
 REAL, INTENT(IN) :: f(nf)
 REAL, INTENT(IN) :: TEMP
 REAL, INTENT(INOUT) :: DTM(nf)
-INTEGER, INTENT(IN) :: i,j,k,myi
+INTEGER, INTENT(IN) :: i,j,k
        
 REAL :: MNDON        ! Dissolved organic N mineralization mass derivative
 REAL :: HDRLPON      ! Labile detrital N hydrolysis mass mass derivative
@@ -388,7 +388,7 @@ IF (DO_DO2) THEN
            DENITRIFICATION_N = 0
        ENDIF
 
-       SUM_DENITR(myi,j,k) = SUM_DENITR(myi,j,k) + DENITRIFICATION_N
+       SUM_DENITR(i,j,k) = SUM_DENITR(i,j,k) + DENITRIFICATION_N
 
        DTM(JNO3) = DTM(JNO3) - DENITRIFICATION_N 
 

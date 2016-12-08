@@ -88,6 +88,13 @@
      !TR
       f( i, j, k, JTR ) = 1. 
 
+!Droop
+      f( i, j, k, JDIAN ) = 0.004
+      f( i, j, k, JDIAP ) = 0.004
+      f( i, j, k, JGREN ) = 0.004
+      f( i, j, k, JGREP ) = 0.004
+
+
       else
 
        f( i, j, k, : ) = -9999.

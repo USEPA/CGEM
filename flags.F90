@@ -73,6 +73,8 @@ MODULE FLAGS
 
 IMPLICIT NONE
 
+INTEGER :: DoDroop = 1
+
 INTEGER :: OVERWRITE                     ! Overwrite output
 LOGICAL :: END_RUN                       ! Stop the run
 LOGICAL :: DOAGGREG                      ! Perform aggregation

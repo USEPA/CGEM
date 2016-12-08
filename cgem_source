@@ -108,14 +108,19 @@ OBJ  =  Model_dim.o\
 	eutro.o\
 	zoo.o\
 	diatoms.o\
+	diatoms_droop.o\
 	greens.o\
+	greens_droop.o\
 	MASS_BALANCE_GD_allocate.o\
 	carbon.o\
 	phosph.o\
+	phosph_droop.o\
 	nitrog.o\
+	nitrog_droop.o\
 	silica.o\
 	dissolved_oxygen.o\
-	exchange.o
+	exchange.o\
+	exchange_droop.o
 
 # implicitnone on compile line must be disabled for these diagenesis
 # related files. If IMPLICIT NONE is used, it is declared within the

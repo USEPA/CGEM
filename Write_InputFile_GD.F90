@@ -45,6 +45,7 @@ write(999,*) "Which_Vmix",Which_Vmix
 write(999,*) "KH_coeff",KH_coeff  
 write(999,*) "Which_Outer_BC",Which_Outer_BC 
 write(999,*) "m_OM_init,m_OM_bc,m_OM_sh",m_OM_init,m_OM_bc,m_OM_sh 
+write(999,*) "DoDroop",DoDroop
 !---------------------------------------------------
 
 !--GOMDOM params------------------------------------------------
@@ -200,10 +201,72 @@ write(999,*) KRDO(1,1,1)     ! KRDO: D.O. reaeration coefficient (m/s)
 write(999,*) RCDO            ! RCDO: D.O. to carbon ratio in resp 
 write(999,*) RNTO            ! RNTO: ratio of O2 consumed to nitrif
 write(999,*) 
+write(999,*) !Droop Kinetics
+write(999,*)
+write(999,*) FINTNID
+write(999,*) FINTNDD
+write(999,*) FINTNLD
+write(999,*) FINTNRD
+write(999,*)
+write(999,*) FINTNIG
+write(999,*) FINTNDG
+write(999,*) FINTNLG
+write(999,*) FINTNRG
+write(999,*)
+write(999,*) FINTLUXNIP
+write(999,*) FINTSTRNIP
+write(999,*) FINTLUXNDP
+write(999,*) FINTSTRNDP
+write(999,*) FINTLUXNLP
+write(999,*) FINTSTRNLP
+write(999,*) FINTLUXNRP
+write(999,*) FINTSTRNRP
+write(999,*)
+write(999,*) FINTPID
+write(999,*) FINTPDD
+write(999,*) FINTPLD
+write(999,*) FINTPRD
+write(999,*)
+write(999,*) FINTPIG
+write(999,*) FINTPDG
+write(999,*) FINTPLG
+write(999,*) FINTPRG
+write(999,*)
+write(999,*) FINTLUXPIP
+write(999,*) FINTSTRPIP
+write(999,*) FINTLUXPDP
+write(999,*) FINTSTRPDP
+write(999,*) FINTLUXPLP
+write(999,*) FINTSTRPLP
+write(999,*) FINTLUXPRP
+write(999,*) FINTSTRPRP
+write(999,*)
+write(999,*) KHINTND
+write(999,*) KHINTNG
+write(999,*) KHINTPD
+write(999,*) KHINTPG
+write(999,*)
+write(999,*) QMINND
+write(999,*) QMINNG
+write(999,*) QMINPD
+write(999,*) QMINPG
+write(999,*) QMAXND
+write(999,*) QMAXNG
+write(999,*) QMAXPD
+write(999,*) QMAXPG
+write(999,*) UPNMAXD
+write(999,*) UPNMAXG
+write(999,*) UPPMAXD
+write(999,*) UPPMAXG
+write(999,*)
 write(999,*) ! Settling rates
 write(999,*) 
 write(999,*) ws(JDIA)  ! VDIA
+write(999,*) ws(JDIAN) ! VDIAN
+write(999,*) ws(JDIAP) ! VDIAP
 write(999,*) ws(JGRE)  ! VGRE	
+write(999,*) ws(JGREN) ! VGREN
+write(999,*) ws(JGREP) ! VGREP
 write(999,*) ws(JLOC)  ! VLOC
 write(999,*) ws(JROC)  ! VROC
 write(999,*) ws(JLON)  ! VLON

@@ -79,8 +79,8 @@
       read(19,*) nospZ
       close(19)
 
-      if(Which_code.eq."GOMDOM") then !CGEM
-         nf = 19
+      if(Which_code.eq."GOMDOM") then !GOMDOM
+         nf = 23
          EXTRA_VARIABLES = 5
          call OUTPUT_NETCDF_GD_allocate()
          call INPUT_VARS_GD_allocate()
@@ -89,7 +89,7 @@
          call MASS_BALANCE_GD_allocate()
          call GoMDOM(input_filename,BASE_NETCDF_OUTPUT_FILE_NAME)
       else
-         nf = nospA*3+nospZ+16
+         nf = nospA*3+nospZ+16  !CGEM
         !Calculate EXTRA_VARIABLES for netCDF:
         !ir,irfrac,uN(nospA),uP(nospA),uE(nospA),uA(nospA),Chla,s_xy(8),uSi(nospA),pH,ChlC(nospA),R_11
          EXTRA_VARIABLES = 13 + 6*nospA

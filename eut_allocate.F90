@@ -204,6 +204,12 @@ ALLOCATE(IFG(im,jm,nsl))     ! Light limitation for greens
 
 ALLOCATE(TFG(im,jm,nsl))     ! Temperature limitation for greens
 
+!Droop
+ALLOCATE(QND(im,jm,nsl))  
+ALLOCATE(QPD(im,jm,nsl))  
+ALLOCATE(QNG(im,jm,nsl))  
+ALLOCATE(QPG(im,jm,nsl))  
+
 !------------------------------------------------------------------------------
 !  Dissolved Oxygen arrays used to store kinetic processes.
 !------------------------------------------------------------------------------

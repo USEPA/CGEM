@@ -1,4 +1,4 @@
-SUBROUTINE CARBON(f,DTM,TEMP,i,j,k,myi)
+SUBROUTINE CARBON(f,DTM,TEMP,i,j,k)
 !------------------------------------------------------------------------------
 !-
 !-   $Id: carbon.F90,v 1.0.6.1 2014/08/26 22:54:04 wmelende Exp wmelende $
@@ -111,7 +111,7 @@ IMPLICIT NONE
 REAL, INTENT(IN) :: f(nf)
 REAL, INTENT(INOUT) :: DTM(nf)
 REAL, INTENT(IN) :: TEMP
-INTEGER, INTENT(IN) :: i,j,k,myi
+INTEGER, INTENT(IN) :: i,j,k
 
 REAL :: DOCMET            ! DOC production by algal metabolism
 REAL :: LPOCMET           ! LPOC production by algal metabolism
@@ -207,8 +207,8 @@ REAL :: DENITRIFICATION_C
 
    ENDIF
 
-           SUM_DOCMET(myi,j,k) = SUM_DOCMET(myi,j,k) + DOCMET
-           SUM_DOCPRD(myi,j,k) = SUM_DOCPRD(myi,j,k) + DOCPRD
+           SUM_DOCMET(i,j,k) = SUM_DOCMET(i,j,k) + DOCMET
+           SUM_DOCPRD(i,j,k) = SUM_DOCPRD(i,j,k) + DOCPRD
 
 
 !------------------------------------------------------------------------------
@@ -287,8 +287,8 @@ REAL :: DENITRIFICATION_C
 
    ENDIF 
 
-           SUM_DOCMET(myi,j,k) = SUM_DOCMET(myi,j,k) + DOCMET
-           SUM_DOCPRD(myi,j,k) = SUM_DOCPRD(myi,j,k) + DOCPRD
+           SUM_DOCMET(i,j,k) = SUM_DOCMET(i,j,k) + DOCMET
+           SUM_DOCPRD(i,j,k) = SUM_DOCPRD(i,j,k) + DOCPRD
 
 
 !------------------------------------------------------------------------------
@@ -334,7 +334,7 @@ REAL :: DENITRIFICATION_C
 
    ENDIF
 
-           SUM_DOCZOO(myi,j,k) = SUM_DOCZOO(myi,j,k) + DOCZOO
+           SUM_DOCZOO(i,j,k) = SUM_DOCZOO(i,j,k) + DOCZOO
 
 !------------------------------------------------------------------------------
 !  Labile particulate component
@@ -452,7 +452,7 @@ REAL :: DENITRIFICATION_C
            DENITRIFICATION_C = 0.0
        ENDIF
 
-       SUM_DENITR_C(myi,j,k) = SUM_DENITR_C(myi,j,k) + DENITRIFICATION_C
+       SUM_DENITR_C(i,j,k) = SUM_DENITR_C(i,j,k) + DENITRIFICATION_C
 
        DTM(JDOC) =  DTM(JDOC) - DENITRIFICATION_C 
 

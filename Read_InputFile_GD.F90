@@ -47,6 +47,7 @@ read(999,*) Which_Vmix
 read(999,*) KH_coeff  
 read(999,*) Which_Outer_BC 
 read(999,*) m_OM_init,m_OM_bc,m_OM_sh 
+read(999,*) DoDroop
 !---------------------------------------------------
 
  if(icent_jcent_units.eq.0) then
@@ -64,6 +65,7 @@ read(999,*) m_OM_init,m_OM_bc,m_OM_sh
 ! CALL mdatePminPsec (iYrE,iMonE,iDayE,iHrE, iMinE,iSecE, DayE_8, 1)
 
 !--GOMDOM params------------------------------------------------
+read(999,*)
 read(999,*)             !C
 read(999,*)             !C  FIREAD file
 read(999,*)             !C
@@ -217,10 +219,72 @@ KRDO = dum
 read(999,*) RCDO            ! RCDO: D.O. to carbon ratio in resp 
 read(999,*) RNTO            ! RNTO: ratio of O2 consumed to nitrif
 read(999,*) 
+read(999,*) !Droop Kinetics
+read(999,*)
+read(999,*) FINTNID
+read(999,*) FINTNDD
+read(999,*) FINTNLD
+read(999,*) FINTNRD
+read(999,*)
+read(999,*) FINTNIG
+read(999,*) FINTNDG
+read(999,*) FINTNLG
+read(999,*) FINTNRG
+read(999,*)
+read(999,*) FINTLUXNIP
+read(999,*) FINTSTRNIP
+read(999,*) FINTLUXNDP
+read(999,*) FINTSTRNDP
+read(999,*) FINTLUXNLP
+read(999,*) FINTSTRNLP
+read(999,*) FINTLUXNRP
+read(999,*) FINTSTRNRP
+read(999,*)
+read(999,*) FINTPID
+read(999,*) FINTPDD
+read(999,*) FINTPLD
+read(999,*) FINTPRD
+read(999,*)
+read(999,*) FINTPIG
+read(999,*) FINTPDG
+read(999,*) FINTPLG
+read(999,*) FINTPRG
+read(999,*)
+read(999,*) FINTLUXPIP
+read(999,*) FINTSTRPIP
+read(999,*) FINTLUXPDP
+read(999,*) FINTSTRPDP
+read(999,*) FINTLUXPLP
+read(999,*) FINTSTRPLP
+read(999,*) FINTLUXPRP
+read(999,*) FINTSTRPRP
+read(999,*)
+read(999,*) KHINTND
+read(999,*) KHINTNG
+read(999,*) KHINTPD
+read(999,*) KHINTPG
+read(999,*)
+read(999,*) QMINND
+read(999,*) QMINNG
+read(999,*) QMINPD
+read(999,*) QMINPG
+read(999,*) QMAXND
+read(999,*) QMAXNG
+read(999,*) QMAXPD
+read(999,*) QMAXPG
+read(999,*) UPNMAXD
+read(999,*) UPNMAXG
+read(999,*) UPPMAXD
+read(999,*) UPPMAXG
+read(999,*)
 read(999,*) ! Settling rates
 read(999,*) 
 read(999,*) ws(JDIA)  ! VDIA
+read(999,*) ws(JDIAN)  ! VDIAN
+read(999,*) ws(JDIAP)  ! VDIAP
 read(999,*) ws(JGRE)  ! VGRE	
+read(999,*) ws(JGREN)  ! VGREN
+read(999,*) ws(JGREP)  ! VGREP
 read(999,*) ws(JLOC)  ! VLOC
 read(999,*) ws(JROC)  ! VROC
 read(999,*) ws(JLON)  ! VLON

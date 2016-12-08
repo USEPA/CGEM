@@ -59,6 +59,11 @@ INTEGER,PARAMETER ::  JDO2   = 18          ! Dissolved oxygen
 
 INTEGER,PARAMETER ::  JTR    = 19          ! Tracer 
 
+INTEGER,PARAMETER  :: JDIAN = 20           ! Diatoms's Internal Nitrogen
+INTEGER,PARAMETER  :: JDIAP = 21           ! Diatoms's Internal Phosphorus
+INTEGER,PARAMETER  :: JGREN = 22           ! Greens's Internal Nitrogen
+INTEGER,PARAMETER  :: JGREP = 23           ! Greens's Internal Phosphorus
+
 
 !
 !--------------------------------------------------------------
