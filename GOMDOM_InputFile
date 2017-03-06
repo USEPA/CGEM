@@ -1,16 +1,16 @@
-"GoMDOM2k input file 11.24.16, FullGrid ICBC, with Si flux, Droop" 		!Code_ID: Identifier for run, appears in netCDF file
+"GoMDOM2k input file 9.9.16, Salinity ICBC, no Si flux" 		!Code_ID: Default - Oct 2016 (see spreadsheet)
 
 !Simulation Specifics
-2006     1     1     18     0     0		!- starting time Yr, Mon, Day, Hr, Min, Sec
-2006    12    31     18     0     0		!- ending   time Yr, Mon, Day, Hr, Min, Sec
+2006     1     1     00     0     0		!- starting time Yr, Mon, Day, Hr, Min, Sec
+2006    12    31     00     0     0		!- ending   time Yr, Mon, Day, Hr, Min, Sec
 300 86400      	!- dT (timestep, secs); dT_out (output interval, secs); dT_restart (restart interval, secs)
 0		        !- How cell Location is specified:0==long-lat 1==grid-units
 -92.39 29.03		!- Cell i,j coord (if grid-units) or longcent,latcent vals (if long-lat)
 
 !Switches in GEM
 0 0 0 0 0 0 0 0	0 !Which_Fluxes: Toggle on(1) off(0): O2surf, DICsurf, SOD, MPB, Nutrient Exchange, CMAQ, Instant Remineralization, Sediment Diagenesis, Silica
-1		!SolarRadKo: 0==Calculate Solar, 1==Read Solar Files
-1		!InitializeHow: 0==Salinity, 1==User
+2 1 1 1		!ReadVars: Solar=Calculate(0),Read(1),Read PAR(2); Wind== 5mph(0) or Read(1), Temp== cosine w/params(0) or Read(1), Sal== Read one value(0) or Read(1) 
+0		!InitializeHow: 0==Salinity Regression, 1==User Input
 
 !River Loads - used in 3D only
 1		!rcNO3  - factor multiplying NO3 river load
@@ -21,7 +21,7 @@
 !Other including Boundary Conditions
 1		!Which_VMix: 0==No VMixing, Other==Yes VMixing   
 1		!KH_coeff: multiplying factor for KH in VMixing  
-2		!Which_Outer_BC: 0==Salinity, 1==GoMDOM original, 2==GoMDOM Full Grid
+1		!Which_Outer_BC: 0==Salinity, 1==GoMDOM original, 2==GoMDOM Full Grid
 0 0 0 		!Multipliers for OM_bc at initial conditions and for boundary conditions, lateral and shelf
 0               !DoDroop, 1==Droop
 
@@ -32,19 +32,19 @@ C
 5.00E-02          ! ALPHA_DIA: Initial slope of diatom light sat curve 
 5.00E-02          ! ALPHA_GRE: Initial slope of greens light sat curve
 
-0.088             ! ANCP: N:C ratio
-0.0122            ! APCP: P:C ratio
-0.50              ! ASCD: Si:C ratio
+0.25              ! ANCP: N:C ratio
+0.01              ! APCP: P:C ratio (too low for the original)
+2.3               ! ASCD: Si:C ratio
 0.05              ! AVFRAC: Available DOP fraction
 0.05              ! AVFRACDON: Available DON fraction
 
-1.97E-06          ! BMRD: diatom mortality
-1.97E-06          ! BMRG: greens mortality
+8.60E-07          ! BMRD: diatom mortality
+8.60E-07          ! BMRG: greens mortality
 
-50                ! CCHLD: C:chl ratio for diatoms
-50                ! CCHLG: C:chl ratio for greens
+40                ! CCHLD: C:chl ratio for diatoms
+40                ! CCHLG: C:chl ratio for greens
 
-1.16E-05          ! CGZ: zoo grazing rate
+1.16E-05          ! CGZ: zoo grazing rate - Gulf GoMDOM value (different from original LM3 Eutro eq)
 
 1.07              ! DENIT_CN_RATIO  
 
@@ -94,7 +94,7 @@ C
 0.10              ! FPRZ: Frac z-mort ROP
 0.00              ! FSAP: Frac pred = DSi
 
-0.20              ! GREFF: zoo grazing coeff
+0.20              ! GREFF: zoo grazing coeff (LM3-Eutro used 0.6 which seems high)
 
 1                ! ILMUL: scaling factor for surface short wave radiation
 
@@ -113,55 +113,55 @@ C
 2.50E-05         ! KHNG: mean N half sat (gre)
 1.00E-05         ! KHNNT: half sat of NH3 for nitr
 1.00E-03         ! KHODOC_SED
-1.00E-06         ! KHP: Organic P Decay Half Saturation Constant
-2.50E-06         ! KHPD: mean P half sat (dia)
-2.50E-06         ! KHPG: mean P half sat (gre)
-2.50E-05         ! KHSD: mean Si half sat (dia)
-1.74E-06         ! KLC: min hyd for LOC
+5.00E-07         ! KHP: Organic P Decay Half Saturation Constant
+5.00E-06         ! KHPD: mean P half sat (dia) - change from 5.00E-07
+5.00E-06         ! KHPG: mean P half sat (gre) - change from 5.00E-07
+6.00E-06         ! KHSD: mean Si half sat (dia) - before 6.00E-05 
+1.00E-07         ! KLC: min hyd for LOC
 0.00E+00         ! KLCALG: LOC alg dependence
-1.16E-06         ! KLN: min hyd for LON
+3.47E-07         ! KLN: min hyd for LON
 0.00E+00         ! KLNALG: LON alg dependence
-1.16E-06         ! KLP: min hyd for LOP
-0.00             ! KLPALG: LOP alg dependence
-2.89E-07         ! KRC: min hyd for ROC
+2.30E-07         ! KLP: min hyd for LOP  Note: defaults difference to the LM3 Eutro value
+6.00E-03         ! KLPALG: LOP alg dependence
+1.00E-07         ! KRC: min hyd for ROC
 0.00E+00         ! KRCALG: POC alg dependence
-2.89E-07         ! KRN: min hyd for RON
+3.47E-08         ! KRN: min hyd for RON
 0.00E+00         ! KRNALG: RON alg dependence
-2.89E-07         ! KRP: min hyd for ROP
+5.70E-08         ! KRP: min hyd for ROP
 0.00E+00         ! KRPALG: ROP alg dependence
-7.00E-06         ! KSUA: BSi diss rate
+2.50E-06         ! KSUA: BSi diss rate
 7.50E-05         ! KSZ: zoo half sat phyto
-0.069            ! KTBD: dia mort temp coeff 
-0.069            ! KTBG: gre mort temp coeff 
-0.0030           ! KTGD1: temp coeff < (dia)
-0.00             ! KTGD2: temp coeff > (dia)
-0.0030           ! KTGG1: temp coeff < (gre)
-0.00             ! KTGG2: temp coeff > (gre)
-0.069            ! KTHDR: hyd temp dep
-0.069            ! KTMNL: min temp dep
-0.006            ! KTNT1: temp coeff < nitr
-0.006            ! KTNT2: temp coeff > nitr
+0.074            ! KTBD: dia mort temp coeff 
+0.074            ! KTBG: gre mort temp coeff 
+0.025            ! KTGD1: temp coeff < (dia) before - 0.025
+0.006            ! KTGD2: temp coeff > (dia)
+0.025            ! KTGG1: temp coeff < (gre) before - 0.025
+0.006            ! KTGG2: temp coeff > (gre)
+0.099            ! KTHDR: hyd temp dep
+0.074            ! KTMNL: min temp dep
+0.004            ! KTNT1: temp coeff < nitr
+0.004            ! KTNT2: temp coeff > nitr
 0.069            ! KTSUA: silic diss temp coeff
-8.50E-11         ! NTM: nitrif rate 
-4.30E+00         ! PBMAX_DIA: photo rate at opt illum
-4.30E+00         ! PBMAX_GRE: photo rate at opt illum
-5.21E-05         ! PMD: dia prod
-5.21E-05         ! PMG: gre prod
+2.50E-11         ! NTM: nitrif rate 
+4.30E+00         ! PBMAX_DIA: photo rate at opt illum  (need to understand)
+4.30E+00         ! PBMAX_GRE: photo rate at opt illum  (need to understand)
+2.90E-05         ! PMD: dia prod
+2.60E-05         ! PMG: gre prod
 
 1.00E-3          ! RSODNTR
 
 2                ! SILIM: Minimum nutrient limits growth
 
-32               ! TMD: opt temp dia
-32               ! TMG: opt temp gre
-25               ! TMNT: opt temp nitr
-25               ! TRD: opt metab temp (dia)
-25               ! TRG: opt metab temp (gre)
-25               ! TRHDR: opt hydr temp
-25               ! TRMNL: opt mineral temp
-25               ! TRSUA: opt Si diss temp
-25               ! TZREF: opt pred temp
-25               ! TREF: SOD reference temp
+18               ! TMD: opt temp dia
+18               ! TMG: opt temp gre
+30               ! TMNT: opt temp nitr
+20               ! TRD: opt metab temp (dia)
+20               ! TRG: opt metab temp (gre)
+20               ! TRHDR: opt hydr temp
+20               ! TRMNL: opt mineral temp
+20               ! TRSUA: opt Si diss temp
+20               ! TZREF: opt pred temp
+20               ! TREF: SOD reference temp
 0.15             ! ZDTH: zoo mort, was 5.0E-07
 1.05             ! ZTHET: temp coeff pred
 
@@ -177,7 +177,7 @@ C
 2.67E+00        ! RCDO: D.O. to carbon ratio in resp 
 4.33E+00        ! RNTO: ratio of O2 consumed to nitrif
 
-! Droop Kinetics
+! Droop Kinetics (not used in Monod and not tested yet)
 
 0.4             !FINTNID  
 0.3             !FINTNDD 
@@ -237,16 +237,16 @@ C
 
 ! Settling rates
 
-5.79E-06		! VDIA
-5.79E-06                ! VDIAN
-5.79E-06                ! VDIAP
-5.79E-06		! VGRE
+2.00E-06		! VDIA  different from before
+5.79E-06                ! VDIAN (Droop - not tested)
+5.79E-06                ! VDIAP (Droop - not tested)
+2.00E-06		! VGRE	different from before
 5.79E-06                ! VGREN
 5.79E-06                ! VGREP	
-5.79E-06		! VLOC
-5.79E-06		! VROC
-5.79E-06		! VLON
-5.79E-06		! VRON
-5.79E-06		! VLOP
-5.79E-06		! VROP
-1.16E-05		! VSU
+2.00E-06		! VLOC
+2.00E-06		! VROC
+2.00E-06		! VLON
+2.00E-06		! VRON
+2.00E-06		! VLOP
+2.00E-06		! VROP
+8.00E-05		! VSU   different from before

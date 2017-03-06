@@ -81,7 +81,7 @@
 
       if(Which_code.eq."GOMDOM") then !GOMDOM
          nf = 23
-         EXTRA_VARIABLES = 5
+         EXTRA_VARIABLES = 23 
          call OUTPUT_NETCDF_GD_allocate()
          call INPUT_VARS_GD_allocate()
          call eut_allocate()

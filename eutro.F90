@@ -4,7 +4,7 @@ SUBROUTINE EUTRO(f,T,S,Rad,fm,wsm,d,dz,Vol,dT)
 
 USE Model_dim
 USE STATES
-USE INPUT_VARS_GD, ONLY : Which_Fluxes
+USE INPUT_VARS_GD, ONLY : Which_Fluxes,Read_Solar
 USE EUT
 USE Which_Flux
 USE InRemin
@@ -25,6 +25,10 @@ INTEGER :: i,j,k
 !
 !------------------------------------------------------------------------------
 !
+
+IOPpar(1,1,1) = Rad(1,1)
+
+if(Read_Solar.ne.2) then
 
 Rad_Watts = Rad/3.021948e14
 
@@ -48,6 +52,8 @@ Rad_Watts = Rad/3.021948e14
           KESS(i,j,k) = ( ( -0.10 * (-0.5606 - SAL_TERM + CHL_TERM + POC_TERM) ) &
                   &  + 1 ) ** (1.0/(-0.10))
       enddo
+
+
       DO k = 1,1
          IATTOP    =  Rad_Watts(i,j)
          OPTDEPTH  =  KESS(i,j,k) * dz(i,j,k)
@@ -64,6 +70,8 @@ Rad_Watts = Rad/3.021948e14
    enddo      ! end of do i block do loop
  enddo      ! end of do j block do loop
 
+endif
+
 
 if(DoDroop.eq.1) then
  do j = 1,jm
@@ -72,13 +80,13 @@ if(DoDroop.eq.1) then
       do k = 1, nz
          DTM(i,j,k,:) = 0.
          CALL ZOO(f(i,j,k,:),DTM(i,j,k,:),T(i,j,k),i,j,k)                ! Zooplankton kinetics
-         CALL DIATOMS_droop(f(i,j,k,:),DTM(i,j,k,:),T(i,j,k),IOPpar(i,j,k),i,j,k)            ! Diatom kinetics
-         CALL GREENS_droop(f(i,j,k,:),DTM(i,j,k,:),T(i,j,k),IOPpar(i,j,k),i,j,k)             ! Greens kinetics
+         CALL DIATOMS_droop(f(i,j,k,:),DTM(i,j,k,:),T(i,j,k),IOPpar(i,j,k),Vol(i,j,k),dT,i,j,k)            ! Diatom kinetics
+         CALL GREENS_droop(f(i,j,k,:),DTM(i,j,k,:),T(i,j,k),IOPpar(i,j,k),Vol(i,j,k),dT,i,j,k)             ! Greens kinetics
          CALL CARBON(f(i,j,k,:),DTM(i,j,k,:),T(i,j,k),i,j,k)         ! Carbon (detritus) kinetics
          CALL PHOSPH_droop(f(i,j,k,:),DTM(i,j,k,:),i,j,k)                      ! Phosphorous kinetics
          CALL NITROG_droop(f(i,j,k,:),DTM(i,j,k,:),T(i,j,k),i,j,k)         ! Nitrogen kinetics
          CALL SILICA(f(i,j,k,:),DTM(i,j,k,:),T(i,j,k),i,j,k)             ! Silica kinetics
-         CALL DISSOLVED_OXYGEN(f(i,j,k,:),DTM(i,j,k,:),T(i,j,k),i,j,k)   ! Dissolved Oxygen
+         CALL DISSOLVED_OXYGEN(f(i,j,k,:),DTM(i,j,k,:),T(i,j,k),Vol(i,j,k),dT,i,j,k)   ! Dissolved Oxygen
       enddo
        endif !End of if(fm(ij) statement
    enddo      ! end of do i block do loop
@@ -90,13 +98,13 @@ else
       do k = 1, nz
          DTM(i,j,k,:) = 0.
          CALL ZOO(f(i,j,k,:),DTM(i,j,k,:),T(i,j,k),i,j,k)                !  Zooplankton kinetics
-         CALL DIATOMS(f(i,j,k,:),DTM(i,j,k,:),T(i,j,k),IOPpar(i,j,k),i,j,k) ! Diatom kinetics
-         CALL GREENS(f(i,j,k,:),DTM(i,j,k,:),T(i,j,k),IOPpar(i,j,k),i,j,k) ! Greens kinetics
+         CALL DIATOMS(f(i,j,k,:),DTM(i,j,k,:),T(i,j,k),IOPpar(i,j,k),Vol(i,j,k),dT,i,j,k) ! Diatom kinetics
+         CALL GREENS(f(i,j,k,:),DTM(i,j,k,:),T(i,j,k),IOPpar(i,j,k),Vol(i,j,k),dT,i,j,k) ! Greens kinetics
          CALL CARBON(f(i,j,k,:),DTM(i,j,k,:),T(i,j,k),i,j,k)         ! Carbon (detritus) kinetics
          CALL PHOSPH(f(i,j,k,:),DTM(i,j,k,:),i,j,k)                      !  Phosphorous kinetics
          CALL NITROG(f(i,j,k,:),DTM(i,j,k,:),T(i,j,k),i,j,k)         ! Nitrogen kinetics
          CALL SILICA(f(i,j,k,:),DTM(i,j,k,:),T(i,j,k),i,j,k)             !  Silica kinetics
-         CALL DISSOLVED_OXYGEN(f(i,j,k,:),DTM(i,j,k,:),T(i,j,k),i,j,k)   !  Dissolved Oxygen
+         CALL DISSOLVED_OXYGEN(f(i,j,k,:),DTM(i,j,k,:),T(i,j,k),Vol(i,j,k),dT,i,j,k)   !  Dissolved Oxygen
       enddo
        endif !End of if(fm(ij) statement
    enddo      ! end of do i block do loop
@@ -135,7 +143,7 @@ else
 endif
 endif
 
-
+       !write(6,*) DTM(1,1,1,JDOP)*dt,DTM(1,1,1,JLOP)*dt
 
  do j = 1,jm
      do i = 1,im 
@@ -152,7 +160,9 @@ if(Which_Fluxes(iInRemin).eq.1) then
  do j = 1,jm
      do i = 1,im 
        if(fm(i,j).eq.1.and.wsm(i,j).eq.0.) then
-         f(i,j,nz,:) = max(f(i,j,nz,:)  - (SETRATE(:)/Vol(i,j,nz)) * dT,0.)
+         !write(6,*) area,f(i,j,nz,JDIA),SETRATE(JDIA),dT,(SETRATE(JDIA)/Vol(i,j,nz)) * dT
+!         f(i,j,nz,:) = max(f(i,j,nz,:)  - (SETRATE(:)/Vol(i,j,nz)) * dT,0.)
+          f(i,j,nz,:) = max( (f(i,j,nz,:)*Vol(i,j,nz) - SETRATE(:)*dT)/Vol(i,j,nz),0. )
        endif !End of if(fm(ij) statement
    enddo      ! end of do i block do loop
  enddo      ! end of do j block do loop

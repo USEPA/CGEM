@@ -85,9 +85,9 @@ OBJ  =  Model_dim.o\
 	USER_get_masks.o\
 	USER_get_Vars.o\
 	USER_output_data.o\
-	USER_Read_Solar.o\
 	USER_Read_Wind.o\
 	USER_Set_Initial_Conditions.o\
+	USER_Read.o\
 	INPUT_VARS_GD.o\
 	INPUT_VARS_GD_allocate.o\
 	states.o\
@@ -120,7 +120,9 @@ OBJ  =  Model_dim.o\
 	silica.o\
 	dissolved_oxygen.o\
 	exchange.o\
-	exchange_droop.o
+	exchange_droop.o\
+	Calc_Sal.o\
+	Calc_Temp.o\
 
 # implicitnone on compile line must be disabled for these diagenesis
 # related files. If IMPLICIT NONE is used, it is declared within the

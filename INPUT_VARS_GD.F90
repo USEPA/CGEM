@@ -15,7 +15,7 @@ real*8 DayS_8, DayE_8
 !--Switches in GEM---------
 integer Which_Fluxes(9)
 integer Which_hydro
-integer solarRadKo
+integer Read_Solar,Read_Wind,Read_T,Read_Sal 
 integer InitializeHow
 !----Sinking Terms----------------------------------
 real,allocatable :: ws(:) 

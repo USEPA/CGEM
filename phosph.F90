@@ -201,7 +201,7 @@ REAL :: ALG               ! Total phytoplankton concentration (dia+gre)
    DTM(JLOP) = DTM(JLOP) - HDRLPOP 
    DTM(JROP) = DTM(JROP) - HDRRPOP 
 
-
+!   write(6,*) "DOP,LOP,HDRL",DTM(JDOP),DTM(JLOP),HDRLPOP
 !
 !------------------------------------------------------------------------------
 !

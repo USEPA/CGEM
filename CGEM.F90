@@ -191,7 +191,7 @@
 ! Beginning of the time-loop
 !---------------------------
 
-      TC_8 = START_SECONDS - dT / 2. ! Subtract half dT to 'center' of timestep.
+      TC_8 = START_SECONDS - dT / 2 ! Subtract half dT to 'center' of timestep.
 
 !-------------- START TIME LOOP -----------------------------------
       do istep = 1, nstep 

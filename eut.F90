@@ -137,7 +137,6 @@ REAL,ALLOCATABLE :: PD(:,:,:)           ! Production rates for diatoms
 
 REAL,ALLOCATABLE :: PD_AVG(:,:,:)       ! Average production rates for 
                                               ! diatoms
-
 REAL,ALLOCATABLE :: PG(:,:,:)           ! Production rates for greens
 
 REAL,ALLOCATABLE :: PG_AVG(:,:,:)       ! Average production rates for 

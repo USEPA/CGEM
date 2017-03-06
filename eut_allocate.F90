@@ -136,14 +136,14 @@ ALLOCATE(DAILY_PAR(im,jm,nsl))     ! Daily cumulative PAR
 ALLOCATE(PARTICLE(im,jm,nsl))   ! Particle/dissolved status flags
 
 ALLOCATE(PD(im,jm,nsl))        ! Production rates for diatoms
-
+PD = 0.
 ALLOCATE(PD_AVG(im,jm,nsl))        ! Average production rates for 
-                                              ! diatoms
+PD_AVG = 0.                                              ! diatoms
 
 ALLOCATE(PG(im,jm,nsl))        ! Production rates for greens
-
+PG = 0.
 ALLOCATE(PG_AVG(im,jm,nsl))        ! Average production rates for 
-                                              ! greens
+PG_AVG = 0.                                              ! greens
 
 ALLOCATE(PPC(im,jm,nsl))        ! Level 2 phytoplankton production rates
 

@@ -1,4 +1,4 @@
-SUBROUTINE DIATOMS_DROOP(f,DTM,TEMP,IOPpar,i,j,k,myi,Vol,dT)
+SUBROUTINE DIATOMS_DROOP(f,DTM,TEMP,IOPpar,Vol,dT,i,j,k)
 !------------------------------------------------------------------------------
 !-   
 !-   Purpose and Methods : Diatoms Droop kinetics calculations
@@ -18,14 +18,14 @@ USE Model_dim
 USE EUT
 USE FLAGS, ONLY: SILIM
 USE STATES
-!USE Extra_Output
+USE INPUT_VARS_GD, ONLY : Read_Solar
 
 IMPLICIT NONE
 
 REAL, INTENT(IN) :: f(nf),dT
 REAL, INTENT(IN) :: TEMP,IOPpar,Vol
 REAL, INTENT(INOUT) :: DTM(nf)
-INTEGER, INTENT(IN) :: i,j,k,myi
+INTEGER, INTENT(IN) :: i,j,k
 
 
 REAL :: FN  ! Nutrient limitation factor
@@ -76,6 +76,8 @@ REAL :: PAR               ! Photosynthetic active radiation
 !------------------------------------------------------------------------------
 
    PAR = IOPpar * 0.48 * 4.57
+   if(Read_Solar.eq.1) PAR = IOPpar
+
    IFD(i,j,k) = TANH (ALPHA_DIA * PAR / PBMAX_DIA)
 
 !------------------------------------------------------------------------------
@@ -143,16 +145,7 @@ REAL :: PAR               ! Photosynthetic active radiation
                   - PRD(i,j,k) 
 
 
-!   IF (DO_PHYTO_PROCESSES) THEN
-!------------------------------------------------------------------------------
-!  Convert metabolism, production, and predation rates to mass terms
-!  and add up mass terms over the time span of a writing interval.
-!------------------------------------------------------------------------------
-!!       BMD_AVG(myi,j,k) = BMD_AVG(myi,j,k) + BMD(i,j,k) * f(JDIA) * Vol * dT 
-!!       PD_AVG(myi,j,k)  = PD_AVG(myi,j,k)  + PD(i,j,k) * f(JDIA) * Vol * dT
-!       PRD_AVG(ISEG) = PRD_AVG(ISEG) + (PRD(ISEG) * V1(ISEG) * DLT)
-
-!   ENDIF
+   PD_AVG(i,j,k)  = PD_AVG(i,j,k)  + PD(i,j,k) * f(JDIA) * Vol * real(dT,4)
 
 
 

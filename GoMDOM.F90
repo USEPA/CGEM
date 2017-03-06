@@ -67,6 +67,8 @@
      real lat(jm),lon(im) !Latitude and longitude of each grid cell
      real d(im,jm,nsl)    !Water depth at cell bottom 
      real Vol(im,jm,nsl)    !Volume of cell
+     real area(im,jm,nsl)   !Area of cell
+
      real S(im,jm,nsl),T(im,jm,nsl)!S=Salinity, T=temperature in Celsius
 
      real f(im,jm,nsl,nf) !Array that holds value of nf state variables
@@ -93,7 +95,7 @@
 !----------------------
       call USER_getLonLat(lat,lon)
       call USER_get_basic_grid(dz,d,d_sfc,Vol)
-
+      area = Vol/dz
 !---------------------------------------------------------------
 ! --- Read input data, from GEM_InputFile
 !-------------------------------------------------------------
@@ -113,6 +115,10 @@
 ! ---  Initialization
 ! ------------------
 
+! --- sinking speed: converted from m/s downward positive to m/s
+! negative
+      ws = -ws
+
     ! Compute starting time of run in seconds since Model_dim::iYr0:
       START_SECONDS = &
       TOTAL_SECONDS( iYr0, iYrS, iMonS, iDayS, iHrS, iMinS, iSecS )
@@ -122,7 +128,17 @@
 !----------------------------
 ! --- Set initial variables
 !----------------------------
-      call USER_get_Vars(START_SECONDS,TC_8,S,T)
+      if(Read_T.ne.0) then
+        call USER_Read(TC_8,T,'t')
+      else
+        call Calc_Temp(START_SECONDS,TC_8,T)
+      endif
+
+      if(Read_Sal.ne.0) then
+        call USER_Read(TC_8,S,'s')
+      else
+        call Calc_Sal(START_SECONDS,TC_8,S)
+      endif
 
 !--------------------------------
 ! --- get land/water and shelf masks
@@ -170,7 +186,7 @@
                             IYRE, IMONE, IDAYE, IHRE, IMINE, ISECE, &
                             DT_OUT, &
                             LON, LAT, D, FM, &
-                            DZ )
+                            DZ, AREA )
           CALL CLOSE_FILE()
 
 ! Opens the output file for writing:
@@ -192,7 +208,7 @@
 ! Beginning of the time-loop
 !---------------------------
 
-      TC_8 = START_SECONDS - dT / 2. ! Subtract half dT to 'center' of timestep.
+      TC_8 = START_SECONDS - dT / 2 ! Subtract half dT to 'center' of timestep.
 
 !-------------- START TIME LOOP -----------------------------------
       do istep = 1, nstep 
@@ -210,19 +226,34 @@
 !------------------------------------------------------------------
       call USER_get_Vars(START_SECONDS,TC_8,S,T)
 
+      if(Read_T.ne.0) then
+        call USER_Read(TC_8,T,'t')
+      else
+        call Calc_Temp(START_SECONDS,TC_8,T)
+      endif
+
+      if(Read_Sal.ne.0) then
+        call USER_Read(TC_8,T,'s')
+      else
+        call Calc_Sal(START_SECONDS,TC_8,S)
+      endif
+
+
 !------------------- Get Solar Radiation --------------------------------
-      !Uncomment when read in routine is written
-      !if(solarRadKo.eq.1) then
-      ! call USER_Read_Solar(TC_8,Rad)
-      !else
+      if(Read_Solar.ne.0) then
+       call USER_Read(TC_8,Rad,'p')
+      else
        call getSolar( lon, lat, iYr, iMon, iDay, iHr, iMin, iSec, Rad)
-      !endif
+      endif
 
 !-------------- GEM - Biogeochemical Equations  ---------------------------
       call EUTRO(f,T,S,Rad,fm,wsm,d,dz,Vol,dT)
-
 !------------------------- Read Wind Data ------------------------
-      call USER_Read_Wind(TC_8,Wind)
+      if(Read_Wind.eq.0) then
+       Wind=5. 
+      else
+       call USER_Read(TC_8,Wind,'w')
+      endif
 
 !-------- Surface and Bottom Fluxes ---------------------------------------
       call Flux_GD(f,T,S,wsm,fm,dz,Vol,Wind,TC_8)

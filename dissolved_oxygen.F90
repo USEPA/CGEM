@@ -1,4 +1,4 @@
-SUBROUTINE DISSOLVED_OXYGEN(f,DTM,TEMP,i,j,k)
+SUBROUTINE DISSOLVED_OXYGEN(f,DTM,TEMP,Vol,dT,i,j,k)
 !------------------------------------------------------------------------------
 !-
 !-  $Id: dissolved_oxygen.F90,v 1.0.6.1 2014/08/26 22:54:04 wmelende Exp wmelende $
@@ -25,9 +25,9 @@ USE STATES
 IMPLICIT NONE
 
 REAL, INTENT(IN) :: f(nf)
-REAL, INTENT(IN) :: TEMP
+REAL, INTENT(IN) :: TEMP,Vol
 REAL, INTENT(INOUT) :: DTM(nf)
-INTEGER, INTENT(IN) :: i,j,k
+INTEGER, INTENT(IN) :: i,j,k,dT
 
 
 REAL :: ALG               ! Phytoplankton concentration (dia+gre)
@@ -105,6 +105,7 @@ IF (.NOT. DO_DO2) RETURN
         DOZOO   = 0.0
     ENDIF
 
+
     DTM(JDO2) = DTM(JDO2) + DOPRODD - DOMETD + DOPRODG - DOMETG -  & 
                    &  DOPREDD - DOPREDG - DOZOO
 
@@ -127,6 +128,16 @@ IF (.NOT. DO_DO2) RETURN
 
     DTM(JDO2) = DTM(JDO2) -(DOMNLDOC + DOCOD) 
 
+
+    PD_AVG(i,j,k)  = PD_AVG(i,j,k)  + PD(i,j,k) * f(JDIA) * Vol * real(dT,4)
+
+    DOMETD_ARR(i,j,k) = DOMETD_ARR(i,j,k) + DOMETD * Vol * real(dT,4)
+    DOMETG_ARR(i,j,k) = DOMETG_ARR(i,j,k) + DOMETG * Vol * real(dT,4)
+    DOPREDD_ARR(i,j,k) = DOPREDD_ARR(i,j,k) + DOPREDD * Vol * real(dT,4)
+    DOPREDG_ARR(i,j,k) = DOPREDG_ARR(i,j,k) + DOPREDG * Vol * real(dT,4)
+    DOZOO_ARR(i,j,k) = DOZOO_ARR(i,j,k) + DOZOO * Vol * real(dT,4)
+    DOMNLDOC_ARR(i,j,k) = DOMNLDOC_ARR(i,j,k) + DOMNLDOC * Vol * real(dT,4)
+    NITDO2(i,j,k) = NITDO2(i,j,k) + RNTO * NT * Vol * real(dT,4)
 
 !------------------------------------------------------------------------------
 END SUBROUTINE DISSOLVED_OXYGEN

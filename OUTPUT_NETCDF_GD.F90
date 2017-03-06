@@ -49,7 +49,7 @@ CONTAINS
                           EXTRA_VARIABLES, IYR0, &
                           IYRS, IMONS, IDAYS, IHRS, IMINS, ISECS, &
                           IYRE, IMONE, IDAYE, IHRE, IMINE, ISECE, &
-                          DT_OUT, RLON, RLAT, H, FM, DZ)
+                          DT_OUT, RLON, RLAT, H, FM, DZ, AREA)
     USE Test_Mod_GD
     USE eut
     USE flags
@@ -64,7 +64,7 @@ CONTAINS
     INTEGER,INTENT(IN):: DT_OUT ! Model timestep size in seconds.
     REAL,DIMENSION(IM):: RLON
     REAL,DIMENSION(JM):: RLAT
-    REAL,DIMENSION(IM, JM, NSL):: H,DZ
+    REAL,DIMENSION(IM, JM, NSL):: H,DZ,AREA
     INTEGER,DIMENSION(IM, JM),INTENT(IN):: FM
    ! External NetCDF routines:
     INTEGER NF_CREATE, NF_ENDDEF, NF_PUT_VAR_INT, NF_PUT_VAR_REAL, NF_SYNC
@@ -74,7 +74,7 @@ CONTAINS
     INTEGER,DIMENSION(IM, JM, NSL):: TEMP_3D_FM ! VLA
     INTEGER IM_DIM, JM_DIM, NSL_DIM, NSTEPP1_DIM
     INTEGER RLON_VAR, RLAT_VAR, H_VAR, FM_VAR
-    INTEGER DZ_VAR
+    INTEGER DZ_VAR,AREA_VAR
     INTEGER K
     INTEGER ERR, VARIABLE, DIM_IDS( 4 )
     REAL,DIMENSION(IM):: RLON_COPY
@@ -107,6 +107,7 @@ CONTAINS
     CALL DEFIAT( FILE_ID, 'iHrE', IHRE )
     CALL DEFIAT( FILE_ID, 'iMinE', IMINE )
     CALL DEFIAT( FILE_ID, 'iSecE', ISECE )
+    CALL DEFIAT( FILE_ID, 'dT', dT )
     CALL DEFIAT( FILE_ID, 'dT_out', DT_OUT )
     CALL DEFTAT( FILE_ID, 'description1', &
       'Output from NCOM_GEM ' // &
@@ -159,7 +160,10 @@ CONTAINS
     CALL DEFIAT( FILE_ID, 'Which_Fluxes(iCMAQ)', Which_Fluxes(iCMAQ) )
     CALL DEFIAT( FILE_ID, 'Which_Fluxes(iInRemin)', Which_Fluxes(iInRemin) )
     CALL DEFIAT( FILE_ID, 'Which_Fluxes(iSDM)', Which_Fluxes(iSDM) )
-    CALL DEFIAT( FILE_ID, 'SolarRadKo', SolarRadKo  )
+    CALL DEFIAT( FILE_ID, 'Read_Solar', Read_Solar  )
+    CALL DEFIAT( FILE_ID, 'Read_T', Read_T  )
+    CALL DEFIAT( FILE_ID, 'Read_Sal', Read_Sal  )
+    CALL DEFIAT( FILE_ID, 'Read_Wind', Read_Wind  )
 !River Loads
     CALL DEFTAT( FILE_ID, 'Calibration7', 'River Loads in GoMDOM.')
     CALL DEFRAT( FILE_ID, 'rcNO3', rcNO3 )
@@ -382,6 +386,9 @@ CONTAINS
                  'Mask: 0 = land, 1 = water.', 'none' )
     CALL DEFVR3( FILE_ID, IM_DIM, JM_DIM, NSL_DIM, DZ_VAR, 'dz', &
                  'Thickness of cell.', 'none' )
+    CALL DEFVR3( FILE_ID, IM_DIM, JM_DIM, NSL_DIM, AREA_VAR, 'Area', &
+                 'Area of cell.', 'm2' )
+
     ! Define time array variable as each output data's seconds since IYR0:
 
     WRITE ( TIME_UNITS, '(A,I4.4,A)' ) &
@@ -461,6 +468,9 @@ CONTAINS
 
     ERR = NF_PUT_VAR_REAL( FILE_ID, DZ_VAR, DZ )
     CALL CHKERR( ERR, 'write output variable dz' )
+
+    ERR = NF_PUT_VAR_REAL( FILE_ID, AREA_VAR, AREA )
+    CALL CHKERR( ERR, 'write output variable AREA' )
 
 
 
@@ -629,6 +639,9 @@ CONTAINS
                                TIMESTEP, SUM_DENITR, SUM_DENITR_C, &
                                SUM_DOCPRD, SUM_DOCMET, SUM_DOCZOO ) 
     USE Test_Mod_GD
+    USE eut, ONLY:PD_AVG,PG_AVG,NITDO2,DOMETD_ARR,DOMETG_ARR,DOPREDD_ARR, &
+&       DOPREDG_ARR,DOZOO_ARR, DOMNLDOC_ARR, PFD, SFD, NFD, IFD, TFD,     &
+&       PFG, NFG, IFG, TFG
     IMPLICIT NONE
     INTEGER,INTENT(IN):: IM, JM, NSL, EXTRA_VARIABLES, TIMESTEP
     REAL,DIMENSION(IM, JM, NSL):: SUM_DENITR 
@@ -708,6 +721,187 @@ CONTAINS
         CALL CHKERR( ERR, 'write output variable  ' &
                      // EXTRA_VARIABLE_NAMES( VARIABLE ) )
       END IF
+
+      VARIABLE = 6 ! PD
+
+      IF ( WRITE_EXTRA_VARIABLE( VARIABLE ) ) THEN
+        ERR = NF_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
+                                    STARTS, COUNTS, &
+                                    PD_AVG( 1, 1, 1 ))
+        CALL CHKERR( ERR, 'write output variable  ' &
+                     // EXTRA_VARIABLE_NAMES( VARIABLE ) )
+      END IF
+
+      VARIABLE = 7 ! PG
+
+      IF ( WRITE_EXTRA_VARIABLE( VARIABLE ) ) THEN
+        ERR = NF_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
+                                    STARTS, COUNTS, &
+                                    PG_AVG( 1, 1, 1 ))
+        CALL CHKERR( ERR, 'write output variable  ' &
+                     // EXTRA_VARIABLE_NAMES( VARIABLE ) )
+      END IF
+
+      VARIABLE = 8 ! NITDO2
+
+      IF ( WRITE_EXTRA_VARIABLE( VARIABLE ) ) THEN
+        ERR = NF_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
+                                    STARTS, COUNTS, &
+                                    NITDO2( 1, 1, 1 ))
+        CALL CHKERR( ERR, 'write output variable  ' &
+                     // EXTRA_VARIABLE_NAMES( VARIABLE ) )
+      END IF
+
+      VARIABLE = 9 ! DOMETD
+
+      IF ( WRITE_EXTRA_VARIABLE( VARIABLE ) ) THEN
+        ERR = NF_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
+                                    STARTS, COUNTS, &
+                                    DOMETD_ARR( 1, 1, 1 ))
+        CALL CHKERR( ERR, 'write output variable  ' &
+                     // EXTRA_VARIABLE_NAMES( VARIABLE ) )
+      END IF
+
+      VARIABLE = 10 ! DOMETG
+
+      IF ( WRITE_EXTRA_VARIABLE( VARIABLE ) ) THEN
+        ERR = NF_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
+                                    STARTS, COUNTS, &
+                                    DOMETG_ARR( 1, 1, 1 ))
+        CALL CHKERR( ERR, 'write output variable  ' &
+                     // EXTRA_VARIABLE_NAMES( VARIABLE ) )
+      END IF
+
+      VARIABLE = 11 ! DOPREDD
+
+      IF ( WRITE_EXTRA_VARIABLE( VARIABLE ) ) THEN
+        ERR = NF_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
+                                    STARTS, COUNTS, &
+                                    DOPREDD_ARR( 1, 1, 1 ))
+        CALL CHKERR( ERR, 'write output variable  ' &
+                     // EXTRA_VARIABLE_NAMES( VARIABLE ) )
+      END IF
+
+      VARIABLE = 12 ! DOPREDG
+
+      IF ( WRITE_EXTRA_VARIABLE( VARIABLE ) ) THEN
+        ERR = NF_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
+                                    STARTS, COUNTS, &
+                                    DOPREDG_ARR( 1, 1, 1 ))
+        CALL CHKERR( ERR, 'write output variable  ' &
+                     // EXTRA_VARIABLE_NAMES( VARIABLE ) )
+      END IF
+
+      VARIABLE = 13 ! DOZOO
+
+      IF ( WRITE_EXTRA_VARIABLE( VARIABLE ) ) THEN
+        ERR = NF_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
+                                    STARTS, COUNTS, &
+                                    DOZOO_ARR( 1, 1, 1 ))
+        CALL CHKERR( ERR, 'write output variable  ' &
+                     // EXTRA_VARIABLE_NAMES( VARIABLE ) )
+      END IF
+
+      VARIABLE = 14 ! DOMNLDOC
+
+      IF ( WRITE_EXTRA_VARIABLE( VARIABLE ) ) THEN
+        ERR = NF_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
+                                    STARTS, COUNTS, &
+                                    DOMNLDOC_ARR( 1, 1, 1 ))
+        CALL CHKERR( ERR, 'write output variable  ' &
+                     // EXTRA_VARIABLE_NAMES( VARIABLE ) )
+      END IF
+
+      VARIABLE = 15 ! PFD 
+
+      IF ( WRITE_EXTRA_VARIABLE( VARIABLE ) ) THEN
+        ERR = NF_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
+                                    STARTS, COUNTS, &
+                                    PFD( 1, 1, 1 ))
+        CALL CHKERR( ERR, 'write output variable  ' &
+                     // EXTRA_VARIABLE_NAMES( VARIABLE ) )
+      END IF
+
+      VARIABLE = 16 ! SFD 
+
+      IF ( WRITE_EXTRA_VARIABLE( VARIABLE ) ) THEN
+        ERR = NF_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
+                                    STARTS, COUNTS, &
+                                    SFD( 1, 1, 1 ))
+        CALL CHKERR( ERR, 'write output variable  ' &
+                     // EXTRA_VARIABLE_NAMES( VARIABLE ) )
+      END IF
+
+      VARIABLE = 17 ! NFD 
+
+      IF ( WRITE_EXTRA_VARIABLE( VARIABLE ) ) THEN
+        ERR = NF_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
+                                    STARTS, COUNTS, &
+                                    NFD( 1, 1, 1 ))
+        CALL CHKERR( ERR, 'write output variable  ' &
+                     // EXTRA_VARIABLE_NAMES( VARIABLE ) )
+      END IF
+
+      VARIABLE = 18 ! IFD 
+
+      IF ( WRITE_EXTRA_VARIABLE( VARIABLE ) ) THEN
+        ERR = NF_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
+                                    STARTS, COUNTS, &
+                                    IFD( 1, 1, 1 ))
+        CALL CHKERR( ERR, 'write output variable  ' &
+                     // EXTRA_VARIABLE_NAMES( VARIABLE ) )
+      END IF
+
+      VARIABLE = 19 ! TFD 
+
+      IF ( WRITE_EXTRA_VARIABLE( VARIABLE ) ) THEN
+        ERR = NF_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
+                                    STARTS, COUNTS, &
+                                    TFD( 1, 1, 1 ))
+        CALL CHKERR( ERR, 'write output variable  ' &
+                     // EXTRA_VARIABLE_NAMES( VARIABLE ) )
+      END IF
+
+      VARIABLE = 20 ! PFG 
+
+      IF ( WRITE_EXTRA_VARIABLE( VARIABLE ) ) THEN
+        ERR = NF_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
+                                    STARTS, COUNTS, &
+                                    PFG( 1, 1, 1 ))
+        CALL CHKERR( ERR, 'write output variable  ' &
+                     // EXTRA_VARIABLE_NAMES( VARIABLE ) )
+      END IF
+
+      VARIABLE = 21 ! NFG 
+
+      IF ( WRITE_EXTRA_VARIABLE( VARIABLE ) ) THEN
+        ERR = NF_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
+                                    STARTS, COUNTS, &
+                                    NFG( 1, 1, 1 ))
+        CALL CHKERR( ERR, 'write output variable  ' &
+                     // EXTRA_VARIABLE_NAMES( VARIABLE ) )
+      END IF
+
+      VARIABLE = 22 ! IFG 
+
+      IF ( WRITE_EXTRA_VARIABLE( VARIABLE ) ) THEN
+        ERR = NF_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
+                                    STARTS, COUNTS, &
+                                    IFG( 1, 1, 1 ))
+        CALL CHKERR( ERR, 'write output variable  ' &
+                     // EXTRA_VARIABLE_NAMES( VARIABLE ) )
+      END IF
+
+      VARIABLE = 23 ! TFG 
+
+      IF ( WRITE_EXTRA_VARIABLE( VARIABLE ) ) THEN
+        ERR = NF_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
+                                    STARTS, COUNTS, &
+                                    TFG( 1, 1, 1 ))
+        CALL CHKERR( ERR, 'write output variable  ' &
+                     // EXTRA_VARIABLE_NAMES( VARIABLE ) )
+      END IF
+
 
     RETURN
   END SUBROUTINE WRITE_EXTRA_DATA

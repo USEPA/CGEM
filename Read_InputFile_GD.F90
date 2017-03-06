@@ -31,7 +31,7 @@ read(999,*)
 !--Switches in GEM---------
 read(999,*)
 read(999,*) Which_Fluxes
-read(999,*) solarRadKo
+read(999,*) Read_Solar,Read_Wind,Read_T 
 read(999,*) InitializeHow
 read(999,*) 
 !----River Params-----------------------------------

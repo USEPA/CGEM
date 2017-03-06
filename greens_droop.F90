@@ -1,4 +1,4 @@
-SUBROUTINE GREENS_DROOP(f,DTM,TEMP,IOPpar,i,j,k,myi,Vol,dT)
+SUBROUTINE GREENS_DROOP(f,DTM,TEMP,IOPpar,Vol,dT,i,j,k)
 !------------------------------------------------------------------------------
 !-
 !-   Purpose and Methods : Perform non-diatoms Droop kinetics calculations
@@ -20,7 +20,7 @@ USE Model_dim
 USE EUT
 USE FLAGS, ONLY: SILIM
 USE STATES
-!USE Extra_Output
+USE INPUT_VARS_GD, ONLY : Read_Solar
 
 IMPLICIT NONE
 
@@ -28,7 +28,7 @@ IMPLICIT NONE
 REAL, INTENT(IN) :: f(nf),dT
 REAL, INTENT(IN) :: TEMP,IOPpar,Vol
 REAL, INTENT(INOUT) :: DTM(nf)
-INTEGER, INTENT(IN) :: i,j,k,myi
+INTEGER, INTENT(IN) :: i,j,k
 
 
 REAL :: FN               ! Nutrient limitation factor
@@ -77,6 +77,8 @@ REAL :: PAR              ! Photosynthetic active radiation
 !------------------------------------------------------------------------------
 
    PAR = IOPpar * 0.48 * 4.57
+   if(Read_Solar.eq.1) PAR = IOPpar
+
    IFG(i,j,k)  = TANH (ALPHA_GRE * PAR / PBMAX_GRE)
 
 !------------------------------------------------------------------------------
@@ -135,16 +137,7 @@ REAL :: PAR              ! Photosynthetic active radiation
                   - PRG(i,j,k)
 
 
-!   IF (DO_PHYTO_PROCESSES) THEN
-!------------------------------------------------------------------------------
-!  Convert metabolism, production, and predation rates to mass terms
-!  and add up mass terms over the time span of a writing interval.
-!------------------------------------------------------------------------------
-!!       BMG_AVG(myi,j,k) = BMG_AVG(myi,j,k) + BMG(i,j,k) * f(JGRE) * Vol * dT
-!!       PG_AVG(myi,j,k)  = PG_AVG(myi,j,k)  + PG(i,j,k) * f(JGRE) * Vol * dT
-!       PRG_AVG(ISEG) = PRG_AVG(ISEG) + (PRG(ISEG) * V1(ISEG) * DLT)
-
-!   ENDIF
+   PG_AVG(i,j,k)  = PG_AVG(i,j,k)  + PG(i,j,k) *  f(JGRE) * Vol * real(dT,4)
 
 
 

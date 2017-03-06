@@ -1,4 +1,4 @@
-SUBROUTINE DIATOMS(f,DTM,TEMP,IOPpar,i,j,k)
+SUBROUTINE DIATOMS(f,DTM,TEMP,IOPpar,Vol,dT,i,j,k)
 !------------------------------------------------------------------------------
 !-
 !-   $Id: diatoms.F90,v 1.0.6.1 2014/08/26 22:54:04 wmelende Exp wmelende $
@@ -32,15 +32,15 @@ USE Model_dim
 USE EUT
 USE FLAGS, ONLY: SILIM
 USE STATES
+USE INPUT_VARS_GD, ONLY : Read_Solar
 
 IMPLICIT NONE
 
 
-REAL, INTENT(IN) :: f(nf)
+REAL, INTENT(IN) :: f(nf),Vol
 REAL, INTENT(IN) :: TEMP,IOPpar
 REAL, INTENT(INOUT) :: DTM(nf)
-INTEGER, INTENT(IN) :: i,j,k
-
+INTEGER, INTENT(IN) :: i,j,k,dT
 
 REAL :: FN  ! Nutrient limitation factor
 
@@ -97,6 +97,9 @@ BMD(i,j,k) = BMRD * EXP(KTBD * (TEMP - TRD))
 !------------------------------------------------------------------------------
 
    PAR = IOPpar * 0.48 * 4.57
+   if(Read_Solar.eq.2) PAR = IOPpar
+   !write(6,*) "PAR",PAR
+
    IFD(i,j,k) = TANH (ALPHA_DIA * PAR / PBMAX_DIA)
 
 !------------------------------------------------------------------------------
@@ -158,7 +161,7 @@ IF (SILIM == 3) FN = SFD(i,j,k) * PFD(i,j,k)
 !  Production
 !------------------------------------------------------------------------------
 PD(i,j,k) = PMD * FN * IFD(i,j,k) * TFD(i,j,k)               
-
+!write(6,*) PD(i,j,k),PMD,FN,IFD(i,j,k),TFD(i,j,k)
 !------------------------------------------------------------------------------
 !  Set production to zero if it's negative
 !------------------------------------------------------------------------------
@@ -169,6 +172,13 @@ PD(i,j,k) = PMD * FN * IFD(i,j,k) * TFD(i,j,k)
 !  Update diatom time derivatives 
 !------------------------------------------------------------------------------
    DTM(JDIA) = DTM(JDIA) + (PD(i,j,k) - BMD(i,j,k)) * f(JDIA) - PRD(i,j,k)     
+
+   PD_AVG(i,j,k)  = PD_AVG(i,j,k)  + PD(i,j,k) * f(JDIA) * Vol * real(dT,4)
+
+
+!     write(6,*)  PD(i,j,k),PD_AVG(i,j,k),add
+!    write(6,*) PD(i,j,k)* f(JDIA) * Vol * real(dT,4),PD_AVG(i,j,k)
+
 
 
 !
