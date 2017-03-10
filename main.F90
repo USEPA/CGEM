@@ -64,7 +64,6 @@
          call get_command_argument(2,input_filename) 
          call get_command_argument(3,BASE_NETCDF_OUTPUT_FILE_NAME) !User selects output file name
        endif
-       write(6,*) "Biogeochem equations are: ",Which_code
        write(6,*) "Base Outputfile Name will be: ",trim(BASE_NETCDF_OUTPUT_FILE_NAME)
        write(6,*) "Inputfile will be: ",trim(input_filename)
 
@@ -79,16 +78,17 @@
       read(19,*) nospZ
       close(19)
 
-      if(Which_code.eq."GOMDOM") then !GOMDOM
+      if(Which_code.eq."GOMDOM".or.Which_code.eq."GoMDOM".or.Which_code.eq."gomdom") then !GOMDOM
+         write(6,*) "Biogeochem equations are: ",Which_code
          nf = 23
-         EXTRA_VARIABLES = 23 
+         EXTRA_VARIABLES = 24 
          call OUTPUT_NETCDF_GD_allocate()
          call INPUT_VARS_GD_allocate()
          call eut_allocate()
          call InRemin_allocate()
          call MASS_BALANCE_GD_allocate()
          call GoMDOM(input_filename,BASE_NETCDF_OUTPUT_FILE_NAME)
-      else
+      else 
          nf = nospA*3+nospZ+16  !CGEM
         !Calculate EXTRA_VARIABLES for netCDF:
         !ir,irfrac,uN(nospA),uP(nospA),uE(nospA),uA(nospA),Chla,s_xy(8),uSi(nospA),pH,ChlC(nospA),R_11
@@ -103,6 +103,7 @@
          call JWMod_allocate()
          call OUTPUT_NETCDF_allocate()
          call CGEM(input_filename,BASE_NETCDF_OUTPUT_FILE_NAME)
+         write(6,*) "Biogeochem equations are CGEM, input was: ",Which_code
       endif
 
 !----------------------------------------------------------------

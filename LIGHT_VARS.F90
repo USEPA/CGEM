@@ -8,5 +8,6 @@ real astarOMA
 real astarOMZ
 real astarOMR
 real astarOMBC
+real PARfac
  
 END MODULE LIGHT_VARS

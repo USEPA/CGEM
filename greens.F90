@@ -92,8 +92,9 @@ BMG(i,j,k) = BMRG * EXP(KTBG * (TEMP - TRG))
 ! details regarding the conversion factor of 4.57.
 !
 !------------------------------------------------------------------------------
-   PAR = IOPpar * 0.48 * 4.57
+   PAR = IOPpar * 4.57
    if(Read_Solar.eq.2) PAR = IOPpar
+   DAILY_PAR(i,j,k) = PAR  !Store instantaneous PAR in this array.
 
    IFG(i,j,k)  = TANH (ALPHA_GRE * PAR / PBMAX_GRE)
 

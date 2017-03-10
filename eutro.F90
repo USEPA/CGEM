@@ -1,10 +1,10 @@
-SUBROUTINE EUTRO(f,T,S,Rad,fm,wsm,d,dz,Vol,dT)
+SUBROUTINE EUTRO(f,TC_8,T,S,Rad,lat,lon,fm,wsm,d,d_sfc,dz,Vol,dT)
 !------------------------------------------------------------------------------
 !
 
 USE Model_dim
 USE STATES
-USE INPUT_VARS_GD, ONLY : Which_Fluxes,Read_Solar
+USE INPUT_VARS_GD, ONLY : Which_Fluxes,Read_Solar,ws
 USE EUT
 USE Which_Flux
 USE InRemin
@@ -14,8 +14,10 @@ IMPLICIT NONE
 
 REAL, INTENT(INOUT) :: f(im,jm,nsl,nf)
 REAL, INTENT(IN)    :: T(im,jm,nsl),S(im,jm,nsl),Rad(im,jm)
+REAL, INTENT(IN)    :: lat(jm),lon(im) !Latitude and longitude of each grid cell
 INTEGER, INTENT(IN) :: fm(im,jm),dT
-REAL, INTENT(IN) :: d(im,jm,nsl),dz(im,jm,nsl),Vol(im,jm,nsl),wsm(im,jm)
+INTEGER*8, INTENT(IN) :: TC_8
+REAL, INTENT(IN) :: d(im,jm,nsl),dz(im,jm,nsl),Vol(im,jm,nsl),wsm(im,jm),d_sfc(im,jm,nsl)
 REAL :: DTM(im,jm,nsl,nf),SAL_TERM,CHL_TERM,POC_TERM,IOPpar(im,jm,nsl)
 REAL :: IATTOP, IATBOT(im,jm,nsl),OPTDEPTH,Rad_Watts(im,jm)
 REAL :: SETRATE(nf),area
@@ -26,52 +28,16 @@ INTEGER :: i,j,k
 !------------------------------------------------------------------------------
 !
 
-IOPpar(1,1,1) = Rad(1,1)
+!
+IOPpar(:,:,1) = Rad(:,:)  !If Rad was read in as PAR
 
-if(Read_Solar.ne.2) then
-
-Rad_Watts = Rad/3.021948e14
-
-!GoMDOM LIGHT MODEL, No Wind Speed
- do j = 1,jm
-     do i = 1,im 
-       if(fm(i,j).eq.1) then
-      do k = 1, nz
-         SAL_TERM = 1.084E-06 * (S(i,j,k)**4)
-
-          IF ((f(i,j,k,JDIA) + f(i,j,k,JGRE)) < 1.0E-07) THEN
-               CHL_TERM = 0.0
-          ELSE
-               CHL_TERM = 0.2085 * LOG( (f(i,j,k,JDIA) * 1.0E6 / CCHLD) + &
-                        & (f(i,j,k,JGRE) * 1.0E6 / CCHLG) )
-          ENDIF
-
-          POC_TERM = 0.7640 * SQRT( (f(i,j,k,JLOC) * 1.0E3) +  &
-                   & (f(i,j,k,JROC) * 1.0E3) + (f(i,j,k,JZOO) * 1.0E3) )
-
-          KESS(i,j,k) = ( ( -0.10 * (-0.5606 - SAL_TERM + CHL_TERM + POC_TERM) ) &
-                  &  + 1 ) ** (1.0/(-0.10))
-      enddo
-
-
-      DO k = 1,1
-         IATTOP    =  Rad_Watts(i,j)
-         OPTDEPTH  =  KESS(i,j,k) * dz(i,j,k)
-         IATBOT(i,j,k) =  IATTOP  * EXP(-OPTDEPTH)
-         IOPpar(i,j,k)   =  (IATTOP - IATBOT(i,j,k)) / OPTDEPTH
-      END DO
-      DO k = 2,nz
-         IATTOP    =  IATBOT(i,j,k-1)
-         OPTDEPTH  =  KESS(i,j,k) * dz(i,j,k) 
-         IATBOT(i,j,k) =  IATTOP * EXP(-OPTDEPTH)
-         IOPpar(i,j,k) =  (IATTOP - IATBOT(i,j,k)) / OPTDEPTH
-      END DO
-       endif !End of if(fm(ij) statement
-   enddo      ! end of do i block do loop
- enddo      ! end of do j block do loop
-
+if(Read_Solar.eq.0.or.Read_Solar.eq.1) then
+  call GD_Light_Model(f,S,Rad,IOPpar,fm,dz,dT)
 endif
 
+if(Read_Solar.eq.3) then
+  call Brad_Light_Model(f,fm,TC_8,lat,lon,Rad,d,d_sfc,IOPpar)
+endif
 
 if(DoDroop.eq.1) then
  do j = 1,jm
@@ -141,9 +107,9 @@ else
    enddo      ! end of do i block do loop
  enddo      ! end of do j block do loop
 endif
+
 endif
 
-       !write(6,*) DTM(1,1,1,JDOP)*dt,DTM(1,1,1,JLOP)*dt
 
  do j = 1,jm
      do i = 1,im 
@@ -160,15 +126,23 @@ if(Which_Fluxes(iInRemin).eq.1) then
  do j = 1,jm
      do i = 1,im 
        if(fm(i,j).eq.1.and.wsm(i,j).eq.0.) then
-         !write(6,*) area,f(i,j,nz,JDIA),SETRATE(JDIA),dT,(SETRATE(JDIA)/Vol(i,j,nz)) * dT
-!         f(i,j,nz,:) = max(f(i,j,nz,:)  - (SETRATE(:)/Vol(i,j,nz)) * dT,0.)
-          f(i,j,nz,:) = max( (f(i,j,nz,:)*Vol(i,j,nz) - SETRATE(:)*dT)/Vol(i,j,nz),0. )
+         f(i,j,nz,:) = max(f(i,j,nz,:)  - (SETRATE(:)/Vol(i,j,nz)) * dT,0.)
        endif !End of if(fm(ij) statement
    enddo      ! end of do i block do loop
  enddo      ! end of do j block do loop
 endif
 
-
+if(Which_Fluxes(iInRemin).eq.2) then
+ do j = 1,jm
+     do i = 1,im
+       if(fm(i,j).eq.1.and.wsm(i,j).eq.0.) then
+         area = Vol(i,j,nz)/dz(i,j,nz)
+         SETRATE(:) = f(i,j,nz,:)*area*(-ws(:))
+         f(i,j,nz,:) = max(f(i,j,nz,:)  - (SETRATE(:)/Vol(i,j,nz)) * dT,0.)
+       endif !End of if(fm(ij) statement
+   enddo      ! end of do i block do loop
+ enddo      ! end of do j block do loop
+endif
 
 
 !

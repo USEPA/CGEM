@@ -28,7 +28,6 @@ real Kw
 real Kcdom
 real Kspm
 real Kchla
-real PARfac
 !---Phytoplankton 
 real, allocatable :: ediblevector(:,:)
 real, allocatable :: umax(:) 

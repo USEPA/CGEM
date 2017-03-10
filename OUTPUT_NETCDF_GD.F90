@@ -641,7 +641,7 @@ CONTAINS
     USE Test_Mod_GD
     USE eut, ONLY:PD_AVG,PG_AVG,NITDO2,DOMETD_ARR,DOMETG_ARR,DOPREDD_ARR, &
 &       DOPREDG_ARR,DOZOO_ARR, DOMNLDOC_ARR, PFD, SFD, NFD, IFD, TFD,     &
-&       PFG, NFG, IFG, TFG
+&       PFG, NFG, IFG, TFG, DAILY_PAR
     IMPLICIT NONE
     INTEGER,INTENT(IN):: IM, JM, NSL, EXTRA_VARIABLES, TIMESTEP
     REAL,DIMENSION(IM, JM, NSL):: SUM_DENITR 
@@ -898,6 +898,16 @@ CONTAINS
         ERR = NF_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
                                     STARTS, COUNTS, &
                                     TFG( 1, 1, 1 ))
+        CALL CHKERR( ERR, 'write output variable  ' &
+                     // EXTRA_VARIABLE_NAMES( VARIABLE ) )
+      END IF
+
+      VARIABLE = 24 ! PAR 
+
+      IF ( WRITE_EXTRA_VARIABLE( VARIABLE ) ) THEN
+        ERR = NF_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
+                                    STARTS, COUNTS, &
+                                    DAILY_PAR( 1, 1, 1 ))
         CALL CHKERR( ERR, 'write output variable  ' &
                      // EXTRA_VARIABLE_NAMES( VARIABLE ) )
       END IF

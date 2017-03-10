@@ -93,15 +93,7 @@ REAL :: Carbon_Consumed_Denitr  !  Carbon consumed by the denitrification proces
 !------------------------------------------------------------------------------
 !
 ! Mass loss due to settling in kg/s
-  SETRATE = 0.
-  SETRATE(JLOC) = f(JLOC)*area*(-ws(JLOC))
-  SETRATE(JROC) = f(JROC)*area*(-ws(JROC))
-  SETRATE(JDIA) = f(JDIA)*area*(-ws(JDIA))
-  SETRATE(JGRE) = f(JGRE)*area*(-ws(JGRE))
-  SETRATE(JLON) = f(JLON)*area*(-ws(JLON))
-  SETRATE(JRON) = f(JRON)*area*(-ws(JRON))
-  SETRATE(JDIAN) = f(JDIAN)*area*(-ws(JDIAN))
-  SETRATE(JGREN) = f(JGREN)*area*(-ws(JGREN))
+  SETRATE(:) = f(:)*area*(-ws(:))
 
 !------------------------------------------------------------------------------
 ! Calculate sediment oxygen demand, ammonia, and nitrate mass rates at

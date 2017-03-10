@@ -8,9 +8,18 @@
 -92.39 29.03		!- Cell i,j coord (if grid-units) or longcent,latcent vals (if long-lat)
 
 !Switches in GEM
-0 0 0 0 0 0 0 0	0 !Which_Fluxes: Toggle on(1) off(0): O2surf, DICsurf, SOD, MPB, Nutrient Exchange, CMAQ, Instant Remineralization, Sediment Diagenesis, Silica
-2 1 1 1		!ReadVars: Solar=Calculate(0),Read(1),Read PAR(2); Wind== 5mph(0) or Read(1), Temp== cosine w/params(0) or Read(1), Sal== Read one value(0) or Read(1) 
+0 0 0 0 0 0 2 0	0 !Which_Fluxes: Toggle on(1) off(0): O2surf, DICsurf, SOD, MPB, Nutrient Exchange, CMAQ, Instant Remineralization, Sediment Diagenesis, Silica
+3 0 0 0		!ReadVars: Solar=Calculate(0),Read(1),Read PAR(2); Wind== 5mph(0) or Read(1), Temp== cosine w/params(0) or Read(1), Sal== Read one value(0) or Read(1) 
 0		!InitializeHow: 0==Salinity Regression, 1==User Input
+
+!Optics
+0.0375          !astar490: Chla specific absorption at 490 nm
+0.015           !aw490: seawater absorption at 490 nm
+0.0             !astarOMA: REUSE to set constant CDOM(ppb) 
+0.01            !astarOMZ: Zooplankton specific absorption at 490 nm
+0.01            !astarOMR: ROC specific absorption at 490 nm
+0.01            !astarOMBC: LOC specific absorption at 490 nm
+1.              !PARfac: Multiplies surface PAR
 
 !River Loads - used in 3D only
 1		!rcNO3  - factor multiplying NO3 river load
@@ -238,15 +247,15 @@ C
 ! Settling rates
 
 2.00E-06		! VDIA  different from before
-5.79E-06                ! VDIAN (Droop - not tested)
-5.79E-06                ! VDIAP (Droop - not tested)
-2.00E-06		! VGRE	different from before
-5.79E-06                ! VGREN
-5.79E-06                ! VGREP	
-2.00E-06		! VLOC
-2.00E-06		! VROC
-2.00E-06		! VLON
-2.00E-06		! VRON
-2.00E-06		! VLOP
-2.00E-06		! VROP
-8.00E-05		! VSU   different from before
+0. 5.79E-06                ! VDIAN (Droop - not tested)
+0. 5.79E-06                ! VDIAP (Droop - not tested)
+0. 4.00E-06		! VGRE	different from before
+0. 5.79E-06                ! VGREN
+0. 5.79E-06                ! VGREP	
+0. 2.00E-06		! VLOC
+0. 2.00E-06		! VROC
+0. 2.00E-06		! VLON
+0. 2.00E-06		! VRON
+0. 2.00E-06		! VLOP
+0. 2.00E-06		! VROP
+0. 8.00E-05		! VSU   different from before

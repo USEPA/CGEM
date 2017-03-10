@@ -5,6 +5,7 @@ USE INPUT_VARS_GD
 USE STATES
 USE EUT
 USE FLAGS
+USE LIGHT_VARS
 
 IMPLICIT NONE
 
@@ -34,6 +35,16 @@ read(999,*) Which_Fluxes
 read(999,*) Read_Solar,Read_Wind,Read_T 
 read(999,*) InitializeHow
 read(999,*) 
+!--Optics-----------------------
+read(999,*)
+read(999,*) astar490
+read(999,*) aw490
+read(999,*) astarOMA
+read(999,*) astarOMZ
+read(999,*) astarOMR
+read(999,*) astarOMBC
+read(999,*) PARfac
+read(999,*)
 !----River Params-----------------------------------
 read(999,*) 
 read(999,*) rcNO3

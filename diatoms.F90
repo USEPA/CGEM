@@ -96,9 +96,10 @@ BMD(i,j,k) = BMRD * EXP(KTBD * (TEMP - TRD))
 !
 !------------------------------------------------------------------------------
 
-   PAR = IOPpar * 0.48 * 4.57
+   PAR = IOPpar * 4.57
    if(Read_Solar.eq.2) PAR = IOPpar
-   !write(6,*) "PAR",PAR
+   DAILY_PAR(i,j,k) = PAR  !Store instantaneous PAR in this array.
+
 
    IFD(i,j,k) = TANH (ALPHA_DIA * PAR / PBMAX_DIA)
 

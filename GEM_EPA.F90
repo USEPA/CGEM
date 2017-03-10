@@ -14,6 +14,7 @@
      USE STOICH_VARS
      USE MASS_BALANCE
      USE DailyRad
+     USE LIGHT_VARS
 
       IMPLICIT NONE
 

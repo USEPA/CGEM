@@ -72,6 +72,7 @@
       real aOM1A490_bot, aOM1Z490_bot, aOM1R490_bot, aOM1BC490_bot
       integer :: k  
 
+
 ! First, convert CDOM(ppb) into CDOM, a490 (m-1)
 ! Once the CDOM (QSE ppb) is in the model domain, we advect and mix using the same 
 ! routine as for other dissolved constituents. However, to use the CDOM in the light 
@@ -83,6 +84,7 @@
       CDOM(k) = (CDOM_k(k) - 0.538)/2.933 !ppb to a312
       CDOM(k) = CDOM(k) * exp(-0.016*(490.-312.))
    enddo 
+
 
 !Initialize counters for Chla, CDOM, and detritus:
    Chla_tot = 0.

@@ -156,7 +156,6 @@
       endif
 !========End Initialization of f==============================================
 
-
 !---------------------------------------------------
 ! Calc nstep , the total number of timesteps in a run	
 !---------------------------------------------------       
@@ -240,14 +239,14 @@
 
 
 !------------------- Get Solar Radiation --------------------------------
-      if(Read_Solar.ne.0) then
+      if(Read_Solar.eq.1.or.Read_Solar.eq.2) then
        call USER_Read(TC_8,Rad,'p')
       else
        call getSolar( lon, lat, iYr, iMon, iDay, iHr, iMin, iSec, Rad)
       endif
 
 !-------------- GEM - Biogeochemical Equations  ---------------------------
-      call EUTRO(f,T,S,Rad,fm,wsm,d,dz,Vol,dT)
+      call EUTRO(f,TC_8,T,S,Rad,lat,lon,fm,wsm,d,d_sfc,dz,Vol,dT)
 !------------------------- Read Wind Data ------------------------
       if(Read_Wind.eq.0) then
        Wind=5. 

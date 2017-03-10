@@ -123,6 +123,8 @@ OBJ  =  Model_dim.o\
 	exchange_droop.o\
 	Calc_Sal.o\
 	Calc_Temp.o\
+	GD_Light_Model.o\
+	Brad_Light_Model.o
 
 # implicitnone on compile line must be disabled for these diagenesis
 # related files. If IMPLICIT NONE is used, it is declared within the

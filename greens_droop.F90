@@ -76,8 +76,9 @@ REAL :: PAR              ! Photosynthetic active radiation
 !
 !------------------------------------------------------------------------------
 
-   PAR = IOPpar * 0.48 * 4.57
-   if(Read_Solar.eq.1) PAR = IOPpar
+   PAR = IOPpar * 4.57
+   if(Read_Solar.eq.2) PAR = IOPpar
+   DAILY_PAR(i,j,k) = PAR  !Store instantaneous PAR in this array.
 
    IFG(i,j,k)  = TANH (ALPHA_GRE * PAR / PBMAX_GRE)
 
