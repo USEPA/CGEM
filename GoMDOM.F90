@@ -128,17 +128,18 @@
 !----------------------------
 ! --- Set initial variables
 !----------------------------
-      if(Read_T.ne.0) then
-        call USER_Read(TC_8,T,'t')
-      else
+      if(Read_T.eq.0) then
         call Calc_Temp(START_SECONDS,TC_8,T)
+      else
+       call USER_Read(TC_8,T,'t')
       endif
 
-      if(Read_Sal.ne.0) then
-        call USER_Read(TC_8,S,'s')
-      else
+      if(Read_Sal.eq.0) then
         call Calc_Sal(START_SECONDS,TC_8,S)
+      else
+        call USER_Read(TC_8,S,'s')
       endif
+
 
 !--------------------------------
 ! --- get land/water and shelf masks
@@ -221,28 +222,26 @@
                             iYr, iMon, iDay, iHr, iMin, iSec )
 
 !------------------------------------------------------------------
-! Read T, S, TC_8
+! Read or calculate T, S
 !------------------------------------------------------------------
-      call USER_get_Vars(START_SECONDS,TC_8,S,T)
-
-      if(Read_T.ne.0) then
-        call USER_Read(TC_8,T,'t')
-      else
+      if(Read_T.eq.0) then
         call Calc_Temp(START_SECONDS,TC_8,T)
+      else
+       call USER_Read(TC_8,T,'t')
       endif
 
-      if(Read_Sal.ne.0) then
-        call USER_Read(TC_8,T,'s')
-      else
+      if(Read_Sal.eq.0) then
         call Calc_Sal(START_SECONDS,TC_8,S)
+      else
+        call USER_Read(TC_8,S,'s')
       endif
 
 
 !------------------- Get Solar Radiation --------------------------------
-      if(Read_Solar.eq.1.or.Read_Solar.eq.2) then
-       call USER_Read(TC_8,Rad,'p')
-      else
+      if(Read_Solar.eq.0) then
        call getSolar( lon, lat, iYr, iMon, iDay, iHr, iMin, iSec, Rad)
+      else
+       call USER_Read(TC_8,Rad,'p')
       endif
 
 !-------------- GEM - Biogeochemical Equations  ---------------------------

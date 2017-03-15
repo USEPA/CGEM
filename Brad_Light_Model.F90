@@ -46,7 +46,7 @@
          ! Hardcoded to 0.47 on 2/11/16, Re: Tsubo and Walker, 2005
                     PARsurf = (0.47 * Rad) * PARfac
 
-  if(Read_Solar.eq.1) PARsurf = Rad * 0.47 * 2.77e14
+  if(Read_Solar.eq.2) PARsurf = Rad*2.77e14/4.57 * PARfac 
 
  ! First calculate the Julian(GMT) model year (iYrTC), month (iMonTC),
  ! day (iDayTC), hour (iHrTC), minute (iMinTC), and second (iSecTC)
@@ -96,8 +96,8 @@
      enddo
    enddo
 
-   IOPpar = IOPpar/2.77e14  !Convert to Watts
-
+   IOPpar = IOPpar/2.77e14  !Convert to Watts/m2/s
+   IOPpar = IOPpar*4.57     !Convert to umol/m2/s
  
    return
  

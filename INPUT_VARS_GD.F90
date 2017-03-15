@@ -17,6 +17,7 @@ integer Which_Fluxes(9)
 integer Which_hydro
 integer Read_Solar,Read_Wind,Read_T,Read_Sal 
 integer InitializeHow
+integer Which_irradiance
 !----Sinking Terms----------------------------------
 real,allocatable :: ws(:) 
 !----River Params-----------------------------------

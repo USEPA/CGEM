@@ -26,6 +26,8 @@ OBJ  =  Model_dim.o\
 	CGEM_vars_allocate.o\
 	INPUT_VARS.o\
 	INPUT_VARS_allocate.o\
+	INPUT_VARS_GD.o\
+	INPUT_VARS_GD_allocate.o\
 	Which_Flux.o\
 	LIGHT_VARS.o\
 	TEMP_VARS.o\
@@ -88,8 +90,6 @@ OBJ  =  Model_dim.o\
 	USER_Read_Wind.o\
 	USER_Set_Initial_Conditions.o\
 	USER_Read.o\
-	INPUT_VARS_GD.o\
-	INPUT_VARS_GD_allocate.o\
 	states.o\
 	eut.o\
 	eut_allocate.o\

@@ -1,4 +1,4 @@
-SUBROUTINE GREENS(f,DTM,TEMP,IOPpar,Vol,dT,i,j,k)
+SUBROUTINE GREENS(f,DTM,TEMP,PAR,Vol,dT,i,j,k)
 !------------------------------------------------------------------------------
 !-
 !-   $Id: greens.F90,v 1.0.6.1 2014/08/26 22:54:04 wmelende Exp wmelende $
@@ -36,7 +36,7 @@ USE INPUT_VARS_GD, ONLY : Read_Solar
 IMPLICIT NONE
 
 REAL, INTENT(IN) :: f(nf),Vol
-REAL, INTENT(IN) :: TEMP,IOPpar
+REAL, INTENT(IN) :: TEMP,PAR
 REAL, INTENT(INOUT) :: DTM(nf)
 INTEGER, INTENT(IN) :: i,j,k,dT
 
@@ -44,7 +44,6 @@ INTEGER, INTENT(IN) :: i,j,k,dT
 REAL :: FN               ! Nutrient limitation factor
 REAL :: PO4AVL           ! Available phosphate
 REAL :: NDIS             ! Dissolved nitrogen
-REAL :: PAR
 !
 !------------------------------------------------------------------------------
 !
@@ -92,8 +91,6 @@ BMG(i,j,k) = BMRG * EXP(KTBG * (TEMP - TRG))
 ! details regarding the conversion factor of 4.57.
 !
 !------------------------------------------------------------------------------
-   PAR = IOPpar * 4.57
-   if(Read_Solar.eq.2) PAR = IOPpar
    DAILY_PAR(i,j,k) = PAR  !Store instantaneous PAR in this array.
 
    IFG(i,j,k)  = TANH (ALPHA_GRE * PAR / PBMAX_GRE)

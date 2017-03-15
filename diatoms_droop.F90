@@ -1,4 +1,4 @@
-SUBROUTINE DIATOMS_DROOP(f,DTM,TEMP,IOPpar,Vol,dT,i,j,k)
+SUBROUTINE DIATOMS_DROOP(f,DTM,TEMP,PAR,Vol,dT,i,j,k)
 !------------------------------------------------------------------------------
 !-   
 !-   Purpose and Methods : Diatoms Droop kinetics calculations
@@ -23,7 +23,7 @@ USE INPUT_VARS_GD, ONLY : Read_Solar
 IMPLICIT NONE
 
 REAL, INTENT(IN) :: f(nf),dT
-REAL, INTENT(IN) :: TEMP,IOPpar,Vol
+REAL, INTENT(IN) :: TEMP,PAR,Vol
 REAL, INTENT(INOUT) :: DTM(nf)
 INTEGER, INTENT(IN) :: i,j,k
 
@@ -31,7 +31,6 @@ INTEGER, INTENT(IN) :: i,j,k
 REAL :: FN  ! Nutrient limitation factor
 
 REAL :: SA                ! Available silica
-REAL :: PAR               ! Photosynthetic active radiation
 
 !
 !------------------------------------------------------------------------------
@@ -74,9 +73,6 @@ REAL :: PAR               ! Photosynthetic active radiation
 ! details regarding the conversion factor of 4.57.
 !
 !------------------------------------------------------------------------------
-
-   PAR = IOPpar * 4.57
-   if(Read_Solar.eq.2) PAR = IOPpar 
    DAILY_PAR(i,j,k) = PAR  !Store instantaneous PAR in this array.
 
    IFD(i,j,k) = TANH (ALPHA_DIA * PAR / PBMAX_DIA)

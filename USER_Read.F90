@@ -2,7 +2,7 @@
 
       USE Model_dim
       USE DATE_TIME
-
+      USE INPUT_VARS_GD, ONLY:Read_Solar
       IMPLICIT NONE
 
       integer*8, intent (in) :: TC_8
@@ -17,6 +17,12 @@
       integer :: ifile
 !    Specify variables for dates and times
       integer iYr, iMon, iDay, iHour, iMin, iSec
+      real, parameter :: cv        = 2.77e14 ! multiplicative factor used
+                                                 ! to convert from
+                                                 ! watts/m2
+                                                 ! to photons/cm2/sec
+                                                 ! Morel and Smith
+                                                 ! (1974)
       
       iSec = 0
 
@@ -77,6 +83,9 @@
       fac = real(TC_8 - t1)
       fac = real(fac,4) / real(( t2 - t1 ),4)
       Var(1,1) = Var1 + ( Var2 - Var1 ) * fac
+!Convert Watts/m2/s into quanta/cm2/s:
+      if(Read_Solar.ne.2) Var = Var*cv
+
 
       return 
       end subroutine USER_Read

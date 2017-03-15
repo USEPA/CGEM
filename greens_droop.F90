@@ -1,4 +1,4 @@
-SUBROUTINE GREENS_DROOP(f,DTM,TEMP,IOPpar,Vol,dT,i,j,k)
+SUBROUTINE GREENS_DROOP(f,DTM,TEMP,PAR,Vol,dT,i,j,k)
 !------------------------------------------------------------------------------
 !-
 !-   Purpose and Methods : Perform non-diatoms Droop kinetics calculations
@@ -26,13 +26,12 @@ IMPLICIT NONE
 
 
 REAL, INTENT(IN) :: f(nf),dT
-REAL, INTENT(IN) :: TEMP,IOPpar,Vol
+REAL, INTENT(IN) :: TEMP,PAR,Vol
 REAL, INTENT(INOUT) :: DTM(nf)
 INTEGER, INTENT(IN) :: i,j,k
 
 
 REAL :: FN               ! Nutrient limitation factor
-REAL :: PAR              ! Photosynthetic active radiation
 
 !
 !------------------------------------------------------------------------------
@@ -75,9 +74,6 @@ REAL :: PAR              ! Photosynthetic active radiation
 ! details regarding the conversion factor of 4.57.
 !
 !------------------------------------------------------------------------------
-
-   PAR = IOPpar * 4.57
-   if(Read_Solar.eq.2) PAR = IOPpar
    DAILY_PAR(i,j,k) = PAR  !Store instantaneous PAR in this array.
 
    IFG(i,j,k)  = TANH (ALPHA_GRE * PAR / PBMAX_GRE)

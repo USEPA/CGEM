@@ -1,4 +1,4 @@
-SUBROUTINE GD_Light_Model(f,S,Rad,IOPpar,fm,dz,dT)
+SUBROUTINE GD_Light_Model(f,S,Rad,PAR,fm,dz,dT)
 !------------------------------------------------------------------------------
 !
 !Input: Rad in Watts...actually, just convert it to Watts for this one
@@ -8,6 +8,7 @@ USE Model_dim
 USE STATES
 USE EUT
 USE INPUT_VARS_GD, ONLY:Read_Solar
+USE LIGHT_VARS, ONLY:PARfac
 
 IMPLICIT NONE
 
@@ -15,7 +16,7 @@ REAL, INTENT(INOUT) :: f(im,jm,nsl,nf)
 REAL, INTENT(IN)    :: S(im,jm,nsl),Rad(im,jm)
 INTEGER, INTENT(IN) :: fm(im,jm),dT
 REAL, INTENT(IN) :: dz(im,jm,nsl)
-REAL, INTENT(OUT) :: IOPpar(im,jm,nsl)
+REAL, INTENT(OUT) :: PAR(im,jm,nsl)
 REAL :: SAL_TERM,CHL_TERM,POC_TERM
 REAL :: IATTOP, IATBOT(im,jm,nsl),OPTDEPTH,Rad_Watts(im,jm)
 INTEGER :: i,j,k
@@ -24,9 +25,13 @@ INTEGER :: i,j,k
 !------------------------------------------------------------------------------
 !
 
-if(Read_Solar.eq.0) Rad_Watts = Rad/2.77e14
+Rad_Watts = Rad/2.77e14*PARfac
 
-Rad_Watts = Rad_Watts*0.48
+if(Read_Solar.ne.2) then
+ Rad_Watts = Rad_Watts*0.48
+endif
+
+if(Read_Solar.eq.2) Rad_Watts = Rad/4.57
 
 !GoMDOM LIGHT MODEL, No Wind Speed
  do j = 1,jm
@@ -53,19 +58,20 @@ Rad_Watts = Rad_Watts*0.48
          IATTOP    =  Rad_Watts(i,j)
          OPTDEPTH  =  KESS(i,j,k) * dz(i,j,k)
          IATBOT(i,j,k) =  IATTOP  * EXP(-OPTDEPTH)
-         IOPpar(i,j,k)   =  (IATTOP - IATBOT(i,j,k)) / OPTDEPTH
+         PAR(i,j,k)   =  (IATTOP - IATBOT(i,j,k)) / OPTDEPTH
       END DO
       DO k = 2,nz
          IATTOP    =  IATBOT(i,j,k-1)
          OPTDEPTH  =  KESS(i,j,k) * dz(i,j,k) 
          IATBOT(i,j,k) =  IATTOP * EXP(-OPTDEPTH)
-         IOPpar(i,j,k) =  (IATTOP - IATBOT(i,j,k)) / OPTDEPTH
+         PAR(i,j,k) =  (IATTOP - IATBOT(i,j,k)) / OPTDEPTH
       END DO
        endif !End of if(fm(ij) statement
    enddo      ! end of do i block do loop
  enddo      ! end of do j block do loop
 
 
+ PAR = PAR*4.57
 
 !
 !-----------------------------------------------------------------------------

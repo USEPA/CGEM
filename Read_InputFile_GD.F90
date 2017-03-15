@@ -32,11 +32,13 @@ read(999,*)
 !--Switches in GEM---------
 read(999,*)
 read(999,*) Which_Fluxes
+read(999,*) !Comment Line
 read(999,*) Read_Solar,Read_Wind,Read_T 
 read(999,*) InitializeHow
 read(999,*) 
 !--Optics-----------------------
 read(999,*)
+read(999,*) Which_irradiance
 read(999,*) astar490
 read(999,*) aw490
 read(999,*) astarOMA
