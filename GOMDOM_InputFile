@@ -10,11 +10,11 @@
 !Switches in GEM
 0 0 0 0 0 0 2 0	0 !Which_Fluxes: Toggle on(1) off(0): O2surf, DICsurf, SOD, MPB, Nutrient Exchange, CMAQ, 
                   !Instant Remineralization(1=with Flux, 2=just sinking), Sediment Diagenesis, Silica
-2 0 0 0		!ReadVars: Solar=Calculate(0),Read(1),Read PAR(2); Wind== 5mph(0) or Read(1), Temp== cosine w/params(0) or Read(1), Sal== Read one value(0) or Read(1) 
+0 0 0 0		!ReadVars: Solar=Calculate(0),Read(1),Read PAR(2); Wind== 5mph(0) or Read(1), Temp== cosine w/params(0) or Read(1), Sal== Read one value(0) or Read(1) 
 0		!InitializeHow: 0==Salinity Regression, 1==User Input
 
 !Optics
-2		!Which_irradiance:(Light Model) 0==none, 1==GoMDOM 2==Brad 
+1		!Which_irradiance:(Light Model) 0==none, 1==GoMDOM 2==Brad 
 0.0375          !astar490: Chla specific absorption at 490 nm
 0.015           !aw490: seawater absorption at 490 nm
 0.0             !astarOMA: REUSE to set constant CDOM(ppb) 
