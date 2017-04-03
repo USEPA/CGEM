@@ -226,6 +226,13 @@ ALLOCATE(DOCOD_ARR(im,jm,nsl))
 ALLOCATE(DOREAR_ARR(im,jm,nsl)) 
 ALLOCATE(DOSOC_ARR(im,jm,nsl)) 
  
+DOMETD_ARR = 0.;
+DOMETG_ARR = 0.
+DOPREDD_ARR = 0.
+DOPREDG_ARR = 0.
+DOZOO_ARR = 0.
+DOMNLDOC_ARR = 0.
+NITDO2 = 0.
 
 !
 !------------------------------------------------------------------------------
