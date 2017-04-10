@@ -171,7 +171,7 @@ REAL :: Carbon_Consumed_Denitr  !  Carbon consumed by the denitrification proces
 !  [SED_CARBON_RATE_OXID] = kg/s
 !------------------------------------------------------------------------------
    Available_Carbon = TOC_SETRATE - SED_CARBON_RATE_OXID
-
+   !write(6,*) "AC=",TOC_SETRATE,SED_CARBON_RATE_OXID
 !------------------------------------------------------------------------------
 !  Calculate the NO3 mass rate that will be moved across the water-sediment
 !  interface by subtracting the NO3 mass rate lost due to denitrification from
@@ -180,6 +180,8 @@ REAL :: Carbon_Consumed_Denitr  !  Carbon consumed by the denitrification proces
 !  [SED_NO3_RATE_NITR] = kg/s
 !------------------------------------------------------------------------------
    SED_NO3_RATE(i,j) = SED_NO3_RATE_NITR -  (Available_Carbon / DENIT_CN_RATIO)
+
+   !write(6,*) "SNR,SNRN,AC/DCN",SED_NO3_RATE(i,j),SED_NO3_RATE_NITR,Available_Carbon/DENIT_CN_RATIO
 
 
    IF ( SED_NO3_RATE(i,j) < 0.0 ) THEN
@@ -206,6 +208,8 @@ REAL :: Carbon_Consumed_Denitr  !  Carbon consumed by the denitrification proces
         MASS_NO3F = -(SED_NO3_FLUX_MIN * area * DLT)
 
         MASS_NO3 = MIN(MASS_NO3R,MASS_NO3F)
+
+        !write(6,*) "R,F,NO3,BC,DLT,area",MASS_NO3R,MASS_NO3F,MASS_NO3,MASSBC,area,DLT
 
 !--------------------------------------------------------------------------------
 !  If the amount of NO3 required by denitrification is greater than the

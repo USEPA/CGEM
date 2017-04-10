@@ -1,4 +1,4 @@
-SUBROUTINE EUTRO(f,TC_8,T,S,Rad,lat,lon,fm,wsm,d,d_sfc,dz,Vol,dT)
+SUBROUTINE EUTRO(f,TC_8,T,S,Rad,lat,lon,fm,wsm,d,d_sfc,dz,Vol,dTime)
 !------------------------------------------------------------------------------
 !
 
@@ -16,7 +16,7 @@ IMPLICIT NONE
 REAL, INTENT(INOUT) :: f(im,jm,nsl,nf)
 REAL, INTENT(IN)    :: T(im,jm,nsl),S(im,jm,nsl),Rad(im,jm)
 REAL, INTENT(IN)    :: lat(jm),lon(im) !Latitude and longitude of each grid cell
-INTEGER, INTENT(IN) :: fm(im,jm),dT
+INTEGER, INTENT(IN) :: fm(im,jm),dTime
 INTEGER*8, INTENT(IN) :: TC_8
 REAL, INTENT(IN) :: d(im,jm,nsl),dz(im,jm,nsl),Vol(im,jm,nsl),wsm(im,jm),d_sfc(im,jm,nsl)
 REAL :: DTM(im,jm,nsl,nf),SAL_TERM,CHL_TERM,POC_TERM,PAR(im,jm,nsl)
@@ -24,7 +24,9 @@ REAL :: IATTOP, IATBOT(im,jm,nsl),OPTDEPTH,Rad_Watts(im,jm)
 REAL :: SETRATE(nf),area
 INTEGER :: i,j,k
 
+REAL dT
 
+dT = real(dTime)
 !
 !------------------------------------------------------------------------------
 !
@@ -105,6 +107,7 @@ else
        if(fm(i,j).eq.1.and.wsm(i,j).eq.0.) then !If on shelf
          area = Vol(i,j,nz)/dz(i,j,nz)
          CALL EXCHANGE(f(i,j,nz,:),area,Vol(i,j,nz),dT,i,j,SETRATE(:))      !  Calculate IR fluxes and settling rates
+         !write(6,*) "area eutro",area
          TSOD(i,j) = TSOD(i,j)/Vol(i,j,nz)
          SED_NO3_RATE(i,j) = SED_NO3_RATE(i,j)/Vol(i,j,nz)
          SED_NH3_RATE(i,j) = SED_NH3_RATE(i,j)/Vol(i,j,nz)
@@ -150,6 +153,8 @@ if(Which_Fluxes(iInRemin).eq.2) then
 endif
 
 
+!write(6,*) TSOD(1,1)*dT,SED_NO3_RATE(1,1)*dT,SED_NH3_RATE(1,1)*dT,SED_CARBON_RATE(1,1)*dT/Vol(1,1,1)
+!f(:,:,:,JLOC) = 2.e-2
 !
 !-----------------------------------------------------------------------------
 
