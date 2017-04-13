@@ -17,7 +17,7 @@
       real, intent(in)   :: pH(im,jm,nsl)
       real, intent(in)   :: Wsp(im,jm)    !Windspeed in m/s
       real, intent(in)   :: dz(im,jm,nsl) !Depth of cell 
-      real, intent(in)   :: wsm(im,jm)    !Shelf mask
+      integer, intent(in)   :: wsm(im,jm)    !Shelf mask
       real, intent(in)   :: Esed(im,jm)   !Irradiance at sediment 
       integer, intent(in) :: istep, fm(im,jm)
       real :: T_sfc, Sal_sfc, O2_sfc, Sc, Op_umole, rhow, Op, OsDOp
@@ -48,6 +48,8 @@
       integer :: NPOINTS, NEQ
       double precision ppH_init(2000)
       double precision YY_init(27000)
+!Layers
+      integer nz
 
 ! -- Read in "A" for SDM --------------------------------------
       if(Which_fluxes(iSDM).eq.1.and.init.eq.1) then
@@ -175,8 +177,8 @@ endif
          do j = 1,jm
          do i = 1,im
              if(fm(i,j).eq.1) then
-              if(wsm(i,j).eq.0.) then !If we are on the shelf
-
+              if(wsm(i,j).eq.0) then !If we are on the shelf
+               nz = nza(i,j)
 if(Which_fluxes(iSOC).eq.1) then
 !Murrell and Lehrter sediment oxygen consumption
        SOC = - 0.0235*2.**(.1*T(i,j,nz))*f(i,j,nz,iO2)

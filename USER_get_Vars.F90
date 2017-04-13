@@ -10,6 +10,7 @@
       real, intent (out) :: T(im,jm,nsl) !Temperature in C
       real,save :: Tmax,Tmin,MaxDay
       real*8 :: Td  !Days from 0 to 365.
+      real   :: readS
       integer, save :: init = 1
 !      T = 23.333 !Our room temperature, 74F
 !      S = 0.5    !Salinity of tap water, psu
@@ -21,7 +22,7 @@
       !write(6,*) "Simulation time in seconds",Td
       Td = Td/86400.d0
       !write(6,*) "Simulation time in days",Td
-      Td = mod(Td,365.)
+      Td = mod(Td,365.d0)
       !write(6,*) "Simulation time within context of year",Td
 
       if(init.eq.1) then  !Only read in data at the first timestep
@@ -43,8 +44,9 @@
 
       open (19,file='./data/S.dat',status='old')
       read (19,*)  !Assumes header file
-      read (19,*) S
+      read (19,*) readS
       close(19)
+      S = readS
       endif
 
 ! Regression equation found by excel from data from a Beach website:

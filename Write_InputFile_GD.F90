@@ -11,8 +11,8 @@ IMPLICIT NONE
 
 integer i,icent_jcent_units
 integer iFijn,isp
-real rlat(jm),rlon(im),i_in,j_in
-character*120 filename
+real rlat(im,jm),rlon(im,jm),i_in,j_in
+character(120) filename
 
 !--Code Identifier--------------
 open(unit=999,file=filename,form='formatted',status='unknown')

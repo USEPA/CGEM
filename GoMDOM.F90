@@ -64,7 +64,7 @@
 
      real, dimension(im,jm,nsl) :: d_sfc         !Distance from surface to center of cell
 
-     real lat(jm),lon(im) !Latitude and longitude of each grid cell
+     real lat(im,jm),lon(im,jm) !Latitude and longitude of each grid cell
      real d(im,jm,nsl)    !Water depth at cell bottom 
      real Vol(im,jm,nsl)    !Volume of cell
      real area(im,jm,nsl)   !Area of cell
@@ -78,15 +78,15 @@
      real Rad(im,jm),Wind(im,jm) !Rad=Irradiance just below sea surface, Wind= Wind velocity (m/s)
 
      integer fm(im,jm)  ! land(0)/sea(1) mask
-     real wsm(im,jm)    ! shelf(0)/open ocean(1) mask
+     integer wsm(im,jm)    ! shelf(0)/open ocean(1) mask
 
 !---------------------
 ! Character variables 
 !---------------------
 #ifdef DEBUG       
-      character*120 output_filename !Output file for debugging
+      character(120) output_filename !Output file for debugging
 #endif
-      character*120 input_filename !Input file
+      character(120) input_filename !Input file
 !------------------------------------------------ 
 
 ! --- Inputs ----------------------------------------------------
@@ -151,7 +151,7 @@
 !Initialize f array
       if(InitializeHow.eq.0) then
        call Set_Initial_Conditions_GD(f,S,d_sfc,fm) !Regression Equations
-       f(:,:,nsl,:) = -9999
+       if(b_layer.ne.0) f(:,:,nz_max+1:nsl,:) = -9999
       else
        call USER_Set_Initial_Conditions_GD(f,fm,wsm)
       endif

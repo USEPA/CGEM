@@ -67,7 +67,7 @@
      real, dimension(im,jm)     :: CBODW         !Chem. Bio. O2 Demand of bottom water
      real, dimension(im,jm,nsl) :: d_sfc         !Distance from surface to center of cell
 
-     real lat(jm),lon(im) !Latitude and longitude of each grid cell
+     real lat(im,jm),lon(im,jm) !Latitude and longitude of each grid cell
      real d(im,jm,nsl)    !Water depth at cell bottom 
      real Vol(im,jm,nsl)  !Volume of each cell
      real S(im,jm,nsl),T(im,jm,nsl)!S=Salinity, T=temperature in Celsius
@@ -80,15 +80,15 @@
      real pH(im,jm,nsl) !pH
 
      integer fm(im,jm)  ! land(0)/sea(1) mask
-     real wsm(im,jm)    ! shelf(0)/open ocean(1) mask
+     integer wsm(im,jm)    ! shelf(0)/open ocean(1) mask
 
 !---------------------
 ! Character variables 
 !---------------------
 #ifdef DEBUG       
-      character*120 output_filename !Output file for debugging
+      character(120) output_filename !Output file for debugging
 #endif
-      character*120 input_filename !Input file
+      character(120) input_filename !Input file
 !------------------------------------------------ 
 
 ! --- Inputs ----------------------------------------------------
@@ -138,7 +138,7 @@
 !Initialize f array
       if(InitializeHow.eq.0) then
        call Set_Initial_Conditions(f,S,T,d_sfc,fm,lat) !Regression Equations
-       f(:,:,nsl,:) = -9999
+       if(b_layer.ne.0) f(:,:,nz_max+1:nsl,:) = -9999
       else
        call USER_Set_Initial_Conditions(f,fm,wsm)
       endif

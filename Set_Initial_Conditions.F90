@@ -17,14 +17,18 @@ Subroutine Set_Initial_Conditions(f,S,T,D,fm,lat)
   real, dimension(1) :: pdbar, rhois !pressure, density
   integer, intent(in) :: fm(im,jm)
   integer i,j,k,isp
+  real x
 
-  do k = 1,nsl
+  x = 0.
+  x = x/x
+  f = x
+
     do j = 1,jm
       do i = 1,im 
 
-        if ( fm( i, j ) .ne. 1 ) then ! Land cell.
-          f( i, j, k, : ) = -9999.
-        else ! Ocean cell:
+        do k=1,nza(i,j)
+
+        if ( fm( i, j ) .eq. 1 ) then ! Land cell.
 
             !Chla
             temp = -0.67 * S(i,j,k) + 0.01 * D(i,j,k) + 24.50
@@ -111,7 +115,7 @@ Subroutine Set_Initial_Conditions(f,S,T,D,fm,lat)
         endif
       enddo
     enddo
-  enddo
+    enddo
 
 END Subroutine Set_Initial_Conditions
 

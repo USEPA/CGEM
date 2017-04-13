@@ -3,7 +3,7 @@ Module INPUT_VARS
 IMPLICIT NONE
 
 !--Code Run Identifier-----------
-character*150 code_ID
+character(150) code_ID
 !--Run Specifics---------------
 integer iYrS,iMonS,iDayS,iHrS,iMinS,iSecS
 integer iYrE,iMonE,iDayE,iHrE,iMinE,iSecE

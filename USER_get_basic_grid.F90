@@ -1,37 +1,52 @@
-      subroutine USER_get_basic_grid(dz,d,d_sfc,Vol)
+      subroutine USER_get_basic_grid(dz,d,d_sfc,dxdy)
 
       USE Model_dim
 
+      real depth(im,jm)
       real, intent (out) :: dz(im,jm,nsl)
       real, intent (out) :: d(im,jm,nsl)
       real, intent (out) :: d_sfc(im,jm,nsl)
-      real, intent (out) :: Vol(im,jm,nsl)
+      real, intent (out) :: dxdy(im,jm)
+      real :: dx(im,jm), dy(im,jm)
+      integer :: i,j,k,nz
+      real x 
 
-!      dz = 25.             !Thickness of cell
-!      d  = 25.             !Depth from surface to bottom of cell
-!      d_sfc(:,:,1) = 12.5  !Depth from surface to cell center
-!      d_sfc(:,:,2) = -9999 
+      x=0.
+      x=0./x
 
-
-      open (19,file='./data/dz.dat',status='old')
-      read (19,*)    !Assumes header file
-      read (19,*) dz
+      open(19,file='./data/dxdy.dat',status='old')
+      read(19,*) !dx
+      do j=1,jm
+         read(19,*) dx(:,j)
+      enddo
+      read(19,*) !dy
+      do j=1,jm
+         read(19,*) dy(:,j)
+      enddo
       close(19)
 
-      open (19,file='./data/d.dat',status='old')
-      read (19,*)    !Assumes header file
-      read (19,*) d 
+      open(19,file='./data/d.dat',status='old')
+      read(19,*) !depth
+      do j=1,jm
+         read(19,*) depth(:,j)
+      enddo
       close(19)
 
-      open (19,file='./data/d_sfc.dat',status='old')
-      read (19,*)    !Assumes header file
-      read (19,*) d_sfc 
-      close(19)
-
-      open (19,file='./data/Vol.dat',status='old')
-      read (19,*)    !Assumes header file
-      read (19,*) Vol 
-      close(19)
+      dz = x 
+      d = x 
+      d_sfc = x 
+      do j=1,jm
+       do i=1,im
+          dxdy(i,j) = dx(i,j)*dy(i,j)
+          nz=nza(i,j)
+          do k=1,nz !do loop will not execute if nza=0
+           dz(i,j,k) = depth(i,j)/nz !assume equally spaced
+           d_sfc(i,j,k) = sum(dz(i,j,1:(k-1))) + dz(i,j,k)/2. 
+           d(i,j,k) = sum(dz(i,j,1:k)) !bottom of cell 
+           write(6,*) i,j,k,dz(i,j,k),d_sfc(i,j,k),d(i,j,k)
+          enddo
+       enddo
+      enddo
 
       return
 

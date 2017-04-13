@@ -23,8 +23,8 @@
 !----------------------
 ! Interface variables:
 !----------------------
-      real   , intent(in)  :: lon(im)  ! longitude (deg E) at center of cell 
-      real   , intent(in)  :: lat(jm)  ! latitude (deg N) at center of cell 
+      real   , intent(in)  :: lon(im,jm)  ! longitude (deg E) at center of cell 
+      real   , intent(in)  :: lat(im,jm)  ! latitude (deg N) at center of cell 
       integer, intent(in)  :: iYr      ! Year that Time_8 corresponds to
       integer, intent(in)  :: iMon     ! Month that Time_8 corresponds to 
       integer, intent(in)  :: iDay     ! Day that Time_8 corresponds to
@@ -79,7 +79,7 @@
 !-----------------------------------	 
          do i = 1,im
          do j = 1,jm
-           Z        = calc_solar_zenith(lat(j),lon(i),rhr,jul_day,leapyr) !in rad
+           Z        = calc_solar_zenith(lat(i,j),lon(i,j),rhr,jul_day,leapyr) !in rad
            Rad(i,j) = solconst *AMAX1( COS(Z), 0.0)    ! COS(Z)<= 0 means night 
          enddo
          enddo

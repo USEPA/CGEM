@@ -6,9 +6,8 @@
       implicit none
  
       real f(im,jm,nsl,nf)
-      integer ii,i,j,k,fm(im,jm)
-      real wsm(im,jm) 
-
+      integer ii,i,j,fm(im,jm)
+      integer wsm(im,jm) 
 
 ! Read in from "InitialConditions_GD.txt" which has 1 value for each state variable.
 ! This is for a single cell.  There is no header line.
@@ -19,15 +18,16 @@
       close(19)
 
 !Values on shelf will be erroneous, set to -9999 as 'land' marker:
+      if(b_layer.ne.0) then
       do ii = 1, nf
        do j=1,jm
         do i=1,im
-          if(wsm(i,j).eq.0.) then !if shelf
-           f(i,j,nsl,ii) = -9999
+          if(wsm(i,j).eq.0) then !if shelf
+           f(i,j,nz_max+1:nsl,ii) = -9999
           endif
         enddo
        enddo
       enddo
-
+      endif
 
       end subroutine USER_Set_Initial_Conditions_GD

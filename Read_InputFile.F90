@@ -11,8 +11,8 @@ IMPLICIT NONE
 
 integer i,icent_jcent_units
 integer iFijn,isp,isz
-real rlat(jm),rlon(im),i_in,j_in,tot
-character*120 filename
+real rlat(im,jm),rlon(im,jm),i_in,j_in,tot,x
+character(120) filename
 
 ws = 0.
 !--Code Identifier--------------
@@ -210,7 +210,7 @@ enddo
 
 !Diatom/non-Diatom array
 do isp=1,nospA
-   if(KSi(isp).eq.0.) then
+   if(KSi(isp).le.tiny(x)) then
       is_diatom(isp) = 0
    else
       is_diatom(isp) = 1

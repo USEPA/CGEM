@@ -7,7 +7,7 @@ MODULE Calc_Chla
 
 CONTAINS
 
-  FUNCTION Chla_Regression(A_k) RESULT(Chla_tot)
+  FUNCTION Chla_Regression(A_k,nz) RESULT(Chla_tot)
 
     use Model_dim
     use Conversions 
@@ -15,7 +15,7 @@ CONTAINS
 
     ! Input parameters
     real, intent(in) :: A_k(nospA,nsl)  ! A's number density, cells/m3
-
+    integer, intent(in) :: nz   ! Number of layers
     ! Function return value
     real :: Chla_tot(nsl)
 
@@ -37,7 +37,7 @@ CONTAINS
   ! The resulting ratio is multiplied by the fixed carbon per cell and the
   ! abundance (A) to get the chlorophyll quantity.
 
-  FUNCTION Chla_Cloern (A_k, Qn_k, Qp_k, N_k, P_k, Si_k, T_k, aRad, Chl_C) RESULT(Chla_tot)
+  FUNCTION Chla_Cloern (A_k, Qn_k, Qp_k, N_k, P_k, Si_k, T_k, aRad, Chl_C, nz) RESULT(Chla_tot)
 
     use Model_dim
     use INPUT_VARS
@@ -53,6 +53,7 @@ CONTAINS
     real, intent(in) :: T_k(nsl)  ! Temperature in Celsius
     real, intent(in) :: aRad(nsl) ! Daily total irradiance per layer
     real, intent(out) :: Chl_C(nospA,nsl)
+    integer, intent(in) :: nz     !number of layers
 
     ! Function return value
     real :: Chla_tot(nsl)

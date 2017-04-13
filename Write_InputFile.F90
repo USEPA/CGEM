@@ -8,7 +8,7 @@ USE CGEM_vars
 
 IMPLICIT NONE
 
-character*120 filename
+character(120) filename
 
 !--Code Identifier--------------
 open(unit=999,file=filename,form='formatted',status='unknown')

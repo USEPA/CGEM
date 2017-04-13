@@ -1,6 +1,6 @@
 ! ------------------------------------------------------------------------
       Subroutine calc_Agrow( E, T_k, Qn, Qp, N, P, Si, A_k, Agrow_k, &
-     & uA_k, Aresp_k, uN_k, uP_k, uE_k, uSi_k )       
+     & uA_k, Aresp_k, uN_k, uP_k, uE_k, uSi_k, nz )       
 ! ------------------------------------------------------------------------
 
       USE Model_dim
@@ -25,6 +25,8 @@
       real,intent(in)  ::  Si(nsl)       ! Silica (mmol-Si/m3)
       
       real,intent(in)  ::  A_k(nospA,nsl)      ! Number density of phytoplankton group isp 
+ 
+      integer, intent(in) :: nz                ! Number of layers 
       real,intent(out) ::  Agrow_k(nospA,nsl)  ! Specific growth rate    
 					       ! of phytoplankton group isp
                                                
@@ -47,6 +49,7 @@
       real,dimension(nospA) :: f_N, f_P, f_Si  ! Nutrient growth functions
       real,dimension(nospA) :: min_S           ! Limiting substrate values
       real,dimension(nospA) :: respg2          ! Actual respiration coefficient
+
 !------------------------------------------------------------------------
 !-------------------------------
 ! Begin growth rate calculations

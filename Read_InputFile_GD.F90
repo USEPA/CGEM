@@ -9,10 +9,10 @@ USE LIGHT_VARS
 
 IMPLICIT NONE
 
-integer i,icent_jcent_units
-integer iFijn,isp
-real rlat(jm),rlon(im),i_in,j_in,dum
-character*120 filename
+integer icent_jcent_units
+integer iFijn
+real rlat(im,jm),rlon(im,jm),i_in,j_in,dum
+character(120) filename
 
 ws = 0.
 !--Code Identifier--------------

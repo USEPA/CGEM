@@ -132,6 +132,7 @@ ALLOCATE(SWR(im,jm,nsl))        ! Shortwave radiation (illumination)
 ALLOCATE(KESS(im,jm,nsl))        ! Light attenuation factor
 
 ALLOCATE(DAILY_PAR(im,jm,nsl))     ! Daily cumulative PAR
+DAILY_PAR = 0.
 
 ALLOCATE(PARTICLE(im,jm,nsl))   ! Particle/dissolved status flags
 

@@ -45,8 +45,9 @@
                                          ! of a successful run occurs.
       integer c_count
 
-      character*120 input_filename !Input file
-      character*6 Which_code
+      integer j
+      character(120) input_filename !Input file
+      character(6) Which_code
 !------------------------------------------------ 
 
 ! --- Command Line Arguments for file names ---
@@ -67,15 +68,27 @@
        write(6,*) "Base Outputfile Name will be: ",trim(BASE_NETCDF_OUTPUT_FILE_NAME)
        write(6,*) "Inputfile will be: ",trim(input_filename)
 
+
 ! --- Read in Model_dim parameters
       open(unit=19,file="./data/Model_dim.txt", form="formatted", status="old")
       read(19,*) !Header
       read(19,*) im
       read(19,*) jm
-      read(19,*) nz
-      read(19,*) nsl 
+      read(19,*) nz_max
+      read(19,*) b_layer
       read(19,*) nospA
       read(19,*) nospZ
+      read(19,*) Which_gridio
+      close(19)
+      nsl = nz_max + b_layer
+
+      call Model_dim_allocate()
+
+      open(unit=19,file="./data/nz.dat")
+      read(19,*)
+      do j=1,jm
+        read(19,*) nza(:,j)
+      enddo
       close(19)
 
       if(Which_code.eq."GOMDOM".or.Which_code.eq."GoMDOM".or.Which_code.eq."gomdom") then !GOMDOM

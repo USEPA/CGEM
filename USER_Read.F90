@@ -9,11 +9,10 @@
       real, intent (out) :: Var(IM,JM)
       integer, save :: init=1
       integer*8,save :: t1,t2
-      integer*8 :: savet
       real,save :: Var1,Var2
-      real :: fac,savev
+      real :: fac
       character, intent(in) :: which
-      character*100 :: filename
+      character(100) :: filename
       integer :: ifile
 !    Specify variables for dates and times
       integer iYr, iMon, iDay, iHour, iMin, iSec

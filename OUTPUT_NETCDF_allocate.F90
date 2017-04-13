@@ -13,9 +13,9 @@ Subroutine OUTPUT_NETCDF_allocate
   IMPLICIT NONE
 
   integer i,counter
-  character*6 var
-  character*19 var1
-  character*100 var2
+  character(6) var
+  character(19) var1
+  character(100) var2
 
   ALLOCATE(VARIABLE_NAMES(nf))
    counter = 0

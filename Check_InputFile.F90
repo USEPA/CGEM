@@ -6,7 +6,8 @@ USE TEMP_VARS
 
 IMPLICIT NONE
 
-integer isp, mpierr
+integer isp
+real x
 
 !read(999,*) Which_fluxes
 
@@ -88,11 +89,11 @@ endif
 
 ! Diatom/Non Diatom check:
 do isp=1,nospA
-   if(KSi(isp).eq.0.and.vmaxSi(isp).ne.0) then
+   if(KSi(isp).le.tiny(x).and.vmaxSi(isp).gt.0.) then
      write(6,*) "If KSi=0, then vmaxSi must =0 (designates non-diatoms)"
      stop
    endif
-   if(vmaxSi(isp).eq.0.and.KSi(isp).ne.0) then
+   if(vmaxSi(isp).le.tiny(x).and.KSi(isp).gt.0.) then
      write(6,*) "If vmaxSi=0, then KSi must =0 (designates non-diatoms)"
      stop
    endif

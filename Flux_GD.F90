@@ -11,9 +11,9 @@
        REAL, INTENT(INOUT)   :: f(im,jm,nsl,nf)
        REAL, INTENT(IN)   :: S(im,jm,nsl),T(im,jm,nsl)
        REAL, INTENT(IN)   :: Wsp(im,jm)       !Windspeed in m/s
-       REAL, INTENT(IN)   :: dz(im,jm,nsl),wsm(im,jm),Vol(im,jm,nsl)
+       REAL, INTENT(IN)   :: dz(im,jm,nsl),Vol(im,jm,nsl)
        INTEGER(KIND=8), INTENT(IN) :: TC_8
-       INTEGER, INTENT(IN) :: fm(im,jm) 
+       INTEGER, INTENT(IN) :: fm(im,jm),wsm(im,jm) 
        REAL :: T_sfc, Sal_sfc, O2_sfc, Sc, Op_umole, rhow, Op, OsDOp
        REAL :: Vtrans, alpha_O2, O2_atF, zs, DIC_sfc, CO2_atF
        REAL :: sw_dens0, gas_exchange, o2sat, SchmidtNumber
@@ -27,13 +27,14 @@
        !Need mol photons/m2/d, N_Av=6.0221413E+23
        !quanta/cm2/s * 1 mol/N_av quanta * 10,000cm2/m2 * 86400s/d = mol/m2/d
        ! 1e-23 * 1e4 * 1e4 = 1e-15
-       REAL, PARAMETER :: convert = 6.0221413 * 8.64 * 1.e-15
        REAL, PARAMETER :: cnvt_O2 = 32.e-6
        REAL, PARAMETER :: cnvt_DIC = 12.e-6
        REAL, PARAMETER :: cnvt_N = 14.e-6
        REAL, PARAMETER :: cnvt_P = 31.e-6
        REAL, PARAMETER :: pH = 8.25
        REAL, PARAMETER :: pco2 = 395
+
+       INTEGER nz !layers
 ! -- SURFACE FLUXES -------------------------------------------------------------
 if(Which_Fluxes(iCMAQ).eq.1) then !CMAQ
       !call Read_CMAQ_NH4_SVflux_bin(TC_8,NO3_CMAQ)
@@ -155,8 +156,8 @@ endif
          do i = 1,im 
              if(fm(i,j).eq.1) then
 
-              if(wsm(i,j).eq.0.) then !If we are on the shelf
-
+              if(wsm(i,j).eq.0) then !If we are on the shelf
+                nz = nza(i,j)
 if(Which_Fluxes(iSOC).eq.1) then
 !Murrell and Lehrter sediment oxygen consumption
                f(i,j,nz,JDO2) = AMAX1(f(i,j,nz,JDO2) - 0.0235*2.**(.1*T(i,j,nz))*  &

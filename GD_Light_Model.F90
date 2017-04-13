@@ -1,4 +1,4 @@
-SUBROUTINE GD_Light_Model(f,S,Rad,PAR,fm,dz,dT)
+SUBROUTINE GD_Light_Model(f,S,Rad,PAR,fm,dz)
 !------------------------------------------------------------------------------
 !
 !Input: Rad in Watts...actually, just convert it to Watts for this one
@@ -14,12 +14,12 @@ IMPLICIT NONE
 
 REAL, INTENT(INOUT) :: f(im,jm,nsl,nf)
 REAL, INTENT(IN)    :: S(im,jm,nsl),Rad(im,jm)
-INTEGER, INTENT(IN) :: fm(im,jm),dT
+INTEGER, INTENT(IN) :: fm(im,jm)
 REAL, INTENT(IN) :: dz(im,jm,nsl)
 REAL, INTENT(OUT) :: PAR(im,jm,nsl)
 REAL :: SAL_TERM,CHL_TERM,POC_TERM
 REAL :: IATTOP, IATBOT(im,jm,nsl),OPTDEPTH,Rad_Watts(im,jm)
-INTEGER :: i,j,k
+INTEGER :: i,j,k,nz
 
 !
 !------------------------------------------------------------------------------
@@ -37,6 +37,7 @@ if(Read_Solar.eq.2) Rad_Watts = Rad/4.57
  do j = 1,jm
      do i = 1,im 
        if(fm(i,j).eq.1) then
+        nz = nza(i,j)
       do k = 1, nz
          SAL_TERM = 1.084E-06 * (S(i,j,k)**4)
 
@@ -60,12 +61,14 @@ if(Read_Solar.eq.2) Rad_Watts = Rad/4.57
          IATBOT(i,j,k) =  IATTOP  * EXP(-OPTDEPTH)
          PAR(i,j,k)   =  (IATTOP - IATBOT(i,j,k)) / OPTDEPTH
       END DO
-      DO k = 2,nz
+      IF(k>=2) THEN
+       DO k = 2,nz
          IATTOP    =  IATBOT(i,j,k-1)
          OPTDEPTH  =  KESS(i,j,k) * dz(i,j,k) 
          IATBOT(i,j,k) =  IATTOP * EXP(-OPTDEPTH)
          PAR(i,j,k) =  (IATTOP - IATBOT(i,j,k)) / OPTDEPTH
-      END DO
+       END DO
+      ENDIF
        endif !End of if(fm(ij) statement
    enddo      ! end of do i block do loop
  enddo      ! end of do j block do loop

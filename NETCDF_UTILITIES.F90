@@ -6,7 +6,6 @@
 
 MODULE NETCDF_UTILITIES
 
-!  USE netcdf
 
   IMPLICIT NONE
 
@@ -232,10 +231,17 @@ CONTAINS
     ! Externals:
     INTEGER NF_DEF_VAR
     EXTERNAL NF_DEF_VAR
+    INTEGER NF_PUT_ATT
+    EXTERNAL NF_PUT_ATT
+    INTEGER NF_DOUBLE
+    EXTERNAL NF_DOUBLE
+
     ! Locals:
     INTEGER ERR
 
     ERR = NF_DEF_VAR( FILEID, VARNAM, 5, 4, DIMIDS, VARID )
+    ERR = nf_put_att(fileid, VARID, "valid_range", 5, 2, (/ 0., 1.e38 /))
+
     CALL CHKERR( ERR, 'create variable ' // VARNAM )
     CALL DEFVAR( FILEID, VARID, VARNAM, VARDES, UNITS )
     RETURN
@@ -257,7 +263,7 @@ CONTAINS
 
     ERR = NF_PUT_ATT_TEXT( FILEID, VARID, 'description', LEN( VARDES ), VARDES)
     CALL CHKERR( ERR, 'create description attribute for ' // VARNAM )
-
+    
     IF ( LEN( UNITS ) > 0 ) THEN
       ERR = NF_PUT_ATT_TEXT( FILEID, VARID, 'units', LEN( UNITS ), UNITS )
       CALL CHKERR( ERR, 'create units attribute for ' // VARNAM )
@@ -391,7 +397,6 @@ CONTAINS
     INTEGER NF_PUT_ATT_REAL
     EXTERNAL NF_PUT_ATT_REAL
     ! Locals:
-    INTEGER EIGHT
     INTEGER ERR
     REAL TEMP(X)
 

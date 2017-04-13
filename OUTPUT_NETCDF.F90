@@ -60,8 +60,8 @@ CONTAINS
     INTEGER,INTENT(IN):: IYRS, IMONS, IDAYS, IHRS, IMINS, ISECS ! Run start.
     INTEGER,INTENT(IN):: IYRE, IMONE, IDAYE, IHRE, IMINE, ISECE ! Run end.
     INTEGER,INTENT(IN):: DT_OUT ! Model timestep size in seconds.
-    REAL,DIMENSION(IM):: RLON
-    REAL,DIMENSION(JM):: RLAT
+    REAL,DIMENSION(IM,JM):: RLON
+    REAL,DIMENSION(IM,JM):: RLAT
     REAL,DIMENSION(IM, JM, NSL):: H,DZ
     INTEGER,DIMENSION(IM, JM),INTENT(IN):: FM
    ! External NetCDF routines:
@@ -73,9 +73,9 @@ CONTAINS
     INTEGER IM_DIM, JM_DIM, NSL_DIM, NSTEPP1_DIM
     INTEGER RLON_VAR, RLAT_VAR, H_VAR, FM_VAR
     INTEGER DZ_VAR
-    INTEGER K, i
+    INTEGER K, i, J
     INTEGER ERR, VARIABLE, DIM_IDS( 4 )
-    REAL,DIMENSION(IM):: RLON_COPY
+    REAL,DIMENSION(IM,JM):: RLON_COPY
     CHARACTER(LEN=40):: TIME_UNITS
     CHARACTER(LEN=14):: var
     FILE_ID = -1
@@ -298,9 +298,9 @@ CONTAINS
 
     ! Define non-time-varying array variables:
 
-    CALL DEFVR1( FILE_ID, IM_DIM, RLON_VAR, 'longitude', &
+    CALL DEFVR2( FILE_ID, IM_DIM, JM_DIM, RLON_VAR, 'LONGXY', &
                  'Cell center longitude [-180, 180].', 'deg' )
-    CALL DEFVR1( FILE_ID, JM_DIM, RLAT_VAR, 'latitude', &
+    CALL DEFVR2( FILE_ID, IM_DIM, JM_DIM, RLAT_VAR, 'LATIXY', &
                  'Cell center latitude [-90, 90].', 'deg' )
     CALL DEFVR3( FILE_ID, IM_DIM, JM_DIM, NSL_DIM, H_VAR, 'h', &
                  'Cell bottom depth.', 'm' )
@@ -362,7 +362,9 @@ CONTAINS
 
     RLON_COPY = RLON
 
-    CALL CONVERT_LONGITUDES( IM, RLON_COPY )
+    DO J = 1, JM
+      CALL CONVERT_LONGITUDES( IM, RLON_COPY(:,J))
+    ENDDO
 
     ERR = NF_PUT_VAR_REAL( FILE_ID, RLON_VAR, RLON_COPY )
     CALL CHKERR( ERR, 'write output variable rlon' )

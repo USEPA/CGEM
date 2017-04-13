@@ -9,10 +9,17 @@
       real f(im,jm,nsl,nf),S(im,jm,nsl),D(im,jm,nsl)!S=Salinity,D=Depth
       real temp
       integer i,j,k,fm(im,jm)
+      real x
 
-      do k = 1,nsl
+      x = 0.
+      x = x/x
+      f = x
+
       do j = 1,jm
       do i = 1,im
+
+         do k=1,nza(i,j)
+
          if(fm(i,j).eq.1) then
 !Regression y  =  b1*Salinity + b2*Depth + b3*Salinity^2 + b4*Depth^2 + Intercept
      !DOC
@@ -94,10 +101,6 @@
       f( i, j, k, JGREN ) = 0.004
       f( i, j, k, JGREP ) = 0.004
 
-
-      else
-
-       f( i, j, k, : ) = -9999.
 
       endif
       enddo

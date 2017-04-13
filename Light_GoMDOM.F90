@@ -1,5 +1,5 @@
 !---------------------------------------------------------------------------
-  SUBROUTINE Light_GoMDOM(PARsurf, S, A, Z, OM1A, OM1Z, OM1R, OM1BC, dz, PAR_percent, PARbot, PARdepth  )   
+  SUBROUTINE Light_GoMDOM(PARsurf, S, A, Z, OM1A, OM1Z, OM1R, OM1BC, dz, PAR_percent, PARbot, PARdepth, nz  )   
 !---------------------------------------------------------------------------
 
   USE Model_dim
@@ -21,10 +21,11 @@
     REAL, INTENT(IN)  :: A(nospA,nsl),Z(nospZ,nsl)    ! Phytoplankton, Zooplankton 
     REAL, INTENT(IN)  :: OM1A(nsl),OM1Z(nsl),OM1R(nsl),OM1BC(nsl) ! Particulate OM in gC/m3
     REAL, INTENT(IN)  :: dz(nsl) !dz = thickness
-    REAL, INTENT(OUT) :: PAR_percent(nz),PARbot,PARdepth(nz) 
-    REAL :: SAL_TERM, CHL_TERM, POC_TERM, KESS(nz) 
-    REAL :: IATTOP, OPTDEPTH, IATBOT(nz)
+    REAL, INTENT(OUT) :: PAR_percent(nsl),PARbot,PARdepth(nsl) 
+    REAL :: SAL_TERM, CHL_TERM, POC_TERM, KESS(nsl) 
+    REAL :: IATTOP, OPTDEPTH, IATBOT(nsl)
     INTEGER :: k
+    INTEGER, INTENT(IN) :: nz
 
       do k = 1, nz
          SAL_TERM = 1.084E-06 * (S(k)**4)
@@ -50,6 +51,7 @@
          PARdepth(k)   =  (IATTOP - IATBOT(k)) / OPTDEPTH
          PAR_percent(k) = 100.*PARdepth(k)/PARsurf
       END DO
+      if(nz>=2) then
       DO k = 2,nz
          IATTOP    =  IATBOT(k-1)
          OPTDEPTH  =  KESS(k) * dz(k)
@@ -57,6 +59,7 @@
          PARdepth(k) =  (IATTOP - IATBOT(k)) / OPTDEPTH
          PAR_percent(k) = 100.*PARdepth(k)/PARsurf
       END DO
+      endif
          PARbot = PARdepth(nz)
 
     RETURN

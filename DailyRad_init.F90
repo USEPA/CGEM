@@ -1,7 +1,7 @@
 ! This routine initializes the previous day's irradiance for use by the
 ! Cloern Chl:C algorithm.
 Subroutine DailyRad_init(TC_8, lat, lon, d, d_sfc, A_k, CDOM_k, &
-           & OM1A_k, OM1Z_k, OM1R_k, OM1BC_k, aDailyRad_k)
+           & OM1A_k, OM1Z_k, OM1R_k, OM1BC_k, aDailyRad_k, nz)
 
   USE Model_dim ! For iYr0, etc.
   USE DATE_TIME ! For SECONDS_PER_DAY, TOTAL_SECONDS, DATE_TIMESTAMP
@@ -21,6 +21,7 @@ Subroutine DailyRad_init(TC_8, lat, lon, d, d_sfc, A_k, CDOM_k, &
   real, intent(in) :: OM1Z_k(nsl)
   real, intent(in) :: OM1R_k(nsl)
   real, intent(in) :: OM1BC_k(nsl)
+  integer, intent(in) :: nz !Number of Layers
 
   ! Output variables
   real, intent(out) :: aDailyRad_k(nsl)
