@@ -1,15 +1,7 @@
 !----------------------------------------------------------------------
-      Subroutine getSolar(                                             &
-      &    lon       , lat    ,                                        & 
-      &    iYr       ,                                                 &
-      &    iMon      , iDay   ,                                        &    
-      &    iHr       , iMin   ,                                        &     
-      &    iSec      , Rad     )        
+      Subroutine getSolar( TC_8, lon, lat, Rad) 
 !----------------------------------------------------------------------
 !     Written by  ::  D.S.Ko/NRL
-!     Modified by ::  Barry Herchenroder/EMVL, April   2010
-!                                              July    2011
-!                                              Nov-Dec 2011
 !
 !     Calculate visible solar radiation irradiance
 !                        using just the solar zenith and ignore
@@ -17,6 +9,7 @@
 !                        absorption and scattering.
 ! ---------------------------------------------------------------------
      USE Model_dim
+     USE DATE_TIME
 
      IMPLICIT NONE
      
@@ -25,14 +18,15 @@
 !----------------------
       real   , intent(in)  :: lon(im,jm)  ! longitude (deg E) at center of cell 
       real   , intent(in)  :: lat(im,jm)  ! latitude (deg N) at center of cell 
-      integer, intent(in)  :: iYr      ! Year that Time_8 corresponds to
-      integer, intent(in)  :: iMon     ! Month that Time_8 corresponds to 
-      integer, intent(in)  :: iDay     ! Day that Time_8 corresponds to
-      integer, intent(in)  :: iHr      ! Hour that Time_8 corresponds to
-      integer, intent(in)  :: iMin     ! Minute that Time_8 corresponds to
-      integer, intent(in)  :: iSec     ! Second that Time_8 corresponds to
-      real   , intent(out) :: Rad(im,jm) ! Solar Radiation 
-                                                                               
+      integer(kind=8), intent(in) :: TC_8 ! Current time in seconds since Model_dim::iYr0
+      real   , intent(out) :: Rad(im,jm) ! Solar Radiation
+      integer  :: iYr      ! Year that Time_8 corresponds to
+      integer  :: iMon     ! Month that Time_8 corresponds to
+      integer  :: iDay     ! Day that Time_8 corresponds to
+      integer  :: iHr      ! Hour that Time_8 corresponds to
+      integer  :: iMin     ! Minute that Time_8 corresponds to
+      integer  :: iSec     ! Second that Time_8 corresponds to
+ 
 !-----------------------
 ! Local variables 
 !-----------------------
@@ -40,50 +34,44 @@
                                                  ! to convert from watts/m2 
                                                  ! to photons/cm2/sec
                                                  ! Morel and Smith (1974)
-      real(kind=8), parameter :: OneD60_8   =  1.0_8/60.0_8
-      real(kind=8), parameter :: OneD3600_8 =  1.0_8/3600.0_8              
-      real :: calc_solar_zenith
+      real, parameter :: OneD60   =  1./60.
+      real, parameter :: OneD3600 =  1./3600.              
       integer  :: i,j  
-      integer  :: jul_day
+      integer  :: jday
       integer  :: JY
       integer  :: mdate_julian
-      real                :: rhr     ! decimal hr in the Julian Day 
-      real(kind=8)        :: rhr_8   ! decimal hr in the Julian Day       
+      real                :: rhr         ! decimal hr in the Julian Day 
+      real                :: sunang, Z   ! solar zenith angle 
+      real calc_solar_zenith
       real                :: solconst      
-      real                :: Z
       LOGICAL :: leapyr  
 
-!------------------------------------------------------------------------
-! Temporarily, we will make the radiation only a function
-! of time based on the zenth value and an approximate solar constant
-! of 1200 watts/m2. We will use the function calc_solar_zenith to
-! generate the solar zenith and the mdate_julian to generate a julian
-! date/time  that approximates the GMT date/time that we need.
+         ! Note in next line that 1200 is the average clear-sky solar constant
+         ! in watts/m^2
+         solconst = 1200.00 * cv  ! in photons/cm2/sec
 !-----------------------------------------------------------------------
-	 rhr_8 = real(iHr,kind=8)                                        &
-	 &     + OneD60_8*(real(iMin,kind=8) + OneD3600_8*real(iSec,kind=8)) 
-         rhr   = real(rhr_8,kind=4)
 
-         if (JY(iYr) == 1) then 
+         !Calculate Yr/Mon/Day from Model time in seconds	 
+         call date_timestamp(iYr0,TC_8,iYr,iMon,iDay,iHr,iMin,iSec)
+
+         !Hours in day
+         rhr = real(iHr,4) + real(iMin,4)*OneD60 + real(iSec,4)*OneD3600
+         !Is Leap year?
+         if (JY(iYr) == 1) then
              leapyr = .FALSE.  ! iYr is not a leap-year
-	 else 
-	     leapyr = .TRUE.   ! iYr is a leap-year
-	 endif 
-	 
-	 jul_day = mdate_julian(iMon,iDay,leapyr )
-         
-! Note in next line that 1200 is the average clear-sky solar constant
-! in watts/m^2     
-	 solconst = 1200.00 * cv  ! in photons/cm2/sec
+         else
+             leapyr = .TRUE.   ! iYr is a leap-year
+         endif
+         !Julian day
+         jday = mdate_julian(iMon,iDay,leapyr)
 
-!-----------------------------------	 
          do i = 1,im
          do j = 1,jm
-           Z        = calc_solar_zenith(lat(i,j),lon(i,j),rhr,jul_day,leapyr) !in rad
-           Rad(i,j) = solconst *AMAX1( COS(Z), 0.0)    ! COS(Z)<= 0 means night 
+           Z =  sunang(jday,rhr,lon(i,j),lat(i,j))
+           Rad(i,j) = solconst * AMAX1( COS(Z), 0.0)    ! COS(suna)<= 0 means night 
          enddo
          enddo
-!-----------------------------------
+
         RETURN
            
       END Subroutine getSolar

@@ -1,0 +1,7 @@
+!Module Model_dim
+20  !INTEGER, PARAMETER :: IM
+33  !INTEGER, PARAMETER :: JM
+7  !INTEGER, PARAMETER :: nz_max
+0    !INTEGER, PARAMETER :: b_layer = 1 for yes
+6    !INTEGER, PARAMETER :: nospA =6
+2    !INTEGER, PARAMETER :: nospZ = 2

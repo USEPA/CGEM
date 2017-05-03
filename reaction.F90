@@ -147,7 +147,7 @@
     RC( 8 ) = RSi 
     RC( 9 ) = RALK
     RC( 10 ) = RN2
- 
+
     RETURN
 
   END SUBROUTINE reaction 

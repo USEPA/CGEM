@@ -10,11 +10,13 @@
       real :: dx(im,jm), dy(im,jm)
       integer :: i,j,k,nz
       real x 
+      character(200) filename
 
       x=0.
       x=0./x
 
-      open(19,file='./data/dxdy.dat',status='old')
+      write(filename,'(A, A)') trim(DATADIR),'/dxdy.dat'
+      open(19,file=filename,status='old')
       read(19,*) !dx
       do j=1,jm
          read(19,*) dx(:,j)
@@ -25,7 +27,8 @@
       enddo
       close(19)
 
-      open(19,file='./data/d.dat',status='old')
+      write(filename,'(A, A)') trim(DATADIR),'/d.dat'
+      open(19,file=filename,status='old')
       read(19,*) !depth
       do j=1,jm
          read(19,*) depth(:,j)

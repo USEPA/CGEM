@@ -1,0 +1,43 @@
+# This is the list of objects to compile. Edit as necessary to reflect
+# source file changes.
+# Note modules must be compiled in bottom-up dependency order.
+
+CGEM_OBJ  =  CGEM_Flux.o\
+	CGEM_vars.o\
+	INPUT_VARS_CGEM.o\
+	OUTPUT_NETCDF_CGEM.o\
+	SDM.o\
+	nparray.o\
+	T_GoMDOM.o\
+	Light_GoMDOM.o\
+	STOICH_VARS.o\
+	MASS_BALANCE_CGEM.o\
+	DailyRad.o\
+	Calc_Chla.o \
+	calc_Agrow.o\
+	Set_Initial_Conditions_CGEM.o\
+	Read_InputFile_CGEM.o\
+	Write_InputFile_CGEM.o\
+	Check_InputFile_CGEM.o\
+        Call_IOP_PAR.o\
+	Flux_CGEM.o\
+	JWMod.o\
+	func_T.o\
+	func_E.o\
+	func_S.o\
+	func_Qs.o\
+	DailyRad_init.o \
+	Sediment_Diagenesis_Flux.o\
+	changeA.o\
+        CGEM.o\
+	JW_SOC.o\
+	Meta_SOC.o\
+	OUTPUT_NRL.o\
+	OUTPUT_NOTCLOERN.o\
+	Allocate_Input_CGEM.o\
+	Model_Output_CGEM.o\
+	Model_Finalize_CGEM.o\
+	Salinity_Regression_Init_CGEM.o\
+	InitError_Check_CGEM.o\
+	Transport_CGEM.o\
+	Init_Output_CGEM.o

@@ -6,11 +6,13 @@
       real, intent (out) :: lon(im,jm)
       integer i,j
       real fillvalue,one
+      character(200) filename
 
       one = -1. 
       fillvalue = sqrt(one) 
 
-      open (19,file='./data/latlon.dat',status='old')
+      write(filename,'(A, A)') trim(DATADIR),'/latlon.dat'
+      open (19,file=filename,status='old')
       read (19,*) !Header File
       do j=1,jm
        read (19,*) lat(:,j)

@@ -8,10 +8,11 @@
 ### =============== User Modifiable Section =============== ###
 
 ### Uncomment the next line to enable debugging
-#DFLAGS = -warn -debug all -g -check all -ftrapuv  #-DDEBUG -mcmodel=medium -shared-intel 
+#DFLAGS = -warn -debug all -g -check all -ftrapuv  -DDEBUG #-mcmodel=medium -shared-intel 
+#DFLAGS = -Wall -Wextra -pedantic -fimplicit-none -fbacktrace -D_CGEM -DRDEBUG -DDEBUG 
 
 ### Build options for specific platforms. 
-### LIBS has path to pnetCDF
+### LIBS has path to netCDF
 SOL_INC	  = -I. -I/usr/local/apps/netcdf-4.3.3/intel-15.0/include/
 SOL_LIBS  = -L/usr/local/apps/netcdf-4.3.3/intel-15.0/lib -lnetcdf -lnetcdff
 
@@ -22,7 +23,16 @@ OTHER_INC   = -I. -I/usr/local/include
 OTHER_LIBS  = -L/usr/local/lib -lnetcdff -L/usr/local/bin -lnetcdf 
 
 ### =============== End User Modifiable Section  =============== ####
-include cgem_source
+include src_files
+include moc_src/src_files
+include sdm_src/src_files
+include cgem_src/src_files
+include gd_src/src_files
+
+mocdir=moc_src
+sdmdir=sdm_src
+cgemdir=cgem_src
+gddir=gd_src
 
 ### These lines should seldom change! ###
 EXE	= FishTank.exe
@@ -46,8 +56,8 @@ else
 endif
 endif
 
-FishTank: ${OBJ} ${SDM_OBJS}
-	$(F90) -o $(EXE) $(FFLAGS) $(DFLAGS) $(OBJ) ${SDM_OBJS} $(LIBS) $(INC)
+FishTank: ${OBJ} ${MOC_OBJ} ${CGEM_OBJ} ${SDM_OBJ} ${GD_OBJ}
+	$(F90) -o $(EXE) $(FFLAGS) $(DFLAGS) $(OBJ) ${MOC_OBJ} ${CGEM_OBJ} ${SDM_OBJ} ${GD_OBJ} $(LIBS) $(INC)
 
 
 #
@@ -59,12 +69,25 @@ $(NO_OPT_OBJS): %.o: %.F90
 	$(F90) -c -O0 $(FFLAGS) $(INC) $(DFLAGS) $<
 
 # No Implicit None flag
-$(SDM_OBJS): %.o: %.f
-	$(F90) -c $(FFLAGS_SDM) $(DFLAGS)  $<
+$(SDM_OBJ): %.o: $(sdmdir)/%.f
+	$(F90) -c $(FFLAGS_SDM) $<
 
-# Generic implicit rules
-%.o: %.F90 
-	$(F90) -c $(FFLAGS) $(DFLAGS)  $<	
+$(MOC_OBJ):%.o: $(mocdir)/%.F90
+	$(F90) -c $(FFLAGS) $(DFLAGS)  $<
+
+$(OBJ):%.o: %.F90
+	$(F90) -c $(FFLAGS) $(DFLAGS)  $<
+
+$(CGEM_OBJ):%.o: $(cgemdir)/%.F90
+	$(F90) -c $(FFLAGS) $(DFLAGS)  $<
+
+$(GD_OBJ):%.o: $(gddir)/%.F90
+	$(F90) -c $(FFLAGS) $(DFLAGS)  $<
+
+
+## Generic implicit rules
+#%.o: %.F90 
+#	$(F90) -c $(FFLAGS) $(DFLAGS)  $<	
 
 #
 # Miscellaneous targets
