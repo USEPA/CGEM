@@ -23,12 +23,13 @@ OTHER_INC   = -I. -I/usr/local/include
 OTHER_LIBS  = -L/usr/local/lib -lnetcdff -L/usr/local/bin -lnetcdf 
 
 ### =============== End User Modifiable Section  =============== ####
-include src_files
+include main_src/src_files
 include moc_src/src_files
 include sdm_src/src_files
 include cgem_src/src_files
 include gd_src/src_files
 
+maindir=main_src
 mocdir=moc_src
 sdmdir=sdm_src
 cgemdir=cgem_src
@@ -56,8 +57,8 @@ else
 endif
 endif
 
-FishTank: ${OBJ} ${MOC_OBJ} ${CGEM_OBJ} ${SDM_OBJ} ${GD_OBJ}
-	$(F90) -o $(EXE) $(FFLAGS) $(DFLAGS) $(OBJ) ${MOC_OBJ} ${CGEM_OBJ} ${SDM_OBJ} ${GD_OBJ} $(LIBS) $(INC)
+FishTank: ${MAIN_OBJ} ${MOC_OBJ} ${CGEM_OBJ} ${SDM_OBJ} ${GD_OBJ}
+	$(F90) -o $(EXE) $(FFLAGS) $(DFLAGS) $(MAIN_OBJ) ${MOC_OBJ} ${CGEM_OBJ} ${SDM_OBJ} ${GD_OBJ} $(LIBS) $(INC)
 
 
 #
@@ -71,6 +72,9 @@ $(NO_OPT_OBJS): %.o: %.F90
 # No Implicit None flag
 $(SDM_OBJ): %.o: $(sdmdir)/%.f
 	$(F90) -c $(FFLAGS_SDM) $<
+
+$(MAIN_OBJ):%.o: $(maindir)/%.F90
+	$(F90) -c $(FFLAGS) $(DFLAGS)  $<
 
 $(MOC_OBJ):%.o: $(mocdir)/%.F90
 	$(F90) -c $(FFLAGS) $(DFLAGS)  $<

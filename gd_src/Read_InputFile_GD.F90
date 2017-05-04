@@ -296,12 +296,16 @@ read(999,*) ws(JSU)   ! VSU
       END_SECONDS = &
       TOTAL_SECONDS( iYr0, iYrE, iMonE, iDayE, iHrE, iMinE, iSecE )
 
+#ifdef DEBUG
       write(6,*) "iYr0",iYr0, iYrS, iMonS, iDayS, iHrS, iMinS, iSecS
       write(6,*) "START_SECONDS",START_SECONDS,START_SECONDS/3600./24./365.
+#endif
       nstep = ( END_SECONDS - START_SECONDS ) / dT !number of timesteps in a run
       iout = dT_out/dT !output time-interval in timesteps
 
 ! --- sinking speed: converted from m/s downward positive to m/s negative
       ws = -ws
+
+      return
 
 END Subroutine Read_InputFile_GD

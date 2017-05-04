@@ -2,7 +2,7 @@
 # source file changes.
 # Note modules must be compiled in bottom-up dependency order.
 
-OBJ  =  fillval.o\
+MAIN_OBJ  =  fillval.o\
 	Model_dim.o\
 	Grid.o\
 	State_Vars.o\

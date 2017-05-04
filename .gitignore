@@ -67,6 +67,21 @@ eut.mod
 inremin.mod
 states.mod
 flags.mod
+mass_balance_cgem.mod
+mod_utilities.mod
+output.mod
+output_netcdf_cgem.mod
+state_vars.mod
+cgem_flux.mod
+fill_value.mod
+gd_src/Read_InputFile_GD.F90
+gd_src/Set_Initial_Conditions_GD.F90
+gd_src/phosph.F90
+grid.mod
+hydro.mod
+input_vars_cgem.mod
+
+
 #
 # Keep directories but not contents. [Not sure if this works.]
 NETCDF/**
