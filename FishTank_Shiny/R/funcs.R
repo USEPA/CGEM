@@ -1,36 +1,3 @@
-# used as selections for plotting
-plo_vars <- function(){
-  
-  library(ncdf4)
-  
-  if(!file.exists('NETCDF/output.000000.nc'))
-    stop('Run model to get labels')
-
-  # get model output from netcdf
-  nc <- nc_open('NETCDF/output.000000.nc')
-  
-  # shrt names, all other vectors will be ordered using shrt
-  shrt <- sort(names(nc$var))
-
-  # long names
-  lngs <- sapply(shrt, function(x) ncatt_get(nc, x, 'description')$value)
-  lngs <- lngs[shrt]
-
-  # remove these, not important to plot
-  torm <- c(
-    'Thickness of cell.', 
-    'Mask: 0 = land, 1 = water.',
-    'Cell bottom depth.', 
-    'Fast reacting organic matter in the initial and boundary conditions',
-    'Particulate organic matter derived from river outflow.'
-    )
-  lngs <- lngs[!lngs %in% torm]
-  lngs <- as.character(lngs)
-
-  return(lngs)
-
-}
-
 # a caller for state variable labels
 labels_fun <- function(){
   

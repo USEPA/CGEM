@@ -42,15 +42,27 @@ shinyServer(function(input, output, session) {
       
   })
 
-  out_vars <- eventReactive(runmod(), { 
-    plo_vars()
+  lab_vars <- eventReactive(runmod(), { 
+    
+    # remove these, not important to plot
+    lngs <- labels_fun()$lngs
+    torm <- c(
+      'Thickness of cell.', 
+      'Mask: 0 = land, 1 = water.',
+      'Cell bottom depth.', 
+      'Fast reacting organic matter in the initial and boundary conditions',
+      'Particulate organic matter derived from river outflow.'
+      )
+    lngs <- lngs[!lngs %in% torm]
+    return(lngs)
+    
     })
   
   # update choices for select input uis with reactive out_var depending on model run
   observe({
-    updateSelectInput(session, 'var1', choices = out_vars(), selected = 'Molecular oxygen.')
-    updateSelectInput(session, 'var2', choices = out_vars(), selected = 'Phosphate.')
-    updateCheckboxGroupInput(session, 'vars_in', choices = out_vars(), selected = c('Molecular oxygen.', 'Phosphate.'))
+    updateSelectInput(session, 'var1', choices = lab_vars(), selected = 'Molecular oxygen.')
+    updateSelectInput(session, 'var2', choices = lab_vars(), selected = 'Phosphate.')
+    updateCheckboxGroupInput(session, 'vars_in', choices = lab_vars(), selected = c('Molecular oxygen.', 'Phosphate.'))
   })
   
   # reset values
