@@ -38,11 +38,21 @@ shinyServer(function(input, output, session) {
     # p1z1 switch
     p1z1 <- input$p1z1
 
-    # run model
     run_mod(pars = parsin, inps = iniin, out_var = NULL,  p1z1 = p1z1)
       
   })
 
+  out_vars <- eventReactive(runmod(), { 
+    plo_vars()
+    })
+  
+  # update choices for select input uis with reactive out_var depending on model run
+  observe({
+    updateSelectInput(session, 'var1', choices = out_vars(), selected = 'Molecular oxygen.')
+    updateSelectInput(session, 'var2', choices = out_vars(), selected = 'Phosphate.')
+    updateCheckboxGroupInput(session, 'vars_in', choices = out_vars(), selected = c('Molecular oxygen.', 'Phosphate.'))
+  })
+  
   # reset values
   observeEvent(input$resetAll, {
     session$sendCustomMessage(type = "resetFileInputHandler", "myfl")

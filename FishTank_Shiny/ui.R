@@ -4,17 +4,6 @@ library(shinyjs)
 
 source('R/funcs.R')
 
-# remove irrelevant output variables
-out_vars <- labels_fun()$lngs
-torm <- c(
-  'Thickness of cell.', 
-  'Mask: 0 = land, 1 = water.',
-  'Cell bottom depth.', 
-  'Fast reacting organic matter in the initial and boundary conditions',
-  'Particulate organic matter derived from river outflow.'
-  )
-out_vars <- out_vars[!out_vars %in% torm]
-
 # Define UI for application
 shinyUI(fluidPage(
   
@@ -610,8 +599,7 @@ shinyUI(fluidPage(
             column(width = 6, 
               selectInput(inputId = 'var1',
                 label = NULL,
-                choices = out_vars,
-                selected = 'Molecular oxygen.', 
+                choices = '',
                 width = '600px'
                 )
               ),
@@ -646,8 +634,7 @@ shinyUI(fluidPage(
               column(width = 6,
                 selectInput(inputId = 'var2',
                   label = NULL,
-                  choices = out_vars, 
-                  selected = 'Phosphate.', 
+                  choices = '', 
                   width = '600px'
                 )
               ),
@@ -688,7 +675,7 @@ shinyUI(fluidPage(
               h3('Select variables to plot'),
               wellPanel(id = "variables", style = "overflow-y:scroll; height:400px; max-height: 400px; background-color:#daf1da", 
               
-              checkboxGroupInput('vars_in', label = NULL, choices = out_vars, selected = c('Molecular oxygen.', 'Phosphate.'))
+              checkboxGroupInput(inputId = 'vars_in', label = NULL, choices = NULL)
                                      
               )
             
