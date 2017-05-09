@@ -15,11 +15,11 @@ labels_fun <- function(){
   # long names
   lngs <- sapply(shrt, function(x) ncatt_get(nc, x, 'description')$value)
   lngs <- lngs[shrt]
-  
+
   # units for each variable
   vals <- sapply(shrt, function(x) ncatt_get(nc, x, 'units')$value)
   vals <- vals[shrt]
-  
+
   # remove names
   names(lngs) <- NULL
   names(vals) <- NULL
@@ -238,14 +238,14 @@ setpars <- function(pars = NULL){
   if(is.null(pars)){
 
     out <- formpars(GEM_InputFile)
-   
+
   # replace row values in input file with input list
   } else {
 
     # format parm names in input list for matching with new parm names
     # must remove regex metacharacters 
     par_nms <- gsub('\\+|\\(|\\)', '', GEM_InputFile$parm)
-    
+
     # replace each parameter with new
     for(par in names(pars)){
       
@@ -295,7 +295,7 @@ showpars <- function(){
 # formats output to return data frame
 #
 # out_var is chr string of variable to return
-# p1z1 logical if only one phyto and one zoop group are used, passed to p1z1_swtch
+# p1z1 logical if only one phyto and two zoop group are used, passed to p1z1_swtch
 run_mod <- function(pars = NULL, inps = NULL, out_var = 'O2', p1z1 = FALSE){
   
   library(ncdf4)
@@ -304,6 +304,7 @@ run_mod <- function(pars = NULL, inps = NULL, out_var = 'O2', p1z1 = FALSE){
   setpars(pars)
   
   # create initial conditions file based on inputs
+#  lapply(inps, write, "debug", append=TRUE, ncolumns=1000)
   setinps(inps)
 
   # move the input files from input to root
@@ -564,8 +565,7 @@ form_iniinps <- function(react_ls){
 # last two files are in root, created on the fly with run_mod from input file so no need to convert back if to = F
 #
 # to logical indicating if changes are made from default (six phyto, two zoop) to one each, set to F to go from one group each back to default
-p1z1_swtch <- function(to = TRUE){
- 
+p1z1_swtch <- function(to = TRUE){ 
   # forward change
   if(to){
     
