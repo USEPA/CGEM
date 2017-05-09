@@ -73,7 +73,7 @@ endif
 ! -- Loop over i,j; k will be 1 (surface)
          do j = 1,jm
          do i = 1,im
-             if(fm(i,j).eq.1) then
+             if(nza(i,j).gt.0) then 
 
 if(Which_fluxes(iO2surf).eq.1) then
 !--------------------------------------------------------------
@@ -165,7 +165,7 @@ elseif(Which_fluxes(iDICsurf).eq.2) then
 endif
 
 
-   endif !End of if(fm(ij) statement
+   endif !End of if(nza(i,j) statement
    END DO      ! end of do i block do loop
    END DO      ! end of do j block do loop
 
@@ -173,7 +173,7 @@ endif
 !-- BOTTOM FLUXES -------------------------------------------------------------------------
          do j = 1,jm
          do i = 1,im
-             if(fm(i,j).eq.1) then
+              if(nza(i,j).gt.0) then
               if(wsm(i,j).eq.0) then !If we are on the shelf
                nz = nza(i,j)
 if(Which_fluxes(iSOC).eq.1) then
@@ -282,7 +282,7 @@ endif
 
 
    endif !end shelf
-   endif !End of if(fm(ij) statement
+   endif !End of if(nza(i,j) statement
    END DO      ! end of do i block do loop
    END DO      ! end of do j block do loop
 

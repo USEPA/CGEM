@@ -65,7 +65,8 @@ CONTAINS
     INTEGER,INTENT(IN):: DT_OUT ! Model timestep size in seconds.
     REAL,DIMENSION(IM,JM):: RLON
     REAL,DIMENSION(IM,JM):: RLAT
-    REAL,DIMENSION(IM, JM, NSL):: H,DZ,AREA
+    REAL,DIMENSION(IM,JM):: H
+    REAL,DIMENSION(IM, JM, NSL):: DZ,AREA
     INTEGER,DIMENSION(IM, JM),INTENT(IN):: FM
    ! External NetCDF routines:
     INTEGER NF_CREATE, NF_ENDDEF, NF_PUT_VAR_INT, NF_PUT_VAR_REAL, NF_SYNC
@@ -369,14 +370,14 @@ CONTAINS
 
     ! Define non-time-varying array variables:
 
-    CALL DEFVR2( FILE_ID, IM_DIM, JM_DIM, RLON_VAR, 'longitude', &
+    CALL DEFVR2( FILE_ID, IM_DIM, JM_DIM, RLON_VAR, 'LONGXY', &
                  'Cell center longitude [-180, 180].', 'deg' )
 #ifdef DEBUG
 write(6,*) "After long"
 #endif
 
 
-    CALL DEFVR2( FILE_ID, IM_DIM, JM_DIM, RLAT_VAR, 'latitude', &
+    CALL DEFVR2( FILE_ID, IM_DIM, JM_DIM, RLAT_VAR, 'LATIXY', &
                  'Cell center latitude [-90, 90].', 'deg' )
 #ifdef DEBUG
 write(6,*) "After lat"
@@ -481,7 +482,7 @@ write(6,*) "After Extra_Vars"
     RLON_COPY = RLON
 
     DO J=1,JM
-     CALL CONVERT_LONGITUDES( IM, RLON_COPY(IM,J) )
+     CALL CONVERT_LONGITUDES( IM, RLON_COPY(:,J) )
     ENDDO
 
     ERR = NF_PUT_VAR_REAL( FILE_ID, RLON_VAR, RLON_COPY )
@@ -492,10 +493,11 @@ write(6,*) "After Extra_Vars"
 
     ! Write h in 3D
 
-    TEMP_3D_H = H
+    DO K = 1, NSL
+      TEMP_3D_H(:,:,K) = H 
+    END DO
     ERR = NF_PUT_VAR_REAL( FILE_ID, H_VAR, TEMP_3D_H )
     CALL CHKERR( ERR, 'write output variable h' )
-
 
     ! Write fm in 3D
 

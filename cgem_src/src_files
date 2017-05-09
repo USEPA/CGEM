@@ -4,13 +4,13 @@
 
 CGEM_OBJ  =  CGEM_Flux.o\
 	CGEM_vars.o\
+	STOICH_VARS.o\
 	INPUT_VARS_CGEM.o\
 	OUTPUT_NETCDF_CGEM.o\
 	SDM.o\
 	nparray.o\
 	T_GoMDOM.o\
 	Light_GoMDOM.o\
-	STOICH_VARS.o\
 	MASS_BALANCE_CGEM.o\
 	DailyRad.o\
 	Calc_Chla.o \

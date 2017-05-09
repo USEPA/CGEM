@@ -1,4 +1,4 @@
-SUBROUTINE GD_Light_Model(f,S,Rad,PAR,fm,dz)
+SUBROUTINE GD_Light_Model(f,S,Rad,PAR,dz)
 !------------------------------------------------------------------------------
 !
 !Input: Rad in Watts...actually, just convert it to Watts for this one
@@ -14,7 +14,6 @@ IMPLICIT NONE
 
 REAL, INTENT(INOUT) :: f(im,jm,nsl,nf)
 REAL, INTENT(IN)    :: S(im,jm,nsl),Rad(im,jm)
-INTEGER, INTENT(IN) :: fm(im,jm)
 REAL, INTENT(IN) :: dz(im,jm,nsl)
 REAL, INTENT(OUT) :: PAR(im,jm,nsl)
 REAL :: KESS(nsl),SAL_TERM,CHL_TERM,POC_TERM
@@ -35,9 +34,9 @@ if(Read_Solar.eq.2) Rad_Watts = Rad/4.57
 
 !GoMDOM LIGHT MODEL, No Wind Speed
  do j = 1,jm
-     do i = 1,im 
-       if(fm(i,j).eq.1) then
+     do i = 1,im
         nz = nza(i,j)
+       if(nz.ge.0) then
       do k = 1, nz
          SAL_TERM = 1.084E-06 * (S(i,j,k)**4)
 
@@ -69,7 +68,7 @@ if(Read_Solar.eq.2) Rad_Watts = Rad/4.57
          PAR(i,j,k) =  (IATTOP - IATBOT(i,j,k)) / OPTDEPTH
        END DO
       ENDIF
-       endif !End of if(fm(ij) statement
+       endif !End of if(nza(i,j) statement
    enddo      ! end of do i block do loop
  enddo      ! end of do j block do loop
 

@@ -25,25 +25,27 @@ Subroutine Salinity_Regression_Init_CGEM()
 #endif
 
       if(Read_Sal.eq.0) then
-       call Calc_Sal(START_SECONDS,START_SECONDS,S)
+       call Calc_Sal(S)
       else
-       call USER_Read(START_SECONDS,S,'s')
+       call USER_Read(START_SECONDS,S,'s',2)
       endif
 
       if(Read_T.eq.0) then
         call Calc_Temp(START_SECONDS,START_SECONDS,T)
       else
-       call USER_Read(START_SECONDS,T,'t')
+       call USER_Read(START_SECONDS,T,'t',2)
       endif
-
-   f = fill(0) !Fill with NaN
 
     do j = 1,jm
       do i = 1,im 
 
         do k=1,nza(i,j)
 
-        if ( fm( i, j ) .eq. 1 ) then ! Land cell.
+#ifdef DEBUG
+      write(6,*) "In Salinity Regression loop"
+      write(6,*) "S,T,d_sfc",S(i,j,k),T(i,j,k),d_sfc(i,j,k)
+#endif
+
 
             !Chla
             temp = -0.67 * S(i,j,k) + 0.01 * d_sfc(i,j,k) + 24.50
@@ -127,9 +129,10 @@ Subroutine Salinity_Regression_Init_CGEM()
             call rhoinsitu(S(i,j,k), T(i,j,k), pdbar, 1, rhois)
 
             f(i,j,k,iALK) = (-0.01586*S(i,j,k) + 2.9573)*rhois(1)
-            !write(6,*) i,j,k,rhois(1),pdbar(1),f(i,j,k,iALK)
+#ifdef DEBUG
+            write(6,*) i,j,k,rhois(1),pdbar(1),f(i,j,k,iALK)
+#endif
           
-        endif
       enddo
     enddo
     enddo

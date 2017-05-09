@@ -1,4 +1,4 @@
-  subroutine Brad_Light_Model(f,fm,TC_8,lat,lon,Rad,d,d_sfc,IOPpar)
+  subroutine Brad_Light_Model(f,TC_8,lat,lon,Rad,d,d_sfc,IOPpar)
 
   USE Model_dim
   USE DATE_TIME
@@ -11,7 +11,6 @@
 
   real, intent(in)    :: Rad(im,jm)     !Irradiance just below sea surface
   real, intent(in)    :: f(im,jm,nsl,nf)
-  integer, intent(in) :: fm(im,jm)
   real, intent(in)    :: lat(im,jm),lon(im,jm)    !Latitude and longitude of each grid cell
   real, intent(out)   :: IOPpar(im,jm,nsl)  !Par at the middle of layer k
   real, intent(in)    :: d_sfc(im,jm,nsl)   !Depth at center of cell k from surface
@@ -35,7 +34,7 @@
     integer         :: julianDay     ! Holds Julian Day
     integer         :: mdate_julian  ! Function calculates Julian Day
     logical         :: leapyr        ! Logical, is leap year
-  integer i,j,numdepths
+  integer i,j,nz,numdepths
 
 
  !--Begin Calculate atmospheric model --------------------------------
@@ -69,26 +68,27 @@
 
    do j = 1,jm
      do i = 1,im
-       if(fm(i,j).eq.1) then
+        nz=nza(i,j)
+        if(nz.gt.0) then
 
          sun_zenith = sunang(julianDay, HrTC, lat(i,j), lon(i,j))
 
-         totChl(:) = (f(i,j,:,JDIA) * 1.0E6 / CCHLD) + (f(i,j,:,JGRE) * 1.0E6 / CCHLG)
-         OM1_A(:) = 0.
-         OM1_Z(:) = f(i,j,:,JZOO) * 1.0E3
-         OM1_R(:) = f(i,j,:,JROC) * 1.0E3
-         OM1_BC(:) = f(i,j,:,JLOC) * 1.0E3
-         CDOM_k(:) = astarOMA 
-         numdepths = nza(i,j)
+         totChl(1:nz) = (f(i,j,1:nz,JDIA) * 1.0E6 / CCHLD) + (f(i,j,1:nz,JGRE) * 1.0E6 / CCHLG)
+         OM1_A(1:nz) = 0.
+         OM1_Z(1:nz) = f(i,j,1:nz,JZOO) * 1.0E3
+         OM1_R(1:nz) = f(i,j,1:nz,JROC) * 1.0E3
+         OM1_BC(1:nz) = f(i,j,1:nz,JLOC) * 1.0E3
+         CDOM_k(1:nz) = astarOMA 
+         numdepths = nz
 
          call Call_IOP_PAR(                                            &
 		 & PARsurf(i,j), sun_zenith,                           &
                  & CDOM_k      , totChl    ,                           &
                  & OM1_A       , OM1_Z     ,                           &
                  & OM1_R       , OM1_BC    ,                           &
-                 & d(i,j,:)    , numdepths ,                           &
-	         & d_sfc(i,j,:), PAR_percent,                          &
-		 & PARbot      , IOPpar(i,j,:)                         )   
+                 & d(i,j,1:nz)    , numdepths ,                           &
+	         & d_sfc(i,j,1:nz), PAR_percent,                          &
+		 & PARbot      , IOPpar(i,j,1:nz)                         )   
 
 
        endif

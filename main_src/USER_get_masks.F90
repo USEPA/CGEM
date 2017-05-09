@@ -2,21 +2,24 @@
 
       USE Model_dim
 
-      integer, intent (out) :: fm(im,jm)  ! land(0)/sea(1) mask
-      integer, intent (out)    :: wsm(im,jm) ! shelf(0)/open ocean(1) mask
-      integer i,j
- 
-      if(Which_gridio.eq.0) then
+      integer, intent (out) :: fm(im,jm)  ! land(0)/sea(1) mask for NCOM
+                                          ! other for EFDC
+      integer, intent (out) :: wsm(im,jm) ! shelf(0)/open ocean(1) mask
+      integer j
+      character(100) :: filename 
+
+      if(Which_gridio.eq.0) then !FishTank
        fm  = 1  !Everything is water
        wsm = 0  !Everything is on the shelf
       elseif (Which_gridio.eq.1) then !EFDC
-       fm=0  !Default Land
        wsm=0 !Everything is shelf
+       write(filename,'(A, A)') trim(DATADIR),'/nz.dat'
+       open(unit=19,file=filename)
+       read(19,*)
        do j=1,jm
-        do i=1,im  !If has layers, then water
-          if(nza(i,j).gt.0) fm(i,j)=1
-        enddo
+         read(19,*) fm(:,j)
        enddo
+       close(19)
       endif
 
       return

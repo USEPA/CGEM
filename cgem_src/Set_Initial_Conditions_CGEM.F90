@@ -34,7 +34,7 @@
           stop
        endif
 
-       call InitError_Check_CGEM()
+       !call InitError_Check_CGEM()
 
        return
 

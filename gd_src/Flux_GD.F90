@@ -59,7 +59,7 @@ endif
 ! -- Loop over i,j; k will be 1 (surface)
          do j = 1,jm
          do i = 1,im
-             if(fm(i,j).eq.1) then
+             if(nza(i,j).gt.0) then
 
 
 if(Which_Fluxes(iO2surf).eq.1) then
@@ -150,17 +150,17 @@ endif
 !!           stop
 !endif
 
-   endif !End of if(fm(ij) statement
+   endif !End of if(nza(i,j) statement
    END DO      ! end of do i block do loop
    END DO      ! end of do j block do loop
 
 !-- BOTTOM FLUXES -------------------------------------------------------------------------
          do j = 1,jm
          do i = 1,im 
-             if(fm(i,j).eq.1) then
-
-              if(wsm(i,j).eq.0) then !If we are on the shelf
                 nz = nza(i,j)
+             if(nz.gt.0) then  !water cell
+              if(wsm(i,j).eq.0) then !If we are on the shelf
+
 if(Which_Fluxes(iSOC).eq.1) then
 !Murrell and Lehrter sediment oxygen consumption
                f(i,j,nz,JDO2) = AMAX1(f(i,j,nz,JDO2) - 0.0235*2.**(.1*T(i,j,nz))*  &
@@ -212,7 +212,7 @@ endif
 
    endif !end shelf
 
-   endif !End of if(fm(ij) statement
+   endif !End of if(nza(i,j) statement
    END DO      ! end of do i block do loop
    END DO      ! end of do j block do loop
 

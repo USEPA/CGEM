@@ -1,4 +1,4 @@
-Subroutine Write_InputFile_GD(filename)
+Subroutine Write_InputFile_GD()
 
 USE INPUT_VARS
 USE INPUT_VARS_GD
@@ -9,12 +9,11 @@ USE FLAGS
 IMPLICIT NONE
 
 
-integer i,icent_jcent_units
+integer icent_jcent_units
 real i_in,j_in
-character(120),intent(in):: filename
 
 !--Code Identifier--------------
-open(unit=999,file=filename,form='formatted',status='unknown')
+open(unit=999,file="GD_debug.txt",form='formatted',status='unknown')
 write(999,*) "code_ID",code_ID
 write(999,*)
 !--Simulation specifics------

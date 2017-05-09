@@ -34,7 +34,7 @@ write(6,*) "After Set_Vars"
                             IYRS, IMONS, IDAYS, IHRS, IMINS, ISECS, &
                             IYRE, IMONE, IDAYE, IHRE, IMINE, ISECE, &
                             DT_OUT, &
-                            LON, LAT, D, FM, &
+                            LON, LAT, Depth, FM, &
                             DZ )
           CALL CLOSE_FILE()
 

@@ -1,4 +1,4 @@
-Subroutine Write_InputFile_CGEM(filename)
+Subroutine Write_InputFile_CGEM()
 
 USE Model_dim
 USE INPUT_VARS
@@ -6,13 +6,13 @@ USE INPUT_VARS_CGEM
 USE LIGHT_VARS
 USE TEMP_VARS
 USE CGEM_vars 
+USE STOICH_VARS
 
 IMPLICIT NONE
 
-character(120),intent(in) :: filename
 
 !--Code Identifier--------------
-open(unit=999,file=filename,form='formatted',status='unknown')
+open(unit=999,file="CGEM_debug.txt",form='formatted',status='unknown')
 write(999,*) "code_ID",code_ID
 write(999,*)
 !--Simulation specifics------

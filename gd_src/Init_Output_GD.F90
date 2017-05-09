@@ -29,7 +29,7 @@ write(6,*) im,jm,nsl,nstep,nf,EXTRA_VARIABLES
                             IYRS, IMONS, IDAYS, IHRS, IMINS, ISECS, &
                             IYRE, IMONE, IDAYE, IHRE, IMINE, ISECE, &
                             DT_OUT, &
-                            LON, LAT, D, FM, &
+                            LON, LAT, Depth, FM, &
                             DZ, AREA )
 #ifdef DEBUG
 write(6,*) "After create"

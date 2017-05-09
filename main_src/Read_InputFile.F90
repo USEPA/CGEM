@@ -12,7 +12,7 @@ if(Which_code.eq."CGEM") then !CGEM
 
 #ifdef DEBUG
 !This will check if Read_InputFile is correctly reading
-       call Write_InputFile_CGEM("Debug_InputFile")
+       call Write_InputFile_CGEM()
        write(6,*) "DEBUG: Wrote Debug_InputFile, Stopping"
        !stop
 #endif
@@ -23,7 +23,7 @@ else if(Which_code.eq."GOMDOM") then !GOMDOM
 
 #ifdef RDEBUG
 !This will check if Read_InputFile is correctly reading
-       call Write_InputFile_GD("Debug_InputFile")
+       call Write_InputFile_GD()
        write(6,*) "DEBUG: Wrote Debug_InputFile, Stopping"
        !stop
 #endif

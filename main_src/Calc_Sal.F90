@@ -5,13 +5,20 @@
       IMPLICIT NONE
 
       real, intent (out) :: Sal(im,jm,nsl) !Salinity in psu
+      real input_S 
       character(200) filename
 
        write(filename,'(A, A)') trim(DATADIR),'/S.dat'
        open (19,file=filename,status='old')
        read (19,*)  !Assumes header file
-       read (19,*) Sal
+       read (19,*) input_S
        close(19)
+
+       Sal=input_S
+
+#ifdef DEBUG
+      write(6,*) "In Calc_Sal, Sal=",input_S
+#endif
 
 
       return 

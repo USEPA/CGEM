@@ -11,7 +11,6 @@
  
       real temp
       integer i,j,k
-      real x
       real S(im,jm,nsl), T(im,jm,nsl) !S=Salinity,T=Temperature in C 
 
 #ifdef DEBUG
@@ -20,27 +19,23 @@
 #endif
 
       if(Read_Sal.eq.0) then
-       call Calc_Sal(START_SECONDS,START_SECONDS,S) 
+       call Calc_Sal(S) 
       else
-       call USER_Read(START_SECONDS,S,'s')
+       call USER_Read(START_SECONDS,S,'s',2)
       endif
 
       if(Read_T.eq.0) then
         call Calc_Temp(START_SECONDS,START_SECONDS,T)
       else
-       call USER_Read(START_SECONDS,T,'t')
+       call USER_Read(START_SECONDS,T,'t',2)
       endif
 
-      x = 0.
-      x = x/x
-      f = x
 
       do j = 1,jm
       do i = 1,im
 
          do k=1,nza(i,j)
 
-         if(fm(i,j).eq.1) then
 !Regression y  =  b1*Salinity + b2*Depth + b3*Salinity^2 + b4*Depth^2 + Intercept
      !DOC
       temp = -6.39*S(i,j,k)  -0.40*d_sfc(i,j,k) + 338.89
@@ -122,7 +117,6 @@
       f( i, j, k, JGREP ) = 0.004
 
 
-      endif
       enddo
       enddo
       enddo

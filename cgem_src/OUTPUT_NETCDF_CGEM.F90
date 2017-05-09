@@ -13,11 +13,6 @@ MODULE OUTPUT_NETCDF_CGEM
 
   USE Model_dim, ONLY: nospA,nospZ
   USE INPUT_VARS
-  USE INPUT_VARS_CGEM
-  USE CGEM_vars
-  USE LIGHT_VARS
-  USE Which_Flux
-  USE TEMP_VARS
 
   IMPLICIT NONE
 
@@ -52,6 +47,13 @@ CONTAINS
                           IYRE, IMONE, IDAYE, IHRE, IMINE, ISECE, &
                           DT_OUT, RLON, RLAT, H, FM, DZ)
     USE OUTPUT 
+    USE INPUT_VARS_CGEM
+    USE CGEM_vars
+    USE LIGHT_VARS
+    USE Which_Flux
+    USE TEMP_VARS
+    USE STOICH_VARS
+
     IMPLICIT NONE
     CHARACTER(LEN=*),INTENT(IN):: NAME
     INTEGER,INTENT(IN):: IM, JM, NSL
@@ -63,7 +65,8 @@ CONTAINS
     INTEGER,INTENT(IN):: DT_OUT ! Model timestep size in seconds.
     REAL,DIMENSION(IM,JM):: RLON
     REAL,DIMENSION(IM,JM):: RLAT
-    REAL,DIMENSION(IM, JM, NSL):: H,DZ
+    REAL,DIMENSION(IM, JM, NSL):: DZ
+    REAL, DIMENSION(IM,JM) :: H
     INTEGER,DIMENSION(IM, JM),INTENT(IN):: FM
    ! External NetCDF routines:
     INTEGER NF_CREATE, NF_ENDDEF, NF_PUT_VAR_INT, NF_PUT_VAR_REAL, NF_SYNC
@@ -301,7 +304,7 @@ CONTAINS
     CALL DEFVR2( FILE_ID, IM_DIM, JM_DIM, RLAT_VAR, 'LATIXY', &
                  'Cell center latitude [-90, 90].', 'deg' )
     CALL DEFVR3( FILE_ID, IM_DIM, JM_DIM, NSL_DIM, H_VAR, 'h', &
-                 'Cell bottom depth.', 'm' )
+                 'Depth.', 'm' )
     CALL DEFVI3( FILE_ID, IM_DIM, JM_DIM, NSL_DIM, FM_VAR, 'fm', &
                  'Mask: 0 = land, 1 = water.', 'none' )
     CALL DEFVR3( FILE_ID, IM_DIM, JM_DIM, NSL_DIM, DZ_VAR, 'dz', &
@@ -372,7 +375,9 @@ CONTAINS
 
     ! Write h in 3D
 
-    TEMP_3D_H = H
+    DO K = 1, NSL
+      TEMP_3D_H(:,:,K) = H 
+    END DO
     ERR = NF_PUT_VAR_REAL( FILE_ID, H_VAR, TEMP_3D_H )
     CALL CHKERR( ERR, 'write output variable h' )
 

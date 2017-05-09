@@ -1,4 +1,4 @@
-      subroutine USER_Read(TC_8,Var,which)
+      subroutine USER_Read(TC_8,Var,which,init)
 
       USE Model_dim
       USE DATE_TIME
@@ -6,8 +6,10 @@
       IMPLICIT NONE
 
       integer*8, intent (inout) :: TC_8
+      integer, intent(in) :: init ! Zero is regular already called, 
+                                  ! 1 is regular first call, 
+                                  ! 2 is need to rewind and close 
       real, intent (out) :: Var(IM,JM)
-      integer, save :: init=1
       integer*8,save :: t1,t2
       real,save :: Var1,Var2
       real :: fac
@@ -26,17 +28,17 @@
 
       ifile = 2000 + ichar(which)
 
-      if(init.eq.1) then
+      if(init.gt.0) then
 
         select case(which)
          case("p")  !Solar Radiation
-          filename = "data/INPUT/Solar.dat"
+          write(filename,'(A, A)') trim(DATADIR),'/INPUT/Solar.dat'
          case("w")  !Wind Speed
-          filename = "data/INPUT/Wind.dat"
+          write(filename,'(A, A)') trim(DATADIR),'/INPUT/Wind.dat'
          case("t")  !Temperature
-          filename = "data/INPUT/Temp.dat"
+          write(filename,'(A, A)') trim(DATADIR),'/INPUT/Temp.dat'
          case("s")  !Temperature
-          filename = "data/INPUT/Sal.dat"
+          write(filename,'(A, A)') trim(DATADIR),'/INPUT/Sal.dat'
          case default
            write(6,*) "Error in USER_Read, input=",which
         end select 
@@ -80,7 +82,6 @@
          endif
         enddo
 
-        init=0
       endif
 
 
@@ -98,6 +99,8 @@
 !Convert Watts/m2/s into quanta/cm2/s:
       if(Read_Solar.ne.2) Var = Var*cv
 
+
+      if(init.eq.2) rewind(ifile)
 
       return 
       end subroutine USER_Read

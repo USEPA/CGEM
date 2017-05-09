@@ -20,6 +20,7 @@
      USE DailyRad
      USE LIGHT_VARS
      USE CGEM_Flux
+     USE Fill_Value
 
       IMPLICIT NONE
 
@@ -213,73 +214,24 @@
     integer nz
 !For tiny
     real x
-    integer fill_value
+    integer fill_val
 
-    fill_value=-9999
-    !fill_value=1/fill_value 
+    !fill(1) is for -9999
+    fill_val=fill(1)
 
    if(init.eq.1) then  
 
 !Initialize netCDF output variables
-  RN2_ijk = fill_value !-9999.
-  Chl_C_ijk = -9999.
-  Chla_tot_ijk = -9999.
-  Esed = -9999.
-  PAR_percent_ijk = -9999.
-  uN_ijk = -9999.
-  up_ijk = -9999.
-  uE_ijk = -9999.
-  uA_ijk = -9999.
-  uSi_ijk = -9999.
-
-      !Initial Stoichiometry of POC and DOC:
-       s_x1A= Stoich_x1A_init
-       s_x2A= Stoich_x2A_init
-       s_y1A= Stoich_y1A_init
-       s_y2A= Stoich_y2A_init
-       s_z1A= Stoich_z1A_init
-       s_z2A= Stoich_z2A_init
-       s_x1Z= Stoich_x1Z_init
-       s_x2Z= Stoich_x2Z_init
-       s_y1Z= Stoich_y1Z_init
-       s_y2Z= Stoich_y2Z_init
-       s_z1Z= Stoich_z1Z_init
-       s_z2Z= Stoich_z2Z_init
-
-
-  do j = 1,jm
-    do i = 1,im 
-      if(fm(i,j).eq.0) then
-       s_x1A(i,j,:) = -9999.
-       s_x2A(i,j,:)=  -9999.
-       s_y1A(i,j,:)=  -9999.
-       s_y2A(i,j,:)=  -9999.
-       s_z1A(i,j,:)=  -9999.
-       s_z2A(i,j,:)=  -9999.
-       s_x1Z(i,j,:)=  -9999.
-       s_x2Z(i,j,:)=  -9999.
-       s_y1Z(i,j,:)=  -9999.
-       s_y2Z(i,j,:)=  -9999.
-       s_z1Z(i,j,:)=  -9999.
-       s_z2Z(i,j,:)=  -9999.
-      endif  
-      if(wsm(i,j).eq.0.and.b_layer.ne.0) then
-       s_x1A(i,j,nz_max+1:nsl) = -9999.
-       s_x2A(i,j,nz_max+1:nsl)=  -9999.
-       s_y1A(i,j,nz_max+1:nsl)=  -9999.
-       s_y2A(i,j,nz_max+1:nsl)=  -9999.
-       s_z1A(i,j,nz_max+1:nsl)=  -9999.
-       s_z2A(i,j,nz_max+1:nsl)=  -9999.
-       s_x1Z(i,j,nz_max+1:nsl)=  -9999.
-       s_x2Z(i,j,nz_max+1:nsl)=  -9999.
-       s_y1Z(i,j,nz_max+1:nsl)=  -9999.
-       s_y2Z(i,j,nz_max+1:nsl)=  -9999.
-       s_z1Z(i,j,nz_max+1:nsl)=  -9999.
-       s_z2Z(i,j,nz_max+1:nsl)=  -9999.
-      endif
-  enddo  
-  enddo 
-
+  RN2_ijk = fill_val 
+  Chl_C_ijk = fill_val 
+  Chla_tot_ijk =  fill_val
+  Esed =  fill_val
+  PAR_percent_ijk =  fill_val
+  uN_ijk =  fill_val
+  up_ijk =  fill_val
+  uE_ijk =  fill_val
+  uA_ijk =  fill_val
+  uSi_ijk =  fill_val
 
        dTd = dT/SDay           ! Timestep length in units of days
        StepsPerDay = SDay / dT ! Time steps in a day
@@ -288,7 +240,6 @@
        ! These duplicated lines execute only once for init
        do j = 1,jm
           do i = 1,im 
-             if(fm(i,j).eq.1) then
                 nz = nza(i,j)
                 do k = 1, nz
                    do isp = 1, nospA          
@@ -305,7 +256,6 @@
                 call DailyRad_init(TC_8, lat(i,j), lon(i,j), d(i,j,:), d_sfc(i,j,:), A_k, &
                      & CDOM_k, OM1A_k, OM1Z_k, OM1SPM_k, OM1BC_k, aDailyRad_k,nz)
                 aDailyRad(i,j,:) = aDailyRad_k(:)
-             endif    
           enddo     
        enddo     
 
@@ -329,7 +279,6 @@ write(6,*) "A",f(1,1,1,iA(1:nospA))
 !-----------------------------------------------------------------
  do j = 1,jm
      do i = 1,im 
-       if(fm(i,j).eq.1) then
          nz = nza(i,j)
  !---------------------------------------------------------
  ! Calculate and convert variables needed for light routine
@@ -1269,7 +1218,6 @@ enddo
 !--------------------------------------------------------------------
         enddo   ! end of  "do k = 1, nz" 
 
-       endif !End of if(fm(ij) statement
    enddo      ! end of do i block do loop
  enddo      ! end of do j block do loop
 ! ----------------------------------------------------------------------
@@ -1280,11 +1228,9 @@ write(6,*) "A before update",f(1,1,1,iA(1:nospA))
 !update f for the current timestep
          do j = 1,jm
          do i = 1,im 
-             if(fm(i,j).eq.1) then
                 do k = 1,nza(i,j)
                  f(i,j,k,:) = ff(i,j,k,:)
                 enddo
-             endif
          enddo
          enddo
 !-- End Main GEM Calculations ---------------------------------------------------
