@@ -7,7 +7,7 @@
       implicit none
  
       integer ii,i,j,k,nz
-      character(200),intent(in) :: filename
+      character(*),intent(in) :: filename
       real init(nf)
 
       f=fill(0)  !Fill values for netCDF
