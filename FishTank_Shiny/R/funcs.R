@@ -164,7 +164,7 @@ formpars <- function(parsin){
       rename(parm = L1)
     
   }
-  
+
   return(out)
   
 }
@@ -271,7 +271,7 @@ setpars <- function(pars = NULL){
   }
 
   # save output to file
-  writeLines(out, 'input/GEM_InputFile')
+  writeLines(out, 'GEM_InputFile')
   
 }
 
@@ -296,32 +296,33 @@ showpars <- function(){
 #
 # out_var is chr string of variable to return
 # p1z1 logical if only one phyto and two zoop group are used, passed to p1z1_swtch
-run_mod <- function(pars = NULL, inps = NULL, out_var = 'O2', p1z1 = FALSE){
+run_mod <- function(inps = NULL, out_var = 'O2', p1z1 = FALSE){
   
   library(ncdf4)
-  
-  # create parameter file based on inputs
-  setpars(pars)
   
   # create initial conditions file based on inputs
 #  lapply(inps, write, "debug", append=TRUE, ncolumns=1000)
   setinps(inps)
 
   # move the input files from input to root
-  fls <- c('input/InitialConditions.txt', 'input/GEM_InputFile')
+  fls <- c('input/InitialConditions.txt')
   file.copy(fls, getwd(), overwrite = TRUE)
   
   # set to one phyto, one zoop group if TRUE
   if(p1z1) p1z1_swtch(to = TRUE)
   
-  # run model, suppress output messages
-  suppressWarnings(system('FishTank.exe'))
-  
+  # run model
+  runexe <- suppressWarnings(system('FishTank.exe', intern = TRUE))
+
   # back to default six phyt, two zoop if TRUE
   if(p1z1) p1z1_swtch(to = FALSE)
   
+  # return stderr if runexe is not empty
+  if(length(runexe) > 0) 
+    return(runexe)
+  
   # remove temp files
-  file.remove(c('input/GEM_InputFile', 'input/InitialConditions.txt'))
+  file.remove(c('input/InitialConditions.txt'))
   
   # get model output from netcdf
   nc <- nc_open('NETCDF/output.000000.nc')
@@ -500,47 +501,35 @@ expr_fun <- function(lab_in){
 ######
 # format parameter inputs for shiny app, input is reactive object from shiny (user inputs from ui), output is list to send to setpars
 # react_ls is created from reactiveValuesToList(input)
-form_parinps <- function(react_ls, flrv){
+form_parinps <- function(react_ls){
   
   react_ls <- reactiveValuesToList(react_ls)
-
-  # use input file if provided
-  if(!is.null(flrv$data)){
     
-    myfl <- formpars(flrv$data$datapath)
-    out_ls <- as.list(myfl[, 1])
-    names(out_ls) <- myfl[, 2]
-    
-  # otherwise use gui inputs
-  } else {
-    
-    # format times argument separately
-    times <- react_ls$times
-    times <- list(
-      '- starting time.*1' = as.numeric(format(times[1], '%Y')),
-      '- starting time.*2' = as.numeric(format(times[1], '%m')),
-      '- starting time.*3' = as.numeric(format(times[1], '%d')),
-      '- ending   time.*1' = as.numeric(format(times[2], '%Y')),
-      '- ending   time.*2' = as.numeric(format(times[2], '%m')),
-      '- ending   time.*3' = as.numeric(format(times[2], '%d'))
-      )
-     
-    # remove inputs that are not parameters, make sure this works
+  # format times argument separately
+  times <- react_ls$times
+  times <- list(
+    '- starting time.*1' = as.numeric(format(times[1], '%Y')),
+    '- starting time.*2' = as.numeric(format(times[1], '%m')),
+    '- starting time.*3' = as.numeric(format(times[1], '%d')),
+    '- ending   time.*1' = as.numeric(format(times[2], '%Y')),
+    '- ending   time.*2' = as.numeric(format(times[2], '%m')),
+    '- ending   time.*3' = as.numeric(format(times[2], '%d'))
+    )
    
-    # format parm names in input list for matching with new parm names
-    # must remove regex metacharacters 
-    inps <- gsub('\\+|\\(|\\)', '', names(react_ls))
-    load('input/GEM_InputFile.RData')
-    torm <- gsub('\\+|\\(|\\)*', '', GEM_InputFile$parm) %>% 
-      paste0('^', .) %>% 
-      paste(., collapse = '|') %>% 
-      grep(., inps, value = T, invert = T)
-    
-    out_ls <- react_ls[!names(react_ls) %in% torm]
-    out_ls <- c(out_ls, times)
-    
-  }
+  # remove inputs that are not parameters, make sure this works
+ 
+  # format parm names in input list for matching with new parm names
+  # must remove regex metacharacters 
+  inps <- gsub('\\+|\\(|\\)', '', names(react_ls))
+  load('input/GEM_InputFile.RData')
+  torm <- gsub('\\+|\\(|\\)*', '', GEM_InputFile$parm) %>% 
+    paste0('^', .) %>% 
+    paste(., collapse = '|') %>% 
+    grep(., inps, value = T, invert = T)
   
+  out_ls <- react_ls[!names(react_ls) %in% torm]
+  out_ls <- c(out_ls, times)
+
   return(out_ls)
 
 }

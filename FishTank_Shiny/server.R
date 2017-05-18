@@ -28,18 +28,32 @@ shinyServer(function(input, output, session) {
     progress <- shiny::Progress$new(session, min=1, max=1)
     progress$set(message = 'FishTank is running...')
     on.exit(progress$close())
-  
-    # format parameter inputs 
-    parsin <- form_parinps(input, flrv)
 
+    # format input parameters if gui is used
+    if(is.null(flrv$data)){
+      
+      setpars(form_parinps(input))
+      
+    } else {
+      
+      file.copy(flrv$data$datapath, 'GEM_InputFile')
+      
+    }
+  
     # format initial condition inputs
     iniin <- form_iniinps(input)
 
     # p1z1 switch
     p1z1 <- input$p1z1
 
-    run_mod(pars = parsin, inps = iniin, out_var = NULL,  p1z1 = p1z1)
+    out <- run_mod(inps = iniin, out_var = NULL,  p1z1 = p1z1)
+
+    validate(
+      need(inherits(out, 'ncdf4'), as.character(out))
+    )
       
+    out
+    
   })
 
   lab_vars <- eventReactive(runmod(), { 
@@ -83,7 +97,7 @@ shinyServer(function(input, output, session) {
   output$var1plot <- renderDygraph({
      
     alldat <- runmod()
-    
+
     # data to plot
     varsel <- input$var1
     dylog1 <- input$dylog1

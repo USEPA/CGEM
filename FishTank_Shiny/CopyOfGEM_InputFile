@@ -1,0 +1,131 @@
+"CGEM 1.0 Manuscript Parameters for phytoplankton group 4"		!Code_ID
+
+!Simulation Specifics
+2006 1 1 18 0 0		!- starting time Yr, Mon, Day, Hr, Min, Sec
+2006 12 31 18 0 0		!- ending   time Yr, Mon, Day, Hr, Min, Sec
+0		!- RESTART_FILE_TIMESTEP
+300 86400		!- dT (timestep, seconds); dT_out (output interval, seconds)
+0		!- How cell Location is specified
+-92.39 29.03		!- Cell i,j coord (if grid-units) or longcent,latcent vals (if long-lat)
+
+!Switches in GEM
+0 0 0 0 0 0 0 0		!Which_fluxes
+ 		!  Atmospheric Deposition of Nutrients, Instant Remineralization in Bottom Layer, Sediment Diagenesis Model
+1		!Which_temperature
+1		!Which_uptake
+1		!InitializeHow
+6 saDFASDFASDF
+!Optics
+0.146		!Kw
+spm
+0.024		!Kchla
+0.0375		!astar490
+0.015		!aw490
+0.01		!astarOMA
+0.01		!astarOMZ
+0.01		!astarOMR
+0.01		!astarOMBC
+1		!PARfac
+0		!sink CDOM
+
+!Temperature
+17 17 17 17 17 17 22 26		!Tref(nospA+nospZ)
+0.0035 0.0035 0.0035 0.0035 0.0035 0.0035 0.0035 0.0035		!KTg1(nospA+nospZ)
+0.001 0.001 0.001 0.001 0.001 0.001 0.001 0.001		!KTg2(nospA+nospZ)
+0.61 0.61 0.61 0.61 0.61 0.61 0.61 0.61		!Ea(nospA+nospZ)
+
+!Phytoplankton, up to 6 types
+0.5 0.5 0.5 0.5 0.5 0.5		!ediblevector(Z1)
+0.5 0.5 0.5 0.5 0.5 0.5		!ediblevector(Z2)
+1.12 1.12 1.12 1.12 1.12 1.12		!umax
+3.96e-16 3.96e-16 3.96e-16 3.96e-16 3.96e-16 3.96e-16		!alpha
+1.1e-18 1.1e-18 1.1e-18 1.1e-18 1.1e-18 1.1e-18		!beta
+0.1 0.1 0.1 0.1 0.1 0.1		!respg
+0.02 0.02 0.02 0.02 0.02 0.02		!respb
+1.53e-10 1.53e-10 1.53e-10 1.53e-10 1.53e-10 1.53e-10		!QminN
+1.07e-11 1.07e-11 1.07e-11 1.07e-11 1.07e-11 1.07e-11		!QminP
+6.85e-09 6.85e-09 6.85e-09 6.85e-09 6.85e-09 6.85e-09		!QmaxN
+4.28e-10 4.28e-10 4.28e-10 4.28e-10 4.28e-10 4.28e-10		!QmaxP
+1.13 1.13 1.13 1.13 1.13 1.13		!Kn
+0.51 0.51 0.51 0.51 0.51 0.51		!Kp
+1.13 1.13 1.13 1.13 1.13 1.13		!Ksi
+5 5 5 5 5 5		!KQn
+0.2 0.2 0.2 0.2 0.2 0.2		!KQp
+1 1 1 1 1 1		!nfQs
+1.33e-09 1.33e-09 1.33e-09 1.33e-09 1.33e-09 1.33e-09		!vmaxN
+4.07e-10 4.07e-10 4.07e-10 4.07e-10 4.07e-10 4.07e-10		!vmaxP
+1.33e-09 1.33e-09 1.33e-09 1.33e-09 1.33e-09 1.33e-09		!vmaxSi
+1 1 1 1 1 1		!aN
+513 513 513 513 513 513		!volcell
+4.54e-08 4.54e-08 4.54e-08 4.54e-08 4.54e-08 4.54e-08		!Qc
+70000000 70000000 70000000 70000000 70000000 70000000		!Athresh
+0.29 0.29 0.29 0.29 0.29 0.29		!sink A
+0.11 0.11 0.11 0.11 0.11 0.11		!mA
+1 1 1 1 1 1		!A_wt
+
+!Zooplankton, up to 2 types
+0.4 0.4		!Zeffic
+0.25 0		!Zslop
+29800000 674000		!Zvolcell
+0.000313 7.08e-07		!ZQc
+6.95e-05 1.57e-07		!ZQn
+3.77e-06 8.53e-09		!ZQp
+1.12e+12 1.12e+12		!ZKa
+0.2 0.3		!Zrespg
+0.1 0.416		!Zrespb
+945000000 29800000		!Zumax
+0.00072 0.00072		!Zm
+
+!Organic Matter
+30		!KG1
+30		!KG2
+11		!KG1_R
+3.7		!KG2_R
+1		!KG1_BC
+1		!KG2_BC
+1		!KNH4
+0.52		!nitmax
+10		!KO2
+10		!KstarO2
+5		!KNO3
+380		!pCO2
+51		!stoich_x1R
+4.5		!stoich_y1R
+700		!stoich_x2R
+50		!stoich_y2R
+106		!stoich_x1BC
+16		!stoich_y1BC
+106		!stoich_x2BC
+16		!stoich_y2BC
+10		!sink OM1_A
+0		!sink OM2_A
+10		!sink OM1_Z
+0		!sink OM2_Z
+10		!sink OM1_R
+0		!sink OM2_R
+10		!sink OM1_BC
+0		!sink OM2_BC
+0.01		!KGcdom
+0.018		!CF_SPM
+
+!River Loads - used in 3D only
+1		!rcNO3  - factor multiplying NO3 river load
+1		!rcNH4  - factor multiplying NH4 river load
+1		!rcPO4  - factor multiplying PO4 river load
+1		!rcSi   - factor multiplying Si river load
+
+!Other including Boundary Conditions
+1		!Which_VMix
+1		!KH_coeff
+0		!Which_Outer_BC
+ 		!                4==GoMDOM,   5==no flow boundaries, 6==Salinity with Depth attenuation
+0 1.		!wt_pl, wt_po
+0.5 0.5		!wt_l, wt_o, weights for small gradient BC's, lateral and open ocean
+1 0 1		!Multipliers for OM_BC at initial conditions and for boundary conditions, lateral and shelf
+106 16		!Stoich_x1_init, Stoich_y1_init
+106 16		!Stoich_x2_init, Stoich_y2_init
+106 16		!Stoich_x1Z_init, Stoich_y1Z_init
+106 16		!Stoich_x2Z_init, Stoich_y2Z_init
+92000		!KG_bot, turnover rate for k=20 if Instant Remineralization is used (see Which_fluxes above)
+0		!MC, 1==COMT output
+1		!Which_Output
