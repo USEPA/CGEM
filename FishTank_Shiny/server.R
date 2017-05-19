@@ -38,7 +38,7 @@ shinyServer(function(input, output, session) {
       
     } else {
       
-      file.copy(flrv$data$datapath, 'GEM_InputFile')
+      file.copy(flrv$data$datapath, 'GEM_InputFile', overwrite = TRUE)
       
     }
   

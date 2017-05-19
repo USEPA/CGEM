@@ -9,15 +9,22 @@
 -92.39 29.03		!- Cell i,j coord (if grid-units) or longcent,latcent vals (if long-lat)
 
 !Switches in GEM
-0 0 0 0 0 0 0 0		!Which_fluxes
+1 0 0 0 0 0 0 0		!Which_fluxes
  		!  Atmospheric Deposition of Nutrients, Instant Remineralization in Bottom Layer, Sediment Diagenesis Model
 1		!Which_temperature
 1		!Which_uptake
+1		!Which_quota
+1		!Which_irradiance
+1		!Which_chlaC
+2		!Which_photosynthesis
+1		!Which_growth
+1		!SolarRad
 1		!InitializeHow
-6 saDFASDFASDF
+
 !Optics
 0.146		!Kw
-spm
+0.001		!Kcdom
+0.029		!Kspm
 0.024		!Kchla
 0.0375		!astar490
 0.015		!aw490
