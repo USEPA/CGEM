@@ -1,7 +1,7 @@
 # a caller for state variable labels
+#
+# requires ncdf4
 labels_fun <- function(){
-  
-  library(ncdf4)
   
   if(!file.exists('NETCDF/output.000000.nc'))
     stop('Run model to get labels')
@@ -32,9 +32,9 @@ labels_fun <- function(){
 # convert the initial conditions between formats
 #
 # parsin can be a chr string of file location of original InitialConditions.txt or input data frame of input conditions to be converted to ASCII format, the data frame is the output from the ASCII text file, but there's an additional function that replaces parameters in the data frame for conversion to the standard GEM format
+#
+# requires dplyr
 forminps <- function(parsin){
- 
-  library(dplyr)
   
   # data frame to input file  
   if(inherits(parsin, 'data.frame')){
@@ -68,9 +68,9 @@ forminps <- function(parsin){
 # convert the input parameter info between formats
 #
 # parsin can be a chr string of file location of original GEM_InputFile or input data frame of parameters to be converted to ASCII format, the data frame is the output from the ASCII text file, but there's an additional function that replaces parameters in the data frame for conversion to the standard GEM format
+#
+# requires dplyr
 formpars <- function(parsin){
- 
-  library(dplyr)
   
   # data frame to input file  
   if(inherits(parsin, 'data.frame')){
@@ -174,9 +174,9 @@ formpars <- function(parsin){
 # inps is a named list where each element is one to many parameter values for each input condition
 # partial string matching is used for the names to replace values in a default input list
 # passing NULL to inps will return the existing input conditions file
+#
+# requires dplyr
 setinps <- function(inps = NULL){
-   
-  library(dplyr)
   
   # load default parameter file
   load('input/InitialConditions.RData')
@@ -227,9 +227,9 @@ setinps <- function(inps = NULL){
 # pars is a named list where each element is one to many parameter values for each parameter
 # partial string matching is used for the element names to replace values in a default parameter list
 # passing NULL to pars will return the default parameter list for Weeks Bay
+#
+# requires dplyr
 setpars <- function(pars = NULL){
-  
-  library(dplyr)
   
   # load default parameter file
   load('input/GEM_InputFile.RData')
@@ -296,9 +296,9 @@ showpars <- function(){
 #
 # out_var is chr string of variable to return
 # p1z1 logical if only one phyto and two zoop group are used, passed to p1z1_swtch
+#
+# requires ncdf4
 run_mod <- function(inps = NULL, out_var = 'O2', p1z1 = FALSE){
-  
-  library(ncdf4)
   
   # create initial conditions file based on inputs
 #  lapply(inps, write, "debug", append=TRUE, ncolumns=1000)
@@ -366,10 +366,9 @@ run_mod <- function(inps = NULL, out_var = 'O2', p1z1 = FALSE){
 
 # the plotting function
 # varsel is input name, all dat is input data
+#
+# requires dygraphs, ncdf4
 plo_fun <- function(varsel, alldat, logscale = FALSE){
-
-  library(ncdf4)
-  library(dygraphs)
 
   # get short label from long
   varsel <- labels_fun()$shrt[labels_fun()$lngs %in% varsel]
@@ -429,10 +428,9 @@ plo_fun <- function(varsel, alldat, logscale = FALSE){
 
 # function for saving plot outputs
 # vars_in is input variables to plot, all dat is input data
+#
+# requires ncdf4, ggplot2
 saveplo_fun <- function(vars_in, alldat, logspace = FALSE){
-
-  library(ncdf4)
-  library(ggplot2)
 
   for(var_in in vars_in){
     

@@ -1,5 +1,6 @@
 source('R/funcs.R')
 
+library(shiny)
 library(ggplot2)
 library(dplyr)
 library(tidyr)
@@ -7,6 +8,7 @@ library(dygraphs)
 library(xts)
 library(htmltools)
 library(shinyjs)
+library(ncdf4)
 
 # Define server logic required to generate and plot data
 shinyServer(function(input, output, session) {
