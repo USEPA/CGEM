@@ -312,14 +312,18 @@ run_mod <- function(inps = NULL, out_var = 'O2', p1z1 = FALSE){
   if(p1z1) p1z1_swtch(to = TRUE)
   
   # run model
-  runexe <- suppressWarnings(system('FishTank.exe', intern = TRUE))
+  switch(    Sys.info()[['sysname']], 
+   Windows= {runexe <- suppressWarnings(system('FishTank.exe', intern = TRUE))},
+   Linux  = {print("Does not run on Linux.")},
+   Darwin = {runexe <- suppressWarnings(system('./FishTank_Mac.exe', intern = TRUE))}
+  )
 
   # back to default six phyt, two zoop if TRUE
   if(p1z1) p1z1_swtch(to = FALSE)
   
-  # return stderr if runexe is not empty
-  if(length(runexe) > 0) 
-    return(runexe)
+#L3  # return stderr if runexe is not empty
+#L3  if(length(runexe) > 0) 
+#L3    return(runexe)
   
   # remove temp files
   file.remove(c('input/InitialConditions.txt'))
