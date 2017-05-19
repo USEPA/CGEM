@@ -37,22 +37,22 @@ shinyUI(fluidPage(
         tabPanel("Select parameters", 
           
           ######
-          column(12 , id = 'myfl', 
-            
-           h3('Upload external input file'),
-
-            fileInput('myfl', label = NULL),
-            tags$script('
-             Shiny.addCustomMessageHandler("resetFileInputHandler", function(x) {
-                  var id = "#" + x + "_progress";
-                 var idBar = id + " .bar";
-                  $(id).css("visibility", "hidden");
-                  $(idBar).css("width", "0%");
-              });
-            ') ,
-           h5('Inputs below are inoperable if user file is uploaded, hit "Reset all" above to remove the file.')
-                      
-          ),
+          # column(12 , id = 'myfl', 
+          #   
+          #  h3('Upload external input file'),
+          # 
+          #   fileInput('myfl', label = NULL),
+          #   tags$script('
+          #    Shiny.addCustomMessageHandler("resetFileInputHandler", function(x) {
+          #         var id = "#" + x + "_progress";
+          #        var idBar = id + " .bar";
+          #         $(id).css("visibility", "hidden");
+          #         $(idBar).css("width", "0%");
+          #     });
+          #   ') ,
+          #  h5('Inputs below are inoperable if user file is uploaded, hit "Reset all" above to remove the file.')
+          #             
+          # ),
             
           ######
           column(width = 6, 

@@ -370,9 +370,12 @@ run_mod <- function(inps = NULL, out_var = 'O2', p1z1 = FALSE){
 # requires dygraphs, ncdf4
 plo_fun <- function(varsel, alldat, logscale = FALSE){
 
+	# exit if varsel doesnt exist from reactive
+	if(varsel == '') return()
+	
   # get short label from long
   varsel <- labels_fun()$shrt[labels_fun()$lngs %in% varsel]
-  
+
   # units and variable name
   units <- ncatt_get(alldat, varsel, attname = 'units')$value
   descr <- ncatt_get(alldat, varsel, attname = 'description')$value

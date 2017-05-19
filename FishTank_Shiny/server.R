@@ -48,8 +48,10 @@ shinyServer(function(input, output, session) {
     # p1z1 switch
     p1z1 <- input$p1z1
 
+    # run model
     out <- run_mod(inps = iniin, out_var = NULL,  p1z1 = p1z1)
-
+    
+    # returns stderr from terminal if error on model run
     validate(
       need(inherits(out, 'ncdf4'), as.character(out))
     )
