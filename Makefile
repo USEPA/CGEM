@@ -8,16 +8,17 @@
 ### =============== User Modifiable Section =============== ###
 
 ### Uncomment the next line to enable debugging
+DFLAGS = -DDEBUG
 #DFLAGS = -warn -debug all -g -check all -ftrapuv  -DDEBUG #-mcmodel=medium -shared-intel 
 #DFLAGS = -Wall -Wextra -pedantic -fimplicit-none -fbacktrace -D_CGEM -DRDEBUG -DDEBUG 
 
 ### Build options for specific platforms. 
 ### LIBS has path to netCDF
 SOL_INC	  = -I. -I/usr/local/apps/netcdf-4.3.3/intel-15.0/include/
-SOL_LIBS  = -L/usr/local/apps/netcdf-4.3.3/intel-15.0/lib -lnetcdf -lnetcdff
+SOL_LIBS  = -L/usr/local/apps/netcdf-4.3.3/intel-15.0/lib -lnetcdff -lnetcdf
 
 IRIS_INC  = -I. -I/usr/local/apps/netcdf-4.4.0/gcc-4.4.7/include/
-IRIS_LIBS = -L. -L/usr/local/apps/netcdf-4.4.0/gcc-4.4.7/lib/ -lnetcdf -lnetcdff
+IRIS_LIBS = -L. -L/usr/local/apps/netcdf-4.4.0/gcc-4.4.7/lib/ -lnetcdff -lnetcdf
 
 OTHER_INC   = -I. -I/usr/local/include
 OTHER_LIBS  = -L/usr/local/lib -lnetcdff -L/usr/local/bin -lnetcdf 
@@ -58,7 +59,7 @@ endif
 endif
 
 FishTank: ${MAIN_OBJ} ${MOC_OBJ} ${CGEM_OBJ} ${SDM_OBJ} ${GD_OBJ}
-	$(F90) -o $(EXE) $(FFLAGS) $(DFLAGS) $(MAIN_OBJ) ${MOC_OBJ} ${CGEM_OBJ} ${SDM_OBJ} ${GD_OBJ} $(LIBS) $(INC)
+	$(F90) -o $(EXE) $(FFLAGS) $(DFLAGS) $(INC) $(MAIN_OBJ) ${MOC_OBJ} ${CGEM_OBJ} ${SDM_OBJ} ${GD_OBJ} $(LIBS)
 
 
 #
