@@ -6,6 +6,7 @@
 
 MODULE NETCDF_UTILITIES
 
+!USE netcdf
 
   IMPLICIT NONE
 
@@ -261,8 +262,8 @@ CONTAINS
     ! Locals:
     INTEGER ERR
 
-    ERR = NF_PUT_ATT_TEXT( FILEID, VARID, 'description', LEN( VARDES ), VARDES)
-    CALL CHKERR( ERR, 'create description attribute for ' // VARNAM )
+    ERR = NF_PUT_ATT_TEXT( FILEID, VARID, 'long_name', LEN( VARDES ), VARDES)
+    CALL CHKERR( ERR, 'create long_name attribute for ' // VARNAM )
     
     IF ( LEN( UNITS ) > 0 ) THEN
       ERR = NF_PUT_ATT_TEXT( FILEID, VARID, 'units', LEN( UNITS ), UNITS )

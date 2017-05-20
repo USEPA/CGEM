@@ -95,6 +95,8 @@ CONTAINS
     CALL DEFDIM( FILE_ID, NSTEPP1_DIM, 'time', 0 ) ! 0 Means UNLIMITED size.
     ! Write global scalar attributes:
 
+    CALL DEFTAT( FILE_ID, 'Conventions','CF-1.6')
+
     CALL DEFTAT( FILE_ID, 'Run_Identifier', TRIM(CODE_ID) )
     CALL DEFIAT( FILE_ID, 'nstep', NSTEP )
     CALL DEFIAT( FILE_ID, 'iYr0', IYR0 )
@@ -300,15 +302,15 @@ CONTAINS
     ! Define non-time-varying array variables:
 
     CALL DEFVR2( FILE_ID, IM_DIM, JM_DIM, RLON_VAR, 'LONGXY', &
-                 'Cell center longitude [-180, 180].', 'deg' )
+                 'Cell center longitude [-180, 180].', 'degrees_east' )
     CALL DEFVR2( FILE_ID, IM_DIM, JM_DIM, RLAT_VAR, 'LATIXY', &
-                 'Cell center latitude [-90, 90].', 'deg' )
+                 'Cell center latitude [-90, 90].', 'degrees_north' )
     CALL DEFVR3( FILE_ID, IM_DIM, JM_DIM, NSL_DIM, H_VAR, 'h', &
                  'Depth.', 'm' )
     CALL DEFVI3( FILE_ID, IM_DIM, JM_DIM, NSL_DIM, FM_VAR, 'fm', &
-                 'Mask: 0 = land, 1 = water.', 'none' )
+                 'Mask: 0 = land, 1 = water.',"" )
     CALL DEFVR3( FILE_ID, IM_DIM, JM_DIM, NSL_DIM, DZ_VAR, 'dz', &
-                 'Thickness of cell.', 'none' )
+                 'Thickness of cell.', '' )
     ! Define time array variable as each output data's seconds since IYR0:
 
     WRITE ( TIME_UNITS, '(A,I4.4,A)' ) &

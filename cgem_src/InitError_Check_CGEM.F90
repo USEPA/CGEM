@@ -28,6 +28,10 @@
            write(6,*) "For Qp ",ii,"initial Qp greater than QmaxP" 
            stop
         endif
+        if(f(1,1,1,iA(ii)).lt.1) then
+           write(6,*) "For A ",ii," initial A is less than 1: A= ",f(1,1,1,iA(ii))
+           stop
+        endif
 
       enddo
 
