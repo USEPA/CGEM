@@ -1,22 +1,16 @@
 ! This file contains code for calculating mg chlorophyll-a from phytoplankton
 ! abundance. There are currently two methods:
-! 1. Regression
+! 1. Fixed C:Chla ratio 
 ! 2. Cloern Chl:C ratio
 
 MODULE Calc_Chla
 
-!-----------------------------------------------------------------------
-!-- Conversion factors between mg Chla and phytoplankton number density
-!-----------------------------------------------------------------------
-      real, parameter :: C2_chla_mg       = 3.00203293024339E-09
-      real, parameter :: C2_chla_mg_inv   = 1./C2_chla_mg
-
 CONTAINS
 
-  FUNCTION Chla_Regression(A_k,nz) RESULT(Chla_tot)
+  FUNCTION Fixed_CChla(A_k,nz) RESULT(Chla_tot)
 
     use Model_dim
-    use Conversions 
+    use INPUT_VARS_CGEM, ONLY:Qc,CChla
     implicit none
 
     ! Input parameters
@@ -31,11 +25,11 @@ CONTAINS
     DO k = 1, nz
        Chla_tot(k) = 0.0
        DO isp = 1, nospA
-          Chla_tot(k) =  Chla_tot(k) + A_k(isp,k) * C2_chla_mg !C2_chla_mg defined in Conversions module
+          Chla_tot(k) =  Chla_tot(k) + A_k(isp,k) * Qc(isp) * 12. * (1./CChla(isp)) 
        ENDDO ! isp = 1, nospA
     ENDDO ! k = 1, nz
     RETURN
-  END FUNCTION Chla_Regression
+  END FUNCTION Fixed_CChla 
 
 
   ! This routine uses the Chl:C ratio from Cloern et al. 1995 to calculate

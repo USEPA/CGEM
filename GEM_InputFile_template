@@ -14,7 +14,7 @@
 1		!Which_uptake: 1==Michaelis-Menten, 2==Geider (needs nfQs), 3==Roelke, Nutrient uptake rate
 1		!Which_quota:  1==Droop, 2==Nyholm, 3==Flynn, Nutrient dependent growth, 4==GoMDOM
 1		!Which_irradiance: 1==IOP (inherent optical properties), 2==AOP (apparent optical properties), 3==GoMDOM
-1		!Which_chlaC: 1==Regression, 2==Cloern chl:C
+1		!Which_chlaC: 1==fixed C:Chl-a, 2==Cloern chl:C
 2		!Which_photosynthesis: 1==photoinhibition, 2==without photoinhibition, 3==nutrient dependent, 4==GoMDOM
 1		!Which_growth: 1==minimum, 2==product formulation, 3==umax is nutrient dependent, Specific growth rate
 0 0 0 0         !ReadVars: Solar=Calculate(0),Read(1); Wind== 5mph(0) or Read(1), Temp== cosine w/params(0) or Read(1), Sal== Read one value(0) or Read(1)
@@ -44,6 +44,7 @@
 .5 .5 .5 .5 .5 .5                        !ediblevector(Z1): edibility vector for Z1
 .5 .5 .5 .5 .5 .5                        !ediblevector(Z2): edibility vector for Z2
 1.12 1.12 1.12 1.12 1.12 1.12             !umax: maximum growth rate
+181.477 181.477 181.477 181.477 181.477 181.477 !Fixed C:Chla ratio
 3.96e-16 3.96e-16 3.96e-16 3.96e-16 3.96e-16 3.96e-16  !alpha: initial slope of the photosynthesis-irradiance relationship
 1.1e-18 1.1e-18 1.1e-18 1.1e-18 1.1e-18 1.1e-18        !beta: photoinhibition constant
 0.1 0.1 0.1 0.1 0.1 0.1		!respg: phytoplankton growth respiration coefficient

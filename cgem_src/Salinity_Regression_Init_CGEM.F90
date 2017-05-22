@@ -9,7 +9,6 @@ Subroutine Salinity_Regression_Init_CGEM()
   USE mvars
   USE State_Vars
   USE Grid
-  USE Calc_Chla
   USE Fill_Value
 
   implicit none
@@ -52,11 +51,10 @@ Subroutine Salinity_Regression_Init_CGEM()
             total_chl = AMAX1(temp,0.01) ! in mg.
 
             ! Convert Chla to A
-            ! C2_chla_mg defined in Conversions module
             ! Convert total Chl to cells
             ! Divide by number of groups
             do isp=1,nospA
-             f( i, j, k, iA(isp) ) = total_chl * C2_chla_mg_inv * A_wt(isp)
+             f( i, j, k, iA(isp) ) = total_chl * A_wt(isp)* CChla(isp)/12./Qc(isp) 
             enddo
 
             ! Zooplankton based on E&R ratio (1000 zooplankton)

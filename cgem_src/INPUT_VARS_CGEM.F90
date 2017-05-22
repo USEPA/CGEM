@@ -21,6 +21,7 @@ real Kchla
 !---Phytoplankton 
 real, allocatable :: ediblevector(:,:)
 real, allocatable :: umax(:) 
+real, allocatable :: CChla(:)
 real, allocatable :: alpha(:)
 real, allocatable :: beta(:)
 real, allocatable :: respg(:)
@@ -120,6 +121,9 @@ ALLOCATE( ediblevector(nospZ,nospA),stat=ierr )
 if(ierr.ne.0) write(6,*) "error allocate"
 
 ALLOCATE( umax(nospA),stat=ierr  )
+if(ierr.ne.0) write(6,*) "error allocate"
+
+ALLOCATE( CChla(nospA),stat=ierr  )
 if(ierr.ne.0) write(6,*) "error allocate"
 
 ALLOCATE( alpha(nospA),stat=ierr )

@@ -12,7 +12,7 @@ USE STOICH_VARS
 IMPLICIT NONE
 
 
-integer i,icent_jcent_units
+integer i,j,k,icent_jcent_units
 integer isp,isz
 real i_in,j_in,tot,x
 real, parameter :: SDay = 86400.0  ! # of sec in 24 hr day
@@ -74,6 +74,7 @@ do isz=1,nospZ
 read(999,*) (ediblevector(isz,i), i=1,nospA)
 enddo
 read(999,*) (umax(i), i=1,nospA)
+read(999,*) (CChla(i), i=1,nospA)
 read(999,*) (alpha(i), i=1,nospA)
 read(999,*) (beta(i), i=1,nospA)
 read(999,*) (respg(i), i=1,nospA)
@@ -219,6 +220,25 @@ enddo
 
 ! --- sinking speed: converted from m/d downward positive to m/s negative
       ws = -ws/SDay
+
+  do j = 1,jm
+    do i = 1,im
+      do k=1,nza(i,j)
+       s_x1A(i,j,k)= Stoich_x1A_init
+       s_x2A(i,j,k)= Stoich_x2A_init
+       s_y1A(i,j,k)= Stoich_y1A_init
+       s_y2A(i,j,k)= Stoich_y2A_init
+       s_z1A(i,j,k)= Stoich_z1A_init
+       s_z2A(i,j,k)= Stoich_z2A_init
+       s_x1Z(i,j,k)= Stoich_x1Z_init
+       s_x2Z(i,j,k)= Stoich_x2Z_init
+       s_y1Z(i,j,k)= Stoich_y1Z_init
+       s_y2Z(i,j,k)= Stoich_y2Z_init
+       s_z1Z(i,j,k)= Stoich_z1Z_init
+       s_z2Z(i,j,k)= Stoich_z2Z_init
+    enddo
+   enddo
+  enddo
 
 
 return

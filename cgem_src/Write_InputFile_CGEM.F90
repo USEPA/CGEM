@@ -62,6 +62,7 @@ write(999,*)
 write(999,*) "edibilevector for Z1",ediblevector(1,:)
 write(999,*) "edibilevector for Z2",ediblevector(2,:)
 write(999,*) "umax",umax
+write(999,*) "CChla",CChla
 write(999,*) "alpha",alpha
 write(999,*) "beta",beta
 write(999,*) "respg",respg

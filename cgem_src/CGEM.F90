@@ -327,8 +327,8 @@ write(6,*) "2, A",f(1,1,1,iA(1:nospA))
 ! 
 !----------------------------------------------------------------
       select case (Which_chlaC)
-      case (1) ! Use regression
-         Chla_tot_k = Chla_Regression(A_k,nz)
+      case (1) ! Use fixed C:Chla 
+         Chla_tot_k = Fixed_CChla(A_k,nz)
 
       case (2) ! Use Cloern Chl:C ratio
          Chla_tot_k = Chla_Cloern(A_k, Qn_k, Qp_k, N_k, P_k, Si_k, T_k, aDailyRad_k,Chl_C_k,nz)
@@ -338,7 +338,7 @@ write(6,*) "2, A",f(1,1,1,iA(1:nospA))
          WRITE(6, "('Which_chlaC determines the method for calculating the quantity of chlorophyll-a.')")
          WRITE(6, "('Please set Which_chlaC to one of these values:'/)")
          WRITE(6, "('1:')")
-         WRITE(6, "('  Use the regression expression.'/)")
+         WRITE(6, "('  Use fixed C:Chla.'/)")
          WRITE(6, "('2:')")
          WRITE(6, "('  Use the Cloern Chl:C ratio.'/)")
          WRITE(6, "('Run aborted.'/)")
@@ -545,6 +545,10 @@ write(6,*) "Aresp_k",Aresp_k
 
           do isp = 1, nospA
 	     monodZ(isp,:)  = top_A(isp,:)/(ZKa(:) + bottom(:))
+#ifdef DEBUG
+             write(6,*) "Abiovol,Athresh,edible",Abiovol,Athresh(isp),ediblevector(:,isp)
+             write(6,*) "monod:top,ZKa,bottom",top_A(isp,:),ZKa(:),bottom(:)
+#endif
 	  enddo 
 
 
@@ -729,7 +733,7 @@ write(6,*) "A_k",A_k(isp,k)
 #ifdef _CGEM
 write(6,*) "isp=",isp,"Agrow=",Agrow
 write(6,*) "Aresp",Aresp
-write(6,*) "ZgrazA_tot",ZgrazA_tot(isp)
+write(6,*) "ZgrazA_tot,Z,Zumax,monodZ",ZgrazA_tot(isp),Z(:),Zumax(:),monodZ(isp,:)
 write(6,*) "Amort",Amort(isp)
 write(6,*) "dTd",dTd
 write(6,*)
@@ -897,6 +901,12 @@ write(6,*)
         RSi_A      = RC(8)
         RALK_A     = RC(9)
         RN2_A      = RC(10)
+#ifdef DEBUG
+write(6,*) "RC",RC
+write(6,*) "OM1_A, OM2_A, O2, NO3, KG1, KG2, KO2, KstarO2, KNO3",OM1_A, OM2_A, O2, NO3, KG1, KG2, KO2, KstarO2, KNO3
+write(6,*) "s,T",s_x1A(i,j,k), s_y1A(i,j,k), s_z1A(i,j,k), s_x2A(i,j,k), s_y2A(i,j,k), s_z2A(i,j,k), T_k(k)
+#endif
+
 !------------------------------------------------------------
 ! Particulate and Dissolved fecal pellets, rate of remineralization
 !--------------------------------------------------------------
@@ -975,7 +985,11 @@ write(6,*)
 ! Save RO2 as CBODW
   CBODW(i,j) = RO2 !The last time this happens, k=nz, so will be the bottom
 !--------------------------------------------------------------------
-
+#ifdef DEBUG
+write(6,*) "RNO3_A,RNO3_Z,RNO3_R,RNO3_BC",RNO3_A,RNO3_Z,RNO3_R,RNO3_BC
+write(6,*) "RNH4_A,RNH4_Z,RNH4_R,RNH4_BC",RNH4_A,RNH4_Z,RNH4_R,RNH4_BC
+write(6,*) "R11",R_11
+#endif
 
 !---------------------------------------------------------------------
 ! Stoichiometry - calculate C:N:P ratios for Remineralization equations
@@ -1122,6 +1136,11 @@ enddo
 !--------------------------------
        ff(i,j,k,iNH4) = AMAX1(f(i,j,k,iNH4)                            &
        & + ( RNH4 - AupN*NH4/(NO3+NH4) + 2.*AexudN + SUM(ZexN)  )*dTd, 0.0)          
+
+#ifdef DEBUG
+ write(6,*) "f,RNO3,AupN,NO3",f(i,j,k,iNO3),RNO3,AupN,NO3
+ write(6,*) "f,RNH4,AupN,NH4",f(i,j,k,iNH4),RNH4,NH4,AexudN,ZexN
+#endif
 
 !----------------------------
 !-Silica: (mmol-Si/m3)

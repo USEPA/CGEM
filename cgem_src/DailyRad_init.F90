@@ -6,7 +6,7 @@ Subroutine DailyRad_init(TC_8, lat, lon, d, d_sfc, A_k, CDOM_k, &
   USE Model_dim ! For iYr0, etc.
   USE DATE_TIME ! For SECONDS_PER_DAY, TOTAL_SECONDS, DATE_TIMESTAMP
   use INPUT_VARS
-  use Calc_Chla
+  use INPUT_VARS_CGEM, ONLY:Qc,CChla
   use conversions
 
   implicit none
@@ -54,11 +54,11 @@ Subroutine DailyRad_init(TC_8, lat, lon, d, d_sfc, A_k, CDOM_k, &
   real :: aRadMid(nsl) ! Holds desired output from Call_IOP_Par
   real :: aRadSum(nsl)
 
-  ! Use simple regression to estimate chlorophyll a concentration
+  ! Use fixed C:Chla to estimate chlorophyll a concentration
   do k = 1, nz
      Chla_tot_k(k) = 0.0
      do isp = 1, nospA
-        Chla_tot_k(k) =  Chla_tot_k(k)  + A_k(isp,k)*C2_chla_mg !C2_chla_mg defined in Conversions module 
+        Chla_tot_k(k) =  Chla_tot_k(k)  + A_k(isp,k) * Qc(isp) * 12. * (1./CChla(isp))
      enddo 
      ! Init for later
      aRadSum(k) = 0.0
