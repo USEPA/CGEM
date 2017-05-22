@@ -204,6 +204,7 @@ CONTAINS
        CALL DEFRATX( FILE_ID, var, ediblevector(i,:), nospA )
     enddo
     CALL DEFRATX( FILE_ID, 'umax', umax, nospA )
+    CALL DEFRATX( FILE_ID, 'CChla', CChla, nospA )
     CALL DEFRATX( FILE_ID, 'alpha', alpha, nospA )
     CALL DEFRATX( FILE_ID, 'beta', beta, nospA )
     CALL DEFRATX( FILE_ID, 'respg', respg, nospA )
