@@ -20,8 +20,8 @@ shinyUI(fluidPage(
     fluidRow(
       
       column(width = 2,
-        actionButton('runmod', label = img(src = "FishTankLogo_v2.png", width = 100), width = '90%'),
-        actionButton("resetAll", "Reset all", width = '90%')
+        actionButton('runmod', label = img(src = "CGEM-0dLogo-ST.jpg", width = '100%'), width = '100%'),
+        actionButton("resetAll", "Reset all", width = '100%')
       ),
       
       column(width = 10, 
