@@ -321,9 +321,9 @@ run_mod <- function(inps = NULL, out_var = 'O2', p1z1 = FALSE){
   # back to default six phyt, two zoop if TRUE
   if(p1z1) p1z1_swtch(to = FALSE)
   
-#L3  # return stderr if runexe is not empty
-#L3  if(length(runexe) > 0) 
-#L3    return(runexe)
+  # return stderr if runexe is not empty
+  if(length(runexe) > 0) 
+    return(runexe)
   
   # remove temp files
   file.remove(c('input/InitialConditions.txt'))
