@@ -222,7 +222,7 @@
    if(init.eq.1) then  
 
 !Initialize netCDF output variables
-  RN2_ijk = fill_val 
+  RN2_ijk = 0. 
   Chl_C_ijk = fill_val 
   Chla_tot_ijk =  fill_val
   Esed =  fill_val
