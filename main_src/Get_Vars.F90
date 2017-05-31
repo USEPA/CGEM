@@ -12,35 +12,49 @@
        integer(kind=8), intent(in) :: TC_8 ! Current time in seconds since Model_dim::iYr0.
        integer, save :: init=1
 
-        if(Read_T.eq.0) then
-          call Calc_Temp(START_SECONDS,TC_8,T)
-        else
-         call USER_Read(TC_8,T,'t',init)
-        endif
+       integer :: i,j,k
 
-        if(Read_Sal.eq.0) then
-          if(init.eq.1) call Calc_Sal(S)
-        else
-          call USER_Read(TC_8,S,'s',init)
-        endif
+        if (Which_gridio.eq.0) then 
+          if(Read_T.eq.0) then
+            call Calc_Temp(START_SECONDS,TC_8,T)
+          else
+            call USER_Read(TC_8,T,'t',init)
+          endif
+  
+          if(Read_Sal.eq.0) then
+            if(init.eq.1) call Calc_Sal(S)
+          else
+            call USER_Read(TC_8,S,'s',init)
+          endif
+  
+          if(Read_Solar.eq.0) then
+            call getSolar( TC_8, lon, lat, Rad)
+          else
+            call USER_Read(TC_8,Rad,'p',init)
+          endif
+  
+          if(Read_Wind.eq.0) then
+            Wind=5.
+          else
+            call USER_Read(TC_8,Wind,'w',init)
+          endif
 
-        if(Read_Solar.eq.0) then
-         call getSolar( TC_8, lon, lat, Rad)
-        else
-         call USER_Read(TC_8,Rad,'p',init)
-        endif
+        else if (Which_gridio.eq.1) then
 
-        if(Read_Wind.eq.0) then
-         Wind=5.
-        else
-         call USER_Read(TC_8,Wind,'w',init)
-        endif
+          call interpVar(hydro_info(eSal), TC_8, 5,4, startIndex(eSal), S)  
+          call interpVar(hydro_info(eTemp), TC_8, 5,4, startIndex(eTemp), T) 
+          call interpVar(hydro_info(eUx), TC_8, 5,4, startIndex(eUx), Ux)   
+          call interpVar(hydro_info(eVx), TC_8, 5,4, startIndex(eVx), Vx)   
+          call interpVar(hydro_info(eWx), TC_8, 5,4, startIndex(eWx), Wx)   
+          call interpVar(hydro_info(eKh), TC_8, 5,4, startIndex(eKh), Kh)   
+          call interpVar(hydro_info(eE), TC_8, 4,3, startIndex(eE), E)   
+        endif 
 
-        Ux=0.
-        Vx=0.
-        Wx=0.
-        Kh=0.
-        E=0.
+        !Ux=0.
+        !Vx=0.
+        !Wx=0.
+        !Kh=0.
+        !E=0.
         init=0
 
        return
