@@ -563,7 +563,7 @@ CONTAINS
                                TIMESTEP, IRRADIANCE, IRRADIANCE_FRACTION,    &
                                UN, UP, UE, UA, CHLA_MG_TOT,                  &
                                S_X1A, S_Y1A, S_X2A, S_Y2A,                   &
-                               S_X1FP, S_Y1FP, S_X2FP, S_Y2FP, USI, ChlC, pH, R_11 )
+                               S_X1FP, S_Y1FP, S_X2FP, S_Y2FP, USI, ChlC, pH, RN2, RO2 )
     USE OUTPUT 
     IMPLICIT NONE
     INTEGER,INTENT(IN):: IM, JM, NSL, EXTRA_VARIABLES, SPECIES, TIMESTEP
@@ -579,7 +579,9 @@ CONTAINS
     REAL,DIMENSION(IM, JM, NSL):: S_X1A, S_Y1A, S_X2A, S_Y2A
     REAL,DIMENSION(IM, JM, NSL):: S_X1FP, S_Y1FP, S_X2FP, S_Y2FP
     REAL,DIMENSION(IM, JM, NSL):: pH
-    REAL,DIMENSION(IM, JM, NSL):: R_11
+    REAL,DIMENSION(IM, JM, NSL):: RN2
+    REAL,DIMENSION(IM, JM, NSL):: RO2
+
     ! External NetCDF routines:
     INTEGER NF_PUT_VARA_REAL, NF_SYNC
     EXTERNAL NF_PUT_VARA_REAL, NF_SYNC
@@ -796,12 +798,22 @@ CONTAINS
                    // EXTRA_VARIABLE_NAMES( VARIABLE ) )
     END IF
 
-    VARIABLE = VARIABLE + 1 ! R_11:
+    VARIABLE = VARIABLE + 1 ! RN2:
 
     IF ( WRITE_EXTRA_VARIABLE( VARIABLE ) ) THEN
       ERR = NF_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
                                   STARTS, COUNTS, &
-                                   R_11( 1, 1, 1 ))
+                                   RN2( 1, 1, 1 ))
+      CALL CHKERR( ERR, 'write output variable  ' &
+                   // EXTRA_VARIABLE_NAMES( VARIABLE ) )
+    END IF
+
+    VARIABLE = VARIABLE + 1 ! RN2:
+
+    IF ( WRITE_EXTRA_VARIABLE( VARIABLE ) ) THEN
+      ERR = NF_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
+                                  STARTS, COUNTS, &
+                                   RO2( 1, 1, 1 ))
       CALL CHKERR( ERR, 'write output variable  ' &
                    // EXTRA_VARIABLE_NAMES( VARIABLE ) )
     END IF
@@ -1090,7 +1102,9 @@ Subroutine OUTPUT_NETCDF_CGEM_allocate
   enddo
  endif 
     EXTRA_VARIABLE_NAMES(counter+1) = 'pH'  
-    EXTRA_VARIABLE_NAMES(counter+2) = 'RNO3' 
+    EXTRA_VARIABLE_NAMES(counter+2) = 'RN2'
+    EXTRA_VARIABLE_NAMES(counter+3) = 'RO2'
+ 
 
   ALLOCATE(WRITE_EXTRA_VARIABLE(EXTRA_VARIABLES)) 
   do i=1,EXTRA_VARIABLES
@@ -1179,6 +1193,7 @@ endif
 endif
     EXTRA_VARIABLE_DESCRIPTIONS(counter+1) = 'pH                            '  
     EXTRA_VARIABLE_DESCRIPTIONS(counter+2) = 'RN2 Denitrification Term       '
+    EXTRA_VARIABLE_DESCRIPTIONS(counter+3) = 'RO2 Decay Term       '
 
   ALLOCATE(EXTRA_VARIABLE_UNITS(EXTRA_VARIABLES))
     EXTRA_VARIABLE_UNITS(1) = 'photons/cm2/s                   '
@@ -1220,6 +1235,7 @@ endif
   enddo
     EXTRA_VARIABLE_UNITS(counter+1) = 's.u.                            '  
     EXTRA_VARIABLE_UNITS(counter+2) = 'mmol-N/m3                       '
+    EXTRA_VARIABLE_UNITS(counter+3) = 'mmol-O2/m3                       '
 
   ALLOCATE(F_VAR(nf)) ! NetCDF IDs for each variable.
   F_VAR = fill(0)

@@ -16,8 +16,8 @@ IMPLICIT NONE
 
          nf = nospA*3+nospZ+16  !CGEM
         !Calculate EXTRA_VARIABLES for netCDF:
-        !ir,irfrac,uN(nospA),uP(nospA),uE(nospA),uA(nospA),Chla,s_xy(8),uSi(nospA),pH,ChlC(nospA),R_11
-         EXTRA_VARIABLES = 13 + 6*nospA
+        !ir,irfrac,uN(nospA),uP(nospA),uE(nospA),uA(nospA),Chla,s_xy(8),uSi(nospA),pH,ChlC(nospA),RN2,RO2
+         EXTRA_VARIABLES = 14 + 6*nospA
          call CGEM_vars_allocate()
          call INPUT_VARS_CGEM_allocate()
          call TEMP_VARS_allocate()

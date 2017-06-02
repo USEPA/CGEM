@@ -5,6 +5,7 @@ IMPLICIT NONE
 SAVE
 
 real, dimension(:,:,:), allocatable :: RN2_ijk 
+real, dimension(:,:,:), allocatable :: RO2_ijk
 
 contains
 
@@ -17,6 +18,8 @@ IMPLICIT NONE
 
 ALLOCATE(RN2_ijk(im,jm,nsl))
 RN2_ijk = fill(0)
+ALLOCATE(RO2_ijk(im,jm,nsl))
+RO2_ijk = fill(0)
 
 return
 

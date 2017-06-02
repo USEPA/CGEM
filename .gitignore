@@ -81,6 +81,9 @@ grid.mod
 hydro.mod
 input_vars_cgem.mod
 
+#input files
+data/FishTank/InitialConditions.txt
+data/FishTank/Model_dim.txt
 
 #
 # Keep directories but not contents. [Not sure if this works.]

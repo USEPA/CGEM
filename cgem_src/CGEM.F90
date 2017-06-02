@@ -222,7 +222,8 @@
    if(init.eq.1) then  
 
 !Initialize netCDF output variables
-  RN2_ijk = 0. 
+  RN2_ijk = 0.
+  RO2_ijk = 0. 
   Chl_C_ijk = fill_val 
   Chla_tot_ijk =  fill_val
   Esed =  fill_val
@@ -981,6 +982,7 @@ write(6,*) "s,T",s_x1A(i,j,k), s_y1A(i,j,k), s_z1A(i,j,k), s_x2A(i,j,k), s_y2A(i
   RN2   = RN2_A + RN2_Z + RN2_R + RN2_BC         ! (mmol-N2/m3/d)
        !Save for netCDF
        RN2_ijk(i,j,k) = RN2_ijk(i,j,k) + (2*RN2)*dTd
+       RO2_ijk(i,j,k) = RO2_ijk(i,j,k) + (RO2)*dTd 
 
 ! Save RO2 as CBODW
   CBODW(i,j) = RO2 !The last time this happens, k=nz, so will be the bottom
@@ -1280,7 +1282,8 @@ write(6,*) "A before extra",f(1,1,1,iA(1:nospA))
                                        uSi_ijk,    &
                                        Chl_C_ijk,  &
                                               pH,  &
-                                         RN2_ijk)
+                                         RN2_ijk,  &
+                                         RO2_ijk )
      endif  !end of "if (mod(istep,iout).eq.0)" block if
 
   ! --- dump output when istep is a multiple of iout
@@ -1304,7 +1307,8 @@ write(6,*) "A before extra",f(1,1,1,iA(1:nospA))
                                        uSi_ijk,    &
                                        Chl_C_ijk,  &
                                               pH,  &
-                                          RN2_ijk) 
+                                          RN2_ijk, &
+                                         RO2_ijk )
      endif  !end of "if (mod(istep,iout).eq.0)" block if
 #ifdef _CGEM
 write(6,*) "A last",f(1,1,1,iA(1:nospA))
