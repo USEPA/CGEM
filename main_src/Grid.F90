@@ -37,8 +37,7 @@
 ! --- get grid location
 !----------------------
       call USER_getLonLat(lat,lon)
-      call USER_get_basic_grid(dz,depth,d,d_sfc,Vol,depth)
-      area = Vol/dz
+      call USER_get_basic_grid(dz,depth,d,d_sfc,area,Vol)
 !--------------------------------
 ! --- get land/water and shelf masks
 !--------------------------------
