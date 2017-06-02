@@ -4,9 +4,9 @@
 
 MAIN_OBJ  =  fillval.o\
 	Model_dim.o\
+        netcdf_utils.o\
 	Grid.o\
 	State_Vars.o\
-        netcdf_utils.o\
 	Hydro.o\
 	OUTPUT.o\
 	INPUT_VARS.o\
@@ -30,6 +30,7 @@ MAIN_OBJ  =  fillval.o\
 	Q10_T.o\
 	USER_close_file.o\
 	USER_get_basic_grid.o\
+        USER_get_EFDC_grid.o\
 	USER_getLonLat.o\
 	USER_get_masks.o\
 	USER_Set_Initial_Conditions.o\

@@ -18,7 +18,7 @@ IMPLICIT NONE
 
 
 
-PUBLIC netCDF_file, open_file, close_file, interpVar, getTimeIndex, report_info, init_info
+PUBLIC netCDF_file, open_netcdf, close_netcdf, interpVar, getTimeIndex, report_info, init_info
 
 type netCDF_file
    integer :: ncid
@@ -54,7 +54,7 @@ PRIVATE report_info_from_id, report_info_from_filename, report_info_from_type, i
 CONTAINS
 
   !Open a NetCDF file
-  SUBROUTINE open_file(ncfile, mode, ncid)
+  SUBROUTINE open_netcdf(ncfile, mode, ncid)
     IMPLICIT NONE
   
     character(len=*), INTENT(IN) :: ncfile
@@ -62,15 +62,15 @@ CONTAINS
     integer, INTENT(OUT) :: ncid
 
     call nf_open(ncfile,mode,ncid)
-  END SUBROUTINE open_file
+  END SUBROUTINE open_netcdf
 
   !Close a NetCDF file
-  SUBROUTINE close_file(ncid)
+  SUBROUTINE close_netcdf(ncid)
     IMPLICIT NONE
 
     integer, INTENT(IN) :: ncid
     call nf_close(ncid)
-  END SUBROUTINE
+  END SUBROUTINE close_netcdf
 
 
   !Initializes netCDF_file type
@@ -84,11 +84,11 @@ CONTAINS
 
     integer :: ncid
 
-    call open_file(ncfile, 0, ncid)
+    call open_netcdf(ncfile, 0, ncid)
 
     call init_info_from_id(ncid, info)
 
-    call close_file(ncid)
+    call close_netcdf(ncid)
   END SUBROUTINE init_info_from_filename
 
   !Initializes netCDF_file type
@@ -149,6 +149,7 @@ CONTAINS
     type (netCDF_file), INTENT(IN) :: info
     integer :: i
 
+    write(6,*) "fileName: ", info%fileName
     ! print file info
     write(6,*) "ndims: ", info%ndims
     write(6,*) "nvars: ", info%nvars
@@ -184,11 +185,11 @@ CONTAINS
 
     integer :: ncid
 
-    call open_file(ncfile, 0, ncid)
+    call open_netcdf(ncfile, 0, ncid)
 
     call report_info_from_id(ncid, info)
 
-    call close_file(ncid)
+    call close_netcdf(ncid)
   END SUBROUTINE report_info_from_filename
 
   !Prints netCDF_file info to screen
@@ -287,6 +288,8 @@ CONTAINS
     integer(kind=8) :: t1, t2                          !bookend time values
     real :: fac
     integer :: i,j,k
+
+
     
     call getTimeIndex(info%ncid, t_current, tvar_index, tstep, t1, t2)
 
