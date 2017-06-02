@@ -74,8 +74,16 @@ write(6,*) "After Allocate_Hydro"
 ! Read_InputFile must define nstep, iout, dT, START_SECONDS
       call Read_InputFile(input_filename,Which_code) 
 #ifdef DEBUG
+
 write(6,*) "After Read_InputFile"
       write(6,*) "start,dT",START_SECONDS, dT
+#endif
+
+      if (Which_gridio.eq.1) then
+        call Init_Hydro_NetCDF() 
+      endif
+#ifdef DEBUG
+write(6,*) "After Init_Hydro_NetCDF"
 #endif
 
       call Set_Vars(Which_code,init_filename) !initialize 'f' array
@@ -151,6 +159,9 @@ write(6,*) "After Model_Output"
       enddo
 
       Call Model_Finalize(Which_code) ! Closes the output NetCDF file and whatever else
+      if (Which_gridio.eq.1) then
+        Call Close_Hydro_NetCDF()
+      endif
 
 !----------------------------------------------------------------
 ! If we get here, there will be a normal exit from the program and

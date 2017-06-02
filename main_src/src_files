@@ -6,6 +6,7 @@ MAIN_OBJ  =  fillval.o\
 	Model_dim.o\
 	Grid.o\
 	State_Vars.o\
+        netcdf_utils.o\
 	Hydro.o\
 	OUTPUT.o\
 	INPUT_VARS.o\

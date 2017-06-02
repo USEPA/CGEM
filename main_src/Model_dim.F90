@@ -5,7 +5,7 @@ IMPLICIT NONE
 
 ! Reference year all timestamps are relative to.
 
-      INTEGER, PARAMETER :: iYr0 = 2002
+      INTEGER, PARAMETER :: iYr0 = 1970
 
 ! =========================================================
 ! Dimensions for Lisa's Fish Tank - USER modified part
