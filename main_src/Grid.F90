@@ -10,7 +10,7 @@
       real,allocatable,save :: d_sfc(:,:,:)      !Distance from surface to center of cell
       real,allocatable,save :: depth(:,:)      !Distance from surface to center of cell
       real,allocatable,save :: dz(:,:,:)         !Thickness of cell
-      real,allocatable,save :: Vol(:,:,:)        !Volume of each cell
+      real,allocatable,save :: Vol(:,:,:), Vol_prev(:,:,:)        !Volume of each cell
       real,allocatable,save :: area(:,:)       !Area of each cell
       integer,allocatable,save :: fm(:,:)        ! land(0)/sea(1) mask for NCOM, other for EFDC
       integer,allocatable,save :: wsm(:,:)       ! shelf(0)/open ocean(1) mask
@@ -73,6 +73,7 @@
       ALLOCATE(depth(im,jm))
       ALLOCATE(d(im,jm,nsl))
       ALLOCATE(Vol(im,jm,nsl))
+      ALLOCATE(Vol_prev(im,jm,nsl))
       ALLOCATE(area(im,jm))
       ALLOCATE(dz(im,jm,nsl))
       ALLOCATE(d_sfc(im,jm,nsl))
@@ -104,7 +105,6 @@
       Subroutine Open_Grid_NetCDF()
       
       IMPLICIT NONE
-
       integer :: i
 
       do i=1,numGridFiles
@@ -115,10 +115,10 @@
 
       End Subroutine Open_Grid_NetCDF
 
+
       Subroutine Close_Grid_NetCDF()
       
       IMPLICIT NONE
-
       integer :: i
 
       do i=1,numGridFiles

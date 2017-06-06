@@ -55,6 +55,12 @@ write(6,*) "After Command_Line_Args"
 write(6,*) "After Set_Model_dim"
 #endif
 
+      call Set_Grid(TC_8)
+
+#ifdef DEBUG
+write(6,*) "After Set_Grid"
+#endif
+
       call Allocate_Input(Which_code)
 #ifdef DEBUG
 write(6,*) "After Allocate_Input"
@@ -73,6 +79,13 @@ write(6,*) "After Read_InputFile"
       write(6,*) "start,dT",START_SECONDS, dT
 #endif
 
+      if (Which_gridio.eq.1) then
+        call Init_Hydro_NetCDF() 
+      endif
+#ifdef DEBUG
+write(6,*) "After Init_Hydro_NetCDF"
+#endif
+
       call Set_Vars(Which_code,init_filename) !initialize 'f' array
 #ifdef DEBUG
 write(6,*) "After Set_Vars"
@@ -80,6 +93,10 @@ write(6,*) "After Set_Vars"
 
 #endif
 
+      call Initialize_Output(Which_code,BASE_NETCDF_OUTPUT_FILE_NAME)     !Open file and write initial configuration
+#ifdef DEBUG
+write(6,*) "After Initialize_Output"
+#endif
 ! Initialize time an loop variables
       istep = 0
       istep_out = 0
@@ -92,38 +109,28 @@ write(6,*) "After Set_Vars"
 
 #ifdef DEBUG
       write(6,*) "TC_8,start,dT",TC_8,START_SECONDS, dT
-#endif
 
-      call Set_Grid(TC_8)
-
-#ifdef DEBUG
-write(6,*) "After Set_Grid"
-#endif
-
-      if (Which_gridio.eq.1) then
-        call Init_Hydro_NetCDF() 
-      endif
-#ifdef DEBUG
-write(6,*) "After Init_Hydro_NetCDF"
 write(6,*) "Before loop"
 #endif
-      call Initialize_Output(Which_code,BASE_NETCDF_OUTPUT_FILE_NAME)     !Open file and write initial configuration
-#ifdef DEBUG
-write(6,*) "After Initialize_Output"
-#endif
 
-#ifdef DEBUG_CWS
-     write(6,*) "TC_8= ", TC_8
-     write(6,*) "nstep = ", nstep
-     write(6,*) "dT = ", dT
-#endif
+
+      if (Which_gridio.eq.1) then
+        call USER_update_EFDC_grid(TC_8)
+        Vol_prev = Vol
+      endif
+
 
 !-------------- START TIME LOOP -----------------------------------
       do istep = 1, nstep
        TC_8 = TC_8 + dT
 #ifdef DEBUG
       write(6,*) "TC_8",TC_8
-#endif
+#endif 
+
+      if (Which_gridio.eq.1) then
+        Vol_prev = Vol
+        call USER_update_EFDC_grid(TC_8)
+      endif
 
        call Get_Vars(TC_8) !Hydro, Solar, Wind, Temp, Salinity
 #ifdef DEBUG

@@ -13,7 +13,7 @@
 !      real, intent (out) :: dxdy(im,jm)       !area of cell
 !      real, intent (out) :: Vol(im,jm,nsl)    !Volume of cell
       real, dimension(im,jm) :: dx, dy
-      integer :: i,j,k,nz
+      integer :: i,j,k
       character(200) filename
 
 
@@ -29,23 +29,37 @@
       enddo
       close(19)
 
+      do j=1,jm
+       do i=1,im
+          area(i,j) = dx(i,j)*dy(i,j)
+       enddo
+      enddo
+
+      !call USER_update_EFDC_Grid(TC_8)
+
+      return
+
+      end subroutine USER_get_EFDC_grid
+
+
+      subroutine USER_update_EFDC_grid(TC_8)
+
+      USE Fill_Value
+      USE Model_dim
+      USE Grid
+
+      IMPLICIT NONE
+
+      integer :: i,j,k, nz
+      integer(kind=8) :: TC_8
+
       call interpVar(grid_info(eColDepth), TC_8, 4, 3, gridStartIndex(eColDepth), depth)
       call interpVar(grid_info(eCellDepth), TC_8, 5, 4, gridStartIndex(eCellDepth), dz)
 
-!      write(filename,'(A, A)') trim(DATADIR),'/d.dat'
-!      open(19,file=filename,status='old')
-!      read(19,*) !depth
-!      do j=1,jm
-!         read(19,*) depth(:,j)
-!      enddo
-!      close(19)
-!
-!      dz = fill(0) 
       d = fill(0) 
       d_sfc = fill(0) 
       do j=1,jm
        do i=1,im
-          area(i,j) = dx(i,j)*dy(i,j)
           if(depth(i,j).eq.0) depth(i,j)=fill(0)
           nz=nza(i,j)
           do k=1,nz !do loop will not execute if nza=0
@@ -58,8 +72,5 @@
           enddo
        enddo
       enddo
-
-      return
-
-      end subroutine USER_get_EFDC_grid
+      end subroutine USER_update_EFDC_grid
 

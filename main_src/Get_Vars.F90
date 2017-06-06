@@ -40,14 +40,15 @@
           endif
 
         else if (Which_gridio.eq.1) then
-
           call interpVar(hydro_info(eSal), TC_8, 5,4, startIndex(eSal), S)  
           call interpVar(hydro_info(eTemp), TC_8, 5,4, startIndex(eTemp), T) 
           call interpVar(hydro_info(eUx), TC_8, 5,4, startIndex(eUx), Ux)   
           call interpVar(hydro_info(eVx), TC_8, 5,4, startIndex(eVx), Vx)   
           call interpVar(hydro_info(eWx), TC_8, 5,4, startIndex(eWx), Wx)   
           call interpVar(hydro_info(eKh), TC_8, 5,4, startIndex(eKh), Kh)   
-          call interpVar(hydro_info(eE), TC_8, 4,3, startIndex(eE), E)   
+          call interpVar(hydro_info(eE), TC_8, 4,3, startIndex(eE), E)  
+          call getSolar( TC_8, lon, lat, Rad)
+          Wind = 5
         endif 
 
         !Ux=0.
