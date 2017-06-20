@@ -93,6 +93,11 @@ write(6,*) "After Set_Vars"
 
 #endif
 
+! Add blip for testing advection
+#ifdef DEBUG_CWS
+      f(12,25,1,25) = 300
+#endif
+
       call Initialize_Output(Which_code,BASE_NETCDF_OUTPUT_FILE_NAME)     !Open file and write initial configuration
 #ifdef DEBUG
 write(6,*) "After Initialize_Output"
@@ -116,7 +121,6 @@ write(6,*) "Before loop"
 
       if (Which_gridio.eq.1) then
         call USER_update_EFDC_grid(TC_8)
-        Vol_prev = Vol
       endif
 
 
@@ -127,6 +131,9 @@ write(6,*) "Before loop"
       write(6,*) "TC_8",TC_8
 #endif 
 
+#ifdef DEBUG_CWS
+      write(6,*) "TC_8",TC_8
+#endif 
       if (Which_gridio.eq.1) then
         Vol_prev = Vol
         call USER_update_EFDC_grid(TC_8)

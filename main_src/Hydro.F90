@@ -27,15 +27,6 @@
       integer, parameter :: eWx = 5     !Z- Vertical Current Flux
       integer, parameter :: eKh = 6     !Diffusion Coefficients
       integer, parameter :: eE = 7      !Elevation
-      !enum, bind(c) 
-      !  enumerator :: eSal=1      !Salinity
-      !  enumerator :: eTemp = 2   !Temperature
-      !  enumerator :: eUx = 3     !X- Horizontal Current Flux
-      !  enumerator :: eVx = 4     !Y- Horizontal Current Flux
-      !  enumerator :: eWx = 5     !Z- Vertical Current Flux
-      !  enumerator :: eKh = 6     !Diffusion Coefficients
-      !  enumerator :: eE = 7      !Elevation
-      !endenum  
 
       contains
 
@@ -61,9 +52,12 @@
       T=fill(0) 
       Wind=fill(0)  
       Rad=fill(0) 
-      Ux=fill(0)
-      Vx=fill(0)  
-      Wx=fill(0) 
+      !Ux=fill(0)
+      !Vx=fill(0)  
+      !Wx=fill(0)
+      Ux = 0.0
+      Vx = 0.0
+      Wx = 0.0 
       Kh=fill(0)
       E=fill(0) 
 

@@ -41,4 +41,5 @@ CGEM_OBJ  =  CGEM_Flux.o\
 	InitError_Check_CGEM.o\
 	Transport_CGEM.o\
 	Init_Output_CGEM.o\
-        Adv3D.o
+        Adv3D.o\
+        VMixing.o

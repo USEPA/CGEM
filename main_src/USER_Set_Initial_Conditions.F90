@@ -10,7 +10,8 @@
       character(*),intent(in) :: filename
       real init(nf)
 
-      f=fill(0)  !Fill values for netCDF
+      !This is already done in Vars_allocate() in State_Vars.F90
+      !f=fill(0)  !Fill values for netCDF
 
 ! Read in from "InitialConditions.txt" which has 1 value for each state variable.
 ! There is no header line.

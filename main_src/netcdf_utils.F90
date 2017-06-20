@@ -305,12 +305,12 @@ CONTAINS
       !var2 = 0.0
     endif
 
-#ifdef DEBUG_CWS    
-    write(6,*)"      t1 = ", t1
-    write(6,*)"      t2 = ", t2
-    write(6,*)"      var1(9,26,3) = ", var1(9,26,3)
-    write(6,*)"      var2(9,26,3) = ", var2(9,26,3)
-#endif
+!#ifdef DEBUG_CWS    
+!    write(6,*)"      t1 = ", t1
+!    write(6,*)"      t2 = ", t2
+!    write(6,*)"      var1(9,26,3) = ", var1(9,26,3)
+!    write(6,*)"      var2(9,26,3) = ", var2(9,26,3)
+
     
     ! linear interpolation
     fac = real(t_current - t1)
@@ -347,12 +347,12 @@ CONTAINS
       !var2 = 0.0
     endif
 
-#ifdef DEBUG_CWS    
-    write(6,*)"      t1 = ", t1
-    write(6,*)"      t2 = ", t2
-    write(6,*)"      var1(9,26) = ", var1(9,26)
-    write(6,*)"      var2(9,26) = ", var2(9,26)
-#endif
+!#ifdef DEBUG_CWS    
+!    write(6,*)"      t1 = ", t1
+!    write(6,*)"      t2 = ", t2
+!    write(6,*)"      var1(9,26) = ", var1(9,26)
+!    write(6,*)"      var2(9,26) = ", var2(9,26)
+!#endif
 
     ! linear interpolation
     fac = real(t_current - t1)
