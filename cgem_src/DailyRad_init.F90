@@ -81,7 +81,7 @@ Subroutine DailyRad_init(TC_8, lat, lon, d, d_sfc, A_k, CDOM_k, &
 
   do iSec = 1, iSDay, dT
      rhr = REAL(iSec) / REAL(3600)
-     Zenith = sunang(lat,lon,rhr,jul_day,leapyr) 
+     Zenith = sunang(jul_day,rhr,lon,lat)
      SfcRad = solconst * AMAX1( COS(Zenith), 0.0)    ! COS(Z)<= 0 means night
 
      if(SfcRad .gt. 0.) then

@@ -1,5 +1,4 @@
-      SUBROUTINE model(Ainp,ndays,sedflux,maxres,Y,myid,numprocs,
-     & YY_init,ppH_init)
+      SUBROUTINE model(Ainp,ndays,sedflux,maxres,Y,ppH_init)
 
       USE Model_dim
       USE CGEM_vars 
@@ -9,7 +8,8 @@
       REAL*8 MN2(npts2),NH4(npts2),NO3(npts2)
       REAL, INTENT(OUT) :: sedflux(nf)
       REAL, INTENT(IN)  :: maxres  !Maximum residual
-      INTEGER, INTENT(IN) :: ndays,myid,numprocs
+      REAL*8, INTENT(IN)  :: ppH_init(1500)
+      INTEGER, INTENT(IN) :: ndays
       PARAMETER (MAXNEQ=27000)
       DIMENSION Y(MAXNEQ),val1(400),val2(400)
       DIMENSION G1(npts2),G2(npts2),O2(npts2),Os(npts),Ob(npts)
@@ -45,30 +45,32 @@ C
       np = npts
 
 C
-C --------     Set IFLAG for initializing data
-C
-      if(init.eq.1) then
-        IFLAG=1  
-        init=0
-      endif
 
 C
 C --------     Run a series of CASES with ALtered inputs
 C
-      step= 730.0/365.0           ! Put in units of model (y)
+      !step= 730.0/365.0           ! Put in units of model (y)
+      step = 1.d0/365.d0
+ 
       temp   = ZERO
 
 
-C
       DO IC=1,ndays
+         !write(6,*) "IC",IC
          val1(IC)= temp
          val2(IC)= temp + step
          temp    = val2(IC)
          date= temp*365.
          idate = mod(date,365.0d00)
 
-      CALL CASES(val1(IC),val2(IC),Y,ISTATE,IFLAG,Ainp,myid,numprocs,
-     & YY_init,ppH_init)
+!      write(6,*) "b ca pph_init",ppH_init(1:3)
+
+
+
+      CALL CASES(val1(IC),val2(IC),Y,ISTATE,Ainp,ppH_init)
+
+
+!      write(6,*) "b ca pph_init",ppH_init(1:3)
 
       CALL FILL_Y(NEQ,np,nss,Y,G1,G2,O2,NO3,NH4,MN2,
      *                  FE3,FE2,SO4,HS,FES,TC,ALK,DOM,Os,Ob)
@@ -110,7 +112,7 @@ C
        sedOM2_0 = sedOM2(IC)
        sedALK_0 = sedALK(IC)
 
-!       write(*,'(A6,2X,f12.2)') 'DOflux',sedO2(IC)/365*10   ! check Surface O2 concentrations
+
 !
 ! ------- Output the sediment geochemical profiles to compare w/ data
 !
@@ -119,12 +121,11 @@ C
 !       WRITE(*,260) ISTATE
 
        if(maxval(residual).le.maxres.or.IC.eq.ndays) then
-        EXIT
+        EXIT 
        endif
 
       ENDDO  !ENDDO over ndays
 
-      !write(6,*) "SDM iterations",IC
 
  260  FORMAT(///' POS # IS A GOOD THING, NEG # IS SUSPECT! ISTATE =',I3)
       sedflux(iO2) = sedO2(IC)
@@ -134,7 +135,7 @@ C
       sedflux(iOM1_bc) = sedOM1(IC)
       sedflux(iOM2_bc) = sedOM2(IC)
       sedflux(iALK) = sedALK(IC)
-      sedflux = sedflux/36.5
+      sedflux = sedflux/365.
 
 
       END

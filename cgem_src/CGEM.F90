@@ -253,7 +253,7 @@
                    OM1Z_k(k)   = f(i,j,k,iOM1_Z)  * C_cf   ! Convert mmol/m3 to g carbon/m3
                    OM1A_k(k)   = f(i,j,k,iOM1_A)  * C_cf   ! Convert mmol/m3 to g carbon/m3
                    OM1BC_k(k)  = f(i,j,k,iOM1_BC) * C_cf   ! Convert mmol/m3 to g carbon/m3
-                enddo 
+                enddo
                 call DailyRad_init(TC_8, lat(i,j), lon(i,j), d(i,j,:), d_sfc(i,j,:), A_k, &
                      & CDOM_k, OM1A_k, OM1Z_k, OM1SPM_k, OM1BC_k, aDailyRad_k,nz)
                 aDailyRad(i,j,:) = aDailyRad_k(:)

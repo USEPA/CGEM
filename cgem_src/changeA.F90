@@ -12,7 +12,7 @@
       real, intent(IN) :: f(nf),T,S,pH ! State variables, Temp, Salinity
       real :: R_11
       integer, intent(IN) :: i,j
-      integer nz
+      integer nz,ii
 
       nz = nza(i,j)
 
@@ -66,7 +66,7 @@
 
       A(28) = 1. 
 
-! DOM = Sum of OM2
+! DOM = Sum of OM
       if((f(iOM1_A)+f(iOM1_Z)+f(iOM1_R)+f(iOM1_BC)).gt.0.) then
       A(29) = (s_x2A(i,j,nz)/s_z2A(i,j,nz)*f(iOM2_A) + s_x2Z(i,j,nz)/s_z2Z(i,j,nz)*f(iOM2_Z) +     &
      &       stoich_x2R/stoich_z2R*f(iOM2_R) + stoich_x2BC/stoich_z2BC*f(iOM2_BC)) / &
@@ -90,9 +90,8 @@
       A(58) = f(iDIC)
       A(59) = A(57)
       A(60) = A(49) 
-      A(61) = (f(iOM1_A)*ws(iOM1_A)+f(iOM1_Z)*ws(iOM1_Z))*12.
-      A(62) = (f(iOM1_R)*ws(iOM1_R)+f(iOM1_BC)*ws(iOM1_BC))*12. 
-
+      A(61) = (f(iOM1_A)*ws(iOM1_A)+f(iOM1_Z)*ws(iOM1_Z))*12.*86400.
+      A(62) = (f(iOM1_R)*ws(iOM1_R)+f(iOM1_BC)*ws(iOM1_BC))*12.*86400.
 
       RETURN
 
