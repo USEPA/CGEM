@@ -77,7 +77,7 @@ $(SDM_OBJ): %.o: $(sdmdir)/%.f
 	$(F90) -c $(FFLAGS_SDM) $<
 
 $(MAIN_OBJ):%.o: $(maindir)/%.F90
-	$(F90) -c $(FFLAGS) $(DFLAGS) $(INC)   $<
+	$(F90) -c $(FFLAGS) $(DFLAGS)  $<
 
 $(MOC_OBJ):%.o: $(mocdir)/%.F90
 	$(F90) -c $(FFLAGS) $(DFLAGS)  $<

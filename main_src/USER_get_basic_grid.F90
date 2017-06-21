@@ -1,13 +1,14 @@
-      subroutine USER_get_basic_grid(dz,depth,d,d_sfc,dxdy)
+      subroutine USER_get_basic_grid(dz,depth,d,d_sfc,dxdy,Vol)
 
       USE Fill_Value
       USE Model_dim
 
-      real, intent (out) :: dz(im,jm,nsl)
-      real, intent (out) :: d(im,jm,nsl)
-      real, intent (out) :: depth(im,jm)
-      real, intent (out) :: d_sfc(im,jm,nsl)
-      real, intent (out) :: dxdy(im,jm)
+      real, intent (out) :: dz(im,jm,nsl)     !cell depth
+      real, intent (out) :: d(im,jm,nsl)      !depth from surface to bottom of cell
+      real, intent (out) :: depth(im,jm)      !total depth of column
+      real, intent (out) :: d_sfc(im,jm,nsl)  !depth from surface to cell center
+      real, intent (out) :: dxdy(im,jm)       !area of cell
+      real, intent (out) :: Vol(im,jm,nsl)    !Volume of cell
       real :: dx(im,jm), dy(im,jm)
       integer :: i,j,k,nz
       character(200) filename
@@ -45,6 +46,7 @@
            dz(i,j,k) = depth(i,j)/nz !assume equally spaced
            d_sfc(i,j,k) = sum(dz(i,j,1:(k-1))) + dz(i,j,k)/2. 
            d(i,j,k) = sum(dz(i,j,1:k)) !bottom of cell 
+           Vol(i,j,k) = dxdy(i,j) * dz(i,j,k)
 #ifdef DEBUG
            write(6,*) i,j,k,dz(i,j,k),d_sfc(i,j,k),d(i,j,k)
 #endif

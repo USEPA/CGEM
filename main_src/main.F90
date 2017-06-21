@@ -55,7 +55,7 @@ write(6,*) "After Command_Line_Args"
 write(6,*) "After Set_Model_dim"
 #endif
 
-      call Set_Grid()
+      call Set_Grid(TC_8)
 
 #ifdef DEBUG
 write(6,*) "After Set_Grid"
@@ -93,6 +93,11 @@ write(6,*) "After Set_Vars"
 
 #endif
 
+! Add blip for testing advection
+#ifdef DEBUG_CWS
+      f(12,25,1,25) = 300
+#endif
+
       call Initialize_Output(Which_code,BASE_NETCDF_OUTPUT_FILE_NAME)     !Open file and write initial configuration
 #ifdef DEBUG
 write(6,*) "After Initialize_Output"
@@ -114,12 +119,25 @@ write(6,*) "Before loop"
 #endif
 
 
+      if (Which_gridio.eq.1) then
+        call USER_update_EFDC_grid(TC_8)
+      endif
+
+
 !-------------- START TIME LOOP -----------------------------------
       do istep = 1, nstep
        TC_8 = TC_8 + dT
 #ifdef DEBUG
       write(6,*) "TC_8",TC_8
-#endif
+#endif 
+
+#ifdef DEBUG_CWS
+      write(6,*) "TC_8",TC_8
+#endif 
+      if (Which_gridio.eq.1) then
+        Vol_prev = Vol
+        call USER_update_EFDC_grid(TC_8)
+      endif
 
        call Get_Vars(TC_8) !Hydro, Solar, Wind, Temp, Salinity
 #ifdef DEBUG
@@ -162,6 +180,7 @@ write(6,*) "After Model_Output"
       Call Model_Finalize(Which_code) ! Closes the output NetCDF file and whatever else
       if (Which_gridio.eq.1) then
         Call Close_Hydro_NetCDF()
+        Call Close_Grid_NetCDF()
       endif
 
 !----------------------------------------------------------------

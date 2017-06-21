@@ -86,7 +86,7 @@ if(DoDroop.eq.1) then
      do i = 1,im
          nz = nza(i,j)
        if(nz.ge.0.and.wsm(i,j).eq.0) then !If on shelf
-         CALL EXCHANGE_droop(f(i,j,nz,:),area(i,j,nz),Vol(i,j,nz),dTime,i,j,SETRATE(:))      ! Calculate IR fluxes and settling rates
+         CALL EXCHANGE_droop(f(i,j,nz,:),area(i,j),Vol(i,j,nz),dTime,i,j,SETRATE(:))      ! Calculate IR fluxes and settling rates
          TSOD(i,j) = TSOD(i,j)/Vol(i,j,nz)
          SED_NO3_RATE(i,j) = SED_NO3_RATE(i,j)/Vol(i,j,nz)
          SED_NH3_RATE(i,j) = SED_NH3_RATE(i,j)/Vol(i,j,nz)
@@ -99,7 +99,7 @@ else
      do i = 1,im
          nz = nza(i,j)
        if(nz.gt.0.and.wsm(i,j).eq.0) then !If on shelf
-         CALL EXCHANGE(f(i,j,nz,:),area(i,j,nz),Vol(i,j,nz),dTime,i,j,SETRATE(:))      !  Calculate IR fluxes and settling rates
+         CALL EXCHANGE(f(i,j,nz,:),area(i,j),Vol(i,j,nz),dTime,i,j,SETRATE(:))      !  Calculate IR fluxes and settling rates
          TSOD(i,j) = TSOD(i,j)/Vol(i,j,nz)
          SED_NO3_RATE(i,j) = SED_NO3_RATE(i,j)/Vol(i,j,nz)
          SED_NH3_RATE(i,j) = SED_NH3_RATE(i,j)/Vol(i,j,nz)
@@ -136,7 +136,7 @@ if(Which_Fluxes(iInRemin).eq.2) then
      do i = 1,im
          nz = nza(i,j)
        if(nz.ge.0.and.wsm(i,j).eq.0) then
-         SETRATE(:) = f(i,j,nz,:)*area(i,j,nz)*(-ws(:))
+         SETRATE(:) = f(i,j,nz,:)*area(i,j)*(-ws(:))
          f(i,j,nz,:) = max(f(i,j,nz,:)  - (SETRATE(:)/Vol(i,j,nz)) * dTime,0.)
        endif !End of if(nza(i,j) statement
    enddo      ! end of do i block do loop

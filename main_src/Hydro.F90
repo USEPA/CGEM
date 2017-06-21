@@ -20,15 +20,13 @@
       integer, dimension(7) :: startIndex ! holds the last time index from netcdf file used for each hydro variable
                                           ! used as starting point for next lookup
 
-      enum, bind(c) 
-        enumerator :: eSal=1      !Salinity
-        enumerator :: eTemp = 2   !Temperature
-        enumerator :: eUx = 3     !X- Horizontal Current Flux
-        enumerator :: eVx = 4     !Y- Horizontal Current Flux
-        enumerator :: eWx = 5     !Z- Vertical Current Flux
-        enumerator :: eKh = 6     !Diffusion Coefficients
-        enumerator :: eE = 7      !Elevation
-      endenum  
+      integer, parameter :: eSal=1      !Salinity
+      integer, parameter :: eTemp = 2   !Temperature
+      integer, parameter :: eUx = 3     !X- Horizontal Current Flux
+      integer, parameter :: eVx = 4     !Y- Horizontal Current Flux
+      integer, parameter :: eWx = 5     !Z- Vertical Current Flux
+      integer, parameter :: eKh = 6     !Diffusion Coefficients
+      integer, parameter :: eE = 7      !Elevation
 
       contains
 
@@ -54,9 +52,12 @@
       T=fill(0) 
       Wind=fill(0)  
       Rad=fill(0) 
-      Ux=fill(0)
-      Vx=fill(0)  
-      Wx=fill(0) 
+      !Ux=fill(0)
+      !Vx=fill(0)  
+      !Wx=fill(0)
+      Ux = 0.0
+      Vx = 0.0
+      Wx = 0.0 
       Kh=fill(0)
       E=fill(0) 
 
@@ -84,7 +85,7 @@
       write(netcdf_fileNames(7), '(A, A)') trim(DATADIR), '/INPUT/SurfaceElev.nc'
 
       do i=1,7
-        call open_file(netcdf_fileNames(i), 0, hydro_info(i)%ncid)
+        call open_netcdf(netcdf_fileNames(i), 0, hydro_info(i)%ncid)
         hydro_info(i)%fileName = netcdf_fileNames(i)
         call init_info(hydro_info(i))
       enddo
@@ -100,7 +101,7 @@
       integer :: i
 
       do i=1,7
-        call close_file(hydro_info(i)%ncid)
+        call close_netcdf(hydro_info(i)%ncid)
       enddo
 
       End Subroutine Close_Hydro_NetCDF

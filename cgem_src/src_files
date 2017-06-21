@@ -40,4 +40,6 @@ CGEM_OBJ  =  CGEM_Flux.o\
 	Salinity_Regression_Init_CGEM.o\
 	InitError_Check_CGEM.o\
 	Transport_CGEM.o\
-	Init_Output_CGEM.o
+	Init_Output_CGEM.o\
+        Adv3D.o\
+        VMixing.o
