@@ -8,10 +8,10 @@
 ### =============== User Modifiable Section =============== ###
 
 ### Uncomment the next line to enable debugging
-#DFLAGS = -DDEBUG
 #DFLAGS = -warn -debug all -g -check all -ftrapuv  -DDEBUG #-mcmodel=medium -shared-intel 
 #DFLAGS = -Wall -Wextra -pedantic -fimplicit-none -fbacktrace -D_CGEM -DRDEBUG -DDEBUG 
 #DFLAGS = -DDEBUG
+#DFLAGS = -DDEBUGVARS
 
 ### Build options for specific platforms. 
 ### LIBS has path to netCDF

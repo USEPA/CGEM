@@ -875,6 +875,10 @@ write(6,*)
 ! Carbon Chemistry
 !--------------------------------------------------------------
 !!! MOCSY alkalinity expressions:
+#ifdef DEBUGVARS
+write(6,*) "temp=",T(i,j,k)
+write(6,*) "DIC=",f(i,j,k,iDIC)
+#endif
         m_alk = f(i,j,k,iALK)/1000.
         m_dic = f(i,j,k,iDIC)/1000.
         m_si  = f(i,j,k,iSi)/1000.
@@ -1228,7 +1232,7 @@ enddo
 !-CDOM: (ppb) 
 !----------------------------
        ff(i,j,k,iCDOM) =  AMAX1(f(i,j,k,iCDOM)*(1.0 - KGcdom*dTd), 0.0)  
-
+!       write(6,*) istep,"CDOM",f(i,j,k,iCDOM),ff(i,j,k,iCDOM),(1.0 - KGcdom*dTd)
 !---------------------------------------------------------------------
 !----------------------------
 !-ALK: (mmol-HCO3/m3)

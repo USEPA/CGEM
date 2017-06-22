@@ -312,6 +312,7 @@ SUBROUTINE vars(ph, pco2, fco2, co2, hco3, co3, OmegaA, OmegaC, BetaD, rhoSW, p,
 !             part  (b) is a big correction for deep waters (but zero at surface)
      ELSEIF (trim(optT) == 'Tinsitu' .OR. trim(optT) == 'tinsitu') THEN
 !       When optT = 'Tinsitu', tempis is input & output (no tempot needed)
+        !write(6,*) "tempi",temp(i)
         tempis(i) = temp(i)
         tempis68  = (temp(i) - 0.0002) / 0.99975
 !       dtempot68 = sw_ptmp(DBLE(sal(i)), DBLE(tempis68), DBLE(p), 0.0d0)
@@ -338,8 +339,8 @@ SUBROUTINE vars(ph, pco2, fco2, co2, hco3, co3, OmegaA, OmegaC, BetaD, rhoSW, p,
              .OR.  sil(i) > 1e+3 &
              .OR. phos(i) > 1e+3) THEN
            PRINT *, 'Unacceptable value in one or more of the following:'
-           PRINT *, 'i, icount, tempot, sal,    alk,    dic,    sil,    phos =', &
-                     i, icount, tempot, sal(i), alk(i), dic(i), sil(i), phos(i)
+           PRINT *, 'i, icount, tempis(i), sal,    alk,    dic,    sil,    phos =', &
+                     i, icount, tempis(i), sal(i), alk(i), dic(i), sil(i), phos(i)
            PRINT *, 'Execution will stop (Subroutine vars.F90)'
            STOP 
         ENDIF

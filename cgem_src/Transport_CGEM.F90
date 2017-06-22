@@ -9,6 +9,8 @@
        IMPLICIT NONE
 
        integer :: i, j, k
+ 
+       if(which_gridio.eq.1) then
 
        ! Before Advection and VMixing, combine A's and Q's
        do k=1, nsl
@@ -39,6 +41,8 @@
            enddo
          enddo
        enddo
+
+       endif
 
        return
 
