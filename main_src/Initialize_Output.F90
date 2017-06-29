@@ -5,7 +5,7 @@ USE Model_dim
 IMPLICIT NONE
 
 character(6), intent(in) :: Which_code
-character(200), intent(in) :: BASE_NETCDF_OUTPUT_FILE_NAME
+character(100), intent(in) :: BASE_NETCDF_OUTPUT_FILE_NAME
 
 if(Which_code.eq."CGEM") then !CGEM
 

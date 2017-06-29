@@ -253,7 +253,7 @@
                    OM1Z_k(k)   = f(i,j,k,iOM1_Z)  * C_cf   ! Convert mmol/m3 to g carbon/m3
                    OM1A_k(k)   = f(i,j,k,iOM1_A)  * C_cf   ! Convert mmol/m3 to g carbon/m3
                    OM1BC_k(k)  = f(i,j,k,iOM1_BC) * C_cf   ! Convert mmol/m3 to g carbon/m3
-                enddo 
+                enddo
                 call DailyRad_init(TC_8, lat(i,j), lon(i,j), d(i,j,:), d_sfc(i,j,:), A_k, &
                      & CDOM_k, OM1A_k, OM1Z_k, OM1SPM_k, OM1BC_k, aDailyRad_k,nz)
                 aDailyRad(i,j,:) = aDailyRad_k(:)
@@ -875,6 +875,10 @@ write(6,*)
 ! Carbon Chemistry
 !--------------------------------------------------------------
 !!! MOCSY alkalinity expressions:
+#ifdef DEBUGVARS
+write(6,*) "temp=",T(i,j,k)
+write(6,*) "DIC=",f(i,j,k,iDIC)
+#endif
         m_alk = f(i,j,k,iALK)/1000.
         m_dic = f(i,j,k,iDIC)/1000.
         m_si  = f(i,j,k,iSi)/1000.
@@ -1228,7 +1232,7 @@ enddo
 !-CDOM: (ppb) 
 !----------------------------
        ff(i,j,k,iCDOM) =  AMAX1(f(i,j,k,iCDOM)*(1.0 - KGcdom*dTd), 0.0)  
-
+!       write(6,*) istep,"CDOM",f(i,j,k,iCDOM),ff(i,j,k,iCDOM),(1.0 - KGcdom*dTd)
 !---------------------------------------------------------------------
 !----------------------------
 !-ALK: (mmol-HCO3/m3)

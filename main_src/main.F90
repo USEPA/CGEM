@@ -151,9 +151,10 @@ write(6,*) "Wind",Wind
        call WQ_Model(Which_code,TC_8,istep,istep_out)
 #ifdef DEBUG
 write(6,*) "After WQ_Model"
+write(6,*) "istep=",istep
 #endif
-
-       call Flux(Which_code)
+    
+       call Flux(Which_code,istep)
 #ifdef DEBUG
 write(6,*) "After Flux"
 #endif

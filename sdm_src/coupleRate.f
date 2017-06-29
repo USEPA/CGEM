@@ -55,27 +55,26 @@
 !
 !
 
-      SUBROUTINE CASES(value1,value2,Y,ISTATE,IFLAG,Ainp,myid,numprocs,   &
-     & YY_init,ppH_init)
+      SUBROUTINE CASES(value1,value2,YY,ISTATE,Ainp,ppH_init)
       IMPLICIT REAL*8 (A-H,O-Z)
       EXTERNAL FEX2,JEX
       INTEGER IWORK,LRW,LIW,MU,ML,ITASK,ISTATE,IOPT,ITOL,IPAR
-      INTEGER myid, numprocs
+      INTEGER, SAVE :: IFLAG=1
       PARAMETER (MAXNEQ=27000)
       PARAMETER (NSPECIES=17)
       PARAMETER (NCOMPART=17)
-      PARAMETER (MXSTEP =30000)
+!      PARAMETER (MXSTEP =30000)
+      PARAMETER (MXSTEP =30)
       PARAMETER (MU=NCOMPART,ML=MU)
       PARAMETER (LRW=22+11*MAXNEQ+(3*ML+2*MU)*MAXNEQ)
 C     PARAMETER (LRW=22+9*MAXNEQ+2*MAXNEQ**2)
       PARAMETER (LIW=30+MAXNEQ)
       DIMENSION Y(MAXNEQ),RWORK(LRW),IWORK(LIW),RPAR(MAXNEQ)
-      DIMENSION YY(MAXNEQ),pH(2000),ppH(2000)
+      DIMENSION YY(MAXNEQ),pH(2000),ppH(2000),ppH_init(2000)
       DIMENSION Ainp(100)
       COMMON /SPECIES/ NS,NPOINTS
       COMMON /SROOT/ ZROOT, WROOT
       COMMON /TEMPERATURE/ TEMP, SAL, PRESS,pH0
-      COMMON /GETY/ YY
       COMMON /pHes/ pH
       COMMON /GRIDPOINT/ NEQ
       COMMON /GETPH/ ppH
@@ -93,28 +92,31 @@ C     PARAMETER (LRW=22+9*MAXNEQ+2*MAXNEQ**2)
       MF = 25
       IWORK(6) = MXSTEP
 
+
+!
       IF (IFLAG .EQ. 1) THEN
         CALL FILEDATA2(RPAR,Ainp)
         DO I=1, NEQ
            Y(I)= YY(I)
+           !write(6,*) i,yy(i)
         ENDDO
         IFLAG = 0
       ENDIF
-
-
-!
 ! -------- provide new T and tout
 !
 
       T= value1
       TOUT= value2
+      !write(6,*) T,TOUT
+      !write(6,*) ppH_init(1) 
 
 !
 ! --------  Provide pH profile 
 !
 
         DO I=1,NPOINTS
-           pH(I) = ppH(I)
+           !write(6,*) ppH_init(I)
+           pH(I) = ppH_init(I)
         ENDDO
 
 !----- Get DATA forthe water-column model
@@ -346,6 +348,13 @@ C
       YDOT(3) = DIFF2+ADV2+IRRIG+RO2
       RATE(3) = RO2
       rIRRO2(1) =IRRIG*DH
+      !write(6,*) "O2",FO2
+      !!write(6,*) "DO2/T2*P*(Y(3) - Y(37))/TWO/DH + U*P*Y(20)"
+      !write(6,*) "DO2,T2,P,Y(3),Y(37),DH,U,Y(20)"
+      !write(6,*) DO2,T2,P,Y(3),Y(37),DH,U,Y(20)
+      !write(6,*) " irrig",rIRRO2(1)
+
+
 C 
 C NO3
       FNO3= DNO3/T2*P*(Y(4) - Y(38))/TWO/DH + W*P*Y(21)
@@ -534,7 +543,12 @@ C
       ADV1 = AGST/PS*DGDX    
       YDOT(18) = DIFF1 + ADV1 + RCH2O1 - disOM1
       RATE(18) = RCH2O1
-!
+      !write(6,*)
+      !write(6,*) "OM1",FOM1
+      !!write(6,*) "DB0*PS*(Y(1) -Y(35))/TWO/DH + W*PS*Y(18)"
+      !write(6,*) " DB0,PS,Y(1),Y(35),DH,W,Y(18)"
+      !write(6,*) DB0,PS,Y(1),Y(35),DH,W,Y(18)
+      !write(6,*)
 ! OM
       FOM2= DB0*PS*(Y(2) -Y(36))/TWO/DH + W*PS*Y(19)
       DIFF1 = DB(X)*(Y(36)-TWO*Y(19)+Y(2))/DH/DH
@@ -553,7 +567,7 @@ C
         FLUXES(6) = FOM1
         FLUXES(7) = FOM2
         FLUXES(9) = FALK
-  
+
 !      write(*,'(A4,2X,f12.2)') 'FO2',FO2  ! check HS concentrations
 !  FOR THE INTERVENING POINTS IN THE GRID TO X2:
 !  Following statements gives the # of midpoints NPOINTS -1
@@ -653,6 +667,7 @@ C
        TESTTC    = Y(MID13)
        TESTALK   = Y(MID14)
        TESTDOM   = Y(MID15)
+
 C
 C      IF (TESTOM1 .GT. 3.0D+03) write(*,*) ' 1 OM1 ',TESTOM1
 C      IF (TESTOM2 .GT. 3.0D+03) write(*,*) ' 1 OM2 ',TESTOM2
@@ -2429,7 +2444,7 @@ C
       REAL*8 k15,k23,k_23,KpFES
 
       DIMENSION Ainp(100)
-      DIMENSION :: DF(24),rk(9), ppH(2000),YY(MAXNEQ)
+      DIMENSION :: DF(24),rk(9)
       DIMENSION day(1100),gulfdo(1100)
       COMMON /SPECIES/ NS,NPOINTS
       COMMON /GRIDPOINT/ NEQ
@@ -2445,15 +2460,13 @@ C
       COMMON /FLUXCOMMON/ FG1,FG2
       COMMON /POROS/ P0,P00,BP
       COMMON /SROOT/ ZROOT, WROOT
-      COMMON /IRRIG/ ALPHA0,XIRRIG
+      COMMON /IRRIG/ ALPHAA,XIRRIG
       COMMON /KINETICS/ KG1,KG2,KDOM,KO2,KNO3,KMNO,KFE3,KSO4
       COMMON /CONSTANT2/ KpFES
       COMMON /CONSTANT3/ k8,k10,k11,k12,k13,k14,k15,k23,k_23
       COMMON /DISSOL/ a, PER_DIS
       COMMON /STOIC/ SC1,SN1,SP1,SC2,SN2,SP2,SC3,SN3,SP3
       COMMON /TEMPERATURE/ TEMP, SAL, PRESS,pH0
-      COMMON /GETY/ YY
-      COMMON /GETPH/ ppH
       COMMON /DESORB/ KANH4
       COMMON /hydro/ aa, bb, gg, zz
 
@@ -2477,9 +2490,10 @@ C
        SAL= Ainp(2)
        PRESS= Ainp(3)
        pH0= Ainp(4)
-
       CALL DDIFCOEF(V,DF,SAL,TEMP,PRESS)
       DO2  = DF(2)*YEAR
+
+
       DNO3 = DF(12)*YEAR
       DMN2= DF(22)*YEAR
       DNH3 = DF(10)*YEAR
@@ -2558,7 +2572,7 @@ C
       IRRG   = 0
 !     IS THERE IRRIGATION (INTEGER):YES = 1  NO=0
       IRRG = INT(Ainp(37))
-      ALPHA0 = Ainp(38)
+      ALPHAA = Ainp(38)
       XIRRIG = Ainp(39)
 
 !     ADVECTIVE VELOCITY
@@ -2614,15 +2628,12 @@ C
 !     FOR FLUX BOUNDARY CONDITIONS ON THE ORGANIC MATTER
       IF(IFG.EQ.2) THEN
 !     INTERFACIAL FLUX OM1, OM2
-       FG1 = Ainp(62)*365./10000.*1000./12 ! from mg C m-2 d >umol C cm-2 y-1
-       FG2 = Ainp(63)*365./10000.*1000./12 ! from mg C m-2 d >umol C cm-2 y-1 
+       FG1 = Ainp(62)*365./10000.*1000./12. ! from mg C m-2 d >umol C cm-2 y-1
+       FG2 = Ainp(63)*365./10000.*1000./12. ! from mg C m-2 d >umol C cm-2 y-1 
       ENDIF
 
 !    SWICH options: USE initial guess 1
       KANH4 = (Ainp(64))
-
-      YY = YY_init     !YY_init and ppH_init read in Flux.F90
-      ppH = ppH_init
 
       CALL thermowater(rK,SAL,TEMP)
       rK1=rK(4)

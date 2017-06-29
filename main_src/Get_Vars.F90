@@ -10,33 +10,36 @@
        IMPLICIT NONE
 
        integer(kind=8), intent(in) :: TC_8 ! Current time in seconds since Model_dim::iYr0.
+       integer(kind=8) :: TC_in
        integer, save :: init=1
 
        integer :: i,j,k
 
+        TC_in = TC_8
+
         if (Which_gridio.eq.0) then 
           if(Read_T.eq.0) then
-            call Calc_Temp(START_SECONDS,TC_8,T)
+            call Calc_Temp(START_SECONDS,TC_in,T)
           else
-            call USER_Read(TC_8,T,'t',init)
+            call USER_Read(TC_in,T,'t',init)
           endif
   
           if(Read_Sal.eq.0) then
             if(init.eq.1) call Calc_Sal(S)
           else
-            call USER_Read(TC_8,S,'s',init)
+            call USER_Read(TC_in,S,'s',init)
           endif
   
           if(Read_Solar.eq.0) then
-            call getSolar( TC_8, lon, lat, Rad)
+            call getSolar( TC_in, lon, lat, Rad)
           else
-            call USER_Read(TC_8,Rad,'p',init)
+            call USER_Read(TC_in,Rad,'p',init)
           endif
   
           if(Read_Wind.eq.0) then
             Wind=5.
           else
-            call USER_Read(TC_8,Wind,'w',init)
+            call USER_Read(TC_in,Wind,'w',init)
           endif
 
         else if (Which_gridio.eq.1) then

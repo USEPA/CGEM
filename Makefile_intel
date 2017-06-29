@@ -8,10 +8,9 @@
 ### =============== User Modifiable Section =============== ###
 
 ### Uncomment the next line to enable debugging
+#DFLAGS = -DDEBUG
 #DFLAGS = -warn -debug all -g -check all -ftrapuv  -DDEBUG #-mcmodel=medium -shared-intel 
 #DFLAGS = -Wall -Wextra -pedantic -fimplicit-none -fbacktrace -D_CGEM -DRDEBUG -DDEBUG 
-#DFLAGS = -DDEBUG
-#DFLAGS = -DDEBUGVARS
 
 ### Build options for specific platforms. 
 ### LIBS has path to netCDF
@@ -43,9 +42,8 @@ MY_HOST	  = $(shell hostname)
 ifeq (iris,$(findstring iris,$(MY_HOST)))
   INC	   = $(IRIS_INC)
   LIBS	   = $(IRIS_LIBS)
-  F90      = gfortran #ifort
-  FFLAGS = #-Warn all -traceback #-check -debug -g       #-g -fbacktrace -Wall
-  FFLAGS_SDM = -O3 
+  F90      = ifort
+  FFLAGS = #-Warn all -traceback #-check -debug -g       #-g -fbacktrace -Wall 
 else 
 ifeq (sol,$(findstring sol,$(MY_HOST)))
   INC	   = $(SOL_INC)
@@ -70,7 +68,7 @@ FishTank: ${MAIN_OBJ} ${MOC_OBJ} ${CGEM_OBJ} ${SDM_OBJ} ${GD_OBJ}
 
 # These items must have compiler optimization disabled
 $(NO_OPT_OBJS): %.o: %.F90
-	$(F90) -c -O0 $(FFLAGS) $(INC) $(DFLAGS) $<
+	$(F90) -c -O0 $(FFLAGS) $(DFLAGS) $<
 
 # No Implicit None flag
 $(SDM_OBJ): %.o: $(sdmdir)/%.f
