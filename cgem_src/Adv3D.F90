@@ -14,7 +14,7 @@
 
       IMPLICIT NONE
 
-      integer :: i,j,k,ii,nz
+      integer :: i,j,k,ii
       integer, dimension(im,jm) :: fm2
       real, dimension(im,jm,nsl,nf) :: ff !,f
       real, dimension (im,jm,nsl,nf) :: fmod 
@@ -42,9 +42,9 @@
 !#ifdef DEBUG_CWS
 !      !Vol = 1
 !      !Vol_prev = 1
-!      Ux = -1 
-!      Vx = 0
-!      Wx = 0   !-0.001
+!      Ux = 0 
+!      Vx = 0 
+!      Wx = -1   !-0.001
 !      !Wx(:,:,1) = 0
 !      !do j=1,jm
 !      !  do i=1,im
@@ -60,8 +60,6 @@
 ! -------------------------------------------------------------------
         do j = 1,jm 
           do i = 1, im  ! over all calculation grids
-            !if(fm2(i,j).eq.1) then
-            !write(6,'(a,i2,a,i2,a,i2)') "fm2(",i,",",j,")=",fm2(i,j)
             if(fm2(i,j).ne.0) then
 
 ! --------------------------------------------------------
@@ -78,17 +76,14 @@
 
 !If wsm=0 (shelf), then set sinking velocity to zero as well...
 !     at bottom (w=0) add settling or deep ocean (wsm=1)
-              w_wsink (i,j,nz+1) = Wx(i,j,nz+1)+ ws(ii)*wsm(i,j)*dxdy(i,j)
+              !w_wsink (i,j,nz+1) = Wx(i,j,nz+1)+ ws(ii)*wsm(i,j)*dxdy(i,j)
+              w_wsink (i,j,fm2(i,j)+1) = Wx(i,j,fm2(i,j)+1)+ ws(ii)*wsm(i,j)*dxdy(i,j)
 
 
 ! -------------------------------------------------------------
               !do k = 1, nz	! do layer by layer
               do k = 1, fm2(i,j)	! do layer by layer
                 km1 = max0(k-1,1)
-!#ifdef DEBUG_CWS
-!      write(6,'(a,i2,a,i2,a,i2,a)')"(i,j,k)=(",i,",",j,",",k,")"
-!#endif
-
 
 ! ----- upwind advection
                 !check that data is defined on i-1 cell
@@ -102,34 +97,34 @@
                 wfp = amax1( w_wsink(i,j,k+1),0.)	! pp/n0
 
 
-                if (f(i-1,j,k,ii) .eq. mv) then
-                  fmod_im = f(i,j,k,ii)
-                else 
+                if (fm2(i-1,j) .ge. k) then
                   fmod_im = f(i-1,j,k,ii)
-                endif
-
-                if (f(i+1,j,k,ii) .eq. mv) then
-                  fmod_ip = f(i,j,k,ii)
-                else
-                  fmod_ip = f(i+1,j,k,ii)
-                endif
-
-                if (f(i,j-1,k,ii) .eq. mv) then
-                  fmod_jm = f(i,j,k,ii)
-                else
-                  fmod_jm = f(i,j-1,k,ii)
-                endif
-
-                if (f(i,j+1,k,ii) .eq. mv) then
-                  fmod_jp = f(i,j,k,ii)
                 else 
-                  fmod_jp = f(i,j+1,k,ii)
+                  fmod_im = f(i,j,k,ii)
                 endif
 
-                if (f(i,j,k+1,ii) .eq. mv) then
-                  fmod_wp = f(i,j,k,ii)
+                if (fm2(i+1,j) .ge. k) then
+                  fmod_ip = f(i+1,j,k,ii)
                 else
+                  fmod_ip = f(i,j,k,ii)
+                endif
+
+                if (fm2(i,j-1) .ge. k) then
+                  fmod_jm = f(i,j-1,k,ii)
+                else
+                  fmod_jm = f(i,j,k,ii)
+                endif
+
+                if (fm2(i,j+1) .ge. k) then
+                  fmod_jp = f(i,j+1,k,ii)
+                else 
+                  fmod_jp = f(i,j,k,ii)
+                endif
+
+                if (fm2(i,j) .gt. k) then
                   fmod_wp = f(i,j,k+1,ii)
+                else
+                  fmod_wp = f(i,j,k,ii)
                 endif
 
 !                       p0/nn             pn/n0               
@@ -147,19 +142,6 @@
      !&            ) /Vol(i,j,k)
 
 
-!                ff(i,j,k,ii) =                                     &
-!     &            ( f(i,j,k,ii)*Vol_prev(i,j,k)                            &
-!     &            +(0.0                                             &
-!     &            + cf*f(i,j,k,ii)                                  &
-!     &            +( 0.0 +                                          &
-!     &              ( (ufm*f(i-1,j,k,ii)+ufp*f(i+1,j,k,ii))       &
-!     &            +(vfm*f(i,j-1,k,ii)+vfp*f(i,j+1,k,ii)) )     &
-!     &            +(wfm*f(i,j,km1,ii)+wfp*f(i,j,k+1,ii))            &
-!     &             )                                     &
-!     &            )*dT  &
-!     &            ) /Vol(i,j,k)
-
-
                 tmpVal1 = f(i,j,k,ii)*Vol_prev(i,j,k)
                 tmpVal2 = cf*f(i,j,k,ii)*dT
                 tmpVal3 = ((ufm*fmod_im+ufp*fmod_ip)       &
@@ -167,62 +149,6 @@
                 tmpVal4 = (wfm*f(i,j,km1,ii)+wfp*fmod_wp)*dT
 
                  ff(i,j,k,ii) = (tmpVal1 + tmpVal2 + tmpVal3 +tmpVal4)/Vol(i,j,k)
-
-!#ifdef DEBUG_CWS
-!      !write(6,*)"Vol=", Vol(i,j,k)
-!      !write(6,*)"Vol_prev=",Vol_prev(i,j,k)
-!      !write(6,*)"ii=", ii
-!      !write(6,*)"dT=",dT
-!      !if(ii .eq. 25) then
-!      tmpii = 25
-!      tmpi = 12
-!      tmpj = 25
-!      tmpk = 1
-!
-!      if(ii .eq.tmpii .AND. i.eq.tmpi .AND. j.eq.tmpj .AND. k.eq.tmpk) then
-!        !write(6,*)"  f =", f(i,j,k,ii)
-!        !write(6,*)"  ff=", ff(i,j,k,ii)
-!        write(6,'(a,i2,a,i2,a,i2,a,f17.7)')"  f(",i,",",j,",",k,") =", f(i,j,k,ii)
-!        write(6,'(a,i2,a,i2,a,i2,a,f17.7)')"  ff(",i,",",j,",",k,")=", ff(i,j,k,ii)
-!        write(6,*)"  fmod_im=",fmod_im
-!        write(6,'(a,i2,a,i2,a,i2,a,f17.7)')"     f(",i-1,",",j,",",k,") =", f(i-1,j,k,ii)
-!        write(6,*)"  fmod_ip=",fmod_ip
-!        write(6,'(a,i2,a,i2,a,i2,a,f17.7)')"     f(",i+1,",",j,",",k,") =", f(i+1,j,k,ii)
-!        write(6,*)"  fmod_jm=",fmod_jm
-!        write(6,'(a,i2,a,i2,a,i2,a,f17.7)')"     f(",i,",",j-1,",",k,") =", f(i,j-1,k,ii)
-!        write(6,*)"  fmod_jp=",fmod_jp
-!        write(6,'(a,i2,a,i2,a,i2,a,f17.7)')"     f(",i,",",j+1,",",k,") =", f(i,j+1,k,ii)
-!        !write(6,*)"  fmod_wm=",fmod_wm
-!        write(6,'(a,i2,a,i2,a,i2,a,f17.7)')"     f(",i,",",j,",",km1,") =", f(i,j,km1,ii)
-!        write(6,*)"  fmod_wp=",fmod_wp
-!        write(6,'(a,i2,a,i2,a,i2,a,f17.7)')"     f(",i,",",j,",",k+1,") =", f(i,j,k+1,ii)
-!        !write(6,'(a,i2,a,i2,a,i2,a,f17.7)')"  fmod(",i,",",j,",",km1,") =", fmod(i,j,km1,ii)
-!        !write(6,'(a,i2,a,i2,a,i2,a,f17.7)')"  fmod(",i,",",j,",",k+1,") =", fmod(i,j,k+1,ii)
-!
-!        write(6,'(a,i2,a,i2,a,i2,a,f17.7)')"  Ux(",i,",",j,",",k,") =", Ux(i,j,k)
-!        write(6,'(a,i2,a,i2,a,i2,a,f17.7)')"  Ux(",i+1,",",j,",",k,") =", Ux(i+1,j,k)
-!        write(6,'(a,i2,a,i2,a,i2,a,f17.7)')"  Vx(",i,",",j,",",k,") =", Vx(i,j,k)
-!        write(6,'(a,i2,a,i2,a,i2,a,f17.7)')"  Vx(",i,",",j+1,",",k,") =", Vx(i,j+1,k)
-!        write(6,'(a,i2,a,i2,a,i2,a,f17.7)')"  Wx(",i,",",j,",",k,") =", Wx(i,j,k)
-!        write(6,'(a,i2,a,i2,a,i2,a,f17.7)')"  Wx(",i,",",j,",",k+1,") =", Wx(i,j,k+1)
-!        write(6,'(a,f17.7)')"  ufm=", ufm
-!        write(6,'(a,f17.7)')"  ufp=", ufp
-!        write(6,'(a,f17.7)')"  vfm=", vfm
-!        write(6,'(a,f17.7)')"  vfp=", vfp
-!        write(6,'(a,f17.7)')"  wfm=", wfm
-!        write(6,'(a,f17.7)')"  wfp=", wfp
-!        write(6,'(a,f17.7)')"  cfh=", cfh
-!        write(6,'(a,f17.7)')"  cf =", cf
-!        write(6,*)"  tmpVal1=",tmpVal1
-!        write(6,*)"  tmpVal2=",tmpVal2
-!        write(6,*)"  tmpVal3=",tmpVal3
-!        write(6,*)"  tmpVal4=",tmpVal4
-!        write(6,*)"  dT = ", dT
-!        write(6,*)"Vol=", Vol(i,j,k)
-!        write(6,*)"Vol_prev=",Vol_prev(i,j,k)
-!      endif
-!#endif
-
 
 ! -------------------------------------------------------------
               end do	! k = 1, nz

@@ -27,7 +27,7 @@
 !     parameter (Kh0=1.e-6)	! m**2/s
 
 
-      nz = nsl -1
+!      nz = nsl -1
 
        do j = 1, jm
          do i = 1, im
@@ -61,8 +61,8 @@
                  G(k) = (C(k)*G(k-1)-f(i,j,k,ii))*Gk(k)
                end do
                ! --- No flux at bottom
-               f(i,j,nz,ii) = (C(nz)*G(nz-1)-f(i,j,nz,ii)) &
-              &              /(C(nz)*(1.-E(nz-1))-1.)
+               f(i,j,fm(i,j),ii) = (C(fm(i,j))*G(fm(i,j)-1)-f(i,j,fm(i,j),ii)) &
+              &              /(C(fm(i,j))*(1.-E(fm(i,j)-1))-1.)
          
                do k=fm(i,j)-1, 1, -1
                !do k = nz-1, 1, -1
