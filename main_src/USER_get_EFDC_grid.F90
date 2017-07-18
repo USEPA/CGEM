@@ -53,8 +53,8 @@
       integer :: i,j,k, nz
       integer(kind=8) :: TC_8
 
-      call interpVar(grid_info(eColDepth), TC_8, 4, 3, gridStartIndex(eColDepth), depth)
-      call interpVar(grid_info(eCellDepth), TC_8, 5, 4, gridStartIndex(eCellDepth), dz)
+      call interpVar(grid_info(eColDepth), TC_8, gridStartIndex(eColDepth), depth)
+      call interpVar(grid_info(eCellDepth), TC_8, gridStartIndex(eCellDepth), dz)
 
       d = fill(0) 
       d_sfc = fill(0) 

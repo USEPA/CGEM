@@ -26,6 +26,8 @@ type netCDF_file
    integer :: nvars
    integer :: natts
    integer :: unlim
+   integer, dimension(5) :: dimLocs  !index location of (X,Y,Z,Time,Var) dimensions
+   integer, dimension(5) :: varLocs  !index location of (X,Y,Z,Time,Var) variables
    character(200) :: fileName
    integer, dimension(:), allocatable :: dimLengths
    character(50), allocatable :: dimNames(:)
@@ -138,6 +140,36 @@ CONTAINS
       deallocate(varDimIds)
     enddo
 
+    !populate var locations
+    info%dimLocs=-1
+    do i=1, info%nvars
+      if(info%dimNames(i) .eq. 'X' .or. info%dimNames(i) .eq. 'x') then
+        info%dimLocs(1) = i
+      else if (info%dimNames(i) .eq. 'Y' .or. info%dimNames(i) .eq. 'y') then
+        info%dimLocs(2) = i
+      else if (info%dimNames(i) .eq. 'Z' .or. info%dimNames(i) .eq. 'z') then
+        info%dimLocs(3) = i
+      else if (info%dimNames(i) .eq. 'TIME' .or. info%dimNames(i) .eq. 'Time' .or. info%dimNames(i) .eq. 'time') then
+        info%dimLocs(4) = i
+      endif  
+    enddo
+
+    !populate var locations
+    info%varLocs=-1
+    do i=1, info%nvars
+      if(info%varNames(i) .eq. 'X' .or. info%varNames(i) .eq. 'x') then
+        info%varLocs(1) = i
+      else if (info%varNames(i) .eq. 'Y' .or. info%varNames(i) .eq. 'y') then
+        info%varLocs(2) = i
+      else if (info%varNames(i) .eq. 'Z' .or. info%varNames(i) .eq. 'z') then
+        info%varLocs(3) = i
+      else if (info%varNames(i) .eq. 'TIME' .or. info%varNames(i) .eq. 'Time' .or. info%varNames(i) .eq. 'time') then
+        info%varLocs(4) = i
+      else 
+        info%varLocs(5) = i
+      endif  
+    enddo
+
   END SUBROUTINE init_info_from_type
 
   !Prints netCDF_file info to screen
@@ -171,6 +203,23 @@ CONTAINS
       write(6,*) "  varType: ", info%varTypes(i)
       write(6,*) "  varDim : ", info%varDims(i)
     enddo
+
+    write(6,*)
+    write(6,*) "Dimension : index"
+    write(6,'(a,i1)') "X : ", info%dimLocs(1)
+    write(6,'(a,i1)') "Y : ", info%dimLocs(2)
+    write(6,'(a,i1)') "Z : ", info%dimLocs(3)
+    write(6,'(a,i1)') "Time : ", info%dimLocs(4)
+
+    write(6,*)
+    write(6,*) "Variable : index"
+    write(6,'(a,i1)') "X : ", info%varLocs(1)
+    write(6,'(a,i1)') "Y : ", info%varLocs(2)
+    write(6,'(a,i1)') "Z : ", info%varLocs(3)
+    write(6,'(a,i1)') "Time : ", info%varLocs(4)
+    write(6,'(a,i1)') "Var : ", info%varLocs(5)
+    
+
 
   END SUBROUTINE report_info_from_type
   
@@ -208,10 +257,10 @@ CONTAINS
 
 
   ! Finds time values to bookend current time (t_current)
-  SUBROUTINE getTimeIndex(ncid, t_current, tVar_index, start_index, t1, t2)
+  SUBROUTINE getTimeIndex(ncid, t_current, tDim_index, tVar_index, start_index, t1, t2)
     IMPLICIT NONE
 
-    integer, INTENT(IN) :: ncid, tVar_index
+    integer, INTENT(IN) :: ncid, tDim_index, tVar_index
     integer, INTENT(INOUT) :: start_index
     integer(kind=8), INTENT(IN) :: t_current
     integer(kind=8), INTENT(OUT) :: t1,t2
@@ -220,7 +269,7 @@ CONTAINS
     integer(kind=8), dimension(:), allocatable :: timeVals
     
     ! get time var values 
-    call nf_inq_dimlen(ncid, tVar_index, timeLength)
+    call nf_inq_dimlen(ncid, tDim_index, timeLength)
 
     allocate(timeVals(timeLength))
     call nf_get_var_int64(ncid,tVar_index,timeVals)
@@ -276,27 +325,34 @@ CONTAINS
   END SUBROUTINE getVarAtTime2d
 
   ! interpolates value of 3d variable
-  SUBROUTINE interpVar3d(info, t_current, var_index, tvar_index, tstep, var)  
+  SUBROUTINE interpVar3d(info, t_current, tstep, var)  
     IMPLICIT NONE
 
     type (netCDF_file), INTENT(IN) :: info             !info for netcdf file
-    integer, INTENT(IN) :: var_index, tvar_index       !index in netcdf of interp variable and time variable
     integer, INTENT(INOUT) :: tstep                    !tstep to start looking for current time bookend
     integer(kind=8), INTENT(IN) :: t_current           !current time value to bookend
     real, dimension(:,:,:), INTENT(OUT):: var          !interpolated variable for output
     real, dimension(:,:,:), allocatable :: var1, var2  !bookend variable values
+    integer :: var_index, tdim_index, tvar_index       !index in netcdf of interp variable and time variable
     integer(kind=8) :: t1, t2                          !bookend time values
     real :: fac
     integer :: i,j,k
 
+    var_index = info%varLocs(5)
+    tvar_index = info%varLocs(4)
+    tdim_index = info%dimLocs(4)
 
+    !write(6,*) " file: ", info%filename 
+    !write(6,*) " var_index = ", var_index
+    !write(6,*) " tvar_index = ", tvar_index
+    !write(6,*) " tdim_index = ", tdim_index
     
-    call getTimeIndex(info%ncid, t_current, tvar_index, tstep, t1, t2)
+    call getTimeIndex(info%ncid, t_current, tdim_index, tvar_index, tstep, t1, t2)
 
     allocate(var1(IM,JM,NSL))
     allocate(var2(IM,JM,NSL))
     call getVarAtTime3d(info%ncid, var_index, tstep, var1)
-    if (tstep .LE. info%dimLengths(tvar_index)) then         
+    if (tstep .LE. info%dimLengths(tdim_index)) then         
       call getVarAtTime3d(info%ncid, var_index, tstep+1, var2)
     else 
       write(6,*)"timestep is outside of supplied data range!"
@@ -320,25 +376,36 @@ CONTAINS
   END SUBROUTINE interpVar3d
 
   ! interpolates value of 2d variable
-  SUBROUTINE interpVar2d(info, t_current, var_index, tvar_index, tstep, var)  
+  SUBROUTINE interpVar2d(info, t_current, tstep, var)  
     IMPLICIT NONE
 
     type (netCDF_file), INTENT(IN) :: info           !info for netcdf file
-    integer, INTENT(IN) :: var_index, tvar_index     !index in netcdf of interp variable and time variable
     integer, INTENT(INOUT) :: tstep                  !tstep to start looking for current time bookend
     integer(kind=8), INTENT(IN) :: t_current         !current time value to bookend
     real, dimension(:,:), INTENT(OUT):: var          !interpolated variable for output
     real, dimension(:,:), allocatable :: var1, var2  !bookend variable values
+    integer :: var_index, tdim_index, tvar_index     !index in netcdf of interp variable and time variable
     integer(kind=8) :: t1, t2                        !bookend time values
     integer :: i,j,k
     real :: fac
 
-    call getTimeIndex(info%ncid, t_current, tvar_index, tstep, t1, t2)
+    var_index = info%varLocs(5)
+    tvar_index = info%varLocs(4)
+    tdim_index = info%dimLocs(4)
+
+
+    !write(6,*) " file: ", info%filename 
+    !write(6,*) " var_index = ", var_index
+    !write(6,*) " tvar_index = ", tvar_index
+    !write(6,*) " tdim_index = ", tdim_index
+
+
+    call getTimeIndex(info%ncid, t_current, tdim_index, tvar_index, tstep, t1, t2)
 
     allocate(var1(IM,JM))
     allocate(var2(IM,JM))
     call getVarAtTime2d(info%ncid, var_index, tstep, var1)
-    if (tstep .LE. info%dimLengths(tvar_index)) then                    
+    if (tstep .LE. info%dimLengths(tdim_index)) then                    
       call getVarAtTime2d(info%ncid, var_index, tstep+1, var2)
     else 
       write(6,*)"timestep is outside of supplied data range!"

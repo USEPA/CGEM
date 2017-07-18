@@ -88,6 +88,7 @@
         call open_netcdf(netcdf_fileNames(i), 0, hydro_info(i)%ncid)
         hydro_info(i)%fileName = netcdf_fileNames(i)
         call init_info(hydro_info(i))
+        !call report_info(hydro_info(i))
       enddo
 
       startIndex = 1
