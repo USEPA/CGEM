@@ -44,5 +44,7 @@ MAIN_OBJ  =  fillval.o\
 	Get_Vars.o\
 	WQ_Model.o\
 	Transport.o\
+        Adv3D.o\
+        VMixing.o\
 	Model_Output.o\
 	Model_Finalize.o
