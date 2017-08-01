@@ -20,13 +20,13 @@ if(which.eq.1) then
 
 else
 
-! x=-1
-! fv=sqrt(x)
-fv=-9999
-! if(isnan(fv) .eqv. .FALSE.)then
-! write(6,*) "didn't get NaN, fv=",fv 
-! stop
-! endif
+ x=-1
+ fv=sqrt(x)
+!fv=-9999
+ if(isnan(fv) .eqv. .FALSE.)then
+ write(6,*) "didn't get NaN, fv=",fv 
+ stop
+ endif
 
 endif
 
