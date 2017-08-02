@@ -1,0 +1,13 @@
+#5 timesteps from GOMDOM_CG with IR
+
+To use ncks
+gomdom_sample.nc 
+sol:/work/GLFBREEZ/laf/GOMDOM_CG_2/NETCDF/RUN_2_SAMPLE/
+ncks -d time,213,217 output.000000.nc gomdom_sample.nc
+
+#5 timesteps from CGEM (PAR=1 run from Rick's poster)
+cgem_sample.nc
+cgem_average_sample.nc
+sol:/work/GLFBREEZ/laf/GEM/VIZ
+ncks -d time,213,217 PARfac=1.0.nc cgem_sample.nc
+ncks -d time,213,217 PARfac=1.0.Photosyn.nc cgem_average_sample.nc
