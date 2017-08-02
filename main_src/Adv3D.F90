@@ -23,7 +23,7 @@
 
 ! --- transports
       real, dimension(im,jm,nsl) :: w_wsink
-      real, dimension(im,jm) :: dxdy
+      !real, dimension(im,jm) :: dxdy
 
 ! --- tmp
       integer :: km1
@@ -71,13 +71,13 @@
               !nz=nza(i,j)-1
               !do k = 2, nz 
               do k = 2, fm2(i,j)
-                w_wsink(i,j,k) = Wx(i,j,k) + ws(ii)*dxdy(i,j)
+                w_wsink(i,j,k) = Wx(i,j,k) + ws(ii)*area(i,j)  !dxdy(i,j)
               end do
 
 !If wsm=0 (shelf), then set sinking velocity to zero as well...
 !     at bottom (w=0) add settling or deep ocean (wsm=1)
               !w_wsink (i,j,nz+1) = Wx(i,j,nz+1)+ ws(ii)*wsm(i,j)*dxdy(i,j)
-              w_wsink (i,j,fm2(i,j)+1) = Wx(i,j,fm2(i,j)+1)+ ws(ii)*wsm(i,j)*dxdy(i,j)
+              w_wsink (i,j,fm2(i,j)+1) = Wx(i,j,fm2(i,j)+1)+ ws(ii)*wsm(i,j)*area(i,j)  !dxdy(i,j)
 
 
 ! -------------------------------------------------------------
