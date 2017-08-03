@@ -1,7 +1,7 @@
 # a caller for state variable labels
-#
-# requires ncdf4
 labels_fun <- function(){
+  
+  library(ncdf4)
   
   if(!file.exists('NETCDF/output.000000.nc'))
     stop('Run model to get labels')
@@ -15,11 +15,11 @@ labels_fun <- function(){
   # long names
   lngs <- sapply(shrt, function(x) ncatt_get(nc, x, 'description')$value)
   lngs <- lngs[shrt]
-
+  
   # units for each variable
   vals <- sapply(shrt, function(x) ncatt_get(nc, x, 'units')$value)
   vals <- vals[shrt]
-
+  
   # remove names
   names(lngs) <- NULL
   names(vals) <- NULL
@@ -32,9 +32,9 @@ labels_fun <- function(){
 # convert the initial conditions between formats
 #
 # parsin can be a chr string of file location of original InitialConditions.txt or input data frame of input conditions to be converted to ASCII format, the data frame is the output from the ASCII text file, but there's an additional function that replaces parameters in the data frame for conversion to the standard GEM format
-#
-# requires dplyr
 forminps <- function(parsin){
+ 
+  library(dplyr)
   
   # data frame to input file  
   if(inherits(parsin, 'data.frame')){
@@ -68,9 +68,9 @@ forminps <- function(parsin){
 # convert the input parameter info between formats
 #
 # parsin can be a chr string of file location of original GEM_InputFile or input data frame of parameters to be converted to ASCII format, the data frame is the output from the ASCII text file, but there's an additional function that replaces parameters in the data frame for conversion to the standard GEM format
-#
-# requires dplyr
 formpars <- function(parsin){
+ 
+  library(dplyr)
   
   # data frame to input file  
   if(inherits(parsin, 'data.frame')){
@@ -164,7 +164,7 @@ formpars <- function(parsin){
       rename(parm = L1)
     
   }
-
+  
   return(out)
   
 }
@@ -174,9 +174,9 @@ formpars <- function(parsin){
 # inps is a named list where each element is one to many parameter values for each input condition
 # partial string matching is used for the names to replace values in a default input list
 # passing NULL to inps will return the existing input conditions file
-#
-# requires dplyr
 setinps <- function(inps = NULL){
+   
+  library(dplyr)
   
   # load default parameter file
   load('input/InitialConditions.RData')
@@ -227,9 +227,9 @@ setinps <- function(inps = NULL){
 # pars is a named list where each element is one to many parameter values for each parameter
 # partial string matching is used for the element names to replace values in a default parameter list
 # passing NULL to pars will return the default parameter list for Weeks Bay
-#
-# requires dplyr
 setpars <- function(pars = NULL){
+  
+  library(dplyr)
   
   # load default parameter file
   load('input/GEM_InputFile.RData')
@@ -238,14 +238,14 @@ setpars <- function(pars = NULL){
   if(is.null(pars)){
 
     out <- formpars(GEM_InputFile)
-
+   
   # replace row values in input file with input list
   } else {
 
     # format parm names in input list for matching with new parm names
     # must remove regex metacharacters 
     par_nms <- gsub('\\+|\\(|\\)', '', GEM_InputFile$parm)
-
+    
     # replace each parameter with new
     for(par in names(pars)){
       
@@ -271,7 +271,7 @@ setpars <- function(pars = NULL){
   }
 
   # save output to file
-  writeLines(out, 'GEM_InputFile')
+  writeLines(out, 'input/GEM_InputFile')
   
 }
 
@@ -295,38 +295,32 @@ showpars <- function(){
 # formats output to return data frame
 #
 # out_var is chr string of variable to return
-# p1z1 logical if only one phyto and two zoop group are used, passed to p1z1_swtch
-#
-# requires ncdf4
-run_mod <- function(inps = NULL, out_var = 'O2', p1z1 = FALSE){
+# p1z1 logical if only one phyto and one zoop group are used, passed to p1z1_swtch
+run_mod <- function(pars = NULL, inps = NULL, out_var = 'O2', p1z1 = FALSE){
+  
+  library(ncdf4)
+  
+  # create parameter file based on inputs
+  setpars(pars)
   
   # create initial conditions file based on inputs
-#  lapply(inps, write, "debug", append=TRUE, ncolumns=1000)
   setinps(inps)
 
   # move the input files from input to root
-  fls <- c('input/InitialConditions.txt')
+  fls <- c('input/InitialConditions.txt', 'input/GEM_InputFile')
   file.copy(fls, getwd(), overwrite = TRUE)
   
   # set to one phyto, one zoop group if TRUE
   if(p1z1) p1z1_swtch(to = TRUE)
   
-  # run model
-  switch(    Sys.info()[['sysname']], 
-   Windows= {runexe <- suppressWarnings(system('FishTank.exe', intern = TRUE))},
-   Linux  = {print("Does not run on Linux.")},
-   Darwin = {runexe <- suppressWarnings(system('./FishTank_Mac.exe', intern = TRUE))}
-  )
-
+  # run model, suppress output messages
+  suppressWarnings(system('FishTank.exe'))
+  
   # back to default six phyt, two zoop if TRUE
   if(p1z1) p1z1_swtch(to = FALSE)
   
-  # return stderr if runexe is not empty
-  if(length(runexe) > 0) 
-    return(runexe)
-  
   # remove temp files
-  file.remove(c('input/InitialConditions.txt'))
+  file.remove(c('input/GEM_InputFile', 'input/InitialConditions.txt'))
   
   # get model output from netcdf
   nc <- nc_open('NETCDF/output.000000.nc')
@@ -370,16 +364,14 @@ run_mod <- function(inps = NULL, out_var = 'O2', p1z1 = FALSE){
 
 # the plotting function
 # varsel is input name, all dat is input data
-#
-# requires dygraphs, ncdf4
 plo_fun <- function(varsel, alldat, logscale = FALSE){
 
-	# exit if varsel doesnt exist from reactive
-	if(varsel == '') return()
-	
+  library(ncdf4)
+  library(dygraphs)
+
   # get short label from long
   varsel <- labels_fun()$shrt[labels_fun()$lngs %in% varsel]
-
+  
   # units and variable name
   units <- ncatt_get(alldat, varsel, attname = 'units')$value
   descr <- ncatt_get(alldat, varsel, attname = 'description')$value
@@ -435,9 +427,10 @@ plo_fun <- function(varsel, alldat, logscale = FALSE){
 
 # function for saving plot outputs
 # vars_in is input variables to plot, all dat is input data
-#
-# requires ncdf4, ggplot2
 saveplo_fun <- function(vars_in, alldat, logspace = FALSE){
+
+  library(ncdf4)
+  library(ggplot2)
 
   for(var_in in vars_in){
     
@@ -506,35 +499,51 @@ expr_fun <- function(lab_in){
 ######
 # format parameter inputs for shiny app, input is reactive object from shiny (user inputs from ui), output is list to send to setpars
 # react_ls is created from reactiveValuesToList(input)
-form_parinps <- function(react_ls){
+form_parinps <- function(react_ls, flrv){
   
   react_ls <- reactiveValuesToList(react_ls)
-    
-  # format times argument separately
-  times <- react_ls$times
-  times <- list(
-    '- starting time.*1' = as.numeric(format(times[1], '%Y')),
-    '- starting time.*2' = as.numeric(format(times[1], '%m')),
-    '- starting time.*3' = as.numeric(format(times[1], '%d')),
-    '- ending   time.*1' = as.numeric(format(times[2], '%Y')),
-    '- ending   time.*2' = as.numeric(format(times[2], '%m')),
-    '- ending   time.*3' = as.numeric(format(times[2], '%d'))
-    )
-   
-  # remove inputs that are not parameters, make sure this works
- 
-  # format parm names in input list for matching with new parm names
-  # must remove regex metacharacters 
-  inps <- gsub('\\+|\\(|\\)', '', names(react_ls))
-  load('input/GEM_InputFile.RData')
-  torm <- gsub('\\+|\\(|\\)*', '', GEM_InputFile$parm) %>% 
-    paste0('^', .) %>% 
-    paste(., collapse = '|') %>% 
-    grep(., inps, value = T, invert = T)
-  
-  out_ls <- react_ls[!names(react_ls) %in% torm]
-  out_ls <- c(out_ls, times)
 
+  # use input file if provided
+  if(!is.null(flrv$data)){
+    
+    myfl <- formpars(flrv$data$datapath)
+    out_ls <- as.list(myfl[, 1])
+    names(out_ls) <- myfl[, 2]
+    
+  # otherwise use gui inputs
+  } else {
+    
+    # format times argument separately
+    times <- react_ls$times
+    times <- list(
+      '- starting time.*1' = as.numeric(format(times[1], '%Y')),
+      '- starting time.*2' = as.numeric(format(times[1], '%m')),
+      '- starting time.*3' = as.numeric(format(times[1], '%d')),
+      '- ending   time.*1' = as.numeric(format(times[2], '%Y')),
+      '- ending   time.*2' = as.numeric(format(times[2], '%m')),
+      '- ending   time.*3' = as.numeric(format(times[2], '%d'))
+      )
+     
+    # dT names have to be changed, reset did not work with these
+    names(react_ls)[names(react_ls) %in% 'dt1'] <- '- dT (timestep, seconds); dT_out (output interval, seconds)_1'
+    names(react_ls)[names(react_ls) %in% 'dt2'] <- '- dT (timestep, seconds); dT_out (output interval, seconds)_2'
+
+    # remove inputs that are not parameters, make sure this works
+   
+    # format parm names in input list for matching with new parm names
+    # must remove regex metacharacters 
+    inps <- gsub('\\+|\\(|\\)', '', names(react_ls))
+    load('input/GEM_InputFile.RData')
+    torm <- gsub('\\+|\\(|\\)*', '', GEM_InputFile$parm) %>% 
+      paste0('^', .) %>% 
+      paste(., collapse = '|') %>% 
+      grep(., inps, value = T, invert = T)
+    
+    out_ls <- react_ls[!names(react_ls) %in% torm]
+    out_ls <- c(out_ls, times)
+    
+  }
+  
   return(out_ls)
 
 }
@@ -559,7 +568,8 @@ form_iniinps <- function(react_ls){
 # last two files are in root, created on the fly with run_mod from input file so no need to convert back if to = F
 #
 # to logical indicating if changes are made from default (six phyto, two zoop) to one each, set to F to go from one group each back to default
-p1z1_swtch <- function(to = TRUE){ 
+p1z1_swtch <- function(to = TRUE){
+ 
   # forward change
   if(to){
     
