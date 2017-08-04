@@ -1,0 +1,51 @@
+# This is the list of objects to compile. Edit as necessary to reflect
+# source file changes.
+# Note modules must be compiled in bottom-up dependency order.
+
+MAIN_OBJ  =  fillval.o\
+	Model_dim.o\
+        netcdf_utils.o\
+	Grid.o\
+	State_Vars.o\
+	Hydro.o\
+	OUTPUT.o\
+	INPUT_VARS.o\
+	LIGHT_VARS.o\
+	Which_Flux.o\
+	TEMP_VARS.o\
+	DATE_TIME.o\
+	NETCDF_UTILITIES.o\
+	main.o\
+	MOD_UTILITIES.o\
+	Conversions.o\
+        JY.o\
+        getSolar.o\
+	mdate_julian.o\
+	reaction.o\
+	sunang.o\
+	rnitrate.o\
+	Read_InputFile.o\
+	Flux.o\
+	Nitrification.o\
+	Q10_T.o\
+	USER_close_file.o\
+	USER_get_basic_grid.o\
+        USER_get_EFDC_grid.o\
+        USER_get_NCOM_grid.o\
+	USER_getLonLat.o\
+	USER_get_masks.o\
+	USER_Set_Initial_Conditions.o\
+	USER_Read.o\
+	Calc_Sal.o\
+	Calc_Temp.o\
+	OUTPUT_ALL_FALSE.o\
+	Command_Line_Args.o\
+	Allocate_Input.o\
+	Initialize_Output.o\
+	Get_Vars.o\
+	WQ_Model.o\
+	Transport.o\
+        Adv3D.o\
+        VMixing.o\
+	Model_Output.o\
+	Model_Finalize.o

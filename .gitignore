@@ -2,3 +2,57 @@
 .Rhistory
 .RData
 .Ruserdata
+
+# These are simple regular expression (glob) patterns
+# for files and directories that Git should ignore
+
+# Editor (e.g., Emacs) temp files
+*~
+\#*\#
+
+# Compiled code and objects
+*.exe
+*.EXE
+*.a
+*.so
+*.o
+*__genmod.f90
+*__genmod.mod
+*.mod
+
+# Binary data files
+*.bin
+*.2001-2008
+
+#input files
+data/FishTank/InitialConditions.txt
+data/FishTank/Model_dim.txt
+
+#
+# Keep directories but not contents. [Not sure if this works.]
+NETCDF/**
+output/**
+
+# Subversion
+.svn/
+
+# log and output files
+logfile*
+out
+out.time
+error
+*.pdf
+*.txt
+!Model_dim.txt
+!InitialConditions.txt
+*.out
+
+# Customized runtime files
+submit.sh
+my_submit.sh
+GEM_InputFile
+modules.sh
+
+# Misc
+tags
+TAGS

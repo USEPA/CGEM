@@ -1,0 +1,53 @@
+      Subroutine USER_getLonLat(lat,lon)
+
+      USE Model_dim
+      USE Fill_Value
+
+      IMPLICIT NONE
+
+      real, intent (out) :: lat(im,jm)
+      real, intent (out) :: lon(im,jm)
+      integer i,j
+      character(200) filename
+
+      real :: tmpi(im), tmpj(jm)
+
+      write(filename,'(A, A)') trim(DATADIR),'/latlon.dat'
+      open (19,file=filename,status='old')
+
+      if(Which_gridio.eq.2) then
+        read (19,*) !Header, lat 
+        read (19,*) tmpj
+        do j=1,jm
+         do i=1,im
+           lat(i,j) = tmpj(j)
+         enddo
+        enddo
+        read (19,*) tmpi
+        do j=1,jm
+         do i=1,im
+           lat(i,j) = tmpi(i)
+         enddo
+        enddo
+      else
+        read (19,*) !Header, lat 
+        do j=1,jm
+         read (19,*) lat(:,j)
+        enddo
+        read (19,*) !Header, lon
+        do j=1,jm
+         read (19,*) lon(:,j)
+        enddo
+      endif
+
+      close(19)
+
+      do j=1,jm
+       do i=1,im
+        if(lat(i,j)<=-9999) lat(i,j)=fill(0)
+        if(lon(i,j)<=-9999) lon(i,j)=fill(0)
+       enddo
+      enddo
+
+      return
+      end subroutine USER_getLonLat

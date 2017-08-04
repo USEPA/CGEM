@@ -1,0 +1,4 @@
+# implicitnone on compile line must be disabled for these diagenesis
+# # related files. If IMPLICIT NONE is used, it is declared within the
+# # code for a particular file.
+SDM_OBJ = coupleRate.o MATLAB.o vode.o model.o
