@@ -1,5 +1,6 @@
 source('R/funcs.R')
 
+library(shiny)
 library(ggplot2)
 library(dplyr)
 library(tidyr)
@@ -7,6 +8,7 @@ library(dygraphs)
 library(xts)
 library(htmltools)
 library(shinyjs)
+library(ncdf4)
 
 # Define server logic required to generate and plot data
 shinyServer(function(input, output, session) {
@@ -28,10 +30,18 @@ shinyServer(function(input, output, session) {
     progress <- shiny::Progress$new(session, min=1, max=1)
     progress$set(message = 'FishTank is running...')
     on.exit(progress$close())
+
+    # format input parameters if gui is used
+    if(is.null(flrv$data)){
       
-    # format parameter inputs 
-    parsin <- form_parinps(input, flrv)
-    
+      setpars(form_parinps(input))
+      
+    } else {
+      
+      file.copy(flrv$data$datapath, 'GEM_InputFile', overwrite = TRUE)
+      
+    }
+  
     # format initial condition inputs
     iniin <- form_iniinps(input)
 
@@ -39,10 +49,40 @@ shinyServer(function(input, output, session) {
     p1z1 <- input$p1z1
 
     # run model
-    run_mod(pars = parsin, inps = iniin, out_var = NULL,  p1z1 = p1z1)
+    out <- run_mod(inps = iniin, out_var = NULL,  p1z1 = p1z1)
+    
+    # returns stderr from terminal if error on model run
+    validate(
+      need(inherits(out, 'ncdf4'), as.character(out))
+    )
       
+    out
+    
   })
 
+  lab_vars <- eventReactive(runmod(), { 
+    
+    # remove these, not important to plot
+    lngs <- labels_fun()$lngs
+    torm <- c(
+      'Thickness of cell.', 
+      'Mask: 0 = land, 1 = water.',
+      'Cell bottom depth.', 
+      'Fast reacting organic matter in the initial and boundary conditions',
+      'Particulate organic matter derived from river outflow.'
+      )
+    lngs <- lngs[!lngs %in% torm]
+    return(lngs)
+    
+    })
+  
+  # update choices for select input uis with reactive out_var depending on model run
+  observe({
+    updateSelectInput(session, 'var1', choices = lab_vars(), selected = 'Molecular oxygen.')
+    updateSelectInput(session, 'var2', choices = lab_vars(), selected = 'Phosphate.')
+    updateCheckboxGroupInput(session, 'vars_in', choices = lab_vars(), selected = c('Molecular oxygen.', 'Phosphate.'))
+  })
+  
   # reset values
   observeEvent(input$resetAll, {
     session$sendCustomMessage(type = "resetFileInputHandler", "myfl")
@@ -61,7 +101,7 @@ shinyServer(function(input, output, session) {
   output$var1plot <- renderDygraph({
      
     alldat <- runmod()
-    
+
     # data to plot
     varsel <- input$var1
     dylog1 <- input$dylog1
