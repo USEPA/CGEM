@@ -60,6 +60,8 @@ shinyUI(fluidPage(
             h3('Simulation specifics and switches'),
             wellPanel(id = "specifics", style = "overflow-y:scroll; height:400px; max-height: 400px; background-color:#daf1da", 
               dateRangeInput('times', 'Series length', start = '2006-01-01', end = '2006-12-31'),
+              numericInput('dt1', HTML('dT (timestep, seconds)'), 300, step = 60),
+              numericInput('dt2', HTML('dT_out (output interval, seconds)'), 86400, step = 60),
               p(strong('Which Fluxes, toggle on(1) off(0): O2 surface flux, CO2 surface flux')),
               fluidRow(
                 column(width = 6, selectInput('Which_fluxes_1', label = NULL, choices = list('1' = 1, '0' = 0), width = '1200px', selected = '0')),

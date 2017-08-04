@@ -521,6 +521,10 @@ form_parinps <- function(react_ls){
     '- ending   time.*3' = as.numeric(format(times[2], '%d'))
     )
    
+  # dT names have to be changed, reset did not work with these
+  names(react_ls)[names(react_ls) %in% 'dt1'] <- '- dT (timestep, seconds); dT_out (output interval, seconds)_1'
+  names(react_ls)[names(react_ls) %in% 'dt2'] <- '- dT (timestep, seconds); dT_out (output interval, seconds)_2'
+
   # remove inputs that are not parameters, make sure this works
  
   # format parm names in input list for matching with new parm names
