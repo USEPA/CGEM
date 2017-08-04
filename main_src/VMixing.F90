@@ -10,7 +10,7 @@
 
       USE Model_dim
       USE INPUT_VARS, ONLY: dT
-      USE Grid, ONLY: fm,dz,d_sfc
+      USE Grid, ONLY: fm,dz,d_sfc,d,dzz
       !USE INPUT_VARS_CGEM
       USE State_Vars
       !USE CGEM_Vars
@@ -34,16 +34,19 @@
        !    if(fm(i,j).eq.1) then
            !  do k=2,fm(i,j)
              do k = 2, fm(i,j)
-!              A(k-1) = -dT*(Kh(i,j,k)+Kh0)
-               A(k-1) = -dT*Kh(i,j,k)                       &
-            &              /(dz(i,j,k-1)*(d_sfc(i,j,k)-d_sfc(i,j,k-1)))           
-!           &              /(dz(k-1)*dzz(k-1)*d(i,j)*d(i,j))
+               if (Which_gridio.eq.2) then
+                 A(k-1) = -dT*Kh(i,j,k)                       &
+            &                /(dz(i,j,k-1)*dzz(k-1)*d(i,j,k-1)*d(i,j,k-1))
        
-!              C(k  ) = -dT*(Kh(i,j,k)+Kh0)
-               C(k  ) = -dT*Kh(i,j,k)                       &
-            &              /(dz(i,j,k)*(d_sfc(i,j,k)-d_sfc(i,j,k-1)))            
-!           &              /(dz(k  )*dzz(k-1)*d(i,j)*d(i,j))
+                 C(k  ) = -dT*Kh(i,j,k)                       &
+            &                /(dz(i,j,k  )*dzz(k-1)*d(i,j,k-1)*d(i,j,k-1))
+               else
+                 A(k-1) = -dT*Kh(i,j,k)                       &
+            &                /(dz(i,j,k-1)*(d_sfc(i,j,k)-d_sfc(i,j,k-1)))           
        
+                 C(k  ) = -dT*Kh(i,j,k)                       &
+            &                /(dz(i,j,k)*(d_sfc(i,j,k)-d_sfc(i,j,k-1)))            
+               endif
              end do
              E(1) = A(1)/(A(1)-1.)
              do k=2, fm(i,j)-1

@@ -44,7 +44,7 @@ ifeq (iris,$(findstring iris,$(MY_HOST)))
   INC	   = $(IRIS_INC)
   LIBS	   = $(IRIS_LIBS)
   F90      = gfortran #ifort
-  FFLAGS = #-Warn all -traceback #-check -debug -g       #-g -fbacktrace -Wall
+  FFLAGS = -ffree-line-length-none #-Warn all -traceback #-check -debug -g       #-g -fbacktrace -Wall -ffree-line-length-none
   FFLAGS_SDM = -O3 
 else 
 ifeq (sol,$(findstring sol,$(MY_HOST)))

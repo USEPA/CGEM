@@ -5,7 +5,7 @@ IMPLICIT NONE
 
 ! Reference year all timestamps are relative to.
 
-      INTEGER, PARAMETER :: iYr0 = 1970
+!      INTEGER, PARAMETER :: iYr0 = 1970
 
 ! =========================================================
 ! Dimensions for Lisa's Fish Tank - USER modified part
@@ -21,6 +21,7 @@ IMPLICIT NONE
       INTEGER, SAVE :: Which_gridio
       INTEGER, SAVE :: b_layer !add a boundary layer?
       CHARACTER(200), SAVE :: DATADIR
+      INTEGER, SAVE :: iYr0
 
 CONTAINS
 
@@ -47,8 +48,14 @@ IMPLICIT NONE
       read(19,*) nospA
       read(19,*) nospZ
       read(19,*) Which_gridio
+      read(19,*) iYr0
       close(19)
-      nsl = nz_max + b_layer
+      
+      if (Which_gridio.eq.2) then !NCOM 
+        nsl = nz_max + 1
+      else
+        nsl = nz_max + b_layer
+      endif
 
       call Model_dim_allocate()
 

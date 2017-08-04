@@ -31,6 +31,7 @@ MAIN_OBJ  =  fillval.o\
 	USER_close_file.o\
 	USER_get_basic_grid.o\
         USER_get_EFDC_grid.o\
+        USER_get_NCOM_grid.o\
 	USER_getLonLat.o\
 	USER_get_masks.o\
 	USER_Set_Initial_Conditions.o\

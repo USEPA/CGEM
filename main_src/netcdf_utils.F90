@@ -140,14 +140,14 @@ CONTAINS
       deallocate(varDimIds)
     enddo
 
-    !populate var locations
+    !populate dim locations
     info%dimLocs=-1
     do i=1, info%nvars
-      if(info%dimNames(i) .eq. 'X' .or. info%dimNames(i) .eq. 'x') then
+      if(info%dimNames(i).eq.'X' .or. info%dimNames(i).eq.'x' .or. info%dimNames(i).eq.'I' .or. info%dimNames(i).eq.'i') then
         info%dimLocs(1) = i
-      else if (info%dimNames(i) .eq. 'Y' .or. info%dimNames(i) .eq. 'y') then
+      else if (info%dimNames(i).eq.'Y' .or. info%dimNames(i).eq.'y' .or. info%dimNames(i).eq.'J' .or. info%dimNames(i).eq.'j') then
         info%dimLocs(2) = i
-      else if (info%dimNames(i) .eq. 'Z' .or. info%dimNames(i) .eq. 'z') then
+      else if (info%dimNames(i).eq.'Z' .or. info%dimNames(i).eq.'z' .or. info%dimNames(i).eq.'K' .or. info%dimNames(i).eq.'k') then
         info%dimLocs(3) = i
       else if (info%dimNames(i) .eq. 'TIME' .or. info%dimNames(i) .eq. 'Time' .or. info%dimNames(i) .eq. 'time') then
         info%dimLocs(4) = i
@@ -157,11 +157,11 @@ CONTAINS
     !populate var locations
     info%varLocs=-1
     do i=1, info%nvars
-      if(info%varNames(i) .eq. 'X' .or. info%varNames(i) .eq. 'x') then
+      if(info%varNames(i) .eq. 'X' .or. info%varNames(i) .eq. 'x' .or. info%varNames(i) .eq. 'I' .or. info%varNames(i) .eq. 'i') then
         info%varLocs(1) = i
-      else if (info%varNames(i) .eq. 'Y' .or. info%varNames(i) .eq. 'y') then
+      else if (info%varNames(i) .eq. 'Y' .or. info%varNames(i) .eq. 'y' .or. info%varNames(i) .eq. 'J' .or. info%varNames(i) .eq. 'j') then
         info%varLocs(2) = i
-      else if (info%varNames(i) .eq. 'Z' .or. info%varNames(i) .eq. 'z') then
+      else if (info%varNames(i) .eq. 'Z' .or. info%varNames(i) .eq. 'z' .or. info%varNames(i) .eq. 'K' .or. info%varNames(i) .eq. 'k') then
         info%varLocs(3) = i
       else if (info%varNames(i) .eq. 'TIME' .or. info%varNames(i) .eq. 'Time' .or. info%varNames(i) .eq. 'time') then
         info%varLocs(4) = i
@@ -206,18 +206,18 @@ CONTAINS
 
     write(6,*)
     write(6,*) "Dimension : index"
-    write(6,'(a,i1)') "X : ", info%dimLocs(1)
-    write(6,'(a,i1)') "Y : ", info%dimLocs(2)
-    write(6,'(a,i1)') "Z : ", info%dimLocs(3)
-    write(6,'(a,i1)') "Time : ", info%dimLocs(4)
+    write(6,'(a,i3)') "X or I : ", info%dimLocs(1)
+    write(6,'(a,i3)') "Y or J: ", info%dimLocs(2)
+    write(6,'(a,i3)') "Z or K: ", info%dimLocs(3)
+    write(6,'(a,i3)') "Time : ", info%dimLocs(4)
 
     write(6,*)
     write(6,*) "Variable : index"
-    write(6,'(a,i1)') "X : ", info%varLocs(1)
-    write(6,'(a,i1)') "Y : ", info%varLocs(2)
-    write(6,'(a,i1)') "Z : ", info%varLocs(3)
-    write(6,'(a,i1)') "Time : ", info%varLocs(4)
-    write(6,'(a,i1)') "Var : ", info%varLocs(5)
+    write(6,'(a,i3)') "X or I: ", info%varLocs(1)
+    write(6,'(a,i3)') "Y or J: ", info%varLocs(2)
+    write(6,'(a,i3)') "Z or K: ", info%varLocs(3)
+    write(6,'(a,i3)') "Time : ", info%varLocs(4)
+    write(6,'(a,i3)') "Var : ", info%varLocs(5)
     
 
 
@@ -346,7 +346,12 @@ CONTAINS
     !write(6,*) " var_index = ", var_index
     !write(6,*) " tvar_index = ", tvar_index
     !write(6,*) " tdim_index = ", tdim_index
-    
+   
+#ifdef DEBUG_CWS
+    write(6,*)"Calling getTimeIndex for ", info%filename
+    write(6,*)"tdim_index = ", tdim_index
+    write(6,*)"tvar_index = ", tvar_index
+#endif 
     call getTimeIndex(info%ncid, t_current, tdim_index, tvar_index, tstep, t1, t2)
 
     allocate(var1(IM,JM,NSL))

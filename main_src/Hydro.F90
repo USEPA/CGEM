@@ -75,14 +75,24 @@
 
       integer :: i
 
-      !Set filenames for netCDF 
-      write(netcdf_fileNames(1), '(A, A)') trim(DATADIR), '/INPUT/Salt.nc'
-      write(netcdf_fileNames(2), '(A, A)') trim(DATADIR), '/INPUT/Temp.nc'
-      write(netcdf_fileNames(3), '(A, A)') trim(DATADIR), '/INPUT/UFlow.nc'
-      write(netcdf_fileNames(4), '(A, A)') trim(DATADIR), '/INPUT/VFlow.nc'
-      write(netcdf_fileNames(5), '(A, A)') trim(DATADIR), '/INPUT/WFlow.nc'
-      write(netcdf_fileNames(6), '(A, A)') trim(DATADIR), '/INPUT/Ev.nc'
-      write(netcdf_fileNames(7), '(A, A)') trim(DATADIR), '/INPUT/SurfaceElev.nc'
+      !Set filenames for netCDF
+      if (Which_gridio .eq. 1) then 
+         write(netcdf_fileNames(1), '(A, A)') trim(DATADIR), '/INPUT/Salt.nc'
+         write(netcdf_fileNames(2), '(A, A)') trim(DATADIR), '/INPUT/Temp.nc'
+         write(netcdf_fileNames(3), '(A, A)') trim(DATADIR), '/INPUT/UFlow.nc'
+         write(netcdf_fileNames(4), '(A, A)') trim(DATADIR), '/INPUT/VFlow.nc'
+         write(netcdf_fileNames(5), '(A, A)') trim(DATADIR), '/INPUT/WFlow.nc'
+         write(netcdf_fileNames(6), '(A, A)') trim(DATADIR), '/INPUT/Ev.nc'
+         write(netcdf_fileNames(7), '(A, A)') trim(DATADIR), '/INPUT/SurfaceElev.nc'
+      else if (Which_gridio .eq. 2) then
+         write(netcdf_fileNames(1), '(A, A)') trim(DATADIR), '/INPUT/S.nc'
+         write(netcdf_fileNames(2), '(A, A)') trim(DATADIR), '/INPUT/T.nc'
+         write(netcdf_fileNames(3), '(A, A)') trim(DATADIR), '/INPUT/U.nc'
+         write(netcdf_fileNames(4), '(A, A)') trim(DATADIR), '/INPUT/V.nc'
+         write(netcdf_fileNames(5), '(A, A)') trim(DATADIR), '/INPUT/W.nc'
+         write(netcdf_fileNames(6), '(A, A)') trim(DATADIR), '/INPUT/KH.nc'
+         write(netcdf_fileNames(7), '(A, A)') trim(DATADIR), '/INPUT/E.nc'
+      endif
 
       do i=1,7
         call open_netcdf(netcdf_fileNames(i), 0, hydro_info(i)%ncid)

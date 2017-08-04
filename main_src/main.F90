@@ -79,7 +79,7 @@ write(6,*) "After Read_InputFile"
       write(6,*) "start,dT",START_SECONDS, dT
 #endif
 
-      if (Which_gridio.eq.1) then
+      if (Which_gridio .gt. 0) then
         call Init_Hydro_NetCDF() 
       endif
 #ifdef DEBUG
@@ -94,9 +94,9 @@ write(6,*) "After Set_Vars"
 #endif
 
 ! Add blip for testing advection
-#ifdef DEBUG_CWS
-      f(12,25,1,25) = 300
-#endif
+!#ifdef DEBUG_CWS
+!      f(12,25,1,25) = 300
+!#endif
 
       call Initialize_Output(Which_code,BASE_NETCDF_OUTPUT_FILE_NAME)     !Open file and write initial configuration
 #ifdef DEBUG
@@ -121,15 +121,31 @@ write(6,*) "Before loop"
 
       if (Which_gridio.eq.1) then
         call USER_update_EFDC_grid(TC_8)
+      else if (Which_gridio.eq.2) then
+        call USER_update_NCOM_grid(TC_8)
       endif
+
+#ifdef DEBUG_CWS
+nstep = 1 
+write(6,*)"DEBUG - setting nstep to ",nstep
+#endif
 
 
 !-------------- START TIME LOOP -----------------------------------
       do istep = 1, nstep
        TC_8 = TC_8 + dT
+      write(6,*)"TC_8=",TC_8
 #ifdef DEBUG
       write(6,*) "TC_8",TC_8
 #endif 
+!       call Get_Vars(TC_8) !Hydro, Solar, Wind, Temp, Salinity
+!#ifdef DEBUG
+!write(6,*) "After Get_Vars"
+!write(6,*) "T",T
+!write(6,*) "S",S
+!write(6,*) "Rad",Rad
+!write(6,*) "Wind",Wind
+!#endif
 
 #ifdef DEBUG_CWS
       write(6,*) "TC_8",TC_8
@@ -137,7 +153,11 @@ write(6,*) "Before loop"
       if (Which_gridio.eq.1) then
         Vol_prev = Vol
         call USER_update_EFDC_grid(TC_8)
+      elseif (Which_gridio.eq.2) then
+        Vol_prev = Vol
+        call USER_update_NCOM_grid()
       endif
+
 
        call Get_Vars(TC_8) !Hydro, Solar, Wind, Temp, Salinity
 #ifdef DEBUG
@@ -147,6 +167,13 @@ write(6,*) "S",S
 write(6,*) "Rad",Rad
 write(6,*) "Wind",Wind
 #endif
+
+     
+     if (Which_gridio.eq.1) then
+       !This requires the S variable.  Does this need to occur at every timestep
+       !or just the first?
+       call USER_update_masks()
+     endif
 
        call WQ_Model(Which_code,TC_8,istep,istep_out)
 #ifdef DEBUG

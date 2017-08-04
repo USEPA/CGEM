@@ -42,7 +42,7 @@
             call USER_Read(TC_in,Wind,'w',init)
           endif
 
-        else if (Which_gridio.eq.1) then
+        else if (Which_gridio.eq.1 .or. Which_gridio.eq.2) then
           call interpVar(hydro_info(eSal), TC_8, startIndex(eSal), S)  
           call interpVar(hydro_info(eTemp), TC_8, startIndex(eTemp), T) 
           call interpVar(hydro_info(eUx), TC_8, startIndex(eUx), Ux)   
