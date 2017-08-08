@@ -134,7 +134,7 @@ write(6,*)"DEBUG - setting nstep to ",nstep
 !-------------- START TIME LOOP -----------------------------------
       do istep = 1, nstep
        TC_8 = TC_8 + dT
-      write(6,*)"TC_8=",TC_8
+
 #ifdef DEBUG
       write(6,*) "TC_8",TC_8
 #endif 

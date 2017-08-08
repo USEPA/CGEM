@@ -12,6 +12,7 @@
 
       real :: tmpi(im), tmpj(jm)
 
+
       write(filename,'(A, A)') trim(DATADIR),'/latlon.dat'
       open (19,file=filename,status='old')
 
@@ -44,8 +45,8 @@
 
       do j=1,jm
        do i=1,im
-        if(lat(i,j)<=-9999) lat(i,j)=fill(0)
-        if(lon(i,j)<=-9999) lon(i,j)=fill(0)
+        if(lat(i,j)<=-9999) lat(i,j)=fill(1)
+        if(lon(i,j)<=-9999) lon(i,j)=fill(1)
        enddo
       enddo
 

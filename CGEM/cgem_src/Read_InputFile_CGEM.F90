@@ -52,6 +52,7 @@ read(999,*) Kw
 read(999,*) Kcdom
 read(999,*) Kspm
 read(999,*) Kchla
+
 read(999,*) astar490
 read(999,*) aw490
 read(999,*) astarOMA
