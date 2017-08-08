@@ -545,7 +545,8 @@ shinyUI(fluidPage(
               
               fluidRow(
                 column(width = 4, numericInput('G1', label = 'Zooplankton group 1 (individuals/m3)', 1500, width = '400px', step = 100)),
-                column(width = 4, numericInput('G2', label = 'Zooplankton group 2 (individuals/m3)', 1500, width = '400px', step = 100))
+                column(width = 4, numericInput('G2', label = 'Zooplankton group 2 (individuals/m3)', 1500, width = '400px', step = 100)),
+                column(width = 4, numericInput('Si', label = 'Si, silica (mmol/m3)', 71, width = '400px', step = 1))
               ),
               
               fluidRow(
@@ -573,18 +574,11 @@ shinyUI(fluidPage(
   		),
               
               fluidRow(
-                column(width = 4, numericInput('Si', label = 'Si, silica (mmol/m3)', 71, width = '400px', step = 1)),
-		column(width = 4, numericInput('CDOM', label = 'CDOM, chromophoric dissolved organic matter (ppb)', 20, width = '400px', step = 1))
-              ),
-
-	      fluidRow(
-                column(width = 1, numericInput('OM1_rp', label = 'OM1_rp: particulate organic matter riverine (mmolC/m3)', 0, width = '0px', step = 1)),
-                column(width = 1, numericInput('OM2_rp', label = 'OM2_rp, dissolved organic matter riverine (mmolC/m3)', 0, width = '0px', step = 1))
+                column(width = 4, numericInput('CDOM', label = 'CDOM, chromophoric dissolved organic matter (ppb)', 20, width = '400px', step = 1)),
+                column(width = 4, numericInput('OM1_rp', label = 'OM1_rp: particulate organic matter riverine (mmolC/m3)', 0, width = '400px', step = 1)),
+                column(width = 4, numericInput('OM2_rp', label = 'OM2_rp, dissolved organic matter riverine (mmolC/m3)', 0, width = '400px', step = 1))
               )
 
-
-              
-              
             )
             
           )
