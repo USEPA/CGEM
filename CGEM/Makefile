@@ -56,7 +56,7 @@ else
   INC      = $(OTHER_INC)
   LIBS     = $(OTHER_LIBS)
   F90     = gfortran 
-  FFLAGS = -lgfortran 
+  FFLAGS = -ffree-line-length-none 
 endif
 endif
 
