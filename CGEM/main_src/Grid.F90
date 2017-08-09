@@ -100,9 +100,9 @@
       ALLOCATE(wsm(im,jm))
 
       if (Which_gridio .eq. 2) then
-         ALLOCATE(zz(nsl))
-         ALLOCATE(zl(nsl))
-         ALLOCATE(dzz(nsl))
+         ALLOCATE(zz(35))
+         ALLOCATE(zl(35))
+         ALLOCATE(dzz(35))
          ALLOCATE(h(im,jm))
          zz=fill(0)
          zl=fill(0)

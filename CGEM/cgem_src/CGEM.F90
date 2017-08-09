@@ -219,6 +219,10 @@
     !fill(1) is for -9999
     fill_val=fill(1)
 
+#ifdef DEBUGVARS
+   write(6,*) "T,S=",T,S
+#endif
+
    if(init.eq.1) then  
 
 !Initialize netCDF output variables

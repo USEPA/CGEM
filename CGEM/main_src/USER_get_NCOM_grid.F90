@@ -19,7 +19,7 @@
       integer :: i,j,k
       character(200) filename
 
-      real, dimension(nsl) :: dz_temp
+      real, dimension(35) :: dz_temp
       integer :: nzr, ns
 
       write(filename,'(A, A)') trim(DATADIR),'/dxdy.dat'
@@ -47,8 +47,11 @@
       do i=1,im
       do j=1,jm
       do k=1,nzr
-         dz(i,j,k) = 1
-         !dz(i,j,k) = dz_temp(k)
+         !L3: was this for debugging?  dz(i,j,k) = 1
+         dz(i,j,k) = dz_temp(k)
+#ifdef DEBUG
+      write(6,*) "dz, Hs, k=",k,Hs,dz_temp(k)
+#endif
       enddo
       enddo
       enddo
@@ -100,9 +103,22 @@
       do j=1,jm
        do i=1,im
           h(i,j) = amin1(h(i,j), Hs)   !Depth for sigma layers, maximum depth 100
+#ifdef DEBUG
+ write(6,*) "h,Hs",i,j,h(i,j),Hs
+#endif
        enddo
       enddo
 
+       do k=1,nsl
+        do j=1,jm
+         do i=1,im
+          d_sfc(i,j,k) = h(i,j)*zz(k)
+#ifdef DEBUG
+ write(6,*) "d_sfc",i,j,k,d_sfc(i,j,k)
+#endif
+        enddo
+       enddo
+      enddo
 
       return
 

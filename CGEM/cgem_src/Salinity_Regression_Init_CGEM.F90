@@ -10,12 +10,13 @@ Subroutine Salinity_Regression_Init_CGEM()
   USE State_Vars
   USE Grid
   USE Fill_Value
+  USE Hydro, ONLY:S,T
 
   implicit none
 
   real temp,temp_OM1,temp_OM2,total_chl
   real, dimension(1) :: pdbar, rhois !pressure, density
-  real, dimension(im,jm,nsl) :: T,S
+!L3  real, dimension(im,jm,nsl) :: T,S
   integer i,j,k,isp
 
 #ifdef DEBUG
@@ -40,7 +41,7 @@ Subroutine Salinity_Regression_Init_CGEM()
 
         do k=1,nza(i,j)
 
-#ifdef DEBUG
+#ifdef DEBUGVARS
       write(6,*) "In Salinity Regression loop"
       write(6,*) "S,T,d_sfc",S(i,j,k),T(i,j,k),d_sfc(i,j,k)
 #endif

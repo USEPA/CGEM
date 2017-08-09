@@ -1,0 +1,9 @@
+ Biogeochem equations are: CGEM  
+ Base Outputfile Name will be: ./NETCDF/output.
+ Inputfile will be: GEM_InputFile
+ Initial Conditions filename will be: InitialConditions.txt
+ temp=  -6.47123395E+10
+ DIC=   2110.16992    
+ Unacceptable value in one or more of the following:
+ i, icount, tempis(i), sal,    alk,    dic,    sil,    phos =           1           1  -6.47123395E+10  -6.47123395E+10   2.49805903       2.11016989       6.62318431E-03   9.99999975E-06
+ Execution will stop (Subroutine vars.F90)

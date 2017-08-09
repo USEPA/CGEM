@@ -43,6 +43,10 @@ else
    stop
 endif
 
+#ifdef DEBUGVARS
+write(6,*) f
+#endif
+
 if(DoDroop.eq.1) then
  do j = 1,jm
      do i = 1,im 
@@ -76,6 +80,10 @@ else
    enddo      ! end of do i block do loop
  enddo      ! end of do j block do loop
 endif
+
+#ifdef DEBUGVARS
+write(6,*) f
+#endif
 
 
 if(Which_Fluxes(iInRemin).eq.1) then
