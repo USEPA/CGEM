@@ -135,10 +135,6 @@
       IMPLICIT NONE
 
       integer :: i,j,k, nz
-!      integer(kind=8) :: TC_8
-
-!      call interpVar(grid_info(eColDepth), TC_8, gridStartIndex(eColDepth), depth)
-!      call interpVar(grid_info(eCellDepth), TC_8, gridStartIndex(eCellDepth), dz)
 
       d = fill(0) 
       d_sfc = fill(0) 
@@ -172,19 +168,5 @@
        enddo
       enddo  
 
-!      do j=1,jm
-!       do i=1,im
-!          if(depth(i,j).eq.0) depth(i,j)=fill(0)
-!          nz=nza(i,j)
-!          do k=1,nz !do loop will not execute if nza=0
-!           d_sfc(i,j,k) = sum(dz(i,j,1:(k-1))) + dz(i,j,k)/2. 
-!           d(i,j,k) = sum(dz(i,j,1:k)) !bottom of cell 
-!           Vol(i,j,k) = area(i,j) * dz(i,j,k)
-!#ifdef DEBUG
-!           write(6,*) i,j,k,dz(i,j,k),d_sfc(i,j,k),d(i,j,k)
-!#endif
-!          enddo
-!       enddo
-!      enddo
       end subroutine USER_update_NCOM_grid
 

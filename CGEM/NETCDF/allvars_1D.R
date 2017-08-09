@@ -9,7 +9,7 @@ if(!exists("which_eqs")){
 which_eqs <- "cgem"
 }
 if(!exists("ncfile")){
-ncfile<-"cgem_1D.nc"
+ncfile<-"output.000000.nc"
 }
 
 nc<-nc_open(ncfile)

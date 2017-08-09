@@ -65,14 +65,14 @@ CONTAINS
     INTEGER,INTENT(IN):: DT_OUT ! Model timestep size in seconds.
     REAL,DIMENSION(IM,JM):: RLON
     REAL,DIMENSION(IM,JM):: RLAT
-    REAL,DIMENSION(IM,JM):: H
-    REAL,DIMENSION(IM, JM, NSL):: DZ,AREA
+    REAL,DIMENSION(IM,JM,NSL):: H
+    REAL,DIMENSION(IM, JM, NSL):: DZ
+    REAL,DIMENSION(IM,JM):: AREA
     INTEGER,DIMENSION(IM, JM),INTENT(IN):: FM
    ! External NetCDF routines:
     INTEGER NF_CREATE, NF_ENDDEF, NF_PUT_VAR_INT, NF_PUT_VAR_REAL, NF_SYNC
     EXTERNAL NF_CREATE, NF_ENDDEF, NF_PUT_VAR_INT, NF_PUT_VAR_REAL, NF_SYNC
    ! Locals:
-    REAL,DIMENSION(IM, JM, NSL):: TEMP_3D_H ! VLA
     INTEGER,DIMENSION(IM, JM, NSL):: TEMP_3D_FM ! VLA
     INTEGER IM_DIM, JM_DIM, NSL_DIM, NSTEPP1_DIM
     INTEGER RLON_VAR, RLAT_VAR, H_VAR, FM_VAR
@@ -401,7 +401,7 @@ write(6,*) "After fm"
 write(6,*) "After dz"
 #endif
 
-    CALL DEFVR3( FILE_ID, IM_DIM, JM_DIM, NSL_DIM, AREA_VAR, 'Area', &
+    CALL DEFVR2( FILE_ID, IM_DIM, JM_DIM, AREA_VAR, 'Area', &
                  'Area of cell.', 'm2' )
 #ifdef DEBUG
 write(6,*) "After Area"
@@ -491,12 +491,8 @@ write(6,*) "After Extra_Vars"
     ERR = NF_PUT_VAR_REAL( FILE_ID, RLAT_VAR, RLAT )
     CALL CHKERR( ERR, 'write output variable rlat' )
 
-    ! Write h in 3D
-
-    DO K = 1, NSL
-      TEMP_3D_H(:,:,K) = H 
-    END DO
-    ERR = NF_PUT_VAR_REAL( FILE_ID, H_VAR, TEMP_3D_H )
+    ! Write h
+    ERR = NF_PUT_VAR_REAL( FILE_ID, H_VAR, H )
     CALL CHKERR( ERR, 'write output variable h' )
 
     ! Write fm in 3D

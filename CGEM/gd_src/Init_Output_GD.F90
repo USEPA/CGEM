@@ -16,35 +16,23 @@
        ! Change True/False parameters for netCDF Write Variables
        !L3 add Which_Output to GD InputFile
        !if(Which_Output.eq.2) call OUTPUT_ALL_FALSE() 
-#ifdef DEBUG
-write(6,*) "In Output_GD"
-#endif
 
-      WRITE ( NETCDF_OUTPUT_FILE_NAME, '(A, I6.6, A)' )&
+       WRITE ( NETCDF_OUTPUT_FILE_NAME, '(A, I6.6, A)' )&
               trim(BASE_NETCDF_OUTPUT_FILE_NAME), 0, '.nc'
-write(6,*) im,jm,nsl,nstep,nf,EXTRA_VARIABLES
+
           CALL CREATE_FILE( trim(NETCDF_OUTPUT_FILE_NAME), &
                             im, jm, nsl, nstep, nf, EXTRA_VARIABLES, &
                             iYr0, &
                             IYRS, IMONS, IDAYS, IHRS, IMINS, ISECS, &
                             IYRE, IMONE, IDAYE, IHRE, IMINE, ISECE, &
                             DT_OUT, &
-                            LON, LAT, Depth, FM, &
+                            LON, LAT, d, FM, &
                             DZ, AREA )
-#ifdef DEBUG
-write(6,*) "After create"
-#endif
 
           CALL CLOSE_FILE()
-#ifdef DEBUG
-write(6,*) "After close"
-#endif
 
-! Opens the output file for writing:
+      ! Opens the output file for writing:
        CALL OPEN_FILE( trim(NETCDF_OUTPUT_FILE_NAME), nf, EXTRA_VARIABLES, 0 )
-#ifdef DEBUG
-write(6,*) "After Open"
-#endif
 
        CALL WRITE_DATA( im, jm, nsl, nf, 0, f)
 

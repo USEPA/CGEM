@@ -85,7 +85,7 @@ write(6,*) "After Set_Vars"
 !      f(12,25,1,25) = 300
 !#endif
 
-      call Initialize_Output(Which_code,BASE_NETCDF_OUTPUT_FILE_NAME)     !Open file and write initial configuration
+!L3-move!      call Initialize_Output(Which_code,BASE_NETCDF_OUTPUT_FILE_NAME)     !Open file and write initial configuration
 
 ! Initialize time an loop variables
       istep = 0
@@ -96,6 +96,10 @@ write(6,*) "After Set_Vars"
       else if (Which_gridio.eq.2) then
         call USER_update_NCOM_grid(TC_8)
       endif
+
+
+      call Initialize_Output(Which_code,BASE_NETCDF_OUTPUT_FILE_NAME)     !Open file and write initial configuration
+
 
 #ifdef DEBUG_CWS
 nstep = 1 
@@ -138,8 +142,6 @@ write(6,*) "Wx",Wx
 
      
      if (Which_gridio.eq.1) then
-       !This requires the S variable.  Does this need to occur at every timestep
-       !or just the first?
        call USER_update_masks()
      endif
 

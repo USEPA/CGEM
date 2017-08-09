@@ -60,9 +60,6 @@
          Wx=0.
         endif
 
-        !Kh=0.
-        !E=0.
-
 #ifdef DEBUG
         write(6,*) "Kh",Kh
         write(6,*) "E",E
