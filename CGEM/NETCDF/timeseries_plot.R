@@ -21,7 +21,8 @@ axis(2, at=get_lab(ylimit), labels=get_lab(ylimit), las=2)
 
 
 #Adds lines to an existing plot, can change color but not labels or ranges (for comparisons)
-timeseries_add_lines <- function(Var,time,rdata,color="red"){
+timeseries_addlines <- function(Var,time,rdata,color="red"){
+lines(time,rdata,col=color)
 }
 
 

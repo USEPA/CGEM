@@ -45,52 +45,39 @@
 ! --- Command Line Arguments for file names ---
       call Command_Line_Args(Which_code,input_filename,init_filename,BASE_NETCDF_OUTPUT_FILE_NAME)
 
-#ifdef DEBUG
-write(6,*) "After Command_Line_Args"
-#endif
-
       call Set_Model_dim()
-
-#ifdef DEBUG
-write(6,*) "After Set_Model_dim"
-#endif
 
       call Set_Grid(TC_8)
 
-#ifdef DEBUG
-write(6,*) "After Set_Grid"
-#endif
-
       call Allocate_Input(Which_code)
-#ifdef DEBUG
-write(6,*) "After Allocate_Input"
-#endif
 
       call Allocate_Hydro
       !L3 Take care of ws here
-#ifdef DEBUG
-write(6,*) "After Allocate_Hydro"
-#endif
+
 ! Read_InputFile must define nstep, iout, dT, START_SECONDS
       call Read_InputFile(input_filename,Which_code) 
-#ifdef DEBUG
 
+#ifdef DEBUG
 write(6,*) "After Read_InputFile"
       write(6,*) "start,dT",START_SECONDS, dT
 #endif
 
+!L3--- This next line is from Ko, but I have no idea why this is necessary.
+! Check to see if we can just use START-dT or move the time increment to
+! the bottom of the loop.
+
+      TC_8 = START_SECONDS - (dT / 2) ! Subtract half dT to 'center' of timestep.
+
       if (Which_gridio .gt. 0) then
-        call Init_Hydro_NetCDF() 
+        call Init_Hydro_NetCDF()
+        call Get_Vars(TC_8) !Hydro for initial timestep 
       endif
-#ifdef DEBUG
-write(6,*) "After Init_Hydro_NetCDF"
-#endif
 
       call Set_Vars(Which_code,init_filename) !initialize 'f' array
+
 #ifdef DEBUG
 write(6,*) "After Set_Vars"
-      write(6,*) "start,dT",START_SECONDS, dT
-
+      write(6,*) "S,T",S,T
 #endif
 
 ! Add blip for testing advection
@@ -99,25 +86,10 @@ write(6,*) "After Set_Vars"
 !#endif
 
       call Initialize_Output(Which_code,BASE_NETCDF_OUTPUT_FILE_NAME)     !Open file and write initial configuration
-#ifdef DEBUG
-write(6,*) "After Initialize_Output"
-#endif
+
 ! Initialize time an loop variables
       istep = 0
       istep_out = 0
-
-!L3--- This next line is from Ko, but I have no idea why this is necessary.
-! Check to see if we can just use START-dT or move the time increment to
-! the bottom of the loop.
-
-      TC_8 = START_SECONDS - (dT / 2) ! Subtract half dT to 'center' of timestep.
-
-#ifdef DEBUG
-      write(6,*) "TC_8,start,dT",TC_8,START_SECONDS, dT
-
-write(6,*) "Before loop"
-#endif
-
 
       if (Which_gridio.eq.1) then
         call USER_update_EFDC_grid(TC_8)
@@ -138,18 +110,7 @@ write(6,*)"DEBUG - setting nstep to ",nstep
 #ifdef DEBUG
       write(6,*) "TC_8",TC_8
 #endif 
-!       call Get_Vars(TC_8) !Hydro, Solar, Wind, Temp, Salinity
-!#ifdef DEBUG
-!write(6,*) "After Get_Vars"
-!write(6,*) "T",T
-!write(6,*) "S",S
-!write(6,*) "Rad",Rad
-!write(6,*) "Wind",Wind
-!#endif
 
-#ifdef DEBUG_CWS
-      write(6,*) "TC_8",TC_8
-#endif 
       if (Which_gridio.eq.1) then
         Vol_prev = Vol
         call USER_update_EFDC_grid(TC_8)
@@ -160,13 +121,20 @@ write(6,*)"DEBUG - setting nstep to ",nstep
 
 
        call Get_Vars(TC_8) !Hydro, Solar, Wind, Temp, Salinity
+
 #ifdef DEBUG
 write(6,*) "After Get_Vars"
 write(6,*) "T",T
 write(6,*) "S",S
 write(6,*) "Rad",Rad
 write(6,*) "Wind",Wind
+write(6,*) "E",E
+write(6,*) "Kh",Kh
+write(6,*) "Ux",Ux
+write(6,*) "Vx",Vx
+write(6,*) "Wx",Wx
 #endif
+
 
      
      if (Which_gridio.eq.1) then
@@ -176,29 +144,36 @@ write(6,*) "Wind",Wind
      endif
 
        call WQ_Model(Which_code,TC_8,istep,istep_out)
+
 #ifdef DEBUG
 write(6,*) "After WQ_Model"
 write(6,*) "istep=",istep
+write(6,*) "CDOM",f(1,1,1:nsl,32)
 #endif
     
        call Flux(Which_code,istep)
+
 #ifdef DEBUG
 write(6,*) "After Flux"
+write(6,*) "CDOM",f(1,1,1:nsl,32)
 #endif
 
        call Transport(Which_code)
+
 #ifdef DEBUG
 write(6,*) "After Transport"
+write(6,*) "CDOM",f(1,1,1:nsl,32)
 #endif
 
       ! -------------- BEGIN OUTPUT DATA
       ! --- dump output when istep is a multiple of iout
        if (  mod( istep, iout ) .eq. 0 ) then
+        write(6,*) "output=",istep_out+1
         istep_out = istep_out + 1
         call Model_Output(Which_Code,istep_out)
        endif
 
-#ifdef DEBUG
+#ifdef DEBUG_BASIC
 write(6,*) "After Model_Output"
 #endif
 

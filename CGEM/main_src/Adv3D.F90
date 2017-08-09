@@ -53,7 +53,13 @@
 !      !enddo 
 !#endif
 
-
+#ifdef DEBUG
+ write(6,*) "In Advection"
+ write(6,*) "area, fm2",area,fm2
+ write(6,*) "u,v,w",Ux,Vx,Wx
+ write(6,*) "wsm,ws",wsm,ws
+ write(6,*) "Vol, Vol_prev",Vol,Vol_prev
+#endif
 ! --------loop over each variable
       do ii = 1,nf
 

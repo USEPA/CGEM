@@ -54,11 +54,22 @@
           Wind = 5
         endif 
 
-        !Ux=0.
-        !Vx=0.
-        !Wx=0.
+        if(im*jm.eq.1) then
+         Ux=0.
+         Vx=0.
+         Wx=0.
+        endif
+
         !Kh=0.
         !E=0.
+
+#ifdef DEBUG
+        write(6,*) "Kh",Kh
+        write(6,*) "E",E
+        write(6,*) "S",S
+        write(6,*) "T",T
+#endif
+
         init=0
 
        return

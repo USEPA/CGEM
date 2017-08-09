@@ -143,10 +143,11 @@
       d = fill(0) 
       d_sfc = fill(0) 
 
-
-      do j=1,jm
-       do i=1,im
-          d(i,j,:) = h(i,j)+E(i,j)
+      do k=1,nsl
+       do j=1,jm
+        do i=1,im
+          d(i,j,k) = h(i,j)+E(i,j)
+        enddo
        enddo
       enddo
 
@@ -155,6 +156,18 @@
         do i=1,im
           d_sfc(i,j,k) = d(i,j,k)*zz(k)
           Vol(i,j,k) = area(i,j) *dz(i,j,k)*d(i,j,k)
+
+#ifdef DEBUG
+  write(6,*) i,j,k
+  write(6,*) "h",h(i,j)
+  write(6,*) "E",E(i,j)
+  write(6,*) "d",d(i,j,k)
+  write(6,*) "zz",zz(k)
+  write(6,*) "area",area
+  write(6,*) "d_sfc",d_sfc(i,j,k)
+  write(6,*) "Vol",Vol(i,j,k)
+#endif
+
         enddo
        enddo
       enddo  

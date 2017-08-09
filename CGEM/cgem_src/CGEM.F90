@@ -271,9 +271,6 @@
 
    endif  ! endif(init.eq.1) ------------------------------------
 
-#ifdef _CGEM 
-write(6,*) "A",f(1,1,1,iA(1:nospA))
-#endif
 
 
        optNP = ZQn/ZQp    ! Optimal nutrient ratio for zooplankton
@@ -322,9 +319,6 @@ write(6,*) "A",f(1,1,1,iA(1:nospA))
            aDailyRad_k(k) = aDailyRad(i,j,k)
       enddo ! End of the "DO k = 1, nz" block DO loop
 
-#ifdef _CGEM
-write(6,*) "2, A",f(1,1,1,iA(1:nospA))
-#endif
 
 !----------------------------------------------------------------
 !
@@ -510,9 +504,6 @@ write(6,*) "2, A",f(1,1,1,iA(1:nospA))
      & Qn_k   , Qp_k, N_k, P_k, Si_k , A_k     , Agrow_k,                  &
      & uA_k, Aresp_k, uN_k, uP_k, uE_k, uSi_k, nz  )
 
-#ifdef _CGEM
-write(6,*) "Aresp_k",Aresp_k
-#endif
 
 ! Save arrays to output to netCDF
      do k = 1,nz
@@ -550,10 +541,6 @@ write(6,*) "Aresp_k",Aresp_k
 
           do isp = 1, nospA
 	     monodZ(isp,:)  = top_A(isp,:)/(ZKa(:) + bottom(:))
-#ifdef DEBUG
-             write(6,*) "Abiovol,Athresh,edible",Abiovol,Athresh(isp),ediblevector(:,isp)
-             write(6,*) "monod:top,ZKa,bottom",top_A(isp,:),ZKa(:),bottom(:)
-#endif
 	  enddo 
 
 
@@ -633,9 +620,6 @@ write(6,*) "Aresp_k",Aresp_k
 ! Calculate dead phytoplankton, particulate and dissolved  
 !-------------------------------------------------------------------------      
      Amort(isp)     = A_k(isp,k) * mA(isp)    ! dead phytoplankton (cells/m3/day)
-#ifdef _CGEM
-write(6,*) "Amort",Amort(isp)
-#endif
 
    !Monod Equations
      Ntotal       = NO3 + NH4 
@@ -704,9 +688,6 @@ write(6,*) "Amort",Amort(isp)
       AupN = AupN + A_k(isp,k)*vN     ! Phytoplankton uptake of Nitrogen (mmol-N/m3/d)
       AupP = AupP + A_k(isp,k)*vP     ! Phytoplankton uptake of Phosphorus (mmol-P/m3/d) 
       AupSi = AupSi + A_k(isp,k)*vSi  ! Phytoplankton uptake of Silica (mmol-Si/m3/d)
-#ifdef _CGEM
-write(6,*) "A_k",A_k(isp,k)
-#endif
  
 !-----------------------------------------------------------------------
 ! Note that Zumax(1)*monodZ(isp,1) is volume of type isp phytoplankton
@@ -734,15 +715,6 @@ write(6,*) "A_k",A_k(isp,k)
 !---------------------------------------------------------
       ff(i,j,k,iA(isp)) = AMAX1(f(i,j,k,iA(isp))                              &
       & + ( Agrow - Aresp - ZgrazA_tot(isp) - Amort(isp) )*dTd,1.)
-
-#ifdef _CGEM
-write(6,*) "isp=",isp,"Agrow=",Agrow
-write(6,*) "Aresp",Aresp
-write(6,*) "ZgrazA_tot,Z,Zumax,monodZ",ZgrazA_tot(isp),Z(:),Zumax(:),monodZ(isp,:)
-write(6,*) "Amort",Amort(isp)
-write(6,*) "dTd",dTd
-write(6,*)
-#endif
 
 
 !----------------------------------------------------------------------
@@ -910,11 +882,6 @@ write(6,*) "DIC=",f(i,j,k,iDIC)
         RSi_A      = RC(8)
         RALK_A     = RC(9)
         RN2_A      = RC(10)
-#ifdef DEBUG
-write(6,*) "RC",RC
-write(6,*) "OM1_A, OM2_A, O2, NO3, KG1, KG2, KO2, KstarO2, KNO3",OM1_A, OM2_A, O2, NO3, KG1, KG2, KO2, KstarO2, KNO3
-write(6,*) "s,T",s_x1A(i,j,k), s_y1A(i,j,k), s_z1A(i,j,k), s_x2A(i,j,k), s_y2A(i,j,k), s_z2A(i,j,k), T_k(k)
-#endif
 
 !------------------------------------------------------------
 ! Particulate and Dissolved fecal pellets, rate of remineralization
@@ -995,11 +962,6 @@ write(6,*) "s,T",s_x1A(i,j,k), s_y1A(i,j,k), s_z1A(i,j,k), s_x2A(i,j,k), s_y2A(i
 ! Save RO2 as CBODW
   CBODW(i,j) = RO2 !The last time this happens, k=nz, so will be the bottom
 !--------------------------------------------------------------------
-#ifdef DEBUG
-write(6,*) "RNO3_A,RNO3_Z,RNO3_R,RNO3_BC",RNO3_A,RNO3_Z,RNO3_R,RNO3_BC
-write(6,*) "RNH4_A,RNH4_Z,RNH4_R,RNH4_BC",RNH4_A,RNH4_Z,RNH4_R,RNH4_BC
-write(6,*) "R11",R_11
-#endif
 
 !---------------------------------------------------------------------
 ! Stoichiometry - calculate C:N:P ratios for Remineralization equations
@@ -1147,11 +1109,6 @@ enddo
        ff(i,j,k,iNH4) = AMAX1(f(i,j,k,iNH4)                            &
        & + ( RNH4 - AupN*NH4/(NO3+NH4) + 2.*AexudN + SUM(ZexN)  )*dTd, 0.0)          
 
-#ifdef DEBUG
- write(6,*) "f,RNO3,AupN,NO3",f(i,j,k,iNO3),RNO3,AupN,NO3
- write(6,*) "f,RNH4,AupN,NH4",f(i,j,k,iNH4),RNH4,NH4,AexudN,ZexN
-#endif
-
 !----------------------------
 !-Silica: (mmol-Si/m3)
 !----------------------------
@@ -1236,7 +1193,11 @@ enddo
 !-CDOM: (ppb) 
 !----------------------------
        ff(i,j,k,iCDOM) =  AMAX1(f(i,j,k,iCDOM)*(1.0 - KGcdom*dTd), 0.0)  
-!       write(6,*) istep,"CDOM",f(i,j,k,iCDOM),ff(i,j,k,iCDOM),(1.0 - KGcdom*dTd)
+
+#ifdef DEBUG
+  write(6,*) istep,"CDOM f,ff",f(i,j,k,iCDOM),ff(i,j,k,iCDOM),(1.0 - KGcdom*dTd)
+#endif
+
 !---------------------------------------------------------------------
 !----------------------------
 !-ALK: (mmol-HCO3/m3)
@@ -1250,9 +1211,6 @@ enddo
    enddo      ! end of do i block do loop
  enddo      ! end of do j block do loop
 ! ----------------------------------------------------------------------
-#ifdef _CGEM
-write(6,*) "A before update",f(1,1,1,iA(1:nospA))
-#endif
 
 !update f for the current timestep
          do j = 1,jm
@@ -1263,9 +1221,6 @@ write(6,*) "A before update",f(1,1,1,iA(1:nospA))
          enddo
          enddo
 !-- End Main GEM Calculations ---------------------------------------------------
-#ifdef _CGEM
-write(6,*) "A before extra",f(1,1,1,iA(1:nospA))
-#endif
 
 !-- Call "Extra" variables for netCDF --------------------------------------------------------
 !--------------------------------------------------------
@@ -1318,10 +1273,7 @@ write(6,*) "A before extra",f(1,1,1,iA(1:nospA))
                                           RN2_ijk, &
                                          RO2_ijk )
      endif  !end of "if (mod(istep,iout).eq.0)" block if
-#ifdef _CGEM
-write(6,*) "A last",f(1,1,1,iA(1:nospA))
-stop
-#endif
+
 
    return
    END Subroutine CGEM 

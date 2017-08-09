@@ -27,11 +27,22 @@
        !Needs to call advection because that is where sinking is:
        call Adv3D()
 
+#ifdef DEBUG
+write(6,*) "After Adv3D"
+write(6,*) "CDOM",f(1,1,1:nsl,32)
+#endif
+
       !Multiply Kh by KH_coeff for h<30
         !L3...Fix this so it is only for h<30
-        Kh(:,:,1:nsl-1) = Kh(:,:,1:nsl-1)*KH_coeff
+        Kh(:,:,1:nsl) = Kh(:,:,1:nsl)*KH_coeff
 
        if(Which_VMix.ne.0) call VMixing()
+
+#ifdef DEBUG
+write(6,*) "After VMixing"
+write(6,*) "CDOM",f(1,1,1:nsl,32)
+#endif
+
 
        ! After Advection and VMixing, return to Q's
        do k=1, nsl

@@ -24,17 +24,18 @@ Subroutine Salinity_Regression_Init_CGEM()
       write(6,*) "start,dT",START_SECONDS, dT
 #endif
 
-      if(Read_Sal.eq.0) then
-       call Calc_Sal(S)
-      else
-       call USER_Read(START_SECONDS,S,'s',2)
-      endif
-
-      if(Read_T.eq.0) then
-        call Calc_Temp(START_SECONDS,START_SECONDS,T)
-      else
-       call USER_Read(START_SECONDS,T,'t',2)
-      endif
+      if(Which_gridio.eq.0) then
+       if(Read_Sal.eq.0) then
+        call Calc_Sal(S)
+       else
+        call USER_Read(START_SECONDS,S,'s',2)
+       endif
+       if(Read_T.eq.0) then
+         call Calc_Temp(START_SECONDS,START_SECONDS,T)
+       else
+        call USER_Read(START_SECONDS,T,'t',2)
+       endif
+     endif
 
     do j = 1,jm
       do i = 1,im 
