@@ -18,13 +18,6 @@
       integer :: ifile
 !    Specify variables for dates and times
       integer iYr, iMon, iDay, iHour, iMin, iSec
-      real, parameter :: cv        = 2.77e14 ! multiplicative factor used
-                                                 ! to convert from
-                                                 ! watts/m2
-                                                 ! to photons/cm2/sec
-                                                 ! Morel and Smith
-                                                 ! (1974)
-      iSec = 0
 
       ifile = 2000 + ichar(which)
 
@@ -46,7 +39,7 @@
         open(unit=ifile,file=filename,status="old")
 
         !First line
-        read(ifile,*) iYr,iMon,iDay,iHour,iMin,Var1
+        read(ifile,*) iYr,iMon,iDay,iHour,iMin,iSec,Var1
         t1 = TOTAL_SECONDS( iYr0, iYr, iMon, iDay, iHour, iMin, iSec )
 #ifdef DEBUG
         write(6,*) "iYr0",iYr0,iYr,iMon,iDay,iHour,iMin,iSec
@@ -62,7 +55,7 @@
         endif
 
         !Second line
-        read(ifile,*) iYr,iMon,iDay,iHour,iMin,Var2
+        read(ifile,*) iYr,iMon,iDay,iHour,iMin,iSec,Var2
         t2 = TOTAL_SECONDS( iYr0, iYr, iMon, iDay, iHour, iMin, iSec )
 #ifdef DEBUG
           write(6,*) "t1,t2,T8",t1,t2,TC_8
@@ -72,7 +65,7 @@
          if(t2.lt.TC_8) then
           t1=t2
           Var1=Var2
-          read(ifile,*) iYr,iMon,iDay,iHour,iMin,Var2
+          read(ifile,*) iYr,iMon,iDay,iHour,iMin,iSec,Var2
           t2 = TOTAL_SECONDS( iYr0, iYr, iMon, iDay, iHour, iMin, iSec )
 #ifdef DEBUG
           write(6,*) "t1,t2,T8",t1,t2,TC_8
@@ -88,16 +81,13 @@
       if(t2.le.TC_8) then
         t1=t2
         Var1=Var2
-        read(ifile,*) iYr,iMon,iDay,iHour,iMin,Var2
+        read(ifile,*) iYr,iMon,iDay,iHour,iMin,iSec,Var2
         t2 = TOTAL_SECONDS( iYr0, iYr, iMon, iDay, iHour, iMin, iSec )
       endif        
 
       fac = real(TC_8 - t1)
       fac = real(fac,4) / real(( t2 - t1 ),4)
       Var(1,1) = Var1 + ( Var2 - Var1 ) * fac
-
-!Convert Watts/m2/s into quanta/cm2/s:
-      if(Read_Solar.ne.2) Var = Var*cv
 
 
       if(init.eq.2) rewind(ifile)

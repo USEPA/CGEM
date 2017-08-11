@@ -170,8 +170,8 @@ write(6,*) "CDOM",f(1,1,1:nsl,32)
       ! -------------- BEGIN OUTPUT DATA
       ! --- dump output when istep is a multiple of iout
        if (  mod( istep, iout ) .eq. 0 ) then
-        write(6,*) "output=",istep_out+1
         istep_out = istep_out + 1
+        if(Which_gridio.ne.0) write(6,*) "output=",istep_out+1
         call Model_Output(Which_Code,istep_out)
        endif
 
