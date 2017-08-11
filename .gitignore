@@ -27,6 +27,7 @@
 #input files
 data/FishTank/InitialConditions.txt
 data/FishTank/Model_dim.txt
+data/MyFiles.inp
 
 #
 # Keep directories but not contents. [Not sure if this works.]

@@ -101,16 +101,6 @@
       !-----------------------------------------
           Aresp_k(:,k) =  Agrow_k(:,k) * respg2(:)         &     ! Growth dependent respiration (loss of cells), cells/m3/d
      &                   + Tadj(1:nospA)  * respb(:) * A_k(:,k)  ! Basal respiration (loss of cells) , cells/m3/d
-#ifdef _CGEM
-write(6,*) "Aresp_k",Aresp_k
-write(6,*) "Agrow_k",Agrow_k
-write(6,*) "respg2",respg2
-write(6,*) "Tadj",Tadj
-write(6,*) "respb",respb
-write(6,*) "A_k",A_k
-write(6,*) "uA",uA
-write(6,*) "respg",respg
-#endif
 
       enddo    
          

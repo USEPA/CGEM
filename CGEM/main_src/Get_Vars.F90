@@ -14,6 +14,12 @@
        integer, save :: init=1
 
        integer :: i,j,k
+       real, parameter :: cv        = 2.77e14 ! multiplicative factor used
+                                                 ! to convert from
+                                                 ! watts/m2
+                                                 ! to photons/cm2/sec
+                                                 ! Morel and Smith
+                                                 ! (1974)
 
         TC_in = TC_8
 
@@ -34,6 +40,7 @@
             call getSolar( TC_in, lon, lat, Rad)
           else
             call USER_Read(TC_in,Rad,'p',init)
+            Rad = Rad * cv
           endif
   
           if(Read_Wind.eq.0) then
@@ -54,11 +61,19 @@
           Wind = 5
         endif 
 
-        !Ux=0.
-        !Vx=0.
-        !Wx=0.
-        !Kh=0.
-        !E=0.
+        if(im*jm.eq.1) then
+         Ux=0.
+         Vx=0.
+         Wx=0.
+        endif
+
+#ifdef DEBUG
+        write(6,*) "Kh",Kh
+        write(6,*) "E",E
+        write(6,*) "S",S
+        write(6,*) "T",T
+#endif
+
         init=0
 
        return

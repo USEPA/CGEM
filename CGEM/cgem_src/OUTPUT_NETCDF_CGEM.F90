@@ -45,7 +45,7 @@ CONTAINS
                           EXTRA_VARIABLES, IYR0, &
                           IYRS, IMONS, IDAYS, IHRS, IMINS, ISECS, &
                           IYRE, IMONE, IDAYE, IHRE, IMINE, ISECE, &
-                          DT_OUT, RLON, RLAT, H, FM, DZ)
+                          DT_OUT, RLON, RLAT, depth, FM, DZ)
     USE OUTPUT 
     USE INPUT_VARS_CGEM
     USE CGEM_vars
@@ -66,13 +66,12 @@ CONTAINS
     REAL,DIMENSION(IM,JM):: RLON
     REAL,DIMENSION(IM,JM):: RLAT
     REAL,DIMENSION(IM, JM, NSL):: DZ
-    REAL, DIMENSION(IM,JM) :: H
+    REAL, DIMENSION(IM,JM,NSL) :: depth 
     INTEGER,DIMENSION(IM, JM),INTENT(IN):: FM
    ! External NetCDF routines:
     INTEGER NF_CREATE, NF_ENDDEF, NF_PUT_VAR_INT, NF_PUT_VAR_REAL, NF_SYNC
     EXTERNAL NF_CREATE, NF_ENDDEF, NF_PUT_VAR_INT, NF_PUT_VAR_REAL, NF_SYNC
    ! Locals:
-    REAL,DIMENSION(IM, JM, NSL):: TEMP_3D_H ! VLA
     INTEGER,DIMENSION(IM, JM, NSL):: TEMP_3D_FM ! VLA
     INTEGER IM_DIM, JM_DIM, NSL_DIM, NSTEPP1_DIM
     INTEGER RLON_VAR, RLAT_VAR, H_VAR, FM_VAR
@@ -83,6 +82,7 @@ CONTAINS
     CHARACTER(LEN=40):: TIME_UNITS
     CHARACTER(LEN=14):: var
     FILE_ID = -1
+
 
     ! Create/overwrite NetCDF output file:
     ERR = NF_CREATE( trim(NAME), 770, FILE_ID) 
@@ -376,12 +376,8 @@ CONTAINS
     ERR = NF_PUT_VAR_REAL( FILE_ID, RLAT_VAR, RLAT )
     CALL CHKERR( ERR, 'write output variable rlat' )
 
-    ! Write h in 3D
-
-    DO K = 1, NSL
-      TEMP_3D_H(:,:,K) = H 
-    END DO
-    ERR = NF_PUT_VAR_REAL( FILE_ID, H_VAR, TEMP_3D_H )
+    ! Write h
+    ERR = NF_PUT_VAR_REAL( FILE_ID, H_VAR, depth )
     CALL CHKERR( ERR, 'write output variable h' )
 
 

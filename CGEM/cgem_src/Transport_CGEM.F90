@@ -1,7 +1,7 @@
        Subroutine Transport_CGEM()
 
        USE Model_dim
-       USE INPUT_VARS_CGEM, ONLY: KH_coeff
+       USE INPUT_VARS_CGEM, ONLY: KH_coeff,Which_VMix
        USE State_Vars
        USE CGEM_Vars, ONLY: iQp, iQn, iA
        USE Hydro, ONLY: Kh
@@ -10,7 +10,7 @@
 
        integer :: i, j, k
  
-       if(which_gridio.eq.1) then
+       if(which_gridio.ne.0) then
 
        ! Before Advection and VMixing, combine A's and Q's
        do k=1, nsl
@@ -24,13 +24,25 @@
 
        !Advection and Vmixing
 
-!       call Adv3D()
+       !Needs to call advection because that is where sinking is:
+       call Adv3D()
+
+#ifdef DEBUG
+write(6,*) "After Adv3D"
+write(6,*) "CDOM",f(1,1,1:nsl,32)
+#endif
 
       !Multiply Kh by KH_coeff for h<30
-      !Kh(:,:,1:nsl-1) = Kh(:,:,1:nsl-1)*KH_coeff(:,:,1:nsl-1)
-       Kh(:,:,1:nsl-1) = Kh(:,:,1:nsl-1)*KH_coeff
+        !L3...Fix this so it is only for h<30
+        Kh(:,:,1:nsl) = Kh(:,:,1:nsl)*KH_coeff
 
-       call VMixing()
+       if(Which_VMix.ne.0) call VMixing()
+
+#ifdef DEBUG
+write(6,*) "After VMixing"
+write(6,*) "CDOM",f(1,1,1:nsl,32)
+#endif
+
 
        ! After Advection and VMixing, return to Q's
        do k=1, nsl

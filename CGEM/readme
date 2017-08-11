@@ -1,0 +1,11 @@
+lisa@lisa-Satellite-C55-C:~/CGEM/CGEM$ ./FishTank.exe 
+ Biogeochem equations are: CGEM  
+ Base Outputfile Name will be: ./NETCDF/output.
+ Inputfile will be: GEM_InputFile
+ Initial Conditions filename will be: InitialConditions.txt
+At line 12 of file main_src/Calc_Sal.F90 (unit = 19)
+Fortran runtime error: Cannot open file '/home/lisa/CGEM/CGEM/data/NCOM_1D/S.dat': No such file or directory
+
+Problem: shouldn't need that file...
+
+

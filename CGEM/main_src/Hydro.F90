@@ -91,7 +91,7 @@
          write(netcdf_fileNames(4), '(A, A)') trim(DATADIR), '/INPUT/V.nc'
          write(netcdf_fileNames(5), '(A, A)') trim(DATADIR), '/INPUT/W.nc'
          write(netcdf_fileNames(6), '(A, A)') trim(DATADIR), '/INPUT/KH.nc'
-         write(netcdf_fileNames(7), '(A, A)') trim(DATADIR), '/INPUT/E.nc'
+         write(netcdf_fileNames(7), '(A, A)') trim(DATADIR), '/INPUT/E.2D.nc'
       endif
 
       do i=1,7

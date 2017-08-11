@@ -19,7 +19,7 @@
       integer :: i,j,k
       character(200) filename
 
-      real, dimension(nsl) :: dz_temp
+      real, dimension(35) :: dz_temp
       integer :: nzr, ns
 
       write(filename,'(A, A)') trim(DATADIR),'/dxdy.dat'
@@ -47,8 +47,11 @@
       do i=1,im
       do j=1,jm
       do k=1,nzr
-         dz(i,j,k) = 1
-         !dz(i,j,k) = dz_temp(k)
+         !L3: was this for debugging?  dz(i,j,k) = 1
+         dz(i,j,k) = dz_temp(k)
+#ifdef DEBUG
+      write(6,*) "dz, Hs, k=",k,Hs,dz_temp(k)
+#endif
       enddo
       enddo
       enddo
@@ -100,9 +103,22 @@
       do j=1,jm
        do i=1,im
           h(i,j) = amin1(h(i,j), Hs)   !Depth for sigma layers, maximum depth 100
+#ifdef DEBUG
+ write(6,*) "h,Hs",i,j,h(i,j),Hs
+#endif
        enddo
       enddo
 
+       do k=1,nsl
+        do j=1,jm
+         do i=1,im
+          d_sfc(i,j,k) = h(i,j)*zz(k)
+#ifdef DEBUG
+ write(6,*) "d_sfc",i,j,k,d_sfc(i,j,k)
+#endif
+        enddo
+       enddo
+      enddo
 
       return
 
@@ -119,18 +135,15 @@
       IMPLICIT NONE
 
       integer :: i,j,k, nz
-!      integer(kind=8) :: TC_8
-
-!      call interpVar(grid_info(eColDepth), TC_8, gridStartIndex(eColDepth), depth)
-!      call interpVar(grid_info(eCellDepth), TC_8, gridStartIndex(eCellDepth), dz)
 
       d = fill(0) 
       d_sfc = fill(0) 
 
-
-      do j=1,jm
-       do i=1,im
-          d(i,j,:) = h(i,j)+E(i,j)
+      do k=1,nsl
+       do j=1,jm
+        do i=1,im
+          d(i,j,k) = h(i,j)+E(i,j)
+        enddo
        enddo
       enddo
 
@@ -139,23 +152,21 @@
         do i=1,im
           d_sfc(i,j,k) = d(i,j,k)*zz(k)
           Vol(i,j,k) = area(i,j) *dz(i,j,k)*d(i,j,k)
+
+#ifdef DEBUG
+  write(6,*) i,j,k
+  write(6,*) "h",h(i,j)
+  write(6,*) "E",E(i,j)
+  write(6,*) "d",d(i,j,k)
+  write(6,*) "zz",zz(k)
+  write(6,*) "area",area
+  write(6,*) "d_sfc",d_sfc(i,j,k)
+  write(6,*) "Vol",Vol(i,j,k)
+#endif
+
         enddo
        enddo
       enddo  
 
-!      do j=1,jm
-!       do i=1,im
-!          if(depth(i,j).eq.0) depth(i,j)=fill(0)
-!          nz=nza(i,j)
-!          do k=1,nz !do loop will not execute if nza=0
-!           d_sfc(i,j,k) = sum(dz(i,j,1:(k-1))) + dz(i,j,k)/2. 
-!           d(i,j,k) = sum(dz(i,j,1:k)) !bottom of cell 
-!           Vol(i,j,k) = area(i,j) * dz(i,j,k)
-!#ifdef DEBUG
-!           write(6,*) i,j,k,dz(i,j,k),d_sfc(i,j,k),d(i,j,k)
-!#endif
-!          enddo
-!       enddo
-!      enddo
       end subroutine USER_update_NCOM_grid
 

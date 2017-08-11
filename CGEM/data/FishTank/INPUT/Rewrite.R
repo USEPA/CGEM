@@ -5,7 +5,8 @@ rdata<-read.table("ReformatWindPar.dat")
 #day<-rdata[,3]
 #hour<-rdata[,4]
 #minute<-rdata[,5]
-dates<-rdata[,1:5]
+zeros <- rdata[,1]*0
+dates<-cbind(rdata[,1:5],zeros)
 Wind<-rdata[,6]
 PAR<-rdata[,7]
 

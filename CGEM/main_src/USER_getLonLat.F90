@@ -27,7 +27,7 @@
         read (19,*) tmpi
         do j=1,jm
          do i=1,im
-           lat(i,j) = tmpi(i)
+           lon(i,j) = tmpi(i)
          enddo
         enddo
       else
