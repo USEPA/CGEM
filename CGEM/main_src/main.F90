@@ -70,8 +70,9 @@ write(6,*) "After Read_InputFile"
 
       if (Which_gridio .gt. 0) then
         call Init_Hydro_NetCDF()
-        call Get_Vars(TC_8) !Hydro for initial timestep 
       endif
+  
+      call Get_Vars(TC_8) !Hydro for initial timestep 
 
       call Set_Vars(Which_code,init_filename) !initialize 'f' array
 

@@ -35,7 +35,10 @@ MAIN_OBJ  =  fillval.o\
 	USER_getLonLat.o\
 	USER_get_masks.o\
 	USER_Set_Initial_Conditions.o\
-	USER_Read.o\
+	USER_Read_Solar.o\
+	USER_Read_Temp.o\
+	USER_Read_Wind.o\
+	USER_Read_Sal.o\
 	Calc_Sal.o\
 	Calc_Temp.o\
 	OUTPUT_ALL_FALSE.o\
