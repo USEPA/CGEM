@@ -107,6 +107,9 @@ nstep = 1
 write(6,*)"DEBUG - setting nstep to ",nstep
 #endif
 
+#ifdef CALIBRATE
+     write(6,*) "O2 initial",f(1,1,1,10)
+#endif
 
 !-------------- START TIME LOOP -----------------------------------
       do istep = 1, nstep
@@ -187,6 +190,21 @@ write(6,*) "After Model_Output"
         Call Close_Hydro_NetCDF()
         Call Close_Grid_NetCDF()
       endif
+
+!     write(6,*) "A,Z1,Z2:", f(1,1,1,iA(1)),f(1,1,1,iZ(1),f(1,1,1,iZ(2)
+
+#ifdef CALIBRATE
+      write(6,*) "O2 final: ",f(1,1,1,10)
+#ifdef CAL_LT
+      write(6,*) "Percent Error Light (measured=229.57) = ",(229.57 - f(1,1,1,10))/229.57 * 100
+#endif
+#ifdef CAL_DK
+      write(6,*) "Percent Error Dark  (measured=195.51) = ",(195.51 - f(1,1,1,10))/195.51 * 100
+#endif
+#ifdef CAL_LTNT
+      write(6,*) "Percent Error LTNT  (measured=253.43) = ",(253.43 - f(1,1,1,10))/253.43 * 100
+#endif
+#endif
 
 !----------------------------------------------------------------
 ! If we get here, there will be a normal exit from the program and

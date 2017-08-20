@@ -26,10 +26,28 @@
         select case(which)
          case("p")  !Solar Radiation
           write(filename,'(A, A)') trim(DATADIR),'/INPUT/Solar.dat'
+#ifdef LT
+          write(filename,'(A, A)') trim(DATADIR),'/INPUT/Solar.lt.dat'
+#endif
+#ifdef DK
+          write(filename,'(A, A)') trim(DATADIR),'/INPUT/Solar.dk.dat'
+#endif
+#ifdef LTNT
+          write(filename,'(A, A)') trim(DATADIR),'/INPUT/Solar.ltnt.dat'
+#endif
          case("w")  !Wind Speed
           write(filename,'(A, A)') trim(DATADIR),'/INPUT/Wind.dat'
          case("t")  !Temperature
           write(filename,'(A, A)') trim(DATADIR),'/INPUT/Temp.dat'
+#ifdef LT
+          write(filename,'(A, A)') trim(DATADIR),'/INPUT/Temp.lt.dat'
+#endif
+#ifdef DK
+          write(filename,'(A, A)') trim(DATADIR),'/INPUT/Temp.dk.dat'
+#endif
+#ifdef LTNT
+          write(filename,'(A, A)') trim(DATADIR),'/INPUT/Temp.ltnt.dat'
+#endif
          case("s")  !Temperature
           write(filename,'(A, A)') trim(DATADIR),'/INPUT/Sal.dat'
          case default

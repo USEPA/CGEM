@@ -72,6 +72,9 @@
          enddo
          enddo
 
+        write(6,*) "RAD",Rad/cv
+        !stop
+
         RETURN
            
       END Subroutine getSolar

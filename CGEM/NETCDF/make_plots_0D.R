@@ -14,7 +14,8 @@ if(args[1]=="gomdom"){
  pdf_layout <- c(4,4) 
 } else {
  which_eqs <- "cgem"
- ncfile <- "cgem_0D.nc"
+# ncfile <- "cgem_0D.nc"
+ ncfile <- "output.000000.nc"
  pdfname <- "cgem_0D.pdf"
  pdf_layout <- c(4,4)
 }

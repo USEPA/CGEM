@@ -12,6 +12,9 @@
 #DFLAGS = -Wall -Wextra -pedantic -fimplicit-none -fbacktrace -D_CGEM -DRDEBUG -DDEBUG 
 #DFLAGS = -DDEBUG
 #DFLAGS = -DDEBUGVARS -DDEBUG_Vars
+#CFLAGS = -DCALIBRATE -DCAL_DK
+#CFLAGS = -DCALIBRATE -DCAL_LT
+CFLAGS = -DCALIBRATE -DCAL_LTNT
 
 ### Build options for specific platforms. 
 ### LIBS has path to netCDF
@@ -61,7 +64,7 @@ endif
 endif
 
 FishTank: ${MAIN_OBJ} ${MOC_OBJ} ${CGEM_OBJ} ${SDM_OBJ} ${GD_OBJ}
-	$(F90) -o $(EXE) $(FFLAGS) $(DFLAGS) $(INC) $(MAIN_OBJ) ${MOC_OBJ} ${CGEM_OBJ} ${SDM_OBJ} ${GD_OBJ} $(LIBS)
+	$(F90) -o $(EXE) $(FFLAGS) $(DFLAGS) $(CFLAGS) $(INC) $(MAIN_OBJ) ${MOC_OBJ} ${CGEM_OBJ} ${SDM_OBJ} ${GD_OBJ} $(LIBS)
 
 
 #
@@ -77,7 +80,7 @@ $(SDM_OBJ): %.o: $(sdmdir)/%.f
 	$(F90) -c $(FFLAGS_SDM) $<
 
 $(MAIN_OBJ):%.o: $(maindir)/%.F90
-	$(F90) -c $(FFLAGS) $(DFLAGS)  $<
+	$(F90) -c $(FFLAGS) $(CFLAGS) $(DFLAGS)  $<
 
 $(MOC_OBJ):%.o: $(mocdir)/%.F90
 	$(F90) -c $(FFLAGS) $(DFLAGS)  $<
@@ -86,10 +89,10 @@ $(OBJ):%.o: %.F90
 	$(F90) -c $(FFLAGS) $(DFLAGS) $<
 
 $(CGEM_OBJ):%.o: $(cgemdir)/%.F90
-	$(F90) -c $(FFLAGS) $(DFLAGS)   $<
+	$(F90) -c $(FFLAGS) $(CFLAGS) $(DFLAGS)   $<
 
 $(GD_OBJ):%.o: $(gddir)/%.F90
-	$(F90) -c $(FFLAGS) $(DFLAGS)  $<
+	$(F90) -c $(FFLAGS) $(CFLAGS) $(DFLAGS)  $<
 
 
 ## Generic implicit rules

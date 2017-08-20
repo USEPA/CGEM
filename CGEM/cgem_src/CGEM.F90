@@ -1132,7 +1132,11 @@ enddo
 !-------------------------------------------------------------------      
        ff(i,j,k,iO2)  = AMAX1(f(i,j,k,iO2)                             &  
        &  + ( PrimProd - ArespC + RO2 - ZrespC)*dTd, 0.0)
-
+#ifdef CALIBRATE
+      if (  mod( istep, iout ) .eq. 0 ) then
+       write(6,*) "PP,resp,decay,Zresp",istep,PrimProd,ArespC,RO2,ZrespC
+      endif
+#endif
 !-----------------------------------------
 !-OM1_A: (mmol-C/m3-- Dead Phytoplankton Particulate)
 !-----------------------------------------

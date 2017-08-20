@@ -32,6 +32,7 @@ nvars <- length(Var)
 time <- ncvar_get(nc,"time")
 iYr0 <- ncatt_get(nc,0,attname="iYr0")$value
 time<- as.POSIXct(time, origin=paste(iYr0,"-01-01",sep=""), tz="GMT")
+tt<-dim(time)
 
 if(!exists("pdfname")){
 if(which_eqs=="cgem") pdfname="cgem_0D.pdf"
@@ -53,6 +54,9 @@ par(mfrow=pdf_layout)
  rdata <- ncvar_get(nc,Var[i])
  unit <- ncatt_get(nc,Var[i],attname="units")$value
  timeseries_plot(Var[i],time,rdata,unit)
+ if(Var[i]=="O2"){
+    cat(rdata[tt],"\n")
+ }
 
  if(i%%which_mod == 0) {
   par(mfrow=pdf_layout)

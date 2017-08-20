@@ -22,6 +22,15 @@
 
         !Solar Radiation
         write(filename,'(A, A)') trim(DATADIR),'/INPUT/Temp.dat'
+#ifdef CAL_LT
+          write(filename,'(A, A)') trim(DATADIR),'/INPUT/Temp.lt.dat'
+#endif
+#ifdef CAL_DK
+          write(filename,'(A, A)') trim(DATADIR),'/INPUT/Temp.dk.dat'
+#endif
+#ifdef CAL_LTNT
+          write(filename,'(A, A)') trim(DATADIR),'/INPUT/Temp.ltnt.dat'
+#endif
         open(unit=ifile,file=filename,status="old")
 
         !First line

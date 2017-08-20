@@ -16,6 +16,16 @@
          input_filename = "GEM_InputFile"
          init_filename = "InitialConditions.txt"
          BASE_NETCDF_OUTPUT_FILE_NAME = './NETCDF/output.'
+#ifdef CAL_LT
+        init_filename = "InitialConditions.lt.txt"
+#endif
+#ifdef CAL_DK
+        init_filename = "InitialConditions.lt.txt"
+#endif
+#ifdef CAL_LTNT
+        init_filename = "InitialConditions.ltnt.txt"
+#endif
+
 
        if (c_count.gt.0) then
          call get_command_argument(1,Which_code)  !User selects which code
