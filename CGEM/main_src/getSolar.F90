@@ -72,7 +72,7 @@
          enddo
          enddo
 
-        write(6,*) "RAD",Rad/cv
+        !write(6,*) "RAD",Rad/cv
         !stop
 
         RETURN
