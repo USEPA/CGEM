@@ -1,3 +1,8 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+
 # These are simple regular expression (glob) patterns
 # for files and directories that Git should ignore
 
