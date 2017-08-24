@@ -15,7 +15,8 @@
          Which_code = "CGEM"
          input_filename = "GEM_InputFile"
          init_filename = "InitialConditions.txt"
-         BASE_NETCDF_OUTPUT_FILE_NAME = './NETCDF/output.'
+         BASE_NETCDF_OUTPUT_FILE_NAME = './NETCDF/cgem.'
+
 
        if (c_count.gt.0) then
          call get_command_argument(1,Which_code)  !User selects which code
@@ -28,8 +29,33 @@
            Which_code = "GOMDOM"
            input_filename = "GOMDOM_InputFile"
            init_filename = "InitialConditions_GD.txt"
+           BASE_NETCDF_OUTPUT_FILE_NAME = './NETCDF/gomdom.'
          endif
        endif
+
+#ifdef CAL_LT
+         if(Which_code.eq."CGEM") then
+          init_filename = "InitialConditions.lt.txt"
+         else
+          init_filename = "InitialConditions_GD.lt.txt"
+         endif
+
+#endif
+#ifdef CAL_DK
+         if(Which_code.eq."CGEM") then
+          init_filename = "InitialConditions.lt.txt"
+         else
+          init_filename = "InitialConditions_GD.lt.txt"
+         endif
+#endif
+
+#ifdef CAL_LTNT
+         if(Which_code.eq."CGEM") then
+          init_filename = "InitialConditions.lt.txt"
+         else
+          init_filename = "InitialConditions_GD.ltnt.txt"
+         endif
+#endif
 
 
        if (c_count.gt.1) then

@@ -215,6 +215,8 @@
 !For tiny
     real x
     integer fill_val
+!For calibration
+    real O2_total
 
     !fill(1) is for -9999
     fill_val=fill(1)
@@ -715,6 +717,13 @@
 !---------------------------------------------------------
       ff(i,j,k,iA(isp)) = AMAX1(f(i,j,k,iA(isp))                              &
       & + ( Agrow - Aresp - ZgrazA_tot(isp) - Amort(isp) )*dTd,1.)
+#ifdef CAL_PHYTO
+      if (  mod( istep, iout ) .eq. 0 ) then
+        write(6,300) "Agrow,Aresp,ZgrazA,Amort,total",Agrow,-Aresp, &
+      & -ZgrazA_tot(isp), - Amort(isp),  Agrow - Aresp - ZgrazA_tot(isp) - Amort(isp)
+      endif
+300 format(A,5E12.2)
+#endif
 
 
 !----------------------------------------------------------------------
@@ -832,6 +841,17 @@
 !---------------------------------------------------------
       ff(i,j,k,iZ(:))  = AMAX1( f(i,j,k,iZ(:))                         &
       &      + (Zgrow(:) - Zresp(:) - Zmort(:))*dTd, 1.)
+
+#ifdef CAL_ZOO
+      if (  mod( istep, iout ) .eq. 0 ) then
+        write(6,100) "Z1:Zgrow,Zresp,Zmort,total",Zgrow(1),-Zresp(1),-Zmort(1),&
+       & Zgrow(1) - Zresp(1) - Zmort(1)
+        write(6,100) "Z2:Zgrow,Zresp,Zmort,total",Zgrow(2),-Zresp(2),-Zmort(2),&
+       & Zgrow(2) - Zresp(2) - Zmort(2)
+      endif
+100 format(A,4E12.2)
+#endif
+
 !------------------------------------------------------------------------
 
 !-----------------------------------------------------------
@@ -1132,7 +1152,13 @@ enddo
 !-------------------------------------------------------------------      
        ff(i,j,k,iO2)  = AMAX1(f(i,j,k,iO2)                             &  
        &  + ( PrimProd - ArespC + RO2 - ZrespC)*dTd, 0.0)
-
+#ifdef CAL_O2
+      if (  mod( istep, iout ) .eq. 0 ) then
+        O2_total = PrimProd - ArespC + RO2 - ZrespC 
+        write(6,200) "PP,resp,decay,Zresp,total",PrimProd,-ArespC,RO2,-ZrespC,O2_total
+      endif
+200 format(A,5E12.2)
+#endif
 !-----------------------------------------
 !-OM1_A: (mmol-C/m3-- Dead Phytoplankton Particulate)
 !-----------------------------------------

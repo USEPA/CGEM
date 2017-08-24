@@ -14,12 +14,6 @@
        integer, save :: init=1
 
        integer :: i,j,k
-       real, parameter :: cv        = 2.77e14 ! multiplicative factor used
-                                                 ! to convert from
-                                                 ! watts/m2
-                                                 ! to photons/cm2/sec
-                                                 ! Morel and Smith
-                                                 ! (1974)
 
         TC_in = TC_8
 
@@ -27,26 +21,25 @@
           if(Read_T.eq.0) then
             call Calc_Temp(START_SECONDS,TC_in,T)
           else
-            call USER_Read(TC_in,T,'t',init)
+            call USER_Read_Temp(TC_in,T)
           endif
   
           if(Read_Sal.eq.0) then
             if(init.eq.1) call Calc_Sal(S)
           else
-            call USER_Read(TC_in,S,'s',init)
+            call USER_Read_Sal(TC_in,S)
           endif
   
           if(Read_Solar.eq.0) then
             call getSolar( TC_in, lon, lat, Rad)
           else
-            call USER_Read(TC_in,Rad,'p',init)
-            Rad = Rad * cv
+            call USER_Read_Solar(TC_in,Rad)
           endif
   
           if(Read_Wind.eq.0) then
             Wind=5.
           else
-            call USER_Read(TC_in,Wind,'w',init)
+            call USER_Read_Wind(TC_in,Wind)
           endif
 
         else if (Which_gridio.eq.1 .or. Which_gridio.eq.2) then

@@ -1,64 +1,48 @@
-      subroutine USER_Read(TC_8,Var,which,init)
+      subroutine USER_Read_Solar(TC_8,Var)
 
       USE Model_dim
       USE DATE_TIME
-      USE INPUT_VARS, ONLY:Read_Solar,START_SECONDS
+      USE INPUT_VARS, ONLY:START_SECONDS
       IMPLICIT NONE
 
-      integer*8, intent (inout) :: TC_8
-      integer, intent(in) :: init ! Zero is regular already called, 
-                                  ! 1 is regular first call, 
-                                  ! 2 is need to rewind and close 
-      real, intent (out) :: Var(IM,JM)
+      integer*8, intent (in) :: TC_8
+      real, intent (out) :: Var(im,jm)
       integer*8,save :: t1,t2
       real,save :: Var1,Var2
       real :: fac
-      character, intent(in) :: which
       character(100) :: filename
       integer :: ifile
 !    Specify variables for dates and times
       integer iYr, iMon, iDay, iHour, iMin, iSec
+      integer, save :: init=1
+      real, parameter :: cv        = 2.77e14 ! multiplicative factor used
+                                                 ! to convert from
+                                                 ! watts/m2
+                                                 ! to photons/cm2/sec
+                                                 ! Morel and Smith
+                                                 ! (1974)
 
-      ifile = 2000 + ichar(which)
+      ifile = 2001 
 
-      if(init.gt.0) then
+      if(init.eq.1) then
 
-        select case(which)
-         case("p")  !Solar Radiation
-          write(filename,'(A, A)') trim(DATADIR),'/INPUT/Solar.dat'
-#ifdef LT
+        !Solar Radiation
+        write(filename,'(A, A)') trim(DATADIR),'/INPUT/Solar.dat'
+#ifdef CAL_LT
           write(filename,'(A, A)') trim(DATADIR),'/INPUT/Solar.lt.dat'
 #endif
-#ifdef DK
+#ifdef CAL_DK
           write(filename,'(A, A)') trim(DATADIR),'/INPUT/Solar.dk.dat'
 #endif
-#ifdef LTNT
+#ifdef CAL_LTNT
           write(filename,'(A, A)') trim(DATADIR),'/INPUT/Solar.ltnt.dat'
 #endif
-         case("w")  !Wind Speed
-          write(filename,'(A, A)') trim(DATADIR),'/INPUT/Wind.dat'
-         case("t")  !Temperature
-          write(filename,'(A, A)') trim(DATADIR),'/INPUT/Temp.dat'
-#ifdef LT
-          write(filename,'(A, A)') trim(DATADIR),'/INPUT/Temp.lt.dat'
-#endif
-#ifdef DK
-          write(filename,'(A, A)') trim(DATADIR),'/INPUT/Temp.dk.dat'
-#endif
-#ifdef LTNT
-          write(filename,'(A, A)') trim(DATADIR),'/INPUT/Temp.ltnt.dat'
-#endif
-         case("s")  !Temperature
-          write(filename,'(A, A)') trim(DATADIR),'/INPUT/Sal.dat'
-         case default
-           write(6,*) "Error in USER_Read, input=",which
-        end select 
-
         open(unit=ifile,file=filename,status="old")
 
         !First line
         read(ifile,*) iYr,iMon,iDay,iHour,iMin,iSec,Var1
         t1 = TOTAL_SECONDS( iYr0, iYr, iMon, iDay, iHour, iMin, iSec )
+
 #ifdef DEBUG
         write(6,*) "iYr0",iYr0,iYr,iMon,iDay,iHour,iMin,iSec
         write(6,*) "t1",t1,real(t1,4)/3600/24/365
@@ -67,7 +51,7 @@
 #endif
 
         if(t1.gt.TC_8) then
-           write(6,*) "Data of type ",which," does not start early enough, exiting"
+           write(6,*) "Solar data does not start early enough, exiting"
 !"
            stop
         endif
@@ -75,6 +59,7 @@
         !Second line
         read(ifile,*) iYr,iMon,iDay,iHour,iMin,iSec,Var2
         t2 = TOTAL_SECONDS( iYr0, iYr, iMon, iDay, iHour, iMin, iSec )
+
 #ifdef DEBUG
           write(6,*) "t1,t2,T8",t1,t2,TC_8
 #endif
@@ -94,6 +79,8 @@
          endif
         enddo
 
+      init=0
+
       endif
 
 
@@ -108,9 +95,8 @@
       fac = real(fac,4) / real(( t2 - t1 ),4)
       Var(1,1) = Var1 + ( Var2 - Var1 ) * fac
 
-
-      if(init.eq.2) rewind(ifile)
+      Var(1,1) = cv*Var(1,1)
 
       return 
-      end subroutine USER_Read
+      end subroutine USER_Read_Solar
 

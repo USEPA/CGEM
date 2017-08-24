@@ -12,12 +12,30 @@ if(args[1]=="gomdom"){
  ncfile <- "gomdom_0D.nc"
  pdfname <- "gomdom_0D.pdf"
  pdf_layout <- c(4,4) 
-} else {
+} else if(args[1]=="cgem") {
  which_eqs <- "cgem"
  ncfile <- "cgem_0D.nc"
  pdfname <- "cgem_0D.pdf"
  pdf_layout <- c(4,4)
-}
+} else if(args[1]=="lt") {
+ which_eqs <- "cgem"
+ ncfile <- "cgem_lt.nc"
+ pdfname <- "cgem_lt.pdf"
+ pdf_layout <- c(4,4)
+} else if(
+args[1]=="dk") {
+ which_eqs <- "cgem"
+ ncfile <- "cgem_dk.nc"
+ pdfname <- "cgem_dk.pdf"
+ pdf_layout <- c(4,4)
+} else if(
+args[1]=="ltnt") {
+ which_eqs <- "cgem"
+ ncfile <- "cgem_ltnt.nc"
+ pdfname <- "cgem_ltnt.pdf"
+ pdf_layout <- c(4,4)
+} 
+
 
 }
 

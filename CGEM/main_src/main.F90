@@ -70,8 +70,9 @@ write(6,*) "After Read_InputFile"
 
       if (Which_gridio .gt. 0) then
         call Init_Hydro_NetCDF()
-        call Get_Vars(TC_8) !Hydro for initial timestep 
       endif
+  
+      call Get_Vars(TC_8) !Hydro for initial timestep 
 
       call Set_Vars(Which_code,init_filename) !initialize 'f' array
 
@@ -106,6 +107,13 @@ nstep = 1
 write(6,*)"DEBUG - setting nstep to ",nstep
 #endif
 
+#ifdef CALIBRATE
+      if(Which_code.eq."CGEM") then
+       write(6,*) "O2 initial: ",f(1,1,1,10)
+      else
+       write(6,*) "O2 initial: ",f(1,1,1,18)
+      endif
+#endif
 
 !-------------- START TIME LOOP -----------------------------------
       do istep = 1, nstep
@@ -186,6 +194,43 @@ write(6,*) "After Model_Output"
         Call Close_Hydro_NetCDF()
         Call Close_Grid_NetCDF()
       endif
+
+!     write(6,*) "A,Z1,Z2:", f(1,1,1,iA(1)),f(1,1,1,iZ(1),f(1,1,1,iZ(2)
+
+#ifdef CALIBRATE
+      if(Which_code.eq."CGEM") then
+       write(6,*) "O2 final: ",f(1,1,1,10)
+      else
+       write(6,*) "O2 final: ",f(1,1,1,18)
+      endif
+#endif
+
+#ifdef CAL_LT
+      if(Which_code.eq."CGEM") then
+        write(6,*) "Percent Error Light (measured=229.57) = ",(229.57 - f(1,1,1,10))/229.57 * 100
+      else
+        !Convert 229.57 to kg/m3, multiply by 32e-6:
+        write(6,*) "Percent Error Light (measured=0.00734624) = ",(0.00734624 - f(1,1,1,18))/0.00734624 * 100
+      endif
+#endif
+#ifdef CAL_DK
+      if(Which_code.eq."CGEM") then
+      write(6,*) "Percent Error Dark (measured=195.51) = ",(195.51 - f(1,1,1,10))/195.51 * 100
+      else
+        !Convert 195.51 to kg/m3, multiply by 32e-6:
+      write(6,*) "Percent Error Dark (measured=0.00625632) = ",(0.00625632 - f(1,1,1,18))/0.00625632 * 100
+      endif
+
+#endif
+#ifdef CAL_LTNT
+      if(Which_code.eq."CGEM") then
+      write(6,*) "Percent Error LTNT (measured=253.43) = ",(253.43 - f(1,1,1,10))/253.43 * 100
+      else
+        !Convert 253.43 to kg/m3, multiply by 32e-6:
+      write(6,*) "Percent Error LTNT (measured=0.00810976) = ",(0.00810976 - f(1,1,1,18))/0.00810976 * 100
+      endif
+
+#endif
 
 !----------------------------------------------------------------
 ! If we get here, there will be a normal exit from the program and
