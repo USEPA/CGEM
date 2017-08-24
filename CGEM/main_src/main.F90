@@ -108,7 +108,11 @@ write(6,*)"DEBUG - setting nstep to ",nstep
 #endif
 
 #ifdef CALIBRATE
-     write(6,*) "O2 initial",f(1,1,1,10)
+      if(Which_code.eq."CGEM") then
+       write(6,*) "O2 initial: ",f(1,1,1,10)
+      else
+       write(6,*) "O2 initial: ",f(1,1,1,18)
+      endif
 #endif
 
 !-------------- START TIME LOOP -----------------------------------
@@ -194,16 +198,38 @@ write(6,*) "After Model_Output"
 !     write(6,*) "A,Z1,Z2:", f(1,1,1,iA(1)),f(1,1,1,iZ(1),f(1,1,1,iZ(2)
 
 #ifdef CALIBRATE
-      write(6,*) "O2 final: ",f(1,1,1,10)
+      if(Which_code.eq."CGEM") then
+       write(6,*) "O2 final: ",f(1,1,1,10)
+      else
+       write(6,*) "O2 final: ",f(1,1,1,18)
+      endif
+#endif
+
 #ifdef CAL_LT
-      write(6,*) "Percent Error Light (measured=229.57) = ",(229.57 - f(1,1,1,10))/229.57 * 100
+      if(Which_code.eq."CGEM") then
+        write(6,*) "Percent Error Light (measured=229.57) = ",(229.57 - f(1,1,1,10))/229.57 * 100
+      else
+        !Convert 229.57 to kg/m3, multiply by 32e-6:
+        write(6,*) "Percent Error Light (measured=0.00734624) = ",(0.00734624 - f(1,1,1,18))/0.00734624 * 100
+      endif
 #endif
 #ifdef CAL_DK
-      write(6,*) "Percent Error Dark  (measured=195.51) = ",(195.51 - f(1,1,1,10))/195.51 * 100
+      if(Which_code.eq."CGEM") then
+      write(6,*) "Percent Error Dark (measured=195.51) = ",(195.51 - f(1,1,1,10))/195.51 * 100
+      else
+        !Convert 195.51 to kg/m3, multiply by 32e-6:
+      write(6,*) "Percent Error Dark (measured=0.00625632) = ",(0.00625632 - f(1,1,1,18))/0.00625632 * 100
+      endif
+
 #endif
 #ifdef CAL_LTNT
-      write(6,*) "Percent Error LTNT  (measured=253.43) = ",(253.43 - f(1,1,1,10))/253.43 * 100
-#endif
+      if(Which_code.eq."CGEM") then
+      write(6,*) "Percent Error LTNT (measured=253.43) = ",(253.43 - f(1,1,1,10))/253.43 * 100
+      else
+        !Convert 253.43 to kg/m3, multiply by 32e-6:
+      write(6,*) "Percent Error LTNT (measured=0.00810976) = ",(0.00810976 - f(1,1,1,18))/0.00810976 * 100
+      endif
+
 #endif
 
 !----------------------------------------------------------------

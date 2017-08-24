@@ -717,12 +717,10 @@
 !---------------------------------------------------------
       ff(i,j,k,iA(isp)) = AMAX1(f(i,j,k,iA(isp))                              &
       & + ( Agrow - Aresp - ZgrazA_tot(isp) - Amort(isp) )*dTd,1.)
-#ifdef CALIBRATE
+#ifdef CAL_PHYTO
       if (  mod( istep, iout ) .eq. 0 ) then
-       if(istep.eq.127) then
         write(6,300) "Agrow,Aresp,ZgrazA,Amort,total",Agrow,-Aresp, &
       & -ZgrazA_tot(isp), - Amort(isp),  Agrow - Aresp - ZgrazA_tot(isp) - Amort(isp)
-       endif
       endif
 300 format(A,5E12.2)
 #endif
@@ -844,14 +842,12 @@
       ff(i,j,k,iZ(:))  = AMAX1( f(i,j,k,iZ(:))                         &
       &      + (Zgrow(:) - Zresp(:) - Zmort(:))*dTd, 1.)
 
-#ifdef CALIBRATE
+#ifdef CAL_ZOO
       if (  mod( istep, iout ) .eq. 0 ) then
-       if(istep.eq.127) then
         write(6,100) "Z1:Zgrow,Zresp,Zmort,total",Zgrow(1),-Zresp(1),-Zmort(1),&
        & Zgrow(1) - Zresp(1) - Zmort(1)
         write(6,100) "Z2:Zgrow,Zresp,Zmort,total",Zgrow(2),-Zresp(2),-Zmort(2),&
        & Zgrow(2) - Zresp(2) - Zmort(2)
-       endif
       endif
 100 format(A,4E12.2)
 #endif
@@ -1156,12 +1152,10 @@ enddo
 !-------------------------------------------------------------------      
        ff(i,j,k,iO2)  = AMAX1(f(i,j,k,iO2)                             &  
        &  + ( PrimProd - ArespC + RO2 - ZrespC)*dTd, 0.0)
-#ifdef CALIBRATE
+#ifdef CAL_O2
       if (  mod( istep, iout ) .eq. 0 ) then
-       if(istep.eq.127) then
         O2_total = PrimProd - ArespC + RO2 - ZrespC 
         write(6,200) "PP,resp,decay,Zresp,total",PrimProd,-ArespC,RO2,-ZrespC,O2_total
-       endif
       endif
 200 format(A,5E12.2)
 #endif

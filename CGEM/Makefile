@@ -12,9 +12,9 @@
 #DFLAGS = -Wall -Wextra -pedantic -fimplicit-none -fbacktrace -D_CGEM -DRDEBUG -DDEBUG 
 #DFLAGS = -DDEBUG
 #DFLAGS = -DDEBUGVARS -DDEBUG_Vars
-#CFLAGS = -DCALIBRATE -DCAL_DK
-#CFLAGS = -DCALIBRATE -DCAL_LT
-CFLAGS = -DCALIBRATE -DCAL_LTNT
+#CFLAGS = -DCALIBRATE -DCAL_LT -DCAL_O2
+#CFLAGS = -DCALIBRATE -DCAL_DK -DCAL_O2
+#CFLAGS = -DCALIBRATE -DCAL_LTNT -DCAL_O2
 
 ### Build options for specific platforms. 
 ### LIBS has path to netCDF
