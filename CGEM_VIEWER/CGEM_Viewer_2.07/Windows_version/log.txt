@@ -1,0 +1,90 @@
+ 
+ __________________________________
+|                                  |
+|            CGEM Viewer           |
+|           Version  2.06          |
+|                                  |
+|            B. Penta              |
+|  U.S. Naval Research Laboratory  |
+|        Stennis Space Center      |
+|                                  |
+|              Thanks:             |
+|     S. Anderson and S. deRada    |
+|                                  |
+|              Using:              |
+|   ----------------------------   |
+|          SEAWATER Library        |
+|           Version 1.2d           |
+|         Phillip P. Morgan        |
+|               CSIRO              |
+|        seawater@ml.csiro.au      |
+|   ----------------------------   |
+|            uipickfiles           |
+|        Douglas M. Schwarz        |
+|   ----------------------------   |
+|              pos2dist            |
+|             Flora Sun            |
+|       University of Toronto      |
+|__________________________________|
+ 
+ uipickfiles 
+ Copyright (c) 2007, Douglas M. Schwarz 
+ All rights reserved. 
+  
+ Redistribution and use in source and binary forms, with or without 
+ modification, are permitted provided that the following conditions are met: 
+  
+     * Redistributions of source code must retain the above copyright 
+       notice, this list of conditions and the following disclaimer. 
+     * Redistributions in binary form must reproduce the above copyright 
+       notice, this list of conditions and the following disclaimer in 
+       the documentation and/or other materials provided with the distribution 
+  
+ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
+ AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
+ IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
+ ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE 
+ LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
+ CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
+ SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
+ INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
+ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+ POSSIBILITY OF SUCH DAMAGE. 
+  
+Warning: Error updating Text.
+
+ Character vector must have valid interpreter syntax: 
+./C:\Users\penta\Desktop\CGEM\_Viewer\_2\_07\1D\_tests\cgem\_0D.nc: Qp6
+
+> In defaulterrorcallback (line 12)
+  In menu>local_GUImenu (line 271)
+  In menu (line 43)
+  In GEM_1D_viewer (line 307)
+  In CGEM_Viewer_2_0 (line 102)
+Warning: Error updating Text.
+
+ Character vector must have valid interpreter syntax: 
+./C:\Users\penta\Desktop\CGEM\_Viewer\_2\_07\1D\_tests\gomdom\_1D.nc: DOC
+
+> In defaulterrorcallback (line 12)
+  In movegui (line 113)
+  In inputdlg (line 326)
+  In GEM_1D_viewer (line 473)
+  In CGEM_Viewer_2_0 (line 102)
+Warning: Error updating Text.
+
+ Character vector must have valid interpreter syntax: 
+./C:\Users\penta\Desktop\CGEM\_Viewer\_2\_07\1D\_tests\gomdom\_1D.nc: LON
+
+> In defaulterrorcallback (line 12)
+  In movegui (line 113)
+  In inputdlg (line 326)
+  In GEM_1D_viewer (line 473)
+  In CGEM_Viewer_2_0 (line 102)
+Cell contents reference from a non-cell array object.
+Error in GEM_AnalysisNew_OneMod (line 70)
+
+
+Error in CGEM_Viewer_2_0 (line 105)
+MATLAB:cellRefFromNonCell
