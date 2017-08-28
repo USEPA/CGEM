@@ -54,9 +54,9 @@ par(mfrow=pdf_layout)
  rdata <- ncvar_get(nc,Var[i])
  unit <- ncatt_get(nc,Var[i],attname="units")$value
  timeseries_plot(Var[i],time,rdata,unit)
- if(Var[i]=="O2"){
-    cat(rdata[tt],"\n")
- }
+# if(Var[i]=="O2"){
+#    cat(rdata[tt],"\n")
+# }
 
  if(i%%which_mod == 0) {
   par(mfrow=pdf_layout)

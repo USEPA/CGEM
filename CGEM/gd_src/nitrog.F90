@@ -387,7 +387,6 @@ IF (DO_DO2) THEN
        ELSE
            DENITRIFICATION_N = 0
        ENDIF
-
        SUM_DENITR(i,j,k) = SUM_DENITR(i,j,k) + DENITRIFICATION_N
 
        DTM(JNO3) = DTM(JNO3) - DENITRIFICATION_N 
