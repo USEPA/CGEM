@@ -25,12 +25,12 @@
 *.2001-2008
 
 #input files
-data/**
+data/*
 
 #
 # Keep directories but not contents. [Not sure if this works.]
-NETCDF/**
-output/**
+CGEM/NETCDF/*
+CGEM/output/*
 
 # Subversion
 .svn/
@@ -45,11 +45,11 @@ error
 *.out
 
 # Customized runtime files
-submit.sh
-my_submit.sh
-GEM_InputFile
-GOMDOM_InputFile
-modules.sh
+CGEM/submit.sh
+CGEM/my_submit.sh
+CGEM/GEM_InputFile
+CGEM/GOMDOM_InputFile
+CGEM/modules.sh
 
 # Misc
 tags
