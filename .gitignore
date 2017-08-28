@@ -25,9 +25,7 @@
 *.2001-2008
 
 #input files
-data/FishTank/InitialConditions.txt
-data/FishTank/Model_dim.txt
-data/MyFiles.inp
+data/**
 
 #
 # Keep directories but not contents. [Not sure if this works.]
@@ -44,14 +42,13 @@ out.time
 error
 *.pdf
 *.txt
-!Model_dim.txt
-!InitialConditions.txt
 *.out
 
 # Customized runtime files
 submit.sh
 my_submit.sh
 GEM_InputFile
+GOMDOM_InputFile
 modules.sh
 
 # Misc
