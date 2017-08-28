@@ -31,6 +31,7 @@ data/*
 # Keep directories but not contents. [Not sure if this works.]
 CGEM/NETCDF/*
 CGEM/output/*
+CGEM/CGEM
 
 # Subversion
 .svn/

@@ -3,7 +3,7 @@
 1  !INTEGER, PARAMETER :: JM
 20  !INTEGER, PARAMETER :: nz_max
 0    !INTEGER, PARAMETER :: b_layer = 1 for yes
-6    !INTEGER, PARAMETER :: nospA =6
+1    !INTEGER, PARAMETER :: nospA =6
 2    !INTEGER, PARAMETER :: nospZ = 2
 2    !Which_gridio 0==fishtank 1==efdc 2==NCOM
 2002 !INTEGER :: iYr0  reference year for timestamps

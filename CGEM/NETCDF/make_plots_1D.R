@@ -9,36 +9,16 @@ cat("If it doesn't work, specify cgem or gomdom at the command line.\n")
 
 if(args[1]=="gomdom"){
  which_eqs <- "gomdom"
- ncfile <- "gomdom_1D.nc"
+ ncfile <- "gomdom.000000.nc"
  pdfname <- "gomdom_1D.pdf"
  pdf_layout <- c(4,4) 
 } else {
  which_eqs <- "cgem"
- ncfile <- "cgem_1D.nc"
+ ncfile <- "cgem.000000.nc"
  pdfname <- "cgem_1D.pdf"
  pdf_layout <- c(4,4)
 }
 
 }
 
-source("allvars_1D.R")
-
-#Which run:
-#which_eqs <- "cgem"
-#which_eqs <- "gomdom"
-
-#netcdf file:
-#ncfile <- cgem_0D.nc
-#ncfile <- gomdom_0D.nc
-
-#firsts:
-#don't use unless you know what this is...
-
-#name of output pdf:
-#pdfname <- "cgem_0D.pdf"
-#pdfname <- "gomdom_0D.pdf"
-
-#Layout of pdf, like 4x4 plots per page:
-#pdf_layout <- c(4,4)
-#pdf_layout <- c(2,2)
-
+source("allvars_1D_EFDC.R")

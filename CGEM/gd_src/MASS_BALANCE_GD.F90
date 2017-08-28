@@ -18,6 +18,8 @@ USE Model_dim
 
 IMPLICIT NONE
 
+SAVE
+
 ALLOCATE(SUM_DENITR(im,jm,nsl))    ! N loss to denitrification 
 ALLOCATE(SUM_DENITR_C(im,jm,nsl))  ! C loss to denitrification 
 ALLOCATE(SUM_DOCPRD(im,jm,nsl))    ! C loss to predation 
