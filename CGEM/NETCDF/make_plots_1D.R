@@ -21,4 +21,4 @@ if(args[1]=="gomdom"){
 
 }
 
-source("allvars_1D_EFDC.R")
+source("allvars_1D.R")

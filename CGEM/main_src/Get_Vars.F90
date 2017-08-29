@@ -58,9 +58,21 @@
          Ux=0.
          Vx=0.
          Wx=0.
+!Only for testing
+         Kh=0.
         endif
 
-        write(6,*) "T",T
+#ifdef DEBUG1
+        write(6,*) "Which_gridio",Which_gridio
+        write(6,*) "Kh",Kh(1,1,1:7)
+        write(6,*) "E",E(1,1)
+        write(6,*) "S",S(1,1,1:7)
+        write(6,*) "T",T(1,1,1:7)
+        write(6,*) "Ux",Ux(1,1,1:7)
+        write(6,*) "Vx",Vx(1,1,1:7)
+        write(6,*) "Wx",Wx(1,1,1:7)
+#endif
+
 #ifdef DEBUG
         write(6,*) "Kh",Kh
         write(6,*) "E",E

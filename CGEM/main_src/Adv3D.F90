@@ -78,6 +78,7 @@
               !do k = 2, nz 
               do k = 2, fm2(i,j)
                 w_wsink(i,j,k) = Wx(i,j,k) + ws(ii)*area(i,j)  !dxdy(i,j)
+                !write(6,*) "sink",ws(ii),area(i,j),w_wsink(i,j,k)
               end do
 
 !If wsm=0 (shelf), then set sinking velocity to zero as well...
