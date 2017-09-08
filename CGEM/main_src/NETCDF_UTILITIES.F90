@@ -232,8 +232,8 @@ CONTAINS
     ! Externals:
     INTEGER NF_DEF_VAR
     EXTERNAL NF_DEF_VAR
-    INTEGER NF_PUT_ATT
-    EXTERNAL NF_PUT_ATT
+    INTEGER NF_PUT_ATT_REAL
+    EXTERNAL NF_PUT_ATT_REAL
     INTEGER NF_DOUBLE
     EXTERNAL NF_DOUBLE
 
@@ -241,7 +241,7 @@ CONTAINS
     INTEGER ERR
 
     ERR = NF_DEF_VAR( FILEID, VARNAM, 5, 4, DIMIDS, VARID )
-    ERR = nf_put_att(fileid, VARID, "valid_range", 5, 2, (/ 0., 1.e38 /))
+    ERR = nf_put_att_real(fileid, VARID, "valid_range", 5, 2, (/ 0., 1.e38 /))
 
     CALL CHKERR( ERR, 'create variable ' // VARNAM )
     CALL DEFVAR( FILEID, VARID, VARNAM, VARDES, UNITS )

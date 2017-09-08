@@ -272,7 +272,8 @@ CONTAINS
     call nf_inq_dimlen(ncid, tDim_index, timeLength)
 
     allocate(timeVals(timeLength))
-    call nf_get_var_int64(ncid,tVar_index,timeVals)
+!    call nf_get_var_int64(ncid,tVar_index,timeVals)
+    call nf_get_var_real(ncid,tVar_index,timeVals)
 
     ! check if requested timeVal is inside dataset
     if (t_current.lt.timeVals(1) .OR. (t_current.gt.timeVals(timeLength))) then
