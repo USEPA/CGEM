@@ -25,6 +25,7 @@
     REAL, INTENT(OUT),DIMENSION(nospA)  :: f_E   ! Growth rate factor (dimensionless) 
     REAL, parameter :: alpha = 1.93e-16
 
+
     if (Which_photosynthesis.eq.1) then         !With photoinhibition 
         f_E(:) = ( 1.0 - exp(-alphad(:) * E) ) * exp(-betad(:)*E)
     else if (Which_photosynthesis.eq.2) then    !Without photoinhibition

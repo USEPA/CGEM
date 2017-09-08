@@ -254,34 +254,32 @@ if(Which_Fluxes(iSDM).eq.1) then
 !Sediment Diagenesis Model
         if(init.eq.1.or.mod(istep,288).eq.0) then  !Call every day, 288 timestep, assumes timestep = 5 min
            call Sediment_Diagenesis_Flux(A,f(i,j,nz,:),T(i,j,nz),S(i,j,nz),pH(i,j,nz),sedflux(i,j,:),i,j,Y,ppH_init)
-           !write(6,*) ppH_init(1:3)
-           !write(6,*) sedflux(i,j,iO2),sedflux(i,j,iOM1_BC),sedflux(i,j,iNO3),sedflux(i,j,iNH4)
+           write(6,*) ppH_init(1:3)
+           write(6,*) "O2,OM1,OM2,NO3,NH4",sedflux(i,j,iO2),sedflux(i,j,iOM1_BC),sedflux(i,j,iOM2_BC),sedflux(i,j,iNO3),sedflux(i,j,iNH4)
         endif
 
 
 !DIC Exchange
-               f(i,j,nz,iDIC) = AMAX1(f(i,j,nz,iDIC) + sedflux(i,j,iDIC)/ &
+               f(i,j,nz,iDIC) = AMAX1(f(i,j,nz,iDIC) - sedflux(i,j,iDIC)/ &
      & dz(i,j,nz)*dT/SDay,0.)
 
 !NH4 Exchange
-               f(i,j,nz,iNH4) = AMAX1(f(i,j,nz,iNH4) + sedflux(i,j,iNH4)/ &
+               f(i,j,nz,iNH4) = AMAX1(f(i,j,nz,iNH4) - sedflux(i,j,iNH4)/ &
      & dz(i,j,nz)*dT/SDay,0.)
 !NO3 Exchange
-               f(i,j,nz,iNO3) = AMAX1(f(i,j,nz,iNO3) + sedflux(i,j,iNO3)/ &
+               f(i,j,nz,iNO3) = AMAX1(f(i,j,nz,iNO3) - sedflux(i,j,iNO3)/ &
      & dz(i,j,nz)*dT/SDay,0.)
 !O2 Exchange
-               f(i,j,nz,iO2) = AMAX1(f(i,j,nz,iO2) + sedflux(i,j,iO2)/ &
+               f(i,j,nz,iO2) = AMAX1(f(i,j,nz,iO2) - sedflux(i,j,iO2)/ &
      & dz(i,j,nz)*dT/SDay,0.)
 !OM1 Exchange
                 sedflux_iOM1_bc = sedflux(i,j,iOM1_bc)/dz(i,j,nz)*dT/SDay
-                !!write(6,*) "f,sf",f(i,j,nz,iOM1_bc),sedflux_iOM1_bc
-               f(i,j,nz,iOM1_bc) = AMAX1(f(i,j,nz,iOM1_bc)+sedflux_iOM1_bc,0.)
-                !write(6,*) "after f",f(i,j,nz,iOM1_bc)
+               f(i,j,nz,iOM1_bc) = AMAX1(f(i,j,nz,iOM1_bc)-sedflux_iOM1_bc,0.)
 !OM2 Exchange
-               f(i,j,nz,iOM2_bc) = AMAX1(f(i,j,nz,iOM2_bc) + sedflux(i,j,iOM2_bc)/ &
+               f(i,j,nz,iOM2_bc) = AMAX1(f(i,j,nz,iOM2_bc) - sedflux(i,j,iOM2_bc)/ &
      & dz(i,j,nz)*dT/SDay,0.)
 !ALK Exchange
-               f(i,j,nz,iALK) = AMAX1(f(i,j,nz,iALK) + sedflux(i,j,iALK)/ &
+               f(i,j,nz,iALK) = AMAX1(f(i,j,nz,iALK) - sedflux(i,j,iALK)/ &
      & dz(i,j,nz)*dT/SDay,0.)
 endif
 

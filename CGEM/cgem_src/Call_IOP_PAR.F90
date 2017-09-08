@@ -85,7 +85,6 @@
       CDOM(k) = CDOM(k) * exp(-0.016*(490.-312.))
    enddo 
 
-
 !Initialize counters for Chla, CDOM, and detritus:
    Chla_tot = 0.
    CDOM_tot = 0.

@@ -30,12 +30,12 @@
 ! Run the simulation
 
 ! Total years is ndays*2
-       ndays=1 !400 !Iterations, Arrays are hardwired for 400(max)
+       ndays= 400 !Iterations, Arrays are hardwired for 400(max)
 !One iteration for testing:
 !      ndays=1
 !      ndays=20
-      maxres=1e-2
-      !if(init.eq.0) maxres=1e-5
+      maxres=1e-5
+      if(init.eq.1) maxres=1e-5
       init=0
 #ifdef DEBUG
      write(6,*) "A ndays ppH_init",ppH_init(1:3)

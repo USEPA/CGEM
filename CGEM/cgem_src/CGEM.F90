@@ -417,7 +417,7 @@
                  & PARsurf    , SunZenithAtm,                          &
                  & CDOM_k     , Chla_tot_k,                            &
                  & OM1A_k     , OM1Z_k,                                &
-                 & OM1SPM_k   , OM1BC_k, d(i,j,:),                       &
+                 & OM1SPM_k   , OM1BC_k, d(i,j,:),                     &
                  & nz         , d_sfc(i,j,:),                          &
                  & PAR_percent_k,                                      &
                  & PARbot     , PARdepth_k                         )

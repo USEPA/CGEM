@@ -74,7 +74,14 @@ write(6,*) "After Read_InputFile"
   
       call Get_Vars(TC_8) !Hydro for initial timestep 
 
+#ifdef DEBUG1
+     write(6,*) S(9,21,1),T(9,21,1)
+#endif
       call Set_Vars(Which_code,init_filename) !initialize 'f' array
+#ifdef DEBUG1
+     write(6,*) f(9,21,1,:)
+#endif 
+
 
 #ifdef DEBUG
 write(6,*) "After Set_Vars"

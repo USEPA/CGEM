@@ -27,8 +27,8 @@ lines(time,rdata,col=color)
 
 
 get_ylim <- function(indata,range) {
- ymin <- min(indata) 
- ymax <- max(indata)
+ ymin <- min(indata,na.rm=TRUE) 
+ ymax <- max(indata,na.rm=TRUE)
  if(!is.null(range)){
   ymin <- range[1]
   ymax <- range[2]
