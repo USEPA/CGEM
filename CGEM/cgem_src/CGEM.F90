@@ -417,7 +417,7 @@
                  & PARsurf    , SunZenithAtm,                          &
                  & CDOM_k     , Chla_tot_k,                            &
                  & OM1A_k     , OM1Z_k,                                &
-                 & OM1SPM_k   , OM1BC_k, d(i,j,:),                       &
+                 & OM1SPM_k   , OM1BC_k, d(i,j,:),                     &
                  & nz         , d_sfc(i,j,:),                          &
                  & PAR_percent_k,                                      &
                  & PARbot     , PARdepth_k                         )
@@ -716,7 +716,7 @@
 !-A; Phytoplankton number density (cells/m3);
 !---------------------------------------------------------
       ff(i,j,k,iA(isp)) = AMAX1(f(i,j,k,iA(isp))                              &
-      & + ( Agrow - Aresp - ZgrazA_tot(isp) - Amort(isp) )*dTd,1.)
+      & + ( Agrow - Aresp - ZgrazA_tot(isp) - Amort(isp) )*dTd,1.e-8)
 #ifdef CAL_PHYTO
       if (  mod( istep, iout ) .eq. 0 ) then
         write(6,300) "Agrow,Aresp,ZgrazA,Amort,total",Agrow,-Aresp, &

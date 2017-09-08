@@ -56,7 +56,7 @@ C
 
 
       DO IC=1,ndays
-         !write(6,*) "IC",IC
+         write(6,*) "IC",IC
          val1(IC)= temp
          val2(IC)= temp + step
          temp    = val2(IC)
@@ -121,6 +121,7 @@ C
 !       WRITE(*,260) ISTATE
 
        if(maxval(residual).le.maxres.or.IC.eq.ndays) then
+        write(6,*) "residual=",residual
         EXIT 
        endif
 

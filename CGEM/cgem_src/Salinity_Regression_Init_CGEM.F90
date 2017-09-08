@@ -24,19 +24,6 @@ Subroutine Salinity_Regression_Init_CGEM()
       write(6,*) "start,dT",START_SECONDS, dT
 #endif
 
-!      if(Which_gridio.eq.0) then
-!       if(Read_Sal.eq.0) then
-!        call Calc_Sal(S)
-!       else
-!        call USER_Read(START_SECONDS,S,'s',2)
-!       endif
-!       if(Read_T.eq.0) then
-!         call Calc_Temp(START_SECONDS,START_SECONDS,T)
-!       else
-!        call USER_Read(START_SECONDS,T,'t',2)
-!       endif
-!     endif
-
     do j = 1,jm
       do i = 1,im 
 
@@ -136,6 +123,33 @@ Subroutine Salinity_Regression_Init_CGEM()
       enddo
     enddo
     enddo
+
+#ifdef test1d
+f(1,1,1,1:6) =  6.882082e+07
+f(1,1,2,1:6) =   6.935694e+07
+f(1,1,3,1:6) =   6.989742e+07
+f(1,1,4,1:6) =   7.044161e+07
+f(1,1,5,1:6) =   7.099245e+07
+f(1,1,6,1:6) =   7.15845e+07
+f(1,1,7,1:6) =   7.222927e+07
+f(1,1,8,1:6) =   7.292943e+07
+f(1,1,9,1:6) =   7.36047e+07
+f(1,1,10,1:6) =   7.44781e+07
+f(1,1,11,1:6) =   7.482808e+07
+f(1,1,12,1:6) =   7.493862e+07
+f(1,1,13,1:6) =   7.400868e+07
+f(1,1,14,1:6) =   7.383831e+07
+f(1,1,15,1:6) =   7.197927e+07
+f(1,1,16,1:6) =   6.968458e+07
+f(1,1,17,1:6) =   6.885577e+07
+f(1,1,18,1:6) =   6.729714e+07
+f(1,1,19,1:6) =   6.750278e+07
+f(1,1,20,1:6) =   6.79578e+07
+           do k=1,nsl
+            f( 1, 1, k, iZ(1) ) = 2.e-6 * SUM(f( 1, 1, k, iA(:)))/3./real(nospZ)
+            f( 1, 1, k, iZ(2) ) = 2.e-5 * SUM(f( 1, 1, k, iA(:)))/3./real(nospZ)
+           enddo
+#endif
 
 #ifdef DEBUG
       write(6,*) "In (bottom) Salinity Regression"

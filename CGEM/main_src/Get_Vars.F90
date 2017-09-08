@@ -64,13 +64,13 @@
 
 #ifdef DEBUG1
         write(6,*) "Which_gridio",Which_gridio
-        write(6,*) "Kh",Kh(1,1,1:7)
-        write(6,*) "E",E(1,1)
-        write(6,*) "S",S(1,1,1:7)
-        write(6,*) "T",T(1,1,1:7)
-        write(6,*) "Ux",Ux(1,1,1:7)
-        write(6,*) "Vx",Vx(1,1,1:7)
-        write(6,*) "Wx",Wx(1,1,1:7)
+        write(6,*) "Kh",Kh(9,21,1:7)
+        write(6,*) "E",E(9,21)
+        write(6,*) "S",S(9,21,1:7)
+        write(6,*) "T",T(9,21,1:7)
+        write(6,*) "Ux",Ux(9,21,1:7)
+        write(6,*) "Vx",Vx(9,21,1:7)
+        write(6,*) "Wx",Wx(9,21,1:7)
 #endif
 
 #ifdef DEBUG

@@ -17,7 +17,7 @@ integer isp,isz
 real i_in,j_in,tot,x
 real, parameter :: SDay = 86400.0  ! # of sec in 24 hr day
 character(120) filename
-
+real eps
 
 ws(1:nf) = 0.
 !--Code Identifier--------------
@@ -181,9 +181,12 @@ stoich_z1Z_init = 1.
 stoich_z2Z_init = 1.
 
 Athresh  = Athresh*volcell   ! Threshold for grazing, um^3/m3
+eps=0
 do isp=1,nospA
-   alphad(isp) = alpha(isp)/umax(isp) ! Initial slope of photosynthesis-irradiance curve / Vmax
-   betad(isp)  = beta(isp)/umax(isp)  ! Photoinhibition constant / Vmax
+   eps=0
+   if(umax(isp).eq.0) eps=1.e-18
+   alphad(isp) = alpha(isp)/(umax(isp)+eps) ! Initial slope of photosynthesis-irradiance curve / Vmax
+   betad(isp)  = beta(isp)/(umax(isp)+eps)  ! Photoinhibition constant / Vmax
 enddo
 
 !Convert relative proportions of phytoplankton to percentage of total chlA

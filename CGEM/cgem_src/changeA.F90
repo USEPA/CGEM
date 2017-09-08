@@ -90,8 +90,14 @@
       A(58) = f(iDIC)
       A(59) = A(57)
       A(60) = A(49) 
-      A(61) = (f(iOM1_A)*ws(iOM1_A)+f(iOM1_Z)*ws(iOM1_Z))*12.*86400.
-      A(62) = (f(iOM1_R)*ws(iOM1_R)+f(iOM1_BC)*ws(iOM1_BC))*12.*86400.
+      A(62) = (f(iOM1_A)*ws(iOM1_A)+f(iOM1_Z)*ws(iOM1_Z))*12.
+      A(63) = (f(iOM1_R)*ws(iOM1_R)+f(iOM1_BC)*ws(iOM1_BC))*12.
+
+#ifdef SDM_DEBUG
+        do ii=1,64
+          write(*,*)'i=',ii,'A=',A(ii)
+        enddo
+#endif
 
       RETURN
 

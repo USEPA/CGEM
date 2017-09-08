@@ -69,10 +69,12 @@
           uP_k(k,:)   = f_P(:)  * umax(:) * Tadj(1:nospA)
           uE_k(k,:)   = f_E(:)  * umax(:) * Tadj(1:nospA) 
           uSi_k(k,:)  = f_Si(:) * umax(:) * Tadj(1:nospA)
+          !write(6,*) f_E,umax,uE_k
 
          if(Which_growth.eq.1) then
             do isp=1,nospA
                uA(isp) = umax(isp) * Tadj(isp) * AMIN1(min_S(isp),f_E(isp)) ! Minimum Formulation
+            !   write(6,*) "k=",k,uA,f_E,min_S,AMIN1(min_S(isp),f_E(isp))
             enddo
          else if(Which_growth.eq.2) then
             uA(:) = umax(:) * Tadj(1:nospA) * f_E(:) * min_S(:)   ! Product Formulation
