@@ -716,7 +716,7 @@
 !-A; Phytoplankton number density (cells/m3);
 !---------------------------------------------------------
       ff(i,j,k,iA(isp)) = AMAX1(f(i,j,k,iA(isp))                              &
-      & + ( Agrow - Aresp - ZgrazA_tot(isp) - Amort(isp) )*dTd,1.e-8)
+      & + ( Agrow - Aresp - ZgrazA_tot(isp) - Amort(isp) )*dTd,1.)
 #ifdef CAL_PHYTO
       if (  mod( istep, iout ) .eq. 0 ) then
         write(6,300) "Agrow,Aresp,ZgrazA,Amort,total",Agrow,-Aresp, &
