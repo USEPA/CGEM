@@ -28,7 +28,7 @@ IRIS_INC  = -I. -I/usr/local/apps/netcdf-4.4.0/gcc-4.4.7/include/
 IRIS_LIBS = -L. -L/usr/local/apps/netcdf-4.4.0/gcc-4.4.7/lib/ -lnetcdff -lnetcdf
 
 OTHER_INC   = -I. -I/usr/local/include
-OTHER_LIBS  = -L/usr/local/lib -lnetcdff -L/usr/local/bin -lnetcdf 
+OTHER_LIBS  = -L. -L/usr/local/lib -lnetcdff -L/usr/local/bin -lnetcdf 
 
 ### =============== End User Modifiable Section  =============== ####
 include main_src/src_files
