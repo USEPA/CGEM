@@ -19,6 +19,7 @@
 *__genmod.f90
 *__genmod.mod
 *.mod
+CGEM
 
 # Binary data files
 *.bin
