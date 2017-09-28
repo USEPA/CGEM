@@ -23,29 +23,35 @@ integer Read_Solar,Read_Wind,Read_T,Read_Sal
 integer InitializeHow
 integer Which_hydro
 integer Which_Output
-
+integer Which_VMix
+integer Which_Adv
 !----Sinking Terms----------------------------------
 real,allocatable :: ws(:)
 
 contains
 
-Subroutine INPUT_VARS_allocate
+Subroutine Allocate_Input
 
 USE Model_dim, ONLY : nf
-USE Fill_Value
 
 IMPLICIT NONE
 
 integer ierr
+
+#ifdef map_code
+write(6,*) "---INPUT_VARS---"
+write(6,*) " general allocate, just ws, default is no sinking"
+write(6,*) 
+#endif
 
 !----Sinking Terms----------------------------------
 ALLOCATE( ws(nf),stat=ierr ) 
 if(ierr.ne.0) write(6,*) "error allocate"
 return
 
-ws=fill(0)  !Fill values for netCDF
+ws= 0.  !Default is no sinking
 
-END Subroutine INPUT_VARS_allocate
+END Subroutine Allocate_Input
 
 END MODULE INPUT_VARS
 

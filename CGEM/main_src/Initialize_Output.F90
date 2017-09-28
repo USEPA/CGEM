@@ -11,16 +11,10 @@ if(Which_code.eq."CGEM") then !CGEM
 
    !Fix up NETCDF output according to InputFile:
       call Init_Output_CGEM(BASE_NETCDF_OUTPUT_FILE_NAME)
-#ifdef DEBUG
-write(6,*) "After Output_CGEM"
-#endif
 
 
 else if(Which_code.eq."GOMDOM") then !GOMDOM
      call Init_Output_GD(BASE_NETCDF_OUTPUT_FILE_NAME)
-#ifdef DEBUG
-write(6,*) "After Output_GD"
-#endif
 
 else
 

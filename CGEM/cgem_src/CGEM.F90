@@ -33,37 +33,37 @@
 !---------------------------------------------------------------------------------------
 ! Local Variables
 !-----------------------------------------------------
-    real ::  ff(im,jm,nsl,nf)        ! Holds the nf state vectors
+    real ::  ff(im,jm,km,nf)        ! Holds the nf state vectors
     integer        ::  i, j, k, isp, isz ! Loop indicies, isp/isz is for phytoplankton/zooplankton species
     integer, save  ::  init  = 1         ! Declare some variables only at first subroutine call
     integer        ::  Is_Day            ! Switch for day/night for phytoplankton nutrient uptake only, Is_Day=0 means night
 !------------------------------------ 
 ! Variables to hold netCDF output
-    real    :: PAR_percent_ijk(im,jm,nsl) ! Percent Irradiance at mid cell (quanta/cm2/sec)
-    real    :: PARdepth_ijk(im,jm,nsl)    ! Percent Irradiance at mid cell (quanta/cm2/sec) 
-    real    :: uN_ijk(im,jm,nsl,nospA)    ! Nitrogen Limited growth rate (1/d)
-    real    :: uP_ijk(im,jm,nsl,nospA)    ! Phosphorus limited growth rate (1/d)
-    real    :: uE_ijk(im,jm,nsl,nospA)    ! Light limited growth rate (1/d)
-    real    :: uSi_ijk(im,jm,nsl,nospA)   ! Silica limited growth rate (1/d)
-    real    :: uA_ijk(im,jm,nsl,nospA)    ! Specific growth rate (1/d)
-    real    :: Chla_tot_ijk(im,jm,nsl)    ! Total Chl-a concentration from all phytoplankton (mg/m3)
-    real    :: Chl_C_ijk(im,jm,nsl,nospA)    ! Chl:C from each phytoplankton species
+    real    :: PAR_percent_ijk(im,jm,km) ! Percent Irradiance at mid cell (quanta/cm2/sec)
+    real    :: PARdepth_ijk(im,jm,km)    ! Percent Irradiance at mid cell (quanta/cm2/sec) 
+    real    :: uN_ijk(im,jm,km,nospA)    ! Nitrogen Limited growth rate (1/d)
+    real    :: uP_ijk(im,jm,km,nospA)    ! Phosphorus limited growth rate (1/d)
+    real    :: uE_ijk(im,jm,km,nospA)    ! Light limited growth rate (1/d)
+    real    :: uSi_ijk(im,jm,km,nospA)   ! Silica limited growth rate (1/d)
+    real    :: uA_ijk(im,jm,km,nospA)    ! Specific growth rate (1/d)
+    real    :: Chla_tot_ijk(im,jm,km)    ! Total Chl-a concentration from all phytoplankton (mg/m3)
+    real    :: Chl_C_ijk(im,jm,km,nospA)    ! Chl:C from each phytoplankton species
 !-------------------------------------------------------------------------
 ! Phytoplankton parameters
  !Phytoplankton uptake and growth
-    real, dimension(nospA,nsl) :: A_k      ! Phytoplankton number density (cells/m3)
+    real, dimension(nospA,km) :: A_k      ! Phytoplankton number density (cells/m3)
     real    :: Agrow                       ! Phytoplankton growth (cells/m3/d)
-    real, dimension(nospA,nsl) :: Agrow_k  ! Phytoplankton growth (cells/m3/d)
+    real, dimension(nospA,km) :: Agrow_k  ! Phytoplankton growth (cells/m3/d)
     real    :: uA                 ! Specific growth rate (1/d)
-    real    :: uA_k(nsl,nospA)    ! Specific growth rate (1/d)
-    real    :: uN_k(nsl,nospA)    ! Nitrogen Limited growth rate (1/d)
-    real    :: uP_k(nsl,nospA)    ! Phosphorus limited growth rate (1/d)
-    real    :: uE_k(nsl,nospA)    ! Light limited growth rate (1/d)
-    real    :: uSi_k(nsl,nospA)   ! Silica limited growth rate (1/d)
+    real    :: uA_k(km,nospA)    ! Specific growth rate (1/d)
+    real    :: uN_k(km,nospA)    ! Nitrogen Limited growth rate (1/d)
+    real    :: uP_k(km,nospA)    ! Phosphorus limited growth rate (1/d)
+    real    :: uE_k(km,nospA)    ! Light limited growth rate (1/d)
+    real    :: uSi_k(km,nospA)   ! Silica limited growth rate (1/d)
     real    :: f_Qn(nospA)        ! Quota model for N
     real    :: f_Qp(nospA)        ! Quota model for P
-    real    :: Qn,Qn_k(nospA,nsl) ! Phytoplankton Nitrogen Quota (mmol-N/cell)
-    real    :: Qp,Qp_k(nospA,nsl) ! Phytoplankton Phosphorus Quota (mmol-P/cell)
+    real    :: Qn,Qn_k(nospA,km) ! Phytoplankton Nitrogen Quota (mmol-N/cell)
+    real    :: Qp,Qp_k(nospA,km) ! Phytoplankton Phosphorus Quota (mmol-P/cell)
     real    :: vN    ! Phytoplankton uptake rate of Nitrogen (mmol-N/cell/d)
     real    :: vP    ! Phytoplankton uptake rate of Phosphorus (mmol-P/cell/d)
     real    :: vSi   ! Phytoplankton uptake rate of Silica (mmol-Si/cell/d)
@@ -83,12 +83,12 @@
     real    :: AexudN          ! Sum of Exudation of N from all phytoplankton groups (mmol-N/m3/d)
     real    :: AexudP          ! Sum of Exudation of P from all phytoplankton groups (mmol-P/m3/d)
     real    :: Aresp           ! Total respiration from a phytoplankton group (cells/m3/d)
-    real    :: Aresp_k(nospA,nsl) ! Total respiration from a phytoplankton group (cells/m3/d)
+    real    :: Aresp_k(nospA,km) ! Total respiration from a phytoplankton group (cells/m3/d)
     real    :: ArespC          ! Phytoplankton equivalent carbon loss from respiration (mmol-C/m3/d)
 !------------------------------------------------------------------
 ! Zooplankton parameters
  !Zooplankton uptake and growth
-    real, dimension(nospZ,nsl)   :: Z_k      ! Zooplankton number density (indv./m3)
+    real, dimension(nospZ,km)   :: Z_k      ! Zooplankton number density (indv./m3)
     real, dimension(nospZ)       :: optNP    ! Optimal nutrient ratio for zooplankton
     real, dimension(nospZ)       :: Z        ! Zooplankton
     real, dimension(nospZ)       :: Zgrow    ! Zooplankton growth (indv./m3/d)
@@ -172,29 +172,29 @@
 !---------------------------------------------------------
 ! Variables needed for light routine and calc_Agrow
     real    :: SunZenithAtm       ! Solar beam zenith angle
-    real    :: sunang             ! Function, calculates solar beam zenith angle
+    real    :: calc_solar_zenith  ! Function, calculates solar beam zenith angle
     real    :: Katt               ! Attenuation coefficient for Irradiance model 2 
     real    :: tmpexp             ! Intermediate calculation
     real    :: PARbotkm1          ! Irradiance at bottom of layer k-1 (quanta/cm2/s)
     real    :: PARtopk            ! Irradiance at top of layer k (quanta/cm2/s)
     real    :: PARsurf            ! Irradiance just below the sea surface (quanta/cm2/s) 
     real    :: PARbot             ! Irradiance at sea floor (quanta/cm2/s)
-    real    :: PARdepth_k(nsl)    ! Irradiance at center of layer k (quanta/cm2/s)
-    real    :: PAR_percent_k(nsl) ! Percent irradiance at center of layer k (quanta/cm2/s)
-    real       :: aDailyRad_k(nsl), aRadSum_k(nsl)
+    real    :: PARdepth_k(km)    ! Irradiance at center of layer k (quanta/cm2/s)
+    real    :: PAR_percent_k(km) ! Percent irradiance at center of layer k (quanta/cm2/s)
+    real       :: aDailyRad_k(km), aRadSum_k(km)
     real, parameter :: RADCONV = 1./6.0221413*1.e-19 ! Convert quanta/cm2/s to mol/m2/s:
                                                !  = quanta/cm2/s * 1 mol/Avogadro# * 10,000cm2/m2
                                                !  = (1/6.022e23) * 1.0e4 = (1./6.022)e-23 * 1.0e4
                                                !  = (1./6.0221413)*1.e-19
-    real, dimension(nsl) :: Chla_tot_k  ! Total amount of Chl-a in all the
+    real, dimension(km) :: Chla_tot_k  ! Total amount of Chl-a in all the
                                         !  phytoplankton species (mg/m3) per cell
-    real, dimension(nospA,nsl) :: Chl_C_k     ! Chl:C
-    real, dimension(nsl) :: OM1A_k, OM1Z_k, OM1SPM_k, OM1BC_k !POC in g/m3
-    real, dimension(nsl) :: CDOM_k    ! CDOM, ppb
-    real, dimension(nsl) :: N_k       ! Nitrogen, mmol/m3
-    real, dimension(nsl) :: P_k       ! Phosphorus, mmol/m3
-    real, dimension(nsl) :: Si_k      ! Silica, mmol/m3
-    real, dimension(nsl) :: S_k, T_k  ! Salinity and Temperature(Celsius)
+    real, dimension(nospA,km) :: Chl_C_k     ! Chl:C
+    real, dimension(km) :: OM1A_k, OM1Z_k, OM1SPM_k, OM1BC_k !POC in g/m3
+    real, dimension(km) :: CDOM_k    ! CDOM, ppb
+    real, dimension(km) :: N_k       ! Nitrogen, mmol/m3
+    real, dimension(km) :: P_k       ! Phosphorus, mmol/m3
+    real, dimension(km) :: Si_k      ! Silica, mmol/m3
+    real, dimension(km) :: S_k, T_k  ! Salinity and Temperature(Celsius)
     real, parameter :: C_cf  = 12.0E-3    ! C conversion factor (mmol-C/m3 to g-C/m3) 
 !-----------------------------------------------------------------------
 ! Other variables 
@@ -276,7 +276,7 @@
 
 
        optNP = ZQn/ZQp    ! Optimal nutrient ratio for zooplankton
-
+!write(6,*) "istep=",istep
 !-----------------------------------------------------------------
 !   Begin main ij loop for the biogeochemistry 
 !   calculations at time-level istep
@@ -375,8 +375,8 @@
       julianDay = mdate_julian(iMonTC,iDayTC,leapyr)
 
  ! Now calculate SunZenithAtm, the solar beam zenith angle in radians
- ! for a given GMT Julian day, hour, latitude and and longitude
-     SunZenithAtm = sunang(julianDay, HrTC, lat(i,j), lon(i,j))
+ ! for a given GMT Julian day, hour, longitude and latitude 
+     SunZenithAtm = calc_solar_zenith(lat(i,j), lon(i,j),  HrTC, julianDay, leapyr)
 
  !--Begin Calculate atmospheric model --------------------------------
          ! Rad(i,j) is short wave generated by NRL is used,
@@ -385,6 +385,10 @@
          ! Hardcoded to 0.47 on 2/11/16, Re: Tsubo and Walker, 2005
                     PARsurf = (0.47 * Rad(i,j)) * PARfac
  !--End Calculate atmospheric model ---------------------------------------------
+
+!write(6,*) "PARsurf in GEM_EPA",PARsurf,Rad(i,j),PARfac
+!write(6,*) "lat/lon",lat(i,j),lon(i,j)
+!write(6,*) "SunZenithAtm",SunZenithAtm,julianDay,HrTC
 
 !----------------------------------------------------------------------------
 ! Execute the desired underwater light model to calculate the 1-D radiation
@@ -422,7 +426,14 @@
                  & PAR_percent_k,                                      &
                  & PARbot     , PARdepth_k                         )
 
-
+#ifdef DEBUG_LIGHT
+                 write(6,*) "percent", PAR_percent_k(1),PAR_percent_k(6),PAR_percent_k(12),PAR_percent_k(20)
+                 write(6,*) "depth", PARdepth_k(1),PARdepth_k(6),PARdepth_k(12),PARdepth_k(20)
+                 write(6,*) "BC", m_OM_init,m_OM_BC,m_OM_sh
+                 write(6,*) "d_sfc,nz",d_sfc(i,j,:),nz
+                 write(6,*) "bot",PARbot
+                  write(6,*) "Chl,A,Z,SP,BC",Chla_tot_k(1),OM1A_k(1),OM1Z_k(1),OM1SPM_k(1),OM1BC_k(1)
+#endif
                  !-------------------------------------------------
          case (2)! Upgraded form of the original underwater light
                  ! model of Pete Eldridge is used. Now accounts for
@@ -433,7 +444,6 @@
                  PARbotkm1 = PARsurf             ! initialize at top of
                                                  ! column i,j., i.e.
                                                  ! at bottom of layer "zero".
-
                  do k = 1, nz
                    !Calculate attenuation coefficient
                      Katt    = Kw                                                  &
@@ -730,7 +740,7 @@
 !-Qn: Phytoplankton Nitrogen Quota (mmol-N/cell)
 !----------------------------------------------------------------------
       Qn = f(i,j,k,iQn(isp))                              &
-    &               + (vN - Qn*uA - AexudN_A(isp))*dTd
+    &               + (vN - Qn*uA)*dTd
 
 ! Enforce minima, also enforce maxima if not equal Droop (Which_quota=1)
       if(Which_quota.eq.1) then
@@ -745,7 +755,7 @@
 !-Qp: Phytoplankton Phosphorus Quota (mmol-P/cell)
 !----------------------------------------------------------------------
       Qp = f(i,j,k,iQp(isp))                              &
-       &               + (vP - Qp*uA - AexudP_A(isp))*dTd
+       &               + (vP - Qp*uA)*dTd
 
 ! Enforce minima, also enforce maxima if not equal Droop (Which_quota=1)
       if(Which_quota.eq.1) then
@@ -871,10 +881,13 @@
 ! Carbon Chemistry
 !--------------------------------------------------------------
 !!! MOCSY alkalinity expressions:
-#ifdef DEBUGVARS
-write(6,*) "temp=",T(i,j,k)
-write(6,*) "DIC=",f(i,j,k,iDIC)
-#endif
+!#ifdef DEBUGVARS
+!if(istep.gt.200) then
+!write(6,*) "i,j,k",i,j,k
+!write(6,*) "temp=",T(i,j,k)
+!write(6,*) "DIC=",f(i,j,k,iDIC)
+!endif
+!#endif
         m_alk = f(i,j,k,iALK)/1000.
         m_dic = f(i,j,k,iDIC)/1000.
         m_si  = f(i,j,k,iSi)/1000.
@@ -1018,9 +1031,10 @@ enddo
 
                                              ! Dissolved
 
-
+ !write(6,*) stoich_x1A
    !This calculates the cumulative stoichiometry ratios for OM1_A
    if(OM1_CA.gt.tiny(x)) then
+!   if(OM1_CA.ne.0) then
     stoich_x1A = (OM1_CA*dTd + OM1_A) / (OM1_PA*dTd + (1/s_x1A(i,j,k))*OM1_A) ! C/P
     stoich_y1A = (OM1_NA*dTd + (s_y1A(i,j,k)/s_x1A(i,j,k))*OM1_A) / (OM1_PA*dTd + (1/s_x1A(i,j,k))*OM1_A) !N/P
     stoich_z1A = 1.
@@ -1036,6 +1050,7 @@ enddo
 
    !This calculates the cumulative stoichiometry ratios for OM2_A
    if(OM2_CA.gt.tiny(x)) then
+!    if(OM2_CA.ne.0) then
     stoich_x2A = (OM2_CA*dTd + OM2_A) / (OM2_PA*dTd + (1/s_x2A(i,j,k))*OM2_A) ! C/P
     stoich_y2A = (OM2_NA*dTd + (s_y2A(i,j,k)/s_x2A(i,j,k))*OM2_A) / (OM2_PA*dTd + (1/s_x2A(i,j,k))*OM2_A) !N/P
     stoich_z2A = 1.
@@ -1088,6 +1103,7 @@ enddo
 
    !This calculates the cumulative stoichiometry ratios for OM1_Z
    if(OM1_CZ.gt.tiny(x)) then
+!    if(OM1_CZ.ne.0) then
     stoich_x1Z = (OM1_CZ*dTd + OM1_Z) / (OM1_PZ*dTd + (1./s_x1Z(i,j,k))*OM1_Z) ! C/P
     stoich_y1Z = (OM1_NZ*dTd + (s_y1Z(i,j,k)/s_x1Z(i,j,k))*OM1_Z) / (OM1_PZ*dTd + (1./s_x1Z(i,j,k))*OM1_Z) !N/P
     stoich_z1Z = 1.
@@ -1103,6 +1119,7 @@ enddo
 
    !This calculates the cumulative stoichiometry ratios for OM2_Z
    if(OM2_CZ.gt.tiny(x)) then
+!    if(OM2_CZ.ne.0) then
     stoich_x2Z = (OM2_CZ*dTd + OM2_Z) / (OM2_PZ*dTd + (1./s_x2Z(i,j,k))*OM2_Z) !  C/P
     stoich_y2Z = (OM2_NZ*dTd + (s_y2Z(i,j,k)/s_x2Z(i,j,k))*OM2_Z) / (OM2_PZ*dTd + (1./s_x2Z(i,j,k))*OM2_Z) !N/P
     stoich_z2Z = 1.
@@ -1127,7 +1144,7 @@ enddo
 !-NH4; Ammonium (mmol-N/m3)
 !--------------------------------
        ff(i,j,k,iNH4) = AMAX1(f(i,j,k,iNH4)                            &
-       & + ( RNH4 - AupN*NH4/(NO3+NH4) + 2.*AexudN + SUM(ZexN)  )*dTd, 0.0)          
+       & + ( RNH4 - AupN*NH4/(NO3+NH4) + AexudN + SUM(ZexN)  )*dTd, 0.0)          
 
 !----------------------------
 !-Silica: (mmol-Si/m3)
@@ -1139,7 +1156,7 @@ enddo
 !-PO4: Phosphate (mmol-P/m3)
 !--------------------------------------
       ff(i,j,k,iPO4) = AMAX1(f(i,j,k,iPO4)                             &
-      & + ( RPO4 - AupP + 2.*AexudP + SUM(ZexP)  )*dTd, 0.0)
+      & + ( RPO4 - AupP + AexudP + SUM(ZexP)  )*dTd, 0.0)
 
 !---------------------------------------------------------
 !-DIC: Dissolved Inorganic Carbon (mmol-C/m3)
@@ -1230,7 +1247,10 @@ enddo
 !----------------------------
        ff(i,j,k,iALK) =  AMAX1(f(i,j,k,iALK) +                 &
       & (RALK + AupN*NO3/(NO3+NH4) - AupN*NH4/(NO3+NH4) + AupP + 4.8*AupP)*dTd, 0.0) 
-                      
+                
+!Tracer
+       ff(i,j,k,iTr) =  f(i,j,k,iTr)       
+      
 !--------------------------------------------------------------------
         enddo   ! end of  "do k = 1, nz" 
 
@@ -1252,7 +1272,7 @@ enddo
 !--------------------------------------------------------
   ! -- do initialization of first timestep:
       if (   istep .eq. 1 ) then
-                 CALL WRITE_EXTRA_DATA( im, jm, nsl, EXTRA_VARIABLES, nospA, 0, &
+                 CALL WRITE_EXTRA_DATA( im, jm, km, EXTRA_VARIABLES, nospA, 0, &
                                      PARdepth_ijk, &
                                   PAR_percent_ijk, &
                                         uN_ijk, &
@@ -1277,7 +1297,7 @@ enddo
 
   ! --- dump output when istep is a multiple of iout
       if (  mod( istep, iout ) .eq. 0 ) then
-                 CALL WRITE_EXTRA_DATA( im, jm, nsl, EXTRA_VARIABLES, nospA, istep_out+1, &
+                 CALL WRITE_EXTRA_DATA( im, jm, km, EXTRA_VARIABLES, nospA, istep_out+1, &
                                      PARdepth_ijk, &
                                   PAR_percent_ijk, &
                                         uN_ijk, &

@@ -41,7 +41,7 @@ CONTAINS
   ! then call CLOSE_FILE then
   ! worker processes should call OPEN_FILE, WRITE_DATA, CLOSE_FILE.
   !
-  SUBROUTINE CREATE_FILE( NAME, IM, JM, NSL, NSTEP, VARIABLES,    &
+  SUBROUTINE CREATE_FILE( NAME, IM, JM, KM, NSTEP, VARIABLES,    &
                           EXTRA_VARIABLES, IYR0, &
                           IYRS, IMONS, IDAYS, IHRS, IMINS, ISECS, &
                           IYRE, IMONE, IDAYE, IHRE, IMINE, ISECE, &
@@ -56,7 +56,7 @@ CONTAINS
 
     IMPLICIT NONE
     CHARACTER(LEN=*),INTENT(IN):: NAME
-    INTEGER,INTENT(IN):: IM, JM, NSL
+    INTEGER,INTENT(IN):: IM, JM, KM
     INTEGER,INTENT(IN):: NSTEP
     INTEGER,INTENT(IN):: VARIABLES, EXTRA_VARIABLES
     INTEGER,INTENT(IN):: IYR0 ! Reference year (before start of model run).
@@ -65,15 +65,14 @@ CONTAINS
     INTEGER,INTENT(IN):: DT_OUT ! Model timestep size in seconds.
     REAL,DIMENSION(IM,JM):: RLON
     REAL,DIMENSION(IM,JM):: RLAT
-    REAL,DIMENSION(IM, JM, NSL):: DZ
-    REAL, DIMENSION(IM,JM,NSL) :: depth 
-    INTEGER,DIMENSION(IM, JM),INTENT(IN):: FM
+    REAL,DIMENSION(IM, JM, KM):: DZ
+    REAL, DIMENSION(IM,JM,KM) :: depth 
+    REAL,INTENT(IN):: FM(IM,JM,KM)
    ! External NetCDF routines:
     INTEGER NF_CREATE, NF_ENDDEF, NF_PUT_VAR_INT, NF_PUT_VAR_REAL, NF_SYNC
     EXTERNAL NF_CREATE, NF_ENDDEF, NF_PUT_VAR_INT, NF_PUT_VAR_REAL, NF_SYNC
    ! Locals:
-    INTEGER,DIMENSION(IM, JM, NSL):: TEMP_3D_FM ! VLA
-    INTEGER IM_DIM, JM_DIM, NSL_DIM, NSTEPP1_DIM
+    INTEGER IM_DIM, JM_DIM, KM_DIM, NSTEPP1_DIM
     INTEGER RLON_VAR, RLAT_VAR, H_VAR, FM_VAR
     INTEGER DZ_VAR
     INTEGER K, i, J
@@ -90,7 +89,7 @@ CONTAINS
     ! Create dimensions:
     CALL DEFDIM( FILE_ID, IM_DIM, 'longitude', IM )
     CALL DEFDIM( FILE_ID, JM_DIM, 'latitude', JM )
-    CALL DEFDIM( FILE_ID, NSL_DIM, 'k', NSL )
+    CALL DEFDIM( FILE_ID, KM_DIM, 'k', KM )
 !!  CALL DEFDIM( FILE_ID, NSTEPP1_DIM, 'time', NSTEP )
     CALL DEFDIM( FILE_ID, NSTEPP1_DIM, 'time', 0 ) ! 0 Means UNLIMITED size.
     ! Write global scalar attributes:
@@ -306,11 +305,11 @@ CONTAINS
                  'Cell center longitude [-180, 180].', 'degrees_east' )
     CALL DEFVR2( FILE_ID, IM_DIM, JM_DIM, RLAT_VAR, 'LATIXY', &
                  'Cell center latitude [-90, 90].', 'degrees_north' )
-    CALL DEFVR3( FILE_ID, IM_DIM, JM_DIM, NSL_DIM, H_VAR, 'h', &
+    CALL DEFVR3( FILE_ID, IM_DIM, JM_DIM, KM_DIM, H_VAR, 'h', &
                  'Depth.', 'm' )
-    CALL DEFVI3( FILE_ID, IM_DIM, JM_DIM, NSL_DIM, FM_VAR, 'fm', &
+    CALL DEFVR3( FILE_ID, IM_DIM, JM_DIM, KM_DIM, FM_VAR, 'fm', &
                  'Mask: 0 = land, 1 = water.',"" )
-    CALL DEFVR3( FILE_ID, IM_DIM, JM_DIM, NSL_DIM, DZ_VAR, 'dz', &
+    CALL DEFVR3( FILE_ID, IM_DIM, JM_DIM, KM_DIM, DZ_VAR, 'dz', &
                  'Thickness of cell.', '' )
     ! Define time array variable as each output data's seconds since IYR0:
 
@@ -328,7 +327,7 @@ CONTAINS
 
     DIM_IDS( 1 ) = IM_DIM
     DIM_IDS( 2 ) = JM_DIM
-    DIM_IDS( 3 ) = NSL_DIM
+    DIM_IDS( 3 ) = KM_DIM
     DIM_IDS( 4 ) = NSTEPP1_DIM
 
     DO VARIABLE = 1, VARIABLES
@@ -344,7 +343,7 @@ CONTAINS
 
     DIM_IDS( 1 ) = IM_DIM
     DIM_IDS( 2 ) = JM_DIM
-    DIM_IDS( 3 ) = NSL_DIM
+    DIM_IDS( 3 ) = KM_DIM
     DIM_IDS( 4 ) = NSTEPP1_DIM
 
     DO VARIABLE = 1, EXTRA_VARIABLES
@@ -383,10 +382,7 @@ CONTAINS
 
     ! Write fm in 3D
 
-    DO K = 1, NSL
-      TEMP_3D_FM(:,:,K) = FM
-    END DO
-    ERR = NF_PUT_VAR_INT( FILE_ID, FM_VAR, TEMP_3D_FM )
+    ERR = NF_PUT_VAR_REAL( FILE_ID, FM_VAR, FM )
     CALL CHKERR( ERR, 'write output variable fm' )
 
     ERR = NF_PUT_VAR_REAL( FILE_ID, DZ_VAR, DZ )
@@ -501,11 +497,11 @@ CONTAINS
   ! Called by non-concurrent programs to write all data per timestep.
   !
 
-  SUBROUTINE WRITE_DATA( IM, JM, NSL, VARIABLES, TIMESTEP, F ) 
+  SUBROUTINE WRITE_DATA( IM, JM, KM, VARIABLES, TIMESTEP, F ) 
     USE OUTPUT 
     IMPLICIT NONE
-    INTEGER,INTENT(IN):: IM, JM, NSL, VARIABLES, TIMESTEP ! Model TIMESTEP is 0-based.
-    REAL,DIMENSION(IM, JM, NSL, VARIABLES):: F
+    INTEGER,INTENT(IN):: IM, JM, KM, VARIABLES, TIMESTEP ! Model TIMESTEP is 0-based.
+    REAL,DIMENSION(IM, JM, KM, VARIABLES):: F
     ! External NetCDF routines:
     INTEGER NF_PUT_VARA_REAL, NF_PUT_VARA_DOUBLE, NF_SYNC
     EXTERNAL NF_PUT_VARA_REAL, NF_PUT_VARA_DOUBLE, NF_SYNC
@@ -531,7 +527,7 @@ CONTAINS
     STARTS( 4 ) = FILE_TIMESTEP + 1 ! NetCDF follows FORTRAN 1-based convention
     COUNTS( 1 ) = IM
     COUNTS( 2 ) = JM
-    COUNTS( 3 ) = NSL
+    COUNTS( 3 ) = KM
     COUNTS( 4 ) = 1
 
     DO VARIABLE = 1, VARIABLES
@@ -555,28 +551,28 @@ CONTAINS
   ! WRITE_EXTRA_DATA: Write current timestep data to output file.
   ! Called by concurrent programs to write all data per timestep
   !
-  SUBROUTINE WRITE_EXTRA_DATA( IM, JM, NSL, EXTRA_VARIABLES, SPECIES, &
+  SUBROUTINE WRITE_EXTRA_DATA( IM, JM, KM, EXTRA_VARIABLES, SPECIES, &
                                TIMESTEP, IRRADIANCE, IRRADIANCE_FRACTION,    &
                                UN, UP, UE, UA, CHLA_MG_TOT,                  &
                                S_X1A, S_Y1A, S_X2A, S_Y2A,                   &
                                S_X1FP, S_Y1FP, S_X2FP, S_Y2FP, USI, ChlC, pH, RN2, RO2 )
     USE OUTPUT 
     IMPLICIT NONE
-    INTEGER,INTENT(IN):: IM, JM, NSL, EXTRA_VARIABLES, SPECIES, TIMESTEP
-    REAL,DIMENSION(IM, JM, NSL):: IRRADIANCE
-    REAL,DIMENSION(IM, JM, NSL):: IRRADIANCE_FRACTION
-    REAL,DIMENSION(IM, JM, NSL, SPECIES):: UN
-    REAL,DIMENSION(IM, JM, NSL, SPECIES):: UP
-    REAL,DIMENSION(IM, JM, NSL, SPECIES):: UE
-    REAL,DIMENSION(IM, JM, NSL, SPECIES):: UA
-    REAL,DIMENSION(IM, JM, NSL, SPECIES):: USI
-    REAL,DIMENSION(IM, JM, NSL, SPECIES):: ChlC 
-    REAL,DIMENSION(IM, JM, NSL):: CHLA_MG_TOT
-    REAL,DIMENSION(IM, JM, NSL):: S_X1A, S_Y1A, S_X2A, S_Y2A
-    REAL,DIMENSION(IM, JM, NSL):: S_X1FP, S_Y1FP, S_X2FP, S_Y2FP
-    REAL,DIMENSION(IM, JM, NSL):: pH
-    REAL,DIMENSION(IM, JM, NSL):: RN2
-    REAL,DIMENSION(IM, JM, NSL):: RO2
+    INTEGER,INTENT(IN):: IM, JM, KM, EXTRA_VARIABLES, SPECIES, TIMESTEP
+    REAL,DIMENSION(IM, JM, KM):: IRRADIANCE
+    REAL,DIMENSION(IM, JM, KM):: IRRADIANCE_FRACTION
+    REAL,DIMENSION(IM, JM, KM, SPECIES):: UN
+    REAL,DIMENSION(IM, JM, KM, SPECIES):: UP
+    REAL,DIMENSION(IM, JM, KM, SPECIES):: UE
+    REAL,DIMENSION(IM, JM, KM, SPECIES):: UA
+    REAL,DIMENSION(IM, JM, KM, SPECIES):: USI
+    REAL,DIMENSION(IM, JM, KM, SPECIES):: ChlC 
+    REAL,DIMENSION(IM, JM, KM):: CHLA_MG_TOT
+    REAL,DIMENSION(IM, JM, KM):: S_X1A, S_Y1A, S_X2A, S_Y2A
+    REAL,DIMENSION(IM, JM, KM):: S_X1FP, S_Y1FP, S_X2FP, S_Y2FP
+    REAL,DIMENSION(IM, JM, KM):: pH
+    REAL,DIMENSION(IM, JM, KM):: RN2
+    REAL,DIMENSION(IM, JM, KM):: RO2
 
     ! External NetCDF routines:
     INTEGER NF_PUT_VARA_REAL, NF_SYNC
@@ -595,7 +591,7 @@ CONTAINS
     STARTS( 4 ) = FILE_TIMESTEP + 1 ! NetCDF follows FORTRAN 1-based convention.
     COUNTS( 1 ) = IM
     COUNTS( 2 ) = JM
-    COUNTS( 3 ) = NSL
+    COUNTS( 3 ) = KM
     COUNTS( 4 ) = 1
 
     ! Write each extra variable (if selected to be written):
@@ -931,6 +927,7 @@ Subroutine OUTPUT_NETCDF_CGEM_allocate
     VARIABLE_NAMES(counter+14) = 'OM1_BC'
     VARIABLE_NAMES(counter+15) = 'OM2_BC'
     VARIABLE_NAMES(counter+16) = 'ALK   '
+    VARIABLE_NAMES(counter+17) = 'Tr   '
 
 
   ALLOCATE( WRITE_VARIABLE(nf) ) 
@@ -976,6 +973,7 @@ Subroutine OUTPUT_NETCDF_CGEM_allocate
     VARIABLE_DESCRIPTIONS(counter+14) = 'Particulate organic matter in the initial and boundary conditions '
     VARIABLE_DESCRIPTIONS(counter+15) = 'Dissolved organic matter in the initial and boundary conditions '
     VARIABLE_DESCRIPTIONS(counter+16) = 'Alkalinity.                                                         '
+    VARIABLE_DESCRIPTIONS(counter+17) = 'Tracer should be =1.  '
 
   ALLOCATE(VARIABLE_UNITS(nf))
   counter = 0
@@ -1015,6 +1013,7 @@ Subroutine OUTPUT_NETCDF_CGEM_allocate
     VARIABLE_UNITS(counter+14) = 'mmol-C/m3                       '
     VARIABLE_UNITS(counter+15) = 'mmol-C/m3                       '
     VARIABLE_UNITS(counter+16) = 'mmol/m3                         '
+    VARIABLE_UNITS(counter+17) = 'NONE                         '
 
 
   ALLOCATE(EXTRA_VARIABLE_NAMES(EXTRA_VARIABLES))

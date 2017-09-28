@@ -39,7 +39,7 @@
       character(120) init_filename         !Initial conditions file
       character(6) Which_code
       character(100) :: BASE_NETCDF_OUTPUT_FILE_NAME
-
+      integer i,j,k
 !------------------------------------------------ 
 
 ! --- Command Line Arguments for file names ---
@@ -49,7 +49,7 @@
 
       call Set_Grid(TC_8)
 
-      call Allocate_Input(Which_code)
+      call Allocate_Input_Vars(Which_code)
 
       call Allocate_Hydro
       !L3 Take care of ws here
@@ -58,8 +58,8 @@
       call Read_InputFile(input_filename,Which_code) 
 
 #ifdef DEBUG
-write(6,*) "After Read_InputFile"
-      write(6,*) "start,dT",START_SECONDS, dT
+      write(6,*) "----After Read_InputFile"
+      write(6,*) "  start,dT",START_SECONDS, dT
 #endif
 
 !L3--- This next line is from Ko, but I have no idea why this is necessary.
@@ -74,26 +74,6 @@ write(6,*) "After Read_InputFile"
   
       call Get_Vars(TC_8) !Hydro for initial timestep 
 
-#ifdef DEBUG1
-     write(6,*) S(9,21,1),T(9,21,1)
-#endif
-      call Set_Vars(Which_code,init_filename) !initialize 'f' array
-#ifdef DEBUG1
-     write(6,*) f(9,21,1,:)
-#endif 
-
-
-#ifdef DEBUG
-write(6,*) "After Set_Vars"
-      write(6,*) "S,T",S,T
-#endif
-
-! Add blip for testing advection
-!#ifdef DEBUG_CWS
-!      f(12,25,1,25) = 300
-!#endif
-
-!L3-move!      call Initialize_Output(Which_code,BASE_NETCDF_OUTPUT_FILE_NAME)     !Open file and write initial configuration
 
 ! Initialize time an loop variables
       istep = 0
@@ -102,17 +82,17 @@ write(6,*) "After Set_Vars"
       if (Which_gridio.eq.1) then
         call USER_update_EFDC_grid(TC_8)
       else if (Which_gridio.eq.2) then
-        call USER_update_NCOM_grid(TC_8)
+        call USER_update_NCOM_grid()
       endif
 
+!--------------------------------
+! --- get land/water and shelf masks
+!--------------------------------
+      call USER_get_masks()
+
+      call Set_Vars(Which_code,init_filename) !initialize 'f' array
 
       call Initialize_Output(Which_code,BASE_NETCDF_OUTPUT_FILE_NAME)     !Open file and write initial configuration
-
-
-#ifdef DEBUG_CWS
-nstep = 1 
-write(6,*)"DEBUG - setting nstep to ",nstep
-#endif
 
 #ifdef CALIBRATE
       if(Which_code.eq."CGEM") then
@@ -126,10 +106,6 @@ write(6,*)"DEBUG - setting nstep to ",nstep
       do istep = 1, nstep
        TC_8 = TC_8 + dT
 
-#ifdef DEBUG
-      write(6,*) "TC_8",TC_8
-#endif 
-
       if (Which_gridio.eq.1) then
         Vol_prev = Vol
         call USER_update_EFDC_grid(TC_8)
@@ -138,48 +114,31 @@ write(6,*)"DEBUG - setting nstep to ",nstep
         call USER_update_NCOM_grid()
       endif
 
-
        call Get_Vars(TC_8) !Hydro, Solar, Wind, Temp, Salinity
 
-#ifdef DEBUG
-write(6,*) "After Get_Vars"
-write(6,*) "T",T
-write(6,*) "S",S
-write(6,*) "Rad",Rad
-write(6,*) "Wind",Wind
-write(6,*) "E",E
-write(6,*) "Kh",Kh
-write(6,*) "Ux",Ux
-write(6,*) "Vx",Vx
-write(6,*) "Wx",Wx
-#endif
+!L3 add when necessary       call USER_update_masks()
 
-
-     
-     if (Which_gridio.eq.1) then
-       call USER_update_masks()
-     endif
-
-       call WQ_Model(Which_code,TC_8,istep,istep_out)
+!       call WQ_Model(Which_code,TC_8,istep,istep_out)
 
 #ifdef DEBUG
-write(6,*) "After WQ_Model"
+write(6,*) "---After WQ_Model"
 write(6,*) "istep=",istep
-write(6,*) "CDOM",f(1,1,1:nsl,32)
+write(6,*) "f(i19)",f(1,1,1:km,19)
 #endif
     
        call Flux(Which_code,istep)
 
 #ifdef DEBUG
-write(6,*) "After Flux"
-write(6,*) "CDOM",f(1,1,1:nsl,32)
+write(6,*) "---After Flux"
+write(6,*) "f(i19)",f(1,1,1:km,19)
+write(6,*) 
 #endif
 
        call Transport(Which_code)
 
 #ifdef DEBUG
-write(6,*) "After Transport"
-write(6,*) "CDOM",f(1,1,1:nsl,32)
+write(6,*) "---After Transport"
+write(6,*) "f(i19)",f(1,1,1:km,19)
 #endif
 
       ! -------------- BEGIN OUTPUT DATA
@@ -190,8 +149,8 @@ write(6,*) "CDOM",f(1,1,1:nsl,32)
         call Model_Output(Which_Code,istep_out)
        endif
 
-#ifdef DEBUG_BASIC
-write(6,*) "After Model_Output"
+#ifdef DEBUG
+write(6,*) "---After Model_Output"
 #endif
 
       enddo
@@ -201,8 +160,6 @@ write(6,*) "After Model_Output"
         Call Close_Hydro_NetCDF()
         Call Close_Grid_NetCDF()
       endif
-
-!     write(6,*) "A,Z1,Z2:", f(1,1,1,iA(1)),f(1,1,1,iZ(1),f(1,1,1,iZ(2)
 
 #ifdef CALIBRATE
       if(Which_code.eq."CGEM") then

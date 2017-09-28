@@ -1,7 +1,7 @@
        Subroutine Get_Vars(TC_8) 
 
        USE Model_dim
-       USE INPUT_VARS, ONLY: InitializeHow,START_SECONDS,&
+       USE INPUT_VARS, ONLY: START_SECONDS,&
      & Read_T, Read_Sal, Read_Solar, Read_Wind
        USE Grid
        USE DATE_TIME
@@ -12,12 +12,12 @@
        integer(kind=8), intent(in) :: TC_8 ! Current time in seconds since Model_dim::iYr0.
        integer(kind=8) :: TC_in
        integer, save :: init=1
-
-       integer :: i,j,k
+       integer i,j,k
 
         TC_in = TC_8
 
-        if (Which_gridio.eq.0) then 
+        if (Which_gridio.eq.0) then   !CGEM_0D
+
           if(Read_T.eq.0) then
             call Calc_Temp(START_SECONDS,TC_in,T)
           else
@@ -42,7 +42,7 @@
             call USER_Read_Wind(TC_in,Wind)
           endif
 
-        else if (Which_gridio.eq.1 .or. Which_gridio.eq.2) then
+        else if (Which_gridio.eq.1 .or. Which_gridio.eq.2) then  !EFDC.or.NCOM
           call interpVar(hydro_info(eSal), TC_8, startIndex(eSal), S)  
           call interpVar(hydro_info(eTemp), TC_8, startIndex(eTemp), T) 
           call interpVar(hydro_info(eUx), TC_8, startIndex(eUx), Ux)   
@@ -50,37 +50,24 @@
           call interpVar(hydro_info(eWx), TC_8, startIndex(eWx), Wx)   
           call interpVar(hydro_info(eKh), TC_8, startIndex(eKh), Kh)   
           call interpVar(hydro_info(eE), TC_8, startIndex(eE), E)  
-          call getSolar( TC_8, lon, lat, Rad)
-          Wind = 5
+          call getSolar( TC_8, lon, lat, Rad)  !Calculate Solar Radiation for now
+          Wind = 5                             !Set constant wind speed for now
         endif 
 
-        if(im*jm.eq.1) then
+!--------------------------------
+! --- get land/water and shelf masks
+!--------------------------------
+!      call USER_get_masks()
+
+
+        if(im*jm.eq.1) then  !For 1D column, turn off advection
          Ux=0.
          Vx=0.
          Wx=0.
-!Only for testing
-         Kh=0.
         endif
 
-#ifdef DEBUG1
-        write(6,*) "Which_gridio",Which_gridio
-        write(6,*) "Kh",Kh(9,21,1:7)
-        write(6,*) "E",E(9,21)
-        write(6,*) "S",S(9,21,1:7)
-        write(6,*) "T",T(9,21,1:7)
-        write(6,*) "Ux",Ux(9,21,1:7)
-        write(6,*) "Vx",Vx(9,21,1:7)
-        write(6,*) "Wx",Wx(9,21,1:7)
-#endif
-
-#ifdef DEBUG
-        write(6,*) "Kh",Kh
-        write(6,*) "E",E
-        write(6,*) "S",S
-        write(6,*) "T",T
-#endif
-
         init=0
+
 
        return
 

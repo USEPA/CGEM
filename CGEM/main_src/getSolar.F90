@@ -41,7 +41,7 @@
       integer  :: JY
       integer  :: mdate_julian
       real                :: rhr         ! decimal hr in the Julian Day 
-      real                :: sunang, Z   ! solar zenith angle 
+      real                :: Z   ! solar zenith angle 
       real calc_solar_zenith
       real                :: solconst      
       LOGICAL :: leapyr  
@@ -67,13 +67,12 @@
 
          do i = 1,im
          do j = 1,jm
-           Z =  sunang(jday,rhr,lon(i,j),lat(i,j))
+           Z =  calc_solar_zenith(lat(i,j),lon(i,j),rhr,jday,leapyr) !in rad
+         !  write(6,*) "lon,lat,rhr,jday",lon(i,j),lat(i,j),rhr,jday,Z
            Rad(i,j) = solconst * AMAX1( COS(Z), 0.0)    ! COS(suna)<= 0 means night 
          enddo
          enddo
 
-        !write(6,*) "RAD",Rad/cv
-        !stop
 
         RETURN
            

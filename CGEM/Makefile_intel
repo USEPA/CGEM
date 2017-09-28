@@ -9,8 +9,9 @@
 
 ### Uncomment the next line to enable debugging
 #DFLAGS = -DDEBUG
-#DFLAGS = -warn -debug all -g -check all -ftrapuv  -DDEBUG #-mcmodel=medium -shared-intel 
+DFLAGS = -g -warn -debug all -g -check all -ftrapuv#  -DDEBUG #-mcmodel=medium -shared-intel 
 #DFLAGS = -Wall -Wextra -pedantic -fimplicit-none -fbacktrace -D_CGEM -DRDEBUG -DDEBUG 
+#DFLAGS = -g
 
 ### Build options for specific platforms. 
 ### LIBS has path to netCDF
@@ -43,7 +44,7 @@ ifeq (iris,$(findstring iris,$(MY_HOST)))
   INC	   = $(IRIS_INC)
   LIBS	   = $(IRIS_LIBS)
   F90      = ifort
-  FFLAGS = #-Warn all -traceback #-check -debug -g       #-g -fbacktrace -Wall 
+  FFLAGS = -warn all -traceback -no-diag-error-limit -implicitnone -convert big_endian -ftz #-check -debug -g       #-g -fbacktrace -Wall 
 else 
 ifeq (sol,$(findstring sol,$(MY_HOST)))
   INC	   = $(SOL_INC)

@@ -1,22 +1,19 @@
-      subroutine USER_get_EFDC_grid(TC_8)
+      subroutine USER_get_EFDC_grid()
 
       USE Fill_Value
       USE Model_dim
       USE Grid
-     
-      integer(kind=8) :: TC_8
+      USE INPUT_VARS, Only:icent,jcent 
 
-!      real, intent (out) :: dz(im,jm,nsl)     !cell depth
-!      real, intent (out) :: d(im,jm,nsl)      !depth from surface to bottom of cell
-!      real, intent (out) :: depth(im,jm)      !total depth of column
-!      real, intent (out) :: d_sfc(im,jm,nsl)  !depth from surface to cell center
-!      real, intent (out) :: dxdy(im,jm)       !area of cell
-!      real, intent (out) :: Vol(im,jm,nsl)    !Volume of cell
-      real, dimension(im,jm) :: dx, dy
-      integer :: i,j,k
+      real, dimension(im,jm) :: dx, dy, sdetg
+      integer :: i,j
       character(200) filename
 
-
+#ifdef map_code
+write(6,*) "---USER_get_EFDC grid----"
+write(6,*) "  only setting dx, dy, dxdy, and area"
+write(6,*)
+#endif
       write(filename,'(A, A)') trim(DATADIR),'/dxdy.dat'
       open(19,file=filename,status='old')
       read(19,*) !dx
@@ -29,13 +26,20 @@
       enddo
       close(19)
 
+      write(filename,'(A, A)') trim(DATADIR),'/lxly.dat'
+      open(19,file=filename,status='old')
+      read(19,*) !sqrt(det(g))
+      do j=1,jm
+         read(19,*) sdetg(:,j)
+      enddo
+
+
       do j=1,jm
        do i=1,im
-          area(i,j) = dx(i,j)*dy(i,j)
+          area(i,j) = dx(i,j)*dy(i,j) *sdetg(i,j)
        enddo
       enddo
 
-      !call USER_update_EFDC_Grid(TC_8)
 
       return
 
@@ -52,6 +56,16 @@
 
       integer :: i,j,k, nz
       integer(kind=8) :: TC_8
+      integer, save :: init=1
+
+#ifdef map_code
+if(init.eq.1) then
+write(6,*) "---USER_update_EFDC_grid----"
+write(6,*) "  setting depth, dz, d_sfc, d, Vol"
+write(6,*)
+init=0
+endif
+#endif
 
       call interpVar(grid_info(eColDepth), TC_8, gridStartIndex(eColDepth), depth)
       call interpVar(grid_info(eCellDepth), TC_8, gridStartIndex(eCellDepth), dz)
@@ -60,17 +74,40 @@
       d_sfc = fill(0) 
       do j=1,jm
        do i=1,im
-          if(depth(i,j).eq.0) depth(i,j)=fill(0)
           nz=nza(i,j)
           do k=1,nz !do loop will not execute if nza=0
+           if(depth(i,j).le.0) then  !L3 Soon change to error checking before run, assume data is correct.
+                 write(6,*) "DEPTH",depth(i,j)
+                 stop
+           endif
+           !if(dz(i,j,k).ne.0) then
+           !      write(6,*) "dz for i,j,k=",i,j,k
+           !      write(6,*) "where nz(i,j)=",nza(i,j)
+           !      write(6,*) "dz",dz(i,j,k)
+           !      write(6,*) "depth",depth(i,j)
+           !      !stop
+           !endif
+!L3 just make dz=depth/layers for now:
+           dz(i,j,k) = depth(i,j)/nz
            d_sfc(i,j,k) = sum(dz(i,j,1:(k-1))) + dz(i,j,k)/2. 
            d(i,j,k) = sum(dz(i,j,1:k)) !bottom of cell 
            Vol(i,j,k) = area(i,j) * dz(i,j,k)
-#ifdef DEBUG
-           write(6,*) i,j,k,dz(i,j,k),d_sfc(i,j,k),d(i,j,k)
-#endif
           enddo
        enddo
       enddo
+!stop
+#ifdef debug
+write(6,*) "---USER_update_EFDC grid----"
+write(6,*) "  setting depth, dz, d_sfc, d, Vol"
+write(6,*) "  Time in seconds",TC_8
+nz=nza(icent,jcent)
+write(6,*) "  At i,j,k=",icent,jcent,nz)
+write(6,*) " d, d_sfc, depth, dz, Vol, area="
+write(6,*) d(icent,jcent,nz),d_sfc(icent,jcent,nz),depth(icent,jcent)
+write(6,*) dz(icent,jcent,nz),Vol(icent,jcent,nz),area(icent,jcent)
+#endif
+
+      return
+
       end subroutine USER_update_EFDC_grid
 

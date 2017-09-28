@@ -14,169 +14,112 @@
 
       IMPLICIT NONE
 
-      integer :: i,j,k,ii
-      integer, dimension(im,jm) :: fm2
-      real, dimension(im,jm,nsl,nf) :: ff !,f
-      real, dimension (im,jm,nsl,nf) :: fmod 
-   
-      integer :: mv
+      integer :: i,j,k,ii,nz
+      real :: f_n(im,jm,km,nf) 
 
 ! --- transports
-      real, dimension(im,jm,nsl) :: w_wsink
-      !real, dimension(im,jm) :: dxdy
+      real :: w_wsink(im,jm,nsl)
 
 ! --- tmp
-      integer :: km1
+      integer :: im1,ip1,jm1,jp1,km1
       real :: ufm,ufp,vfm,vfp,wfm,wfp
       real :: cfh,cf
 
-      integer :: tmpi,tmpj,tmpk,tmpii
-      real :: tmpVal1, tmpVal2, tmpVal3, tmpVal4
-      real :: fmod_im, fmod_ip, fmod_jm, fmod_jp, fmod_wm, fmod_wp
-      mv = -9999
-
-
-       fm2 = fm
-
-
-!#ifdef DEBUG_CWS
-!      !Vol = 1
-!      !Vol_prev = 1
-!      Ux = 0 
-!      Vx = 0 
-!      Wx = -1   !-0.001
-!      !Wx(:,:,1) = 0
-!      !do j=1,jm
-!      !  do i=1,im
-!      !    Wx(i,j,fm2(i,j)) = 0
-!      !  enddo
-!      !enddo 
-!#endif
-
 #ifdef DEBUG
- write(6,*) "In Advection"
- write(6,*) "area, fm2",area,fm2
- write(6,*) "u,v,w",Ux,Vx,Wx
- write(6,*) "wsm,ws",wsm,ws
- write(6,*) "Vol, Vol_prev",Vol,Vol_prev
+write(6,*) "---Adv3D---"
+write(6,*) "  Which_adv=",Which_adv
+write(6,*) 
 #endif
+
+      if(Which_Adv.eq.0) then
+       ux=0.
+       vx=0.
+       wx=0.
+      endif
+
 ! --------loop over each variable
-      do ii = 1,nf
+     do ii = 1,nf
 
 ! -------------------------------------------------------------------
-        do j = 1,jm 
-          do i = 1, im  ! over all calculation grids
-            if(fm2(i,j).ne.0) then
-
+      do j = 1,jm
+      do i = 1,im
 ! --------------------------------------------------------
+       im1 = max0(i-1,1)
+       ip1 = min0(i+1,im)
+       jm1 = max0(j-1,1)
+       jp1 = min0(j+1,jm)
 
 !     w_wsink means 'w' with sinking terms
 !     at surface sink = 0.
-              w_wsink (i,j,1) = Wx(i,j,1)
+      w_wsink (i,j,1) = wx(i,j,1)
 
-              !nz=nza(i,j)-1
-              !do k = 2, nz 
-              do k = 2, fm2(i,j)
-                w_wsink(i,j,k) = Wx(i,j,k) + ws(ii)*area(i,j)  !dxdy(i,j)
-                !write(6,*) "sink",ws(ii),area(i,j),w_wsink(i,j,k)
-              end do
+       nz = nza(i,j)
+
+      do k = 2,nz 
+        w_wsink(i,j,k) = wx(i,j,k) + ws(ii)*area(i,j)
+      end do
 
 !If wsm=0 (shelf), then set sinking velocity to zero as well...
 !     at bottom (w=0) add settling or deep ocean (wsm=1)
-              !w_wsink (i,j,nz+1) = Wx(i,j,nz+1)+ ws(ii)*wsm(i,j)*dxdy(i,j)
-              w_wsink (i,j,fm2(i,j)+1) = Wx(i,j,fm2(i,j)+1)+ ws(ii)*wsm(i,j)*area(i,j)  !dxdy(i,j)
+      w_wsink (i,j,nz+1) = wx(i,j,nz+1) + ws(ii)*real(wsm(i,j),4)*area(i,j)
 
+#ifdef DEBUG
+write(6,*) "nz=",nz
+write(6,*)
+write(6,*) "At the cell i,j,k=",icent,jcent,nz
+write(6,*) "ux,vx,wx,w_wsink:"
+write(6,*) ux(icent,jcent,nz),vx(icent,jcent,nz),wx(icent,jcent,nz),w_wsink(icent,jcent,nz)
+write(6,*) 
+#endif
 
 ! -------------------------------------------------------------
-              !do k = 1, nz	! do layer by layer
-              do k = 1, fm2(i,j)	! do layer by layer
-                km1 = max0(k-1,1)
-
+      do k = 1, nz       ! do layer by layer
+      km1 = max0(k-1,1)
 ! ----- upwind advection
-                !check that data is defined on i-1 cell
+        ufm = amax1( ux(i  ,j,k),0.)    ! pp/n0
+        ufp = amax1(-ux(ip1,j,k),0.)    ! p0/np
 
-              
-                ufm = amax1( Ux(i  ,j,k),0.)	! pp/n0
-                ufp = amax1(-Ux(i+1,j,k),0.)	! p0/np
-                vfm = amax1( Vx(i  ,j,k),0.)
-                vfp = amax1(-Vx(i,j+1,k),0.)
-                wfm = amax1(-w_wsink(i,j,k  ),0.)	! p0/np
-                wfp = amax1( w_wsink(i,j,k+1),0.)	! pp/n0
-
-
-                if (fm2(i-1,j) .ge. k) then
-                  fmod_im = f(i-1,j,k,ii)
-                else 
-                  fmod_im = f(i,j,k,ii)
-                endif
-
-                if (fm2(i+1,j) .ge. k) then
-                  fmod_ip = f(i+1,j,k,ii)
-                else
-                  fmod_ip = f(i,j,k,ii)
-                endif
-
-                if (fm2(i,j-1) .ge. k) then
-                  fmod_jm = f(i,j-1,k,ii)
-                else
-                  fmod_jm = f(i,j,k,ii)
-                endif
-
-                if (fm2(i,j+1) .ge. k) then
-                  fmod_jp = f(i,j+1,k,ii)
-                else 
-                  fmod_jp = f(i,j,k,ii)
-                endif
-
-                if (fm2(i,j) .gt. k) then
-                  fmod_wp = f(i,j,k+1,ii)
-                else
-                  fmod_wp = f(i,j,k,ii)
-                endif
-
-!                       p0/nn             pn/n0               
-
-                cfh = ( (Ux(i,j,k)-ufm) - (Ux(i+1,j,k)+ufp) )               &
-     &               +( (Vx(i,j,k)-vfm) - (Vx(i,j+1,k)+vfp) )              
-                cf  = cfh + ((w_wsink(i,j,k+1)-wfp)-(w_wsink(i,j,k)+wfm))
+        vfm = amax1( vx(i  ,j,k),0.)
+        vfp = amax1(-vx(i,jp1,k),0.)
+        wfm = amax1(-w_wsink(i,j,k  ),0.)       ! p0/np
+        wfp = amax1( w_wsink(i,j,k+1),0.)       ! pp/n0
+!                   p0/nn             pn/n0
+        cfh = ( (ux(i,j,k)-ufm) - (ux(ip1,j,k)+ufp) )               &
+     &       +( (vx(i,j,k)-vfm) - (vx(i,jp1,k)+vfp) )
+        cf  = cfh + ((w_wsink(i,j,k+1)-wfp)-(w_wsink(i,j,k)+wfm))
 ! -------------------------------------------------------------
-     !           ff(i,j,k,ii) =                                        &
-     !&            ( f(i,j,k,ii)*Vol_prev(i,j,k)                            &
-     !&            +( cf*f(i,j,k,ii)                                  &
-     !&            +( ( (ufm*f(i-1,j,k,ii)+ufp*f(i+1,j,k,ii))       &
-     !&            +(vfm*f(i,j-1,k,ii)+vfp*f(i,j+1,k,ii)) )     &
-     !&            +(wfm*f(i,j,km1,ii)+wfp*f(i,j,k+1,ii)) ) )*dT  &
-     !&            ) /Vol(i,j,k)
-
-
-                tmpVal1 = f(i,j,k,ii)*Vol_prev(i,j,k)
-                tmpVal2 = cf*f(i,j,k,ii)*dT
-                tmpVal3 = ((ufm*fmod_im+ufp*fmod_ip)       &
-     &            +(vfm*fmod_jm+vfp*fmod_jp))*dT
-                tmpVal4 = (wfm*f(i,j,km1,ii)+wfp*fmod_wp)*dT
-
-                 ff(i,j,k,ii) = (tmpVal1 + tmpVal2 + tmpVal3 +tmpVal4)/Vol(i,j,k)
-
+          f_n(i,j,k,ii) =                                        &
+     &      ( f(i,j,k,ii)*Vol_prev(i,j,k)                            &
+     &       +( cf*f(i,j,k,ii)                                  &
+     &         +( ( (ufm*f(im1,j,k,ii)+ufp*f(ip1,j,k,ii))       &
+     &             +(vfm*f(i,jm1,k,ii)+vfp*f(i,jp1,k,ii)) )     &
+     &           +(wfm*f(i,j,km1,ii)+wfp*f(i,j,k+1,ii))) ) *dT  &
+     &      ) /Vol(i,j,k)
 ! -------------------------------------------------------------
-              end do	! k = 1, nz
-            endif !fm = 1
-          end do !i
-        end do !j
+      !if(ii.eq.1) write(6,*) Vol_prev(i,j,k)/Vol(i,j,k)
+      !if(Vol(i,j,k).le.0) write(6,*) "Vol",i,j,k,Vol(i,j,k)
+      !if(f(i,j,k,ii).lt.0.and.cf.ne.0)    write(6,*) "cf",i,j,k,cf,f(i,j,k,ii),fm(i,j,k)
+      !if(f(i-1,j,k,ii).lt.0.and.ufm.ne.0) write(6,*) "ufm",i,j,k,ufm,f(i-1,j,k,ii),fm(i-1,j,k)
+      !if(f(i+1,j,k,ii).lt.0.and.ufp.ne.0) write(6,*) "ufp",i,j,k,ufp,f(i+1,j,k,ii),fm(i+1,j,k)
+      !if(f(i,j-1,k,ii).lt.0.and.vfm.ne.0) write(6,*) "vfm",i,j,k,vfm,f(i,j-1,k,ii),fm(i,j-1,k)
+      !if(f(i,j+1,k,ii).lt.0.and.vfp.ne.0) write(6,*) "vfp",i,j,k,vfp,f(i,j+1,k,ii),fm(i,j+1,k)
+      !if(f(i,j,km1,ii).lt.0.and.wfm.ne.0) write(6,*) "wfm",i,j,k,wfm,f(i,j,km1,ii),fm(i,j,km1)
+      !if(f(i,j,k+1,ii).lt.0.and.wfp.ne.0) write(6,*) "wfp",i,j,k,wfp,f(i,j,k+1,ii),fm(i,j,k+1)
+      end do ! k = 1, nz
+      end do !i
+      end do !j
       end do   ! ii = 1,nf
-
+      !stop
 
 ! update f for the current timestep
-      !do k = 1,nz
-        !do j = 2,jm-1
-        !  do i = 2, im-1 !my_imstart,my_imend
-        do j = 1,jm
-          do i = 1, im !my_imstart,my_imend
-            do k=1,fm2(i,j)   !Will not execute loop if fm2=0
-              f(i,j,k,:) = ff(i,j,k,:)
-            enddo
-          enddo
-        enddo
-      !enddo
+         do j = 1,jm
+         do i = 1,im
+            nz = nza(i,j)
+          do k=1,nz
+             f(i,j,k,:) = f_n(i,j,k,:)
+         enddo
+         enddo
+         enddo
 
       RETURN 
       END 

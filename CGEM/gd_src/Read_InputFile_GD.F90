@@ -12,7 +12,6 @@ USE DATE_TIME
 IMPLICIT NONE
 
 integer icent_jcent_units
-real i_in,j_in,dum
 character(120) filename
 
 ws = 0.
@@ -26,7 +25,7 @@ read(999,*) iYrS,iMonS,iDayS,iHrS,iMinS,iSecS
 read(999,*) iYrE,iMonE,iDayE,iHrE,iMinE,iSecE
 read(999,*) dT, dT_out
 read(999,*) icent_jcent_units
-read(999,*) i_in, j_in
+read(999,*) icent, jcent
 read(999,*)
 !--Switches in GEM---------
 read(999,*)
@@ -55,7 +54,7 @@ read(999,*) rcSi
 read(999,*)
 !----Other including Boundary Conditions-------------
 read(999,*)
-read(999,*) Which_Vmix   
+read(999,*) Which_Vmix, Which_Adv   
 read(999,*) KH_coeff  
 read(999,*) Which_Outer_BC 
 read(999,*) m_OM_init,m_OM_bc,m_OM_sh 
@@ -212,6 +211,7 @@ read(999,*) KHDENITR        ! KHDENITR: Half-sat [NO3] for dentrification
 read(999,*) KHDONT          ! KHDONT: Half-sat [D.O] required for nitrification
 read(999,*) KHOCOD          ! KHOCOD: Half-sat [D.O] required for exertion of COD
 read(999,*) KHODOC          ! KHODOC: Half-sat [D.O] required for oxic respiration
+read(999,*) KRDO            ! KRDO: D.O. reaeration coefficient (m/s)
 read(999,*) RCDO            ! RCDO: D.O. to carbon ratio in resp 
 read(999,*) RNTO            ! RNTO: ratio of O2 consumed to nitrif
 read(999,*) 

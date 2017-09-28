@@ -956,6 +956,11 @@ REAL :: RCDO = 2.67
 REAL :: RNTO = 1.0
 
 !------------------------------------------------------------------------------
+! D.O. reaeration coefficient (m/s)
+!------------------------------------------------------------------------------
+REAL :: KRDO = 2.77E-05
+
+!------------------------------------------------------------------------------
 ! SOD to nitrification ratio?? 
 !------------------------------------------------------------------------------
 REAL :: RSODNTR = 0.24
@@ -1008,71 +1013,71 @@ IMPLICIT NONE
 !  Miscellaneous arrays/variables; not parameters
 !------------------------------------------------------------------------------
   
-ALLOCATE(BMD(im,jm,nsl))        ! Base metabolic rate for diatoms
+ALLOCATE(BMD(im,jm,km))        ! Base metabolic rate for diatoms
 
-ALLOCATE(BMG(im,jm,nsl))        ! Base metabolic rate for greens
+ALLOCATE(BMG(im,jm,km))        ! Base metabolic rate for greens
 
-ALLOCATE(FTHDR(im,jm,nsl))        ! Temperature correction for hydrolysis
+ALLOCATE(FTHDR(im,jm,km))        ! Temperature correction for hydrolysis
 
-ALLOCATE(FTMNL(im,jm,nsl))        ! Temperature correction for mineralization
+ALLOCATE(FTMNL(im,jm,km))        ! Temperature correction for mineralization
 
-ALLOCATE(OUTPUT_PAR(im,jm,nsl))     ! Daily cumulative PAR
+ALLOCATE(OUTPUT_PAR(im,jm,km))     ! Daily cumulative PAR
 OUTPUT_PAR = 0.
 
 
-ALLOCATE(PD(im,jm,nsl))        ! Production rates for diatoms
+ALLOCATE(PD(im,jm,km))        ! Production rates for diatoms
 PD = 0.
-ALLOCATE(PD_AVG(im,jm,nsl))        ! Average production rates for 
+ALLOCATE(PD_AVG(im,jm,km))        ! Average production rates for 
 PD_AVG = 0.                                              ! diatoms
 
-ALLOCATE(PG(im,jm,nsl))        ! Production rates for greens
+ALLOCATE(PG(im,jm,km))        ! Production rates for greens
 PG = 0.
-ALLOCATE(PG_AVG(im,jm,nsl))        ! Average production rates for 
+ALLOCATE(PG_AVG(im,jm,km))        ! Average production rates for 
 PG_AVG = 0.                                              ! greens
 
-ALLOCATE(PRD(im,jm,nsl))        ! Predation time derivative for diatoms
+ALLOCATE(PRD(im,jm,km))        ! Predation time derivative for diatoms
 
-ALLOCATE(PRG(im,jm,nsl))        ! Predation time derivative for greens
+ALLOCATE(PRG(im,jm,km))        ! Predation time derivative for greens
 
 
 !------------------------------------------------------------------------------
 !  Fine segmentation growth limitation factors
 !------------------------------------------------------------------------------
 
-ALLOCATE(PFD(im,jm,nsl))     ! Phosphorous limitation for diatoms
+ALLOCATE(PFD(im,jm,km))     ! Phosphorous limitation for diatoms
 
-ALLOCATE(SFD(im,jm,nsl))     ! Silica limitation for diatoms
+ALLOCATE(SFD(im,jm,km))     ! Silica limitation for diatoms
 
-ALLOCATE(NFD(im,jm,nsl))     ! Nitrogen limitation for diatoms
+ALLOCATE(NFD(im,jm,km))     ! Nitrogen limitation for diatoms
 
-ALLOCATE(IFD(im,jm,nsl))     ! Light limitation for diatoms
+ALLOCATE(IFD(im,jm,km))     ! Light limitation for diatoms
 
-ALLOCATE(TFD(im,jm,nsl))     ! Temperature limitation for diatoms
+ALLOCATE(TFD(im,jm,km))     ! Temperature limitation for diatoms
 
-ALLOCATE(PFG(im,jm,nsl))     ! Phosphorous limitation for greens
+ALLOCATE(PFG(im,jm,km))     ! Phosphorous limitation for greens
 
-ALLOCATE(NFG(im,jm,nsl))     ! Nitrogen limitation for greens
+ALLOCATE(NFG(im,jm,km))     ! Nitrogen limitation for greens
 
-ALLOCATE(IFG(im,jm,nsl))     ! Light limitation for greens
+ALLOCATE(IFG(im,jm,km))     ! Light limitation for greens
 
-ALLOCATE(TFG(im,jm,nsl))     ! Temperature limitation for greens
+ALLOCATE(TFG(im,jm,km))     ! Temperature limitation for greens
 
 !Droop
-ALLOCATE(QND(im,jm,nsl))  
-ALLOCATE(QPD(im,jm,nsl))  
-ALLOCATE(QNG(im,jm,nsl))  
-ALLOCATE(QPG(im,jm,nsl))  
+ALLOCATE(QND(im,jm,km))  
+ALLOCATE(QPD(im,jm,km))  
+ALLOCATE(QNG(im,jm,km))  
+ALLOCATE(QPG(im,jm,km))  
 
 !------------------------------------------------------------------------------
 !  Dissolved Oxygen arrays used to store kinetic processes.
 !------------------------------------------------------------------------------
-ALLOCATE(NITDO2(im,jm,nsl)) 
-ALLOCATE(DOMETD_ARR(im,jm,nsl)) 
-ALLOCATE(DOMETG_ARR(im,jm,nsl))
-ALLOCATE(DOPREDD_ARR(im,jm,nsl)) 
-ALLOCATE(DOPREDG_ARR(im,jm,nsl))
-ALLOCATE(DOZOO_ARR(im,jm,nsl)) 
-ALLOCATE(DOMNLDOC_ARR(im,jm,nsl)) 
+ALLOCATE(NITDO2(im,jm,km)) 
+ALLOCATE(DOMETD_ARR(im,jm,km)) 
+ALLOCATE(DOMETG_ARR(im,jm,km))
+ALLOCATE(DOPREDD_ARR(im,jm,km)) 
+ALLOCATE(DOPREDG_ARR(im,jm,km))
+ALLOCATE(DOZOO_ARR(im,jm,km)) 
+ALLOCATE(DOMNLDOC_ARR(im,jm,km)) 
  
 DOMETD_ARR = 0.;
 DOMETG_ARR = 0.

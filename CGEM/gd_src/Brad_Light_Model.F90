@@ -10,21 +10,21 @@
   IMPLICIT NONE
 
   real, intent(in)    :: Rad(im,jm)     !Irradiance just below sea surface
-  real, intent(in)    :: f(im,jm,nsl,nf)
+  real, intent(in)    :: f(im,jm,km,nf)
   real, intent(in)    :: lat(im,jm),lon(im,jm)    !Latitude and longitude of each grid cell
-  real, intent(out)   :: IOPpar(im,jm,nsl)  !Par at the middle of layer k
-  real, intent(in)    :: d_sfc(im,jm,nsl)   !Depth at center of cell k from surface
-  real, intent(in)    :: d(im,jm,nsl)   !Depth at center of cell k from surface
-  real :: sun_zenith, sunang
-  real :: totChl(nsl)  ! total Chl-a (mg/m3)
-  real :: CDOM_k(nsl)  ! CDOM (ppb)
-  real :: OM1_A(nsl)   ! Concentration of particulate
-  real :: OM1_Z(nsl)   ! Concentration of particulate
-  real :: OM1_R(nsl)   ! Concentration of particulate
-  real :: OM1_BC(nsl)  ! Concentration of particulate
+  real, intent(out)   :: IOPpar(im,jm,km)  !Par at the middle of layer k
+  real, intent(in)    :: d_sfc(im,jm,km)   !Depth at center of cell k from surface
+  real, intent(in)    :: d(im,jm,km)   !Depth at center of cell k from surface
+  real :: sun_zenith, calc_solar_zenith 
+  real :: totChl(km)  ! total Chl-a (mg/m3)
+  real :: CDOM_k(km)  ! CDOM (ppb)
+  real :: OM1_A(km)   ! Concentration of particulate
+  real :: OM1_Z(km)   ! Concentration of particulate
+  real :: OM1_R(km)   ! Concentration of particulate
+  real :: OM1_BC(km)  ! Concentration of particulate
                        ! initial and boundary condition
                        ! generated SPM (g/m3)
-  real :: PARsurf(im,jm),PAR_percent(nsl), PARbot     ! Not used in GD Light Model 
+  real :: PARsurf(im,jm),PAR_percent(km), PARbot     ! Not used in GD Light Model 
   integer(kind=8), intent(in) :: TC_8  ! Model time (seconds from beginning of Jan 1, 2002)
 ! Time variables
     real, parameter :: OneD60     = 1.0/60.0  ! Convert 1/min to 1/sec
@@ -71,7 +71,7 @@
         nz=nza(i,j)
         if(nz.gt.0) then
 
-         sun_zenith = sunang(julianDay, HrTC, lat(i,j), lon(i,j))
+         sun_zenith = calc_solar_zenith(lat(i,j),lon(i,j),HrTC,julianDay,leapyr)
 
          totChl(1:nz) = (f(i,j,1:nz,JDIA) * 1.0E6 / CCHLD) + (f(i,j,1:nz,JGRE) * 1.0E6 / CCHLG)
          OM1_A(1:nz) = 0.

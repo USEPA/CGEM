@@ -12,6 +12,7 @@
 
        character(100) :: BASE_NETCDF_OUTPUT_FILE_NAME
        character(256) :: NETCDF_OUTPUT_FILE_NAME
+       integer ::  tinit=0
 
        ! Change True/False parameters for netCDF Write Variables
        !L3 add Which_Output to GD InputFile
@@ -21,7 +22,7 @@
               trim(BASE_NETCDF_OUTPUT_FILE_NAME), 0, '.nc'
 
           CALL CREATE_FILE( trim(NETCDF_OUTPUT_FILE_NAME), &
-                            im, jm, nsl, nstep, nf, EXTRA_VARIABLES, &
+                            im, jm, km, nstep, nf, EXTRA_VARIABLES, &
                             iYr0, &
                             IYRS, IMONS, IDAYS, IHRS, IMINS, ISECS, &
                             IYRE, IMONE, IDAYE, IHRE, IMINE, ISECE, &
@@ -33,7 +34,8 @@
 
       ! Opens the output file for writing:
        CALL OPEN_FILE( trim(NETCDF_OUTPUT_FILE_NAME), nf, EXTRA_VARIABLES, 0 )
+       tinit=0
+       CALL WRITE_DATA( im, jm, km, nf, tinit, f)
 
-       CALL WRITE_DATA( im, jm, nsl, nf, 0, f)
-
+       return
        End Subroutine Init_Output_GD

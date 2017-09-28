@@ -3,16 +3,22 @@
       USE Fill_Value
       USE Model_dim
 
-      real, intent (out) :: dz(im,jm,nsl)     !cell depth
-      real, intent (out) :: d(im,jm,nsl)      !depth from surface to bottom of cell
+      real, intent (out) :: dz(im,jm,km)     !cell depth
+      real, intent (out) :: d(im,jm,km)      !depth from surface to bottom of cell
       real, intent (out) :: depth(im,jm)      !total depth of column
-      real, intent (out) :: d_sfc(im,jm,nsl)  !depth from surface to cell center
+      real, intent (out) :: d_sfc(im,jm,km)  !depth from surface to cell center
       real, intent (out) :: dxdy(im,jm)       !area of cell
-      real, intent (out) :: Vol(im,jm,nsl)    !Volume of cell
+      real, intent (out) :: Vol(im,jm,km)    !Volume of cell
       real :: dx(im,jm), dy(im,jm)
       integer :: i,j,k,nz
       character(200) filename
 
+#ifdef map_code
+write(6,*) "-----Calling USER_get_basic_grid-----"
+write(6,*) "  Which_gridio=",Which_gridio
+write(6,*) "  Setting dx, dy, depth, dxdy, dz, d_sfc, d, Vol"
+write(6,*)
+#endif
 
       write(filename,'(A, A)') trim(DATADIR),'/dxdy.dat'
       open(19,file=filename,status='old')
@@ -47,9 +53,6 @@
            d_sfc(i,j,k) = sum(dz(i,j,1:(k-1))) + dz(i,j,k)/2. 
            d(i,j,k) = sum(dz(i,j,1:k)) !bottom of cell 
            Vol(i,j,k) = dxdy(i,j) * dz(i,j,k)
-#ifdef DEBUG
-           write(6,*) i,j,k,dz(i,j,k),d_sfc(i,j,k),d(i,j,k)
-#endif
           enddo
        enddo
       enddo

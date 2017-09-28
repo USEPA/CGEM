@@ -8,28 +8,31 @@
        USE Grid
        USE OUTPUT_NETCDF_CGEM
        USE State_Vars
+       USE CGEM_vars
 
        IMPLICIT NONE
 
        character(100),intent(in) :: BASE_NETCDF_OUTPUT_FILE_NAME
        character(256) :: NETCDF_OUTPUT_FILE_NAME
+       real :: dumf(im,jm,km,nf)
+       integer :: i,j,k,nz
 
-#ifdef DEBUG
-write(6,*) "After Set_Vars"
+#ifdef map_code
+write(6,*) "---- Init_Output_CGEM ---"
 #endif
 
        ! Change True/False parameters for netCDF Write Variables
        if(Which_chlaC.ne.2) call OUTPUT_NotCloern() !Gets rid of unused vars (Cloern)
        if(Which_Output.eq.1) call OUTPUT_NRL() !Limit Outputs
        if(Which_Output.eq.2) call OUTPUT_ALL_FALSE()
-#ifdef DEBUG
-write(6,*) "After Set_Vars"
-#endif
+
+      !write(6,*) d
+      !write(6,*) dz
 
       WRITE ( NETCDF_OUTPUT_FILE_NAME, '(A, I6.6, A)' )&
               trim(BASE_NETCDF_OUTPUT_FILE_NAME), 0, '.nc'
           CALL CREATE_FILE( trim(NETCDF_OUTPUT_FILE_NAME), &
-                            im, jm, nsl, nstep, nf, EXTRA_VARIABLES, &
+                            im, jm, km, nstep, nf, EXTRA_VARIABLES, &
                             iYr0, &
                             IYRS, IMONS, IDAYS, IHRS, IMINS, ISECS, &
                             IYRE, IMONE, IDAYE, IHRE, IMINE, ISECE, &
@@ -48,8 +51,18 @@ write(6,*) "After Set_Vars"
 #ifdef DEBUG
 write(6,*) "After Set_Vars"
 #endif
+        dumf = f
 
-       CALL WRITE_DATA( im, jm, nsl, nf, 0, f)
+        do j=1,jm
+        do i=1,im
+          nz = nza(i,j)
+          do k=1,nz
+           dumf(i,j,k,iTr) = f(i,j,k,iTr) * Vol(i,j,k)
+          enddo
+         enddo
+        enddo
+
+       CALL WRITE_DATA( im, jm, km, nf, 0, dumf)
 
 #ifdef DEBUG
 write(6,*) "After Write_Data"

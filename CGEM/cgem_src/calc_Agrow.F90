@@ -13,33 +13,33 @@
 ! growth model to calculate the one-D array (water column) Agrow_k 
 !-----------------------------------------------------------------------
 ! -- Declare variables coming thru the interface ---------------------
-      real,intent(in)  ::  E(nsl)        ! Irradiance (quanta/cm2/sec) 
+      real,intent(in)  ::  E(km)        ! Irradiance (quanta/cm2/sec) 
                                          ! at middle of layer k
                                        
-      real,intent(in)  ::  T_k(nsl)      ! Water temperature in Celsius
+      real,intent(in)  ::  T_k(km)      ! Water temperature in Celsius
 
-      real,intent(in)  ::  Qn(nospA,nsl) ! Phytoplankton Nitrogen Quota (mmol-N/cell)         
-      real,intent(in)  ::  Qp(nospA,nsl) ! Phytoplankton Phosphorous Quota (mmol-P/cell)     
-      real,intent(in)  ::  N(nsl)        ! Nitrogen (mmol-N/m3)
-      real,intent(in)  ::  P(nsl)        ! Phosphorus (mmol-P/m3) 
-      real,intent(in)  ::  Si(nsl)       ! Silica (mmol-Si/m3)
+      real,intent(in)  ::  Qn(nospA,km) ! Phytoplankton Nitrogen Quota (mmol-N/cell)         
+      real,intent(in)  ::  Qp(nospA,km) ! Phytoplankton Phosphorous Quota (mmol-P/cell)     
+      real,intent(in)  ::  N(km)        ! Nitrogen (mmol-N/m3)
+      real,intent(in)  ::  P(km)        ! Phosphorus (mmol-P/m3) 
+      real,intent(in)  ::  Si(km)       ! Silica (mmol-Si/m3)
       
-      real,intent(in)  ::  A_k(nospA,nsl)      ! Number density of phytoplankton group isp 
+      real,intent(in)  ::  A_k(nospA,km)      ! Number density of phytoplankton group isp 
  
       integer, intent(in) :: nz                ! Number of layers 
-      real,intent(out) ::  Agrow_k(nospA,nsl)  ! Specific growth rate    
+      real,intent(out) ::  Agrow_k(nospA,km)  ! Specific growth rate    
 					       ! of phytoplankton group isp
                                                
-      real,intent(out) ::  uA_k(nsl,nospA)     ! Temperature adjusted light factor
+      real,intent(out) ::  uA_k(km,nospA)     ! Temperature adjusted light factor
                                                ! phytoplankton group isp
                                                                             
-      real,intent(out) ::  Aresp_k(nospA,nsl)    ! Phytoplankton respiration of group       	
+      real,intent(out) ::  Aresp_k(nospA,km)    ! Phytoplankton respiration of group       	
 					         ! isp, including dark respiration. 
 
-      real,intent(out)     :: uN_k(nsl,nospA)  ! Nitrogen limited growth rate (1/d)
-      real,intent(out)     :: uP_k(nsl,nospA)  ! Phosphorus limited growth rate (1/d)
-      real,intent(out)     :: uE_k(nsl,nospA)  ! Light limited growth rate (1/d)
-      real,intent(out)     :: uSi_k(nsl,nospA) ! Silica limited growth rate (1/d)
+      real,intent(out)     :: uN_k(km,nospA)  ! Nitrogen limited growth rate (1/d)
+      real,intent(out)     :: uP_k(km,nospA)  ! Phosphorus limited growth rate (1/d)
+      real,intent(out)     :: uE_k(km,nospA)  ! Light limited growth rate (1/d)
+      real,intent(out)     :: uSi_k(km,nospA) ! Silica limited growth rate (1/d)
 
 ! -- Local variables --------------------------------------------------------------   
       integer :: k, isp ! loop indices     

@@ -46,7 +46,7 @@ CONTAINS
   ! then call CLOSE_FILE then
   ! worker processes should call OPEN_FILE, WRITE_DATA, CLOSE_FILE.
   !
-  SUBROUTINE CREATE_FILE( NAME, IM, JM, NSL, NSTEP, VARIABLES,    &
+  SUBROUTINE CREATE_FILE( NAME, IM, JM, KM, NSTEP, VARIABLES,    &
                           EXTRA_VARIABLES, IYR0, &
                           IYRS, IMONS, IDAYS, IHRS, IMINS, ISECS, &
                           IYRE, IMONE, IDAYE, IHRE, IMINE, ISECE, &
@@ -56,7 +56,7 @@ CONTAINS
     USE flags
     IMPLICIT NONE
     CHARACTER(LEN=*),INTENT(IN):: NAME
-    INTEGER,INTENT(IN):: IM, JM, NSL
+    INTEGER,INTENT(IN):: IM, JM, KM
     INTEGER,INTENT(IN):: NSTEP
     INTEGER,INTENT(IN):: VARIABLES, EXTRA_VARIABLES
     INTEGER,INTENT(IN):: IYR0 ! Reference year (before start of model run).
@@ -65,16 +65,15 @@ CONTAINS
     INTEGER,INTENT(IN):: DT_OUT ! Model timestep size in seconds.
     REAL,DIMENSION(IM,JM):: RLON
     REAL,DIMENSION(IM,JM):: RLAT
-    REAL,DIMENSION(IM,JM,NSL):: H
-    REAL,DIMENSION(IM, JM, NSL):: DZ
+    REAL,DIMENSION(IM,JM,KM):: H
+    REAL,DIMENSION(IM, JM, KM):: DZ
     REAL,DIMENSION(IM,JM):: AREA
-    INTEGER,DIMENSION(IM, JM),INTENT(IN):: FM
+    REAL,DIMENSION(IM,JM,KM),INTENT(IN):: FM
    ! External NetCDF routines:
     INTEGER NF_CREATE, NF_ENDDEF, NF_PUT_VAR_INT, NF_PUT_VAR_REAL, NF_SYNC
     EXTERNAL NF_CREATE, NF_ENDDEF, NF_PUT_VAR_INT, NF_PUT_VAR_REAL, NF_SYNC
    ! Locals:
-    INTEGER,DIMENSION(IM, JM, NSL):: TEMP_3D_FM ! VLA
-    INTEGER IM_DIM, JM_DIM, NSL_DIM, NSTEPP1_DIM
+    INTEGER IM_DIM, JM_DIM, KM_DIM, NSTEPP1_DIM
     INTEGER RLON_VAR, RLAT_VAR, H_VAR, FM_VAR
     INTEGER DZ_VAR,AREA_VAR
     INTEGER K,J
@@ -89,7 +88,7 @@ CONTAINS
     ! Create dimensions:
     CALL DEFDIM( FILE_ID, IM_DIM, 'longitude', IM )
     CALL DEFDIM( FILE_ID, JM_DIM, 'latitude', JM )
-    CALL DEFDIM( FILE_ID, NSL_DIM, 'k', NSL )
+    CALL DEFDIM( FILE_ID, KM_DIM, 'k', KM )
 !!  CALL DEFDIM( FILE_ID, NSTEPP1_DIM, 'time', NSTEP )
     CALL DEFDIM( FILE_ID, NSTEPP1_DIM, 'time', 0 ) ! 0 Means UNLIMITED size.
     ! Write global scalar attributes:
@@ -383,19 +382,19 @@ write(6,*) "After long"
 write(6,*) "After lat"
 #endif
 
-    CALL DEFVR3( FILE_ID, IM_DIM, JM_DIM, NSL_DIM, H_VAR, 'h', &
+    CALL DEFVR3( FILE_ID, IM_DIM, JM_DIM, KM_DIM, H_VAR, 'h', &
                  'Cell bottom depth.', 'm' )
 #ifdef DEBUG
 write(6,*) "After hvar"
 #endif
 
-    CALL DEFVI3( FILE_ID, IM_DIM, JM_DIM, NSL_DIM, FM_VAR, 'fm', &
+    CALL DEFVR3( FILE_ID, IM_DIM, JM_DIM, KM_DIM, FM_VAR, 'fm', &
                  'Mask: 0 = land, 1 = water.', 'none' )
 #ifdef DEBUG
 write(6,*) "After fm"
 #endif
 
-    CALL DEFVR3( FILE_ID, IM_DIM, JM_DIM, NSL_DIM, DZ_VAR, 'dz', &
+    CALL DEFVR3( FILE_ID, IM_DIM, JM_DIM, KM_DIM, DZ_VAR, 'dz', &
                  'Thickness of cell.', 'none' )
 #ifdef DEBUG
 write(6,*) "After dz"
@@ -429,7 +428,7 @@ write(6,*) "After time"
 
     DIM_IDS( 1 ) = IM_DIM
     DIM_IDS( 2 ) = JM_DIM
-    DIM_IDS( 3 ) = NSL_DIM
+    DIM_IDS( 3 ) = KM_DIM
     DIM_IDS( 4 ) = NSTEPP1_DIM
 #ifdef DEBUG
  write(6,*) VARIABLES
@@ -456,7 +455,7 @@ write(6,*) "After Vars"
 
     DIM_IDS( 1 ) = IM_DIM
     DIM_IDS( 2 ) = JM_DIM
-    DIM_IDS( 3 ) = NSL_DIM
+    DIM_IDS( 3 ) = KM_DIM
     DIM_IDS( 4 ) = NSTEPP1_DIM
 
     DO VARIABLE = 1, EXTRA_VARIABLES
@@ -497,10 +496,7 @@ write(6,*) "After Extra_Vars"
 
     ! Write fm in 3D
 
-    DO K = 1, NSL
-      TEMP_3D_FM(:,:,K) = FM
-    END DO
-    ERR = NF_PUT_VAR_INT( FILE_ID, FM_VAR, TEMP_3D_FM )
+    ERR = NF_PUT_VAR_REAL( FILE_ID, FM_VAR, FM )
     CALL CHKERR( ERR, 'write output variable fm' )
 
     ERR = NF_PUT_VAR_REAL( FILE_ID, DZ_VAR, DZ )
@@ -624,11 +620,11 @@ write(6,*) Variable, EXTRA_VARIABLE_NAMES( VARIABLE ), EXTRA_VAR( VARIABLE )
   ! Called by non-concurrent programs to write all data per timestep.
   !
 
-  SUBROUTINE WRITE_DATA( IM, JM, NSL, VARIABLES, TIMESTEP, F ) 
+  SUBROUTINE WRITE_DATA( IM, JM, KM, VARIABLES, TIMESTEP, F ) 
     USE OUTPUT 
     IMPLICIT NONE
-    INTEGER,INTENT(IN):: IM, JM, NSL, VARIABLES, TIMESTEP ! Model TIMESTEP is 0-based.
-    REAL,DIMENSION(IM, JM, NSL, VARIABLES):: F
+    INTEGER,INTENT(IN):: IM, JM, KM, VARIABLES, TIMESTEP ! Model TIMESTEP is 0-based.
+    REAL,DIMENSION(IM, JM, KM, VARIABLES):: F
     ! External NetCDF routines:
     INTEGER NF_PUT_VARA_REAL, NF_PUT_VARA_DOUBLE, NF_SYNC
     EXTERNAL NF_PUT_VARA_REAL, NF_PUT_VARA_DOUBLE, NF_SYNC
@@ -654,7 +650,7 @@ write(6,*) Variable, EXTRA_VARIABLE_NAMES( VARIABLE ), EXTRA_VAR( VARIABLE )
     STARTS( 4 ) = FILE_TIMESTEP + 1 ! NetCDF follows FORTRAN 1-based convention
     COUNTS( 1 ) = IM
     COUNTS( 2 ) = JM
-    COUNTS( 3 ) = NSL
+    COUNTS( 3 ) = KM
     COUNTS( 4 ) = 1
 
     DO VARIABLE = 1, VARIABLES
@@ -678,14 +674,14 @@ write(6,*) Variable, EXTRA_VARIABLE_NAMES( VARIABLE ), EXTRA_VAR( VARIABLE )
   ! WRITE_EXTRA_DATA: Write current timestep data to output file.
   ! Called by concurrent programs to write all data per timestep
   !
-  SUBROUTINE WRITE_EXTRA_DATA( IM, JM, NSL, EXTRA_VARIABLES, TIMESTEP) 
+  SUBROUTINE WRITE_EXTRA_DATA( IM, JM, KM, EXTRA_VARIABLES, TIMESTEP) 
     USE OUTPUT 
     USE MASS_BALANCE_GD
     USE eut, ONLY:PD_AVG,PG_AVG,NITDO2,DOMETD_ARR,DOMETG_ARR,DOPREDD_ARR, &
 &       DOPREDG_ARR,DOZOO_ARR, DOMNLDOC_ARR, PFD, SFD, NFD, IFD, TFD,     &
 &       PFG, NFG, IFG, TFG, OUTPUT_PAR
     IMPLICIT NONE
-    INTEGER,INTENT(IN):: IM, JM, NSL, EXTRA_VARIABLES, TIMESTEP
+    INTEGER,INTENT(IN):: IM, JM, KM, EXTRA_VARIABLES, TIMESTEP
     ! External NetCDF routines:
     INTEGER NF_PUT_VARA_REAL, NF_SYNC
     EXTERNAL NF_PUT_VARA_REAL, NF_SYNC
@@ -703,7 +699,7 @@ write(6,*) Variable, EXTRA_VARIABLE_NAMES( VARIABLE ), EXTRA_VAR( VARIABLE )
     STARTS( 4 ) = FILE_TIMESTEP + 1 ! NetCDF follows FORTRAN 1-based convention.
     COUNTS( 1 ) = IM
     COUNTS( 2 ) = JM
-    COUNTS( 3 ) = NSL
+    COUNTS( 3 ) = KM
     COUNTS( 4 ) = 1
 
     ! Write each extra variable (if selected to be written):

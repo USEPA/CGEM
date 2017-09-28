@@ -4,17 +4,26 @@
 
       IMPLICIT NONE
 
-      integer*8, intent (in) :: START_SECONDS  !Integer seconds since 2002
-      integer*8, intent (in) :: TC_8  !Integer seconds, simulation time
+      integer(8), intent (in) :: START_SECONDS  !Integer seconds since 2002
+      integer(8), intent (in) :: TC_8  !Integer seconds, simulation time
       real, intent (out) :: T(im,jm,nsl) !Temperature in C
       real,save :: Tmax,Tmin,MaxDay
-      real*8 :: Td  !Days from 0 to 365.
+      real(8):: Td  !Days from 0 to 365.
       integer, save :: init = 1
       character(200) filename
 !      T = 23.333 !Our room temperature, 74F
 
-#ifdef DEBUG
-write(6,*) "In Calc_T"
+#ifdef map_code
+      if(init.eq.1) then
+      write(6,*) ""
+      write(6,*) "In Calc_Temp"
+      write(6,*) "Reads a single value, then initializes whole array"
+      write(6,*) "Main data directory, T.dat"
+      write(6,*) "In Calc_Temp"
+      write(6,*) "Uses cosine and min/max T and time of max T to give" 
+      write(6,*) "seasonally varying temperature function"
+      write(6,*) ""
+      endif
 #endif
 
 
@@ -23,13 +32,10 @@ write(6,*) "In Calc_T"
       !write(6,*) "Simulation time in seconds",Td
       Td = Td/86400.d0
       !write(6,*) "Simulation time in days",Td
-      Td = mod(Td,365.)
+      Td = mod(Td,365.d0)
       !write(6,*) "Simulation time within context of year",Td
 
       if(init.eq.1) then  !Only read in data at the first timestep
-#ifdef DEBUG
-write(6,*) "Inside if"
-#endif
  
       write(filename,'(A, A)') trim(DATADIR),'/T.dat'
       open (19,file=filename,status='old')
@@ -50,9 +56,6 @@ write(6,*) "Inside if"
 
       endif
 
-#ifdef DEBUG
-write(6,*) "After If"
-#endif
 
 ! Regression equation found by excel from data from a Beach website:
 ! http://beachhunter.net/thingstoknow/gulfwatertemp/index.htm
@@ -60,14 +63,5 @@ write(6,*) "After If"
 ! January 1st = 1.
       T = Tmin + (Tmax-Tmin)*(COS(((Td-MaxDay))*3.1415/365.)*(COS(((Td-MaxDay))*3.1415/365.)))
       
-#ifdef DEBUG
-write(6,*) "After T"
-#endif
-
-! Here is from 4th order fit in Excel:
-!      T = 1.7065959e-8*Td**4 - 1.2879208e-5*Td**3 + 2.5643923e-3*Td*Td &
-!     &    - 0.05151689*Td+13.578683
-!       write(6,*) Td,T
-
       return 
       end subroutine Calc_Temp 

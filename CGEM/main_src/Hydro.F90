@@ -37,6 +37,13 @@
 
       IMPLICIT NONE
 
+#ifdef map_code
+write(6,*) "---Allocate_Hydro----"
+write(6,*) "  Allocate and fill these vars:"
+write(6,*) "  S,T,Wind,Rad,Ux,Vx,Wx,Kh,E"
+write(6,*) 
+#endif
+
       ALLOCATE(S(im,jm,nsl))
       ALLOCATE(T(im,jm,nsl))
       ALLOCATE(Wind(im,jm))
@@ -66,7 +73,6 @@
       End Subroutine Allocate_Hydro 
 
 
-
       Subroutine Init_Hydro_NetCDF()
       
       USE Model_dim
@@ -74,6 +80,13 @@
       IMPLICIT NONE
 
       integer :: i
+
+#ifdef map_code
+write(6,*) "---Init_Hydro_NetCDF----"
+write(6,*) "  Opening netCDF for Which_gridio=",Which_gridio
+write(6,*) "  1==EFDC, 2==NCOM"
+write(6,*)
+#endif
 
       !Set filenames for netCDF
       if (Which_gridio .eq. 1) then 
@@ -91,14 +104,16 @@
          write(netcdf_fileNames(4), '(A, A)') trim(DATADIR), '/INPUT/V.nc'
          write(netcdf_fileNames(5), '(A, A)') trim(DATADIR), '/INPUT/W.nc'
          write(netcdf_fileNames(6), '(A, A)') trim(DATADIR), '/INPUT/KH.nc'
-         write(netcdf_fileNames(7), '(A, A)') trim(DATADIR), '/INPUT/E.2D.nc'
+         write(netcdf_fileNames(7), '(A, A)') trim(DATADIR), '/INPUT/E.nc'
       endif
 
       do i=1,7
         call open_netcdf(netcdf_fileNames(i), 0, hydro_info(i)%ncid)
         hydro_info(i)%fileName = netcdf_fileNames(i)
         call init_info(hydro_info(i))
-        !call report_info(hydro_info(i))
+#ifdef DEBUG
+        call report_info(hydro_info(i))
+#endif
       enddo
 
       startIndex = 1
@@ -110,6 +125,11 @@
 
       IMPLICIT NONE
       integer :: i
+
+#ifdef map_code
+write(6,*) "---Close_Hydro_NetCDF----"
+write(6,*)
+#endif
 
       do i=1,7
         call close_netcdf(hydro_info(i)%ncid)

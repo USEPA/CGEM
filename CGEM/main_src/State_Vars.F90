@@ -28,7 +28,7 @@
 
       IMPLICIT NONE
 
-      ALLOCATE(f(im,jm,nsl,nf))
+      ALLOCATE(f(im,jm,km,nf))
       f=fill(1)
 
       return

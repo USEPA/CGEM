@@ -1,26 +1,24 @@
-      subroutine USER_get_NCOM_grid(TC_8)
+      subroutine USER_get_NCOM_grid()
 
       USE Fill_Value
       USE Model_dim
       USE Grid
-    
+      USE INPUT_VARS , ONLY: icent,jcent
 
       IMPLICIT NONE
  
-      integer(kind=8) :: TC_8
-
-!      real, intent (out) :: dz(im,jm,nsl)     !cell depth
-!      real, intent (out) :: d(im,jm,nsl)      !depth from surface to bottom of cell
-!      real, intent (out) :: depth(im,jm)      !total depth of column
-!      real, intent (out) :: d_sfc(im,jm,nsl)  !depth from surface to cell center
-!      real, intent (out) :: dxdy(im,jm)       !area of cell
-!      real, intent (out) :: Vol(im,jm,nsl)    !Volume of cell
       real, dimension(jm) :: dxy
       integer :: i,j,k
       character(200) filename
 
-      real, dimension(35) :: dz_temp
       integer :: nzr, ns
+
+#ifdef map_code
+     write(6,*) "----Calling USER_get_NCOM_grid-----"
+     write(6,*) "  setting dxy, area, zl, zz, dz_k, and h"
+     write(6,*) "  Not setting depths, because don't have E"  
+     write(6,*) 
+#endif
 
       write(filename,'(A, A)') trim(DATADIR),'/dxdy.dat'
       open(19,file=filename,status='old')
@@ -35,26 +33,14 @@
       enddo
 
       ! NCOM grid depths do not change with time
-      
       write(filename,'(A, A)') trim(DATADIR),'/Depth.dat'
       open(19,file=filename,status='old')
       read(19,*) nzr,ns,Hs   !Hs is a reference depth used to calculate sigma values given depths of layer surfaces and centers
       read(19,*) zl
       read(19,*) zz
-      read(19,*) dz_temp
+      read(19,*) dz_k
       close(19)
 
-      do i=1,im
-      do j=1,jm
-      do k=1,nzr
-         !L3: was this for debugging?  dz(i,j,k) = 1
-         dz(i,j,k) = dz_temp(k)
-#ifdef DEBUG
-      write(6,*) "dz, Hs, k=",k,Hs,dz_temp(k)
-#endif
-      enddo
-      enddo
-      enddo
       !---------------------------------------------------------------------
       !     ns : no. of sigma levels at center of sigma layers, i.e. the
       !     number
@@ -62,7 +48,7 @@
       !     reference water thickness, Hs
       !---------------------------------------------------------------------
       do k = 1, nsl
-         dz(:,:,k) = dz(:,:,k)/Hs   ! dz(k) on RHS is thickness (m) of layer k
+         dz_k(k) = dz_k(k)/Hs   ! dz(k) on RHS is thickness (m) of layer k
                                     ! On LHS, dz(k) is sigma thickness of layer k
       enddo
       !------------------------------------------------------------- 
@@ -103,25 +89,10 @@
       do j=1,jm
        do i=1,im
           h(i,j) = amin1(h(i,j), Hs)   !Depth for sigma layers, maximum depth 100
-#ifdef DEBUG
- write(6,*) "h,Hs",i,j,h(i,j),Hs
-#endif
-       enddo
-      enddo
-
-       do k=1,nsl
-        do j=1,jm
-         do i=1,im
-          d_sfc(i,j,k) = h(i,j)*zz(k)
-#ifdef DEBUG
- write(6,*) "d_sfc",i,j,k,d_sfc(i,j,k)
-#endif
-        enddo
        enddo
       enddo
 
       return
-
       end subroutine USER_get_NCOM_grid
 
 
@@ -131,35 +102,58 @@
       USE Model_dim
       USE Grid
       USE Hydro, ONLY: E
+      USE INPUT_VARS
 
       IMPLICIT NONE
 
-      integer :: i,j,k, nz
+      real :: dp !d previous
+      integer :: i,j,k,nz
+      integer :: init=1
 
-      d = fill(0) 
-      d_sfc = fill(0) 
+#ifdef map_code 
+     if(init.eq.1) then
+      write(6,*) "----Calling USER_update_NCOM_grid-----"
+      write(6,*) "  setting dxy, area, zl, zz, dz_k, and h"
+      write(6,*) "  Not setting depths, because don't have E"
+      write(6,*)
+     init=0
+     endif
+#endif
+#ifdef DEBUG
+     write(6,*) "----Calling USER_get_NCOM_grid-----"
+     write(6,*) "  setting dxy, area, zl, zz, dz_k, and h"
+     write(6,*) "  For cell i,j,k=",icent,jcent,km
+     write(6,*) "h,E,d,zz,area,d_sfc,Vol="
+     write(6,*) h(icent,jcent),E(icent,jcent),d(icent,jcent,km)
+     write(6,*) zz(km),area(icent,jcent),d_sfc(icent,jcent,km),Vol(icent,jcent,km)
+#endif
 
-      do k=1,nsl
        do j=1,jm
         do i=1,im
-          d(i,j,k) = h(i,j)+E(i,j)
+          depth(i,j) = h(i,j)  + E(i,j)
         enddo
        enddo
-      enddo
 
-      do k=1,nsl
+ 
        do j=1,jm
         do i=1,im
-          d_sfc(i,j,k) = d(i,j,k)*zz(k)
-          Vol(i,j,k) = area(i,j) *dz(i,j,k)*d(i,j,k)
-
-#ifdef DEBUG
-  write(6,*) i,j,k
+           nz = nza(i,j)
+           dp = depth(i,j)
+           do k=1,nz
+            dz(i,j,k) = depth(i,j)*dz_k(k)
+            d_sfc(i,j,k) = depth(i,j)*zz(k)
+            Vol(i,j,k) = area(i,j) *dz(i,j,k)
+            d(i,j,k) = sum(dz(i,j,1:k)) 
+            dp = d(i,j,k)
+#ifdef DEBUG_GRID
+  write(6,*) "for cell i,j,k=",i,j,k
   write(6,*) "h",h(i,j)
+  write(6,*) "depth",depth(i,j)
   write(6,*) "E",E(i,j)
   write(6,*) "d",d(i,j,k)
+  write(6,*) "dz",dz(i,j,k)
   write(6,*) "zz",zz(k)
-  write(6,*) "area",area
+  write(6,*) "area",area(i,j)
   write(6,*) "d_sfc",d_sfc(i,j,k)
   write(6,*) "Vol",Vol(i,j,k)
 #endif

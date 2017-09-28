@@ -8,8 +8,8 @@
 
       integer,intent(in)  :: istep_out !current output counter
 
-        CALL WRITE_DATA( im, jm, nsl, nf, istep_out, f)
-        CALL WRITE_EXTRA_DATA( IM, JM, NSL, EXTRA_VARIABLES, istep_out) 
+        CALL WRITE_DATA( im, jm, km, nf, istep_out, f)
+        CALL WRITE_EXTRA_DATA( IM, JM, KM, EXTRA_VARIABLES, istep_out) 
 
       return
 

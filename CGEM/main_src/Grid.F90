@@ -6,13 +6,13 @@
        IMPLICIT NONE
 
       real,allocatable,save :: lat(:,:),lon(:,:) !Latitude and longitude of each grid cell
-      real,allocatable,save :: d(:,:,:)          !Distance from surface to bottom of cell   !!!OLDCOMMENT -- Water depth at cell bottom
+      real,allocatable,save :: d(:,:,:)          !Distance from surface to bottom of cell 
       real,allocatable,save :: d_sfc(:,:,:)      !Distance from surface to center of cell
-      real,allocatable,save :: depth(:,:)        !Depth of water column       !!!OLDCOMMENT -- Distance from surface to center of cell
+      real,allocatable,save :: depth(:,:)        !Depth of water column    
       real,allocatable,save :: dz(:,:,:)         !Thickness of cell
       real,allocatable,save :: Vol(:,:,:), Vol_prev(:,:,:)        !Volume of each cell
       real,allocatable,save :: area(:,:)       !Area of each cell
-      integer,allocatable,save :: fm(:,:)        ! land(0)/sea(>0) mask for NCOM, other for EFDC
+      real,allocatable,save :: fm(:,:,:)        ! land(0)/sea(1) mask
       integer,allocatable,save :: wsm(:,:)       ! shelf(0)/open ocean(1) mask
 
       !NCOM grid variables
@@ -20,6 +20,7 @@
       real,allocatable,save :: zl(:)  !depth at top of layer
       real,allocatable,save :: dzz(:) !sigma difference between middle of layers
       real,allocatable,save :: h(:,:)   !undisturbed water depth at center of cells
+      real, allocatable, save :: dz_k(:) !Original (Ko) dz, sigma thickness of layer k
       real, save :: Hs  !reference depth used to calculate sigma values given depths of layer surfaces and centers
 
    
@@ -36,11 +37,19 @@
 
       IMPLICIT NONE
 
-      integer i,j
+      integer j
       character(200) filename
       integer(kind=8) :: TC_8
 
       call Grid_allocate()
+
+#ifdef map_code
+write(6,*) "---Set_Grid----"
+write(6,*) "  Allocated Grid in Grid_allocate"
+write(6,*) "  Reading nza for 0D and EFDC, setting nza=km for NCOM"
+write(6,*) "  *** nza really should be zero if land, but is set to km here in Set_Grid"
+write(6,*)
+#endif
 
       if (Which_gridio .eq. 0 .OR. Which_gridio .eq. 1) then   ! used for basic, EFDC, and NCOM grids
          write(filename,'(A, A)') trim(DATADIR),'/nz.dat'
@@ -51,7 +60,7 @@
          enddo
          close(19)
       else if (Which_gridio .eq. 2) then
-         nza = nz_max
+         nza = km 
       else 
           write(6,*)'Could not read number of layers from file'
           write(6,*)'...stopping execution'
@@ -62,6 +71,7 @@
 ! --- get grid location
 !----------------------
       call USER_getLonLat(lat,lon)
+
 
       if (Which_gridio.eq.0) then
         call USER_get_basic_grid(dz,depth,d,d_sfc,area,Vol)
@@ -75,7 +85,7 @@
 !--------------------------------
 ! --- get land/water and shelf masks
 !--------------------------------
-      call USER_get_masks()
+!      call USER_get_masks() !No, need to calculate depth first!!
 
       return
 
@@ -90,25 +100,33 @@
       ALLOCATE(lat(im,jm))
       ALLOCATE(lon(im,jm))
       ALLOCATE(depth(im,jm))
-      ALLOCATE(d(im,jm,nsl))
-      ALLOCATE(Vol(im,jm,nsl))
-      ALLOCATE(Vol_prev(im,jm,nsl))
+      ALLOCATE(d(im,jm,km))
+      ALLOCATE(Vol(im,jm,km))
+      ALLOCATE(Vol_prev(im,jm,km))
       ALLOCATE(area(im,jm))
-      ALLOCATE(dz(im,jm,nsl))
-      ALLOCATE(d_sfc(im,jm,nsl))
-      ALLOCATE(fm(im,jm))
+      ALLOCATE(dz(im,jm,km))
+      ALLOCATE(d_sfc(im,jm,km))
+      ALLOCATE(fm(im,jm,km))
       ALLOCATE(wsm(im,jm))
 
       if (Which_gridio .eq. 2) then
          ALLOCATE(zz(35))
          ALLOCATE(zl(35))
          ALLOCATE(dzz(35))
+         ALLOCATE(dz_k(35))
          ALLOCATE(h(im,jm))
          zz=fill(0)
          zl=fill(0)
          dzz=fill(0)
          h=fill(0)
       endif
+
+#ifdef map_code
+write(6,*) "----Grid_allocate"
+write(6,*) "  Allocating NaN for stuff the code should never access"
+write(6,*) "  Also Open_Grid_NetCDF"
+write(6,*) 
+#endif
 
       lat=fill(0)  !Fill values for netCDF
       lon=fill(0)  
@@ -118,13 +136,13 @@
       area=fill(0)
       dz=fill(0) 
       d_sfc=fill(0)  
-      fm=fill(0) 
-      wsm=fill(0) 
+      fm=0. !Default land, real zero
+      wsm=0 !Default shelf, integer zero
 
       if (Which_gridio.eq.1) then
-        write(grid_info(eColDepth)%fileName, '(A,A)')trim(DATADIR),'/INPUT/WaterDepth.nc'
-        write(grid_info(eCellDepth)%fileName, '(A,A)')trim(DATADIR),'/INPUT/LayerDepth.nc'
-        call Open_Grid_NetCDF()
+       write(grid_info(eColDepth)%fileName, '(A,A)')trim(DATADIR),'/INPUT/WaterDepth.nc'
+       write(grid_info(eCellDepth)%fileName, '(A,A)')trim(DATADIR),'/INPUT/LayerDepth.nc'
+       call Open_Grid_NetCDF()
       endif
 
       return
@@ -137,12 +155,21 @@
       IMPLICIT NONE
       integer :: i
 
+#ifdef map_code
+write(6,*) "---Open_Grid_NetCDF--"
+write(6,*) "  numGridFiles=",numGridFiles
+write(6,*) 
+#endif
       do i=1,numGridFiles
         call open_netcdf(grid_info(i)%fileName, 0, grid_info(i)%ncid)
         call init_info(grid_info(i))
-        !call report_info(grid_info(i))
+#ifdef DEBUG
+        write(6,*) "netCDF file=",grid_info(i)%fileName
+        call report_info(grid_info(i))
+#endif
       enddo
 
+      return
       End Subroutine Open_Grid_NetCDF
 
 
@@ -155,6 +182,7 @@
         call close_netcdf(grid_info(i)%ncid)
       enddo
 
+      return
       End Subroutine Close_Grid_NetCDF
 
 

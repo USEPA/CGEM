@@ -2,39 +2,28 @@
 
       USE Model_dim
       USE STATES 
-      USE INPUT_VARS, ONLY: Read_Sal,Read_T,START_SECONDS
       USE EUT, ONLY:CCHLD,CCHLG
       USE State_Vars
       USE Grid
+      USE Hydro
+      USE INPUT_VARS, ONLY:icent,jcent
 
       implicit none
  
       real temp
-      integer i,j,k
-      real S(im,jm,nsl), T(im,jm,nsl) !S=Salinity,T=Temperature in C 
-
-#ifdef DEBUG
-      write(6,*) "In Salinity_Regression"
-      write(6,*) "start",START_SECONDS
-#endif
-
-      !if(Read_Sal.eq.0) then
-      ! call Calc_Sal(S) 
-      !else
-      ! call USER_Read(START_SECONDS,S,'s',2)
-      !endif
-!
-!      if(Read_T.eq.0) then
-!        call Calc_Temp(START_SECONDS,START_SECONDS,T)
-!      else
-!       call USER_Read(START_SECONDS,T,'t',2)
-!      endif
+      integer i,j,k,nz
 
 
       do j = 1,jm
       do i = 1,im
+            nz = nza(i,j)
+         do k=1,nz
 
-         do k=1,nza(i,j)
+#ifdef DEBUG
+write(6,*) "---Salinity_Regression_Init_GD"
+write(6,*) " S, d_sfc at i,j=",icent,jcent
+write(6,*) S(icent,jcent,km),d_sfc(icent,jcent,km)
+#endif
 
 !Regression y  =  b1*Salinity + b2*Depth + b3*Salinity^2 + b4*Depth^2 + Intercept
      !DOC
@@ -101,7 +90,6 @@
 
      !SU
       f( i, j, k, JSU ) = 0.275*0.001 !mg/L->kg/m3 
-
      !DO2
       temp = -18.02*S(i,j,k) -0.37*d_sfc(i,j,k) +0.23*S(i,j,k)*S(i,j,k) + 521.72  
       temp = AMAX1(temp,0.01) 
@@ -121,11 +109,6 @@
       enddo
       enddo
 
-
-#ifdef DEBUG
-      write(6,*) "In Salinity_Regression end"
-      write(6,*) "start",START_SECONDS
-#endif
 
 
 

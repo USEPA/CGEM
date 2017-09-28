@@ -151,7 +151,7 @@ read(999,*)
 
 !----Other including Boundary Conditions-------------
 read(999,*)
-read(999,*) Which_Vmix   
+read(999,*) Which_Vmix,Which_Adv 
 read(999,*) KH_coeff  
 read(999,*) Which_Outer_BC 
 read(999,*) !Comment Line

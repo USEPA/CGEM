@@ -12,12 +12,12 @@ USE LIGHT_VARS, ONLY:PARfac
 
 IMPLICIT NONE
 
-REAL, INTENT(INOUT) :: f(im,jm,nsl,nf)
-REAL, INTENT(IN)    :: S(im,jm,nsl),Rad(im,jm)
-REAL, INTENT(IN) :: dz(im,jm,nsl)
-REAL, INTENT(OUT) :: PAR(im,jm,nsl)
-REAL :: KESS(nsl),SAL_TERM,CHL_TERM,POC_TERM
-REAL :: IATTOP, IATBOT(im,jm,nsl),OPTDEPTH,Rad_Watts(im,jm)
+REAL, INTENT(INOUT) :: f(im,jm,km,nf)
+REAL, INTENT(IN)    :: S(im,jm,km),Rad(im,jm)
+REAL, INTENT(IN) :: dz(im,jm,km)
+REAL, INTENT(OUT) :: PAR(im,jm,km)
+REAL :: KESS(km),SAL_TERM,CHL_TERM,POC_TERM
+REAL :: IATTOP, IATBOT(im,jm,km),OPTDEPTH,Rad_Watts(im,jm)
 INTEGER :: i,j,k,nz
 
 !

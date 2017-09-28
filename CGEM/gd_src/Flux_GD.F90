@@ -116,25 +116,8 @@ endif
 
 
 if(Which_Fluxes(iDICsurf).eq.1) then
-!--------------------------------------------------------------
-! Calc  SFLUX_CO2, the sea surface vertical flux of CO2
-!--------------------------------------------------------------
-               zs      = dz(i,j,1)           ! thickness of upper
-                                         ! layer, k=1.
-
-
-               T_sfc   = T(i,j,1)        ! Temperature (C) in sfc layer, k=1
-               Sal_sfc = S(i,j,1)        ! Salinity (psu)  in sfc layer, k=1
-               DIC_sfc = f(i,j,1,JDOC)/cnvt_DIC   ! Dissolved Inorganic Carbon
-                                         !    (mmol m-3) in sfc layer, k=1
-
-             !----------------------------------------------------------
-             ! Units of gas_exchange are mmol CO2 m-2 s-1 
-             !----------------------------------------------------------
-
-               CO2_atF = gas_exchange(T_sfc,Sal_sfc,DIC_sfc,zs,pH,pCO2)
-
-               f(i,j,1,JDOC) = AMAX1(f(i,j,1,JDOC) - CO2_atF*cnvt_DIC/dz(i,j,1)*dT,0.)
+  write(6,*) "DO NOT USE DIC surface flux in GoMDOM, no CO2 flux"
+  stop
 endif
 
 !if(Which_Fluxes(iCMAQ).eq.1) then !CMAQ

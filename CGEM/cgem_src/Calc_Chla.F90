@@ -14,10 +14,10 @@ CONTAINS
     implicit none
 
     ! Input parameters
-    real, intent(in) :: A_k(nospA,nsl)  ! A's number density, cells/m3
+    real, intent(in) :: A_k(nospA,km)  ! A's number density, cells/m3
     integer, intent(in) :: nz   ! Number of layers
     ! Function return value
-    real :: Chla_tot(nsl)
+    real :: Chla_tot(km)
 
     ! Local variables
     integer :: k, isp
@@ -44,19 +44,19 @@ CONTAINS
     implicit none
 
     ! Input parameters
-    real, intent(in) :: A_k(nospA,nsl)  ! A's number density, cells/m3
-    real, intent(in) :: Qn_k(nospA,nsl) ! A's Nitrogen Quota (mmol-N/cell)
-    real, intent(in) :: Qp_k(nospA,nsl) ! A's Phosphorus Quota (mmol-P/cell)
-    real, intent(in) :: N_k(nsl)        ! Nitrogen, mmol/m3
-    real, intent(in) :: P_k(nsl)        ! Phosphorus, mmol/m3
-    real, intent(in) :: Si_k(nsl)       ! Silica, mmol/m3 
-    real, intent(in) :: T_k(nsl)  ! Temperature in Celsius
-    real, intent(in) :: aRad(nsl) ! Daily total irradiance per layer
-    real, intent(out) :: Chl_C(nospA,nsl)
+    real, intent(in) :: A_k(nospA,km)  ! A's number density, cells/m3
+    real, intent(in) :: Qn_k(nospA,km) ! A's Nitrogen Quota (mmol-N/cell)
+    real, intent(in) :: Qp_k(nospA,km) ! A's Phosphorus Quota (mmol-P/cell)
+    real, intent(in) :: N_k(km)        ! Nitrogen, mmol/m3
+    real, intent(in) :: P_k(km)        ! Phosphorus, mmol/m3
+    real, intent(in) :: Si_k(km)       ! Silica, mmol/m3 
+    real, intent(in) :: T_k(km)  ! Temperature in Celsius
+    real, intent(in) :: aRad(km) ! Daily total irradiance per layer
+    real, intent(out) :: Chl_C(nospA,km)
     integer, intent(in) :: nz     !number of layers
 
     ! Function return value
-    real :: Chla_tot(nsl)
+    real :: Chla_tot(km)
 
     ! Local variables
     integer :: k, isp

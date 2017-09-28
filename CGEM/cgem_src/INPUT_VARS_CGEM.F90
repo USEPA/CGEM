@@ -70,7 +70,6 @@ real KO2
 real KstarO2
 real KNO3
 real pCO2
-!real, allocatable :: pH(im,jm,nsl)
 real stoich_x1R
 real stoich_y1R
 real stoich_z1R
@@ -86,7 +85,6 @@ real stoich_z2BC
 real KGcdom
 real CF_SPM
 !----Other including Boundary Conditions------------
-integer Which_VMix
 real KH_coeff 
 integer Which_Outer_BC
 real wt_l, wt_o

@@ -114,7 +114,7 @@ CONTAINS
     IMPLICIT NONE
 
     type (netCDF_file), INTENT(INOUT) :: info
-    integer :: i,j,k, temp
+    integer :: i,temp
     integer, dimension(:), allocatable ::  varDimIds
   
     ! get file info
@@ -272,8 +272,8 @@ CONTAINS
     call nf_inq_dimlen(ncid, tDim_index, timeLength)
 
     allocate(timeVals(timeLength))
-!    call nf_get_var_int64(ncid,tVar_index,timeVals)
-    call nf_get_var_real(ncid,tVar_index,timeVals)
+    call nf_get_var_int64(ncid,tVar_index,timeVals)
+!    call nf_get_var_double(ncid,tVar_index,timeVals)
 
     ! check if requested timeVal is inside dataset
     if (t_current.lt.timeVals(1) .OR. (t_current.gt.timeVals(timeLength))) then
@@ -337,7 +337,6 @@ CONTAINS
     integer :: var_index, tdim_index, tvar_index       !index in netcdf of interp variable and time variable
     integer(kind=8) :: t1, t2                          !bookend time values
     real :: fac
-    integer :: i,j,k
 
     var_index = info%varLocs(5)
     tvar_index = info%varLocs(4)
@@ -392,7 +391,6 @@ CONTAINS
     real, dimension(:,:), allocatable :: var1, var2  !bookend variable values
     integer :: var_index, tdim_index, tvar_index     !index in netcdf of interp variable and time variable
     integer(kind=8) :: t1, t2                        !bookend time values
-    integer :: i,j,k
     real :: fac
 
     var_index = info%varLocs(5)

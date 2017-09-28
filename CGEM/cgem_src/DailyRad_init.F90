@@ -14,18 +14,18 @@ Subroutine DailyRad_init(TC_8, lat, lon, d, d_sfc, A_k, CDOM_k, &
   ! Input variables
   integer(kind=8), intent(in) :: TC_8 ! model time in seconds after iYr0.
   real, intent(in) :: lat, lon ! latitude and longitude of current grid cell
-  real, intent(in) :: d(nsl)   ! depth from surface to bottom of cell 
-  real, intent(in) :: d_sfc(nsl)   ! depth cell center to surface 
-  real, intent(in) :: A_k(nospA, nsl) !phytoplankton density in cells/m3
-  real, intent(in) :: CDOM_k(nsl)
-  real, intent(in) :: OM1A_k(nsl)
-  real, intent(in) :: OM1Z_k(nsl)
-  real, intent(in) :: OM1R_k(nsl)
-  real, intent(in) :: OM1BC_k(nsl)
+  real, intent(in) :: d(km)   ! depth from surface to bottom of cell 
+  real, intent(in) :: d_sfc(km)   ! depth cell center to surface 
+  real, intent(in) :: A_k(nospA, km) !phytoplankton density in cells/m3
+  real, intent(in) :: CDOM_k(km)
+  real, intent(in) :: OM1A_k(km)
+  real, intent(in) :: OM1Z_k(km)
+  real, intent(in) :: OM1R_k(km)
+  real, intent(in) :: OM1BC_k(km)
   integer, intent(in) :: nz !Number of Layers
 
   ! Output variables
-  real, intent(out) :: aDailyRad_k(nsl)
+  real, intent(out) :: aDailyRad_k(km)
 
 
   ! Local variables
@@ -40,8 +40,8 @@ Subroutine DailyRad_init(TC_8, lat, lon, d, d_sfc, A_k, CDOM_k, &
   integer :: JY ! function
   integer :: mdate_julian
   real :: rhr ! decimal hour with fraction thereof
-  real :: bottom_depth(nsl)
-  real :: Zenith,  sunang !Solar Zenith Angle
+  real :: bottom_depth(km)
+  real :: Zenith,  calc_solar_zenith !Solar Zenith Angle
   real :: SfcRad ! solar irradiance just below the surface
   ! The avg. clear-sky solar energy is 1200 W/m2. Convert it to photons/cm2/sec
   real, parameter :: solconst = 1200.00 * 2.77e14  ! Morel and Smith (1974) 
@@ -49,10 +49,10 @@ Subroutine DailyRad_init(TC_8, lat, lon, d, d_sfc, A_k, CDOM_k, &
                                              ! mol/m2/s = quanta/cm2/s * 1 mol/Avogadro# * 10,000cm2/m2
                                              !          =  (1/6.022e23) * 1.0e4 = (1/6.022)e-23 * 1.0e4
                                              !          = (1/6.0221413)e-19
-  real :: Chla_tot_k(nsl)! Total Chl-a concentration (mg/m3) 
-  real :: aIOPpar(nsl), aRadBot ! Unused but needed for call
-  real :: aRadMid(nsl) ! Holds desired output from Call_IOP_Par
-  real :: aRadSum(nsl)
+  real :: Chla_tot_k(km)! Total Chl-a concentration (mg/m3) 
+  real :: aIOPpar(km), aRadBot ! Unused but needed for call
+  real :: aRadMid(km) ! Holds desired output from Call_IOP_Par
+  real :: aRadSum(km)
 
   ! Use fixed C:Chla to estimate chlorophyll a concentration
   do k = 1, nz
@@ -81,7 +81,7 @@ Subroutine DailyRad_init(TC_8, lat, lon, d, d_sfc, A_k, CDOM_k, &
 
   do iSec = 1, iSDay, dT
      rhr = REAL(iSec) / REAL(3600)
-     Zenith = sunang(jul_day,rhr,lon,lat)
+     Zenith = calc_solar_zenith(lat,lon,rhr,jul_day,leapyr)
      SfcRad = solconst * AMAX1( COS(Zenith), 0.0)    ! COS(Z)<= 0 means night
 
      if(SfcRad .gt. 0.) then

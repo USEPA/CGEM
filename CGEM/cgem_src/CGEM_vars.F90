@@ -102,6 +102,8 @@ SAVE
 !        -- Alkalinity
 !-------------------------------------------
       integer :: iALK 
+!Tracer
+      integer :: iTR
 
 contains
 
@@ -224,6 +226,9 @@ integer :: counter = 0
 !        -- Alkalinity
 !-------------------------------------------
       iALK = counter+16
+!Tracer
+      iTR = counter+17
+
 return
 END Subroutine CGEM_vars_allocate
 

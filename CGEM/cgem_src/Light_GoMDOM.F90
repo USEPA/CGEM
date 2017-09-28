@@ -17,13 +17,13 @@
     IMPLICIT NONE
 
     REAL, INTENT(IN)  :: PARsurf      ! Irradiance just below sea surface
-    REAL, INTENT(IN)  :: S(nsl)    ! Salinity 
-    REAL, INTENT(IN)  :: A(nospA,nsl),Z(nospZ,nsl)    ! Phytoplankton, Zooplankton 
-    REAL, INTENT(IN)  :: OM1A(nsl),OM1Z(nsl),OM1R(nsl),OM1BC(nsl) ! Particulate OM in gC/m3
-    REAL, INTENT(IN)  :: dz(nsl) !dz = thickness
-    REAL, INTENT(OUT) :: PAR_percent(nsl),PARbot,PARdepth(nsl) 
-    REAL :: SAL_TERM, CHL_TERM, POC_TERM, KESS(nsl) 
-    REAL :: IATTOP, OPTDEPTH, IATBOT(nsl)
+    REAL, INTENT(IN)  :: S(km)    ! Salinity 
+    REAL, INTENT(IN)  :: A(nospA,km),Z(nospZ,km)    ! Phytoplankton, Zooplankton 
+    REAL, INTENT(IN)  :: OM1A(km),OM1Z(km),OM1R(km),OM1BC(km) ! Particulate OM in gC/m3
+    REAL, INTENT(IN)  :: dz(km) !dz = thickness
+    REAL, INTENT(OUT) :: PAR_percent(km),PARbot,PARdepth(km) 
+    REAL :: SAL_TERM, CHL_TERM, POC_TERM, KESS(km) 
+    REAL :: IATTOP, OPTDEPTH, IATBOT(km)
     INTEGER :: k
     INTEGER, INTENT(IN) :: nz
 

@@ -16,9 +16,9 @@ USE Model_dim
 
 IMPLICIT NONE
 
-ALLOCATE(RN2_ijk(im,jm,nsl))
+ALLOCATE(RN2_ijk(im,jm,km))
 RN2_ijk = fill(0)
-ALLOCATE(RO2_ijk(im,jm,nsl))
+ALLOCATE(RO2_ijk(im,jm,km))
 RO2_ijk = fill(0)
 
 return

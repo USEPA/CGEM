@@ -8,8 +8,8 @@
 ### =============== User Modifiable Section =============== ###
 
 ### Uncomment the next line to enable debugging
-#DFLAGS = -warn -debug all -g -check all -ftrapuv -DDEBUG #-mcmodel=medium -shared-intel 
-#DFLAGS = -Wall -Wextra -pedantic -fimplicit-none -fbacktrace -D_CGEM -DRDEBUG -DDEBUG 
+#DFLAGS = -warn -debug all -g -check all -ftrapuv #-DDEBUG #-mcmodel=medium -shared-intel 
+#DFLAGS = -g -Wall -Wextra -pedantic -fimplicit-none -fbacktrace -Dmap_code #-DDEBUG#-D_CGEM #-DRDEBUG -DDEBUGVARS #-DDEBUG_Vars #-DDEBUG1#-DDEBUG 
 #DFLAGS = -DDEBUG
 #DFLAGS = -DDEBUGVARS -DDEBUG_Vars
 #DFLAGS = -DDEBUG1
@@ -17,7 +17,10 @@
 #CFLAGS = -DCALIBRATE -DCAL_DK -DCAL_O2
 #CFLAGS = -DCALIBRATE -DCAL_LTNT -DCAL_O2
 #CFLAGS = -Dtest1d
-DFLAGS = -DSDM_DEBUG
+#DFLAGS = -DSDM_DEBUG 
+#DFLAGS = -DDEBUG_LIGHT
+#DFLAGS = -Dmap_code -DDEBUG #-DDEBUG_GRID#-DDEBUG
+
 
 ### Build options for specific platforms. 
 ### LIBS has path to netCDF

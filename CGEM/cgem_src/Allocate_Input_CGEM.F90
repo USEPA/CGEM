@@ -14,7 +14,7 @@ USE OUTPUT_NETCDF_CGEM
 
 IMPLICIT NONE
 
-         nf = nospA*3+nospZ+16  !CGEM
+         nf = nospA*3+nospZ+17  !CGEM
         !Calculate EXTRA_VARIABLES for netCDF:
         !ir,irfrac,uN(nospA),uP(nospA),uE(nospA),uA(nospA),Chla,s_xy(8),uSi(nospA),pH,ChlC(nospA),RN2,RO2
          EXTRA_VARIABLES = 14 + 6*nospA

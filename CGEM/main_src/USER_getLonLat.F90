@@ -12,6 +12,12 @@
 
       real :: tmpi(im), tmpj(jm)
 
+#ifdef map_code
+write(6,*) "-----USER_getLonLat--------"
+write(6,*) "  Reads in latlon.dat"
+write(6,*) "  Sets NaN for cells with -9999"
+write(6,*) 
+#endif
 
       write(filename,'(A, A)') trim(DATADIR),'/latlon.dat'
       open (19,file=filename,status='old')

@@ -53,7 +53,11 @@ par(mfrow=pdf_layout)
 
  rdata <- ncvar_get(nc,Var[i])
  unit <- ncatt_get(nc,Var[i],attname="units")$value
+ if(rdata[1]>1.e30){
+ timeseries_plot(Var[i],time[2:tt],rdata[2:tt],unit)
+ }else{
  timeseries_plot(Var[i],time,rdata,unit)
+ }
 # if(Var[i]=="O2"){
 #    cat(rdata[tt],"\n")
 # }

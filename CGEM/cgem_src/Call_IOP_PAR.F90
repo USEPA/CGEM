@@ -20,35 +20,35 @@
  
   real   , intent(in)    :: sun_zenith   ! Angle of the sun
 
-  real   , intent(in)    :: totChl(nsl)  ! total Chl-a (mg/m3)
+  real   , intent(in)    :: totChl(km)  ! total Chl-a (mg/m3)
 
-  real   , intent(in)    :: CDOM_k(nsl)  ! CDOM (ppb) 
+  real   , intent(in)    :: CDOM_k(km)  ! CDOM (ppb) 
 
-  real   , intent(in)    :: OM1_A(nsl)   ! Concentration of particulate
+  real   , intent(in)    :: OM1_A(km)   ! Concentration of particulate
                                          ! dead phytoplankton (g/m3)
 
-  real   , intent(in)    :: OM1_Z(nsl)   ! Concentration of particulate
+  real   , intent(in)    :: OM1_Z(km)   ! Concentration of particulate
                                          ! fecal pellets (g/m3)
 
-  real   , intent(in)    :: OM1_R(nsl)   ! Concentration of particulate
+  real   , intent(in)    :: OM1_R(km)   ! Concentration of particulate
                                          ! river generated SPM (g/m3)
 
-  real   , intent(in)    :: OM1_BC(nsl)  ! Concentration of particulate
+  real   , intent(in)    :: OM1_BC(km)  ! Concentration of particulate
                                          ! initial and boundary condition generated SPM (g/m3)
 
-  real   , intent(in)    :: bottom_depth(nsl)
+  real   , intent(in)    :: bottom_depth(km)
                                          ! depths(k) is the depth
                                          ! at the Bottom of layer k.
                                          ! it is assumed that the top
                                          ! of layer k=1 has a depth
                                          ! of zero.
 
-  real   , intent(in)    :: d_sfc(nsl)   ! depth at center of cell k from surface
+  real   , intent(in)    :: d_sfc(km)   ! depth at center of cell k from surface
 
   integer, intent(in)    :: numdepths    ! Total number of layers in water
                                          ! column
 
-  real  , intent(out)    :: PAR_percent(nsl) ! PAR_percent(k) is the % of
+  real  , intent(out)    :: PAR_percent(km) ! PAR_percent(k) is the % of
                                              ! incoming visible
                                              ! irradiance, PARsurf.
 
@@ -57,7 +57,7 @@
                                              ! at the sea bottom 
                                              ! (quanta/cm**2/sec)
 
-  real  , intent(out)    :: PARdepth(nsl)    ! PARdepth(k) is Par, the
+  real  , intent(out)    :: PARdepth(km)    ! PARdepth(k) is Par, the
                                              ! visible irradiance
                                              ! at the middle of layer k.
                                              ! (quanta/cm**2/sec)
@@ -65,13 +65,12 @@
 !----------------------------------------------------------------
 ! Calculate absorption (490 nm) components: seawater, chl, SPM from rivers, CDOM,
 ! detritus (dead cells), fecal pellets ...
-      real Chla_tot, CDOM_tot, OM1A_tot, OM1Z_tot, OM1R_tot, OM1BC_tot, CDOM(nsl)
+      real Chla_tot, CDOM_tot, OM1A_tot, OM1Z_tot, OM1R_tot, OM1BC_tot, CDOM(km)
       real a490_mid, aSw_mid, aChl490_mid, aCDOM490_mid, bbChl490_mid, bb490_mid
       real a490_bot, aSw_bot, aChl490_bot, aCDOM490_bot, bbChl490_bot, bb490_bot
       real aOM1A490_mid, aOM1Z490_mid, aOM1R490_mid, aOM1BC490_mid
       real aOM1A490_bot, aOM1Z490_bot, aOM1R490_bot, aOM1BC490_bot
       integer :: k  
-
 
 ! First, convert CDOM(ppb) into CDOM, a490 (m-1)
 ! Once the CDOM (QSE ppb) is in the model domain, we advect and mix using the same 
@@ -102,7 +101,7 @@
       OM1R_tot = OM1R_tot + OM1_R(k)
       OM1BC_tot = OM1BC_tot + OM1_BC(k)
 !Calculate absorption coefficients:
-      aSw_mid = aw490 * d_sfc(k) !Sea water absorption at mid cell
+      aSw_mid = aw490  !Sea water absorption at mid cell
       aChl490_mid = astar490 * Chla_tot / d_sfc(k)        !Chla absorption at mid cell
       aCDOM490_mid = CDOM_tot / d_sfc(k)        !CDOM absorption at mid cell
       aOM1A490_mid = astarOMA * OM1A_tot / d_sfc(k) ! absorption at mid cell
@@ -114,20 +113,27 @@
       bbChl490_mid = 0.015 * (0.3*((Chla_tot / d_sfc(k))**0.62)*(550./490.)) !Chla backscatter at mid cell
       bb490_mid = bbChl490_mid !Only Chla backscatters for now
 ! Calculate PAR at depth
+      !Why would we check if a490_mid=0??
+      !If it is zero, stop.
+      !  if(a490_mid.le.0) then
+      !     write(6,*) k,CDOM(k),CDOM_k(k)
+      !     write(6,*) "a490_mid.le.0, =",a490_mid,aSw_mid,aChl490_mid,aCDOM490_mid
+      !     !stop
+      !  endif
       call IOP_PARattenuation(AMAX1(a490_mid,0.), bb490_mid, PARsurf, sun_zenith, d_sfc(k), PARdepth(k)) 
       PAR_percent(k) = 100.*PARdepth(k)/PARsurf
    enddo
 
 ! Calculate PAR at sea bottom
-      aSw_bot = aw490 * bottom_depth(numdepths) !Sea water absorption at bottom of cell
-      aChl490_bot = astar490 * Chla_tot / bottom_depth(numdepths) !Chla absorption at bottom
-      aCDOM490_bot = CDOM_tot / bottom_depth(numdepths) !CDOM absorption at bottom
-      aOM1A490_bot = astarOMA * OM1A_tot / bottom_depth(numdepths)    !A absorption at bottom
-      aOM1Z490_bot = astarOMZ * OM1Z_tot / bottom_depth(numdepths) !FP absorption at bottom
-      aOM1R490_bot = astarOMR * OM1R_tot / bottom_depth(numdepths) !SPM absorption at bottom
-      aOM1BC490_bot = astarOMbc * OM1BC_tot / bottom_depth(numdepths) !INIT/BC absorption at bottom
+      aSw_bot = aw490  !Sea water absorption at bottom of cell
+      aChl490_bot = astar490 * Chla_tot / numdepths !bottom_depth(numdepths) !Chla absorption at bottom
+      aCDOM490_bot = CDOM_tot / numdepths !bottom_depth(numdepths) !CDOM absorption at bottom
+      aOM1A490_bot = astarOMA * OM1A_tot / numdepths !bottom_depth(numdepths)    !A absorption at bottom
+      aOM1Z490_bot = astarOMZ * OM1Z_tot / numdepths !bottom_depth(numdepths) !FP absorption at bottom
+      aOM1R490_bot = astarOMR * OM1R_tot / numdepths !bottom_depth(numdepths) !SPM absorption at bottom
+      aOM1BC490_bot = astarOMbc * OM1BC_tot / numdepths !bottom_depth(numdepths) !INIT/BC absorption at bottom
       a490_bot = aSw_bot + aChl490_bot + aCDOM490_bot + aOM1A490_bot + aOM1Z490_bot + aOM1R490_bot + aOM1BC490_bot
-      bbChl490_bot = 0.015 * (0.3*((Chla_tot / bottom_depth(numdepths))**0.62)*(550./490.))
+      bbChl490_bot = 0.015 * (0.3*((Chla_tot / numdepths)**0.62)*(550./490.))
 !Chla backscatter at bottom
       bb490_bot = bbChl490_bot !Only Chla backscatters for now
       call IOP_PARattenuation(AMAX1(a490_bot,0.), bb490_bot, PARsurf, sun_zenith, bottom_depth(numdepths), PARbot)

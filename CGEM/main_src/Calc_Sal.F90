@@ -16,8 +16,12 @@
 
        Sal=input_S
 
-#ifdef DEBUG
+#ifdef map_code
+      write(6,*)
+      write(6,*) "Reads a single value, then initializes whole array"
+      write(6,*) "Main data directory, S.dat" 
       write(6,*) "In Calc_Sal, Sal=",input_S
+      write(6,*)
 #endif
 
 

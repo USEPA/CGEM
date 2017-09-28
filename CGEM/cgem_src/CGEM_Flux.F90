@@ -16,7 +16,7 @@ Contains
   
   Allocate(Esed(im,jm))
   Allocate(CBODW(im,jm))
-  Allocate(pH(im,jm,nsl))
+  Allocate(pH(im,jm,km))
 
   return
 

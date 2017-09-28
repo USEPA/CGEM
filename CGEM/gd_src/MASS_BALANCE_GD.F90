@@ -20,11 +20,11 @@ IMPLICIT NONE
 
 SAVE
 
-ALLOCATE(SUM_DENITR(im,jm,nsl))    ! N loss to denitrification 
-ALLOCATE(SUM_DENITR_C(im,jm,nsl))  ! C loss to denitrification 
-ALLOCATE(SUM_DOCPRD(im,jm,nsl))    ! C loss to predation 
-ALLOCATE(SUM_DOCMET(im,jm,nsl))    ! C loss to metabolism 
-ALLOCATE(SUM_DOCZOO(im,jm,nsl))    ! C loss to zooplankton mortality 
+ALLOCATE(SUM_DENITR(im,jm,km))    ! N loss to denitrification 
+ALLOCATE(SUM_DENITR_C(im,jm,km))  ! C loss to denitrification 
+ALLOCATE(SUM_DOCPRD(im,jm,km))    ! C loss to predation 
+ALLOCATE(SUM_DOCMET(im,jm,km))    ! C loss to metabolism 
+ALLOCATE(SUM_DOCZOO(im,jm,km))    ! C loss to zooplankton mortality 
 
 SUM_DENITR = 0.
 SUM_DENITR_C = 0.

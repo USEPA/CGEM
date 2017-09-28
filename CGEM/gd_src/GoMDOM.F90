@@ -18,7 +18,7 @@ USE LIGHT_VARS, ONLY: PARfac
 IMPLICIT NONE
 
 INTEGER*8, INTENT(IN) :: TC_8
-REAL :: DTM(im,jm,nsl,nf),PAR(im,jm,nsl)
+REAL :: DTM(im,jm,km,nf),PAR(im,jm,km)
 REAL :: SETRATE(nf)
 INTEGER :: i,j,k,nz
 REAL dTime
@@ -43,14 +43,12 @@ else
    stop
 endif
 
-#ifdef DEBUGVARS
-write(6,*) f
-#endif
 
 if(DoDroop.eq.1) then
  do j = 1,jm
-     do i = 1,im 
-      do k = 1, nza(i,j)
+     do i = 1,im
+         nz = nza(i,j)
+      do k = 1, nz
          DTM(i,j,k,:) = 0.
          CALL ZOO(f(i,j,k,:),DTM(i,j,k,:),T(i,j,k),i,j,k)                ! Zooplankton kinetics
          CALL DIATOMS_droop(f(i,j,k,:),DTM(i,j,k,:),T(i,j,k),PAR(i,j,k),Vol(i,j,k),dTime,i,j,k)            ! Diatom kinetics
@@ -66,7 +64,8 @@ if(DoDroop.eq.1) then
 else
  do j = 1,jm
      do i = 1,im
-      do k = 1, nza(i,j)
+         nz = nza(i,j)
+      do k = 1, nz
          DTM(i,j,k,:) = 0.
          CALL ZOO(f(i,j,k,:),DTM(i,j,k,:),T(i,j,k),i,j,k)                !  Zooplankton kinetics
          CALL DIATOMS(f(i,j,k,:),DTM(i,j,k,:),T(i,j,k),PAR(i,j,k),Vol(i,j,k),dTime,i,j,k) ! Diatom kinetics
@@ -80,10 +79,6 @@ else
    enddo      ! end of do i block do loop
  enddo      ! end of do j block do loop
 endif
-
-#ifdef DEBUGVARS
-write(6,*) f
-#endif
 
 
 if(Which_Fluxes(iInRemin).eq.1) then
@@ -121,7 +116,8 @@ endif
 
  do j = 1,jm
      do i = 1,im 
-      do k = 1, nza(i,j)
+         nz = nza(i,j)
+      do k = 1, nz
          f(i,j,k,:) = max(f(i,j,k,:) + DTM(i,j,k,:) * dTime,0.)
       enddo
    enddo      ! end of do i block do loop

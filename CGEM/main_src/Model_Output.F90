@@ -1,9 +1,13 @@
        Subroutine Model_Output(Which_code, istep_out)
 
+       USE STATE_VARS
+
        IMPLICIT NONE
+
 
        integer, intent(in)  :: istep_out
        character(6), intent(in) :: Which_code
+
 
        if(Which_code.eq."CGEM") then !CGEM
          call Model_Output_CGEM( istep_out )

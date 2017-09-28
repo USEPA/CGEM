@@ -25,18 +25,18 @@ IMPLICIT NONE
 real fill_val
 integer i,j,k
 
-ALLOCATE(s_x1A(im,jm,nsl))
-ALLOCATE(s_x2A(im,jm,nsl))
-ALLOCATE(s_y1A(im,jm,nsl))
-ALLOCATE(s_y2A(im,jm,nsl))
-ALLOCATE(s_z1A(im,jm,nsl))
-ALLOCATE(s_z2A(im,jm,nsl))
-ALLOCATE(s_x1Z(im,jm,nsl))
-ALLOCATE(s_x2Z(im,jm,nsl))
-ALLOCATE(s_y1Z(im,jm,nsl))
-ALLOCATE(s_y2Z(im,jm,nsl))
-ALLOCATE(s_z1Z(im,jm,nsl))
-ALLOCATE(s_z2Z(im,jm,nsl))
+ALLOCATE(s_x1A(im,jm,km))
+ALLOCATE(s_x2A(im,jm,km))
+ALLOCATE(s_y1A(im,jm,km))
+ALLOCATE(s_y2A(im,jm,km))
+ALLOCATE(s_z1A(im,jm,km))
+ALLOCATE(s_z2A(im,jm,km))
+ALLOCATE(s_x1Z(im,jm,km))
+ALLOCATE(s_x2Z(im,jm,km))
+ALLOCATE(s_y1Z(im,jm,km))
+ALLOCATE(s_y2Z(im,jm,km))
+ALLOCATE(s_z1Z(im,jm,km))
+ALLOCATE(s_z2Z(im,jm,km))
 
 !initialize for netCDF, 1==-9999
 fill_val = fill(1)

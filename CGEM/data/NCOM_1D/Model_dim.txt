@@ -1,9 +1,8 @@
 !Module Model_dim
-1  !INTEGER, PARAMETER :: IM
-1  !INTEGER, PARAMETER :: JM
-20  !INTEGER, PARAMETER :: nz_max
-0    !INTEGER, PARAMETER :: b_layer = 1 for yes
-6    !INTEGER, PARAMETER :: nospA =6
-2    !INTEGER, PARAMETER :: nospZ = 2
-2    !Which_gridio 0==fishtank 1==efdc 2==NCOM
-2002 !INTEGER :: iYr0  reference year for timestamps
+1    !INTEGER, PARAMETER :: IM, cells in x
+1    !INTEGER, PARAMETER :: JM, cells in y
+20   !INTEGER, PARAMETER :: KM, cells in z
+1    !INTEGER, PARAMETER :: nospA, phytoplankton groups
+2    !INTEGER, PARAMETER :: nospZ, zooplankton groups
+2    !Which_gridio 0==fishtank 1==efdc
+2002 !iYear0, time in terms of seconds from this year

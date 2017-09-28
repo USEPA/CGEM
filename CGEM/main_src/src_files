@@ -22,7 +22,7 @@ MAIN_OBJ  =  fillval.o\
         getSolar.o\
 	mdate_julian.o\
 	reaction.o\
-	sunang.o\
+	calc_solar_zenith.o\
 	rnitrate.o\
 	Read_InputFile.o\
 	Flux.o\
@@ -43,12 +43,13 @@ MAIN_OBJ  =  fillval.o\
 	Calc_Temp.o\
 	OUTPUT_ALL_FALSE.o\
 	Command_Line_Args.o\
-	Allocate_Input.o\
+	Allocate_Input_Vars.o\
 	Initialize_Output.o\
 	Get_Vars.o\
 	WQ_Model.o\
 	Transport.o\
-        Adv3D.o\
+	Adv3D.o\
+        Adv3D_EFDC.o\
         VMixing.o\
 	Model_Output.o\
 	Model_Finalize.o
