@@ -27,7 +27,7 @@
        !Advection and Vmixing
 
        !Needs to call advection because that is where sinking is:
-       if(Which_gridio.eq.2) then
+       if(Which_gridio.eq.1) then
         call Adv3D_EFDC()
        else
         call Adv3D()

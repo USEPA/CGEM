@@ -19,6 +19,9 @@
 
 ! --- transports
       real :: w_wsink(im,jm,km+1)
+      real :: uxx(im,jm,km+1)
+      real :: vxx(im,jm,km+1)
+      real :: wxx(im,jm,km+1)
 
 ! --- tmp
       integer :: im1,ip1,jm1,jp1,km1
@@ -37,6 +40,20 @@ write(6,*)
        wx=0.
       endif
 
+      uxx=0.
+      vxx=0.
+      wxx=0.
+
+      do j = 1,jm
+       do i = 1,(im-1)
+        nz=nza(i,j)
+         do k=1,nz
+           uxx(i,j,k) = ux(i+1,j,k)
+           vxx(i,j,k) = vx(i+1,j,k)
+           wxx(i,j,k) = wx(i+1,j,k)
+         enddo
+        enddo
+      enddo
 
 ! --------loop over each variable
      do ii = 1,nf
@@ -52,17 +69,17 @@ write(6,*)
 
 !     w_wsink means 'w' with sinking terms
 !     at surface sink = 0.
-      w_wsink (i,j,1) = wx(i,j,1)
+      w_wsink (i,j,1) = wxx(i,j,1)
 
        nz = nza(i,j)
 
       do k = 2,nz 
-        w_wsink(i,j,k) = wx(i,j,k) + ws(ii)*area(i,j)
+        w_wsink(i,j,k) = wxx(i,j,k) + ws(ii)*area(i,j)
       end do
 
 !If wsm=0 (shelf), then set sinking velocity to zero as well...
 !     at bottom (w=0) add settling or deep ocean (wsm=1)
-      w_wsink (i,j,nz+1) =  wx(i,j,k) + ws(ii)*real(wsm(i,j),4)*area(i,j)
+      w_wsink (i,j,nz+1) = 0. !For EFDC is always shelf ws(ii)*real(wsm(i,j),4)*area(i,j)
 
 #ifdef DEBUG
 write(6,*) "nz=",nz
@@ -77,17 +94,17 @@ write(6,*)
       do k = 1, nz       ! do layer by layer
       km1 = max0(k-1,1)
 ! ----- upwind advection
-        ufm = amax1( ux(im1  ,j,k),0.)    ! pp/n0
-        ufp = amax1(-ux(ip1  ,j,k),0.)    ! p0/np
+        ufm = amax1( uxx(im1  ,j,k),0.)    ! pp/n0
+        ufp = amax1(-uxx(ip1  ,j,k),0.)    ! p0/np
 
-        vfm = amax1( vx(i  ,jm1,k),0.)
-        vfp = amax1(-vx(i  ,jp1,k),0.)
+        vfm = amax1( vxx(i  ,jm1,k),0.)
+        vfp = amax1(-vxx(i  ,jp1,k),0.)
         wfm = amax1(-w_wsink(i,j,k  ),0.)       ! p0/np
         wfp = amax1( w_wsink(i,j,k+1),0.)       ! pp/n0
 !                   p0/nn             pn/n0
-        cfh = ( (ux(im1,j,k)-ufm) - (ux(ip1,j,k)+ufp) )               &
-     &       +( (vx(i,jm1,k)-vfm) - (vx(i,jp1,k)+vfp) )
-        cf  = cfh + ((w_wsink(i,j,k+1)-wfp)-(w_wsink(i,j,k)+wfm))
+        cfh = ( (uxx(im1,j,k)-ufm) - (uxx(ip1,j,k)+ufp) )               &
+     &       +( (vxx(i,jm1,k)-vfm) - (vxx(i,jp1,k)+vfp) )
+        cf  = cfh + ((w_wsink(i,j,k+1)-wfp)-(w_wsink(i,j,km1)+wfm))
 ! -------------------------------------------------------------
           f_n(i,j,k,ii) =                                        &
      &      ( f(i,j,k,ii)*Vol_prev(i,j,k)                            &
@@ -99,13 +116,13 @@ write(6,*)
 ! -------------------------------------------------------------
       !if(ii.eq.1) write(6,*) Vol_prev(i,j,k)/Vol(i,j,k)
       !if(Vol(i,j,k).le.0) write(6,*) "Vol",i,j,k,Vol(i,j,k)
-      !if(f(i,j,k,ii).lt.0.and.cf.ne.0)    write(6,*) "cf",i,j,k,cf,f(i,j,k,ii),fm(i,j,k)
-      !if(f(i-1,j,k,ii).lt.0.and.ufm.ne.0) write(6,*) "ufm",i,j,k,ufm,f(i-1,j,k,ii),fm(i-1,j,k)
-      !if(f(i+1,j,k,ii).lt.0.and.ufp.ne.0) write(6,*) "ufp",i,j,k,ufp,f(i+1,j,k,ii),fm(i+1,j,k)
-      !if(f(i,j-1,k,ii).lt.0.and.vfm.ne.0) write(6,*) "vfm",i,j,k,vfm,f(i,j-1,k,ii),fm(i,j-1,k)
-      !if(f(i,j+1,k,ii).lt.0.and.vfp.ne.0) write(6,*) "vfp",i,j,k,vfp,f(i,j+1,k,ii),fm(i,j+1,k)
-      !if(f(i,j,km1,ii).lt.0.and.wfm.ne.0) write(6,*) "wfm",i,j,k,wfm,f(i,j,km1,ii),fm(i,j,km1)
-      !if(f(i,j,k+1,ii).lt.0.and.wfp.ne.0) write(6,*) "wfp",i,j,k,wfp,f(i,j,k+1,ii),fm(i,j,k+1)
+      if(f(i,j,k,ii).lt.0.and.cf.ne.0)    write(6,*) "cf",i,j,k,cf,f(i,j,k,ii),fm(i,j,k)
+      if(f(i-1,j,k,ii).lt.0.and.ufm.ne.0) write(6,*) "ufm",i,j,k,ufm,f(i-1,j,k,ii),fm(i-1,j,k)
+      if(f(i+1,j,k,ii).lt.0.and.ufp.ne.0) write(6,*) "ufp",i,j,k,ufp,f(i+1,j,k,ii),fm(i+1,j,k)
+      if(f(i,j-1,k,ii).lt.0.and.vfm.ne.0) write(6,*) "vfm",i,j,k,vfm,f(i,j-1,k,ii),fm(i,j-1,k)
+      if(f(i,j+1,k,ii).lt.0.and.vfp.ne.0) write(6,*) "vfp",i,j,k,vfp,f(i,j+1,k,ii),fm(i,j+1,k)
+      if(f(i,j,km1,ii).lt.0.and.wfm.ne.0) write(6,*) "wfm",i,j,k,wfm,f(i,j,km1,ii),fm(i,j,km1)
+      if(f(i,j,k+1,ii).lt.0.and.wfp.ne.0) write(6,*) "wfp",i,j,k,wfp,f(i,j,k+1,ii),fm(i,j,k+1)
       end do ! k = 1, nz
       end do !i
       end do !j
