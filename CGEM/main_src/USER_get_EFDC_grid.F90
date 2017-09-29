@@ -8,7 +8,6 @@
       real, dimension(im,jm) :: dx, dy, sdetg
       integer :: i,j
       character(200) filename
-
 #ifdef map_code
 write(6,*) "---USER_get_EFDC grid----"
 write(6,*) "  only setting dx, dy, dxdy, and area"
@@ -57,7 +56,7 @@ write(6,*)
       integer :: i,j,k, nz
       integer(kind=8) :: TC_8
       integer, save :: init=1
-
+      real x
 #ifdef map_code
 if(init.eq.1) then
 write(6,*) "---USER_update_EFDC_grid----"
@@ -77,18 +76,22 @@ endif
           nz=nza(i,j)
           do k=1,nz !do loop will not execute if nza=0
            if(depth(i,j).le.0) then  !L3 Soon change to error checking before run, assume data is correct.
-                 write(6,*) "DEPTH",depth(i,j)
+                 write(6,*) "DEPTH.LE.0=",depth(i,j)
                  stop
            endif
-           !if(dz(i,j,k).ne.0) then
-           !      write(6,*) "dz for i,j,k=",i,j,k
-           !      write(6,*) "where nz(i,j)=",nza(i,j)
-           !      write(6,*) "dz",dz(i,j,k)
-           !      write(6,*) "depth",depth(i,j)
-           !      !stop
-           !endif
-!L3 just make dz=depth/layers for now:
-           dz(i,j,k) = depth(i,j)/nz
+           !L3 Soon change to error checking before run, assume data is correct.
+           x = dz(i,j,k)
+           if(x.ne.x) then
+             write(6,*) "dz is NAN",x
+             stop
+           endif 
+           if(dz(i,j,k).le.0) then
+                 write(6,*) "dz for i,j,k=",i,j,k
+                 write(6,*) "where nz(i,j)=",nza(i,j)
+                 write(6,*) "dz",dz(i,j,k)
+                 write(6,*) "depth",depth(i,j)
+                 stop
+           endif
            d_sfc(i,j,k) = sum(dz(i,j,1:(k-1))) + dz(i,j,k)/2. 
            d(i,j,k) = sum(dz(i,j,1:k)) !bottom of cell 
            Vol(i,j,k) = area(i,j) * dz(i,j,k)
