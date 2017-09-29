@@ -118,7 +118,7 @@
 
 !L3 add when necessary       call USER_update_masks()
 
-!       call WQ_Model(Which_code,TC_8,istep,istep_out)
+       call WQ_Model(Which_code,TC_8,istep,istep_out)
 
 #ifdef DEBUG
 write(6,*) "---After WQ_Model"
