@@ -71,9 +71,9 @@
        endif
 
        write(6,*) "Biogeochem equations are: ",Which_code
-       write(6,*) "Base Outputfile Name will be: ",trim(BASE_NETCDF_OUTPUT_FILE_NAME)
        write(6,*) "Inputfile will be: ",trim(input_filename)
        write(6,*) "Initial Conditions filename will be: ",trim(init_filename)
+       write(6,*) "Base Outputfile Name will be: ",trim(BASE_NETCDF_OUTPUT_FILE_NAME)
 
        return
 
