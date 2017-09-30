@@ -57,14 +57,14 @@ colorlist <- c("black","red","blue","green","purple","orange","yellow","pink","b
 
  for(i in 1:nvars){
 
- rdata <- ncvar_get(nc,Var[i],start=c(9,21,k_layers[1],1),count=c(1,1,1,tt))
+ rdata <- ncvar_get(nc,Var[i],start=c(15,25,k_layers[1],1),count=c(1,1,1,tt))
  unit <- ncatt_get(nc,Var[i],attname="units")$value
  ymax <- max(rdata)
  ymax <- ymax + 0.1*ymax
  timeseries_plot(Var[i],time,rdata,unit,label=label,range=c(0,ymax))
  if(n_layers >= 2){
  for(j in 2:n_layers){
-  rdata <- ncvar_get(nc,Var[i],start=c(9,21,k_layers[j],1),count=c(1,1,1,tt))
+  rdata <- ncvar_get(nc,Var[i],start=c(15,25,k_layers[j],1),count=c(1,1,1,tt))
   timeseries_addlines(Var[i],time,rdata,color=colorlist[j])
   }
  }

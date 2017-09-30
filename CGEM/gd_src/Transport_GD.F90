@@ -8,7 +8,7 @@
        !Advection and Vmixing
        if(which_gridio.ne.0) then  
 
-       if(Which_gridio.eq.2) then
+       if(Which_gridio.eq.1) then
         call Adv3D_EFDC()
        else
         call Adv3D()
