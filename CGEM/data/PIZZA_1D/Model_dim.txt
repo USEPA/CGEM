@@ -4,5 +4,5 @@
 7    !INTEGER, PARAMETER :: KM, cells in z
 1    !INTEGER, PARAMETER :: nospA, phytoplankton groups
 2    !INTEGER, PARAMETER :: nospZ, zooplankton groups
-0    !Which_gridio 0==fishtank 1==efdc
+1    !Which_gridio 0==fishtank 1==efdc
 1970 !iYear0, time in terms of seconds from this year
