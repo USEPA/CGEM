@@ -19,13 +19,11 @@
 
 ! --- transports
       real :: w_wsink(im,jm,km+1)
-      real :: uxx(im,jm,km+1)
-      real :: vxx(im,jm,km+1)
-      real :: wxx(im,jm,km+1)
 
 ! --- tmp
-      integer :: im1,ip1,jm1,jp1,km1
+      integer :: im1,ip1,jm1,jp1,km1,kp1
       real :: ufm,ufp,vfm,vfp,wfm,wfp
+      real :: vol_ufm,vol_ufp,vol_vfm,vol_vfp,vol_wfp
       real :: cfh,cf
 
 #ifdef DEBUG
@@ -40,20 +38,7 @@ write(6,*)
        wx=0.
       endif
 
-      uxx=0.
-      vxx=0.
-      wxx=0.
-
-      do j = 1,jm
-       do i = 1,(im-1)
-        nz=nza(i,j)
-         do k=1,nz
-           uxx(i,j,k) = ux(i+1,j,k)
-           vxx(i,j,k) = vx(i+1,j,k)
-           wxx(i,j,k) = wx(i+1,j,k)
-         enddo
-        enddo
-      enddo
+      w_wsink = 0.
 
 ! --------loop over each variable
      do ii = 1,nf
@@ -69,12 +54,14 @@ write(6,*)
 
 !     w_wsink means 'w' with sinking terms
 !     at surface sink = 0.
-      w_wsink (i,j,1) = wxx(i,j,1)
+      w_wsink (i,j,1) = wx(i,j,1)
 
        nz = nza(i,j)
 
       do k = 2,nz 
-        w_wsink(i,j,k) = wxx(i,j,k) + ws(ii)*area(i,j)
+         w_wsink(i,j,k) = wx(i,j,k) + ws(ii)*area(i,j)
+!        w_wsink(i,j,k) = wx(i,j,k) - ws(ii)*area(i,j)
+
       end do
 
 !If wsm=0 (shelf), then set sinking velocity to zero as well...
@@ -93,36 +80,64 @@ write(6,*)
 ! -------------------------------------------------------------
       do k = 1, nz       ! do layer by layer
       km1 = max0(k-1,1)
+      kp1 = min0(k+1,nz)
 ! ----- upwind advection
-        ufm = amax1( uxx(im1  ,j,k),0.)    ! pp/n0
-        ufp = amax1(-uxx(ip1  ,j,k),0.)    ! p0/np
+        vol_ufm = Vol(im1,j,k)/Vol(i,j,k)
+        vol_ufp = Vol(ip1,j,k)/Vol(i,j,k)
+        vol_vfm = Vol(i,jm1,k)/Vol(i,j,k)
+        vol_vfp = Vol(i,jp1,k)/Vol(i,j,k)
 
-        vfm = amax1( vxx(i  ,jm1,k),0.)
-        vfp = amax1(-vxx(i  ,jp1,k),0.)
+        ufm = amax1( ux(im1  ,j,k),0.)*vol_ufm    ! pp/n0
+        ufp = amax1(-ux(ip1  ,j,k),0.)*vol_ufp    ! p0/np
+ 
+        vfm = amax1( vx(i  ,jm1,k),0.)*vol_vfm
+        vfp = amax1(-vx(i  ,jp1,k),0.)*vol_vfp
+
         wfm = amax1(-w_wsink(i,j,k  ),0.)       ! p0/np
         wfp = amax1( w_wsink(i,j,k+1),0.)       ! pp/n0
+
 !                   p0/nn             pn/n0
-        cfh = ( (uxx(im1,j,k)-ufm) - (uxx(ip1,j,k)+ufp) )               &
-     &       +( (vxx(i,jm1,k)-vfm) - (vxx(i,jp1,k)+vfp) )
-        cf  = cfh + ((w_wsink(i,j,k+1)-wfp)-(w_wsink(i,j,km1)+wfm))
+        cfh = ( (ux(i,j,k)-ufm) - (ux(i,j,k)+ufp) )               &
+     &       +( (vx(i,j,k)-vfm) - (vx(i,j,k)+vfp) )
+        cf  = cfh + ((w_wsink(i,j,k+1)-wfp) -(w_wsink(i,j,km1)+wfm))
+!         cf = cfh + (w_wsink(i,j,km1)-wfm) - (w_wsink(i,j,k+1)+wfp)
 ! -------------------------------------------------------------
           f_n(i,j,k,ii) =                                        &
      &      ( f(i,j,k,ii)*Vol_prev(i,j,k)                            &
      &       +( cf*f(i,j,k,ii)                                  &
      &         +( ( (ufm*f(im1,j,k,ii)+ufp*f(ip1,j,k,ii))       &
      &             +(vfm*f(i,jm1,k,ii)+vfp*f(i,jp1,k,ii)) )     &
-     &           +(wfm*f(i,j,km1,ii)+wfp*f(i,j,k+1,ii))) ) *dT  &
+     &           +(wfm*f(i,j,km1,ii)+wfp*f(i,j,kp1,ii))) ) *dT  &
      &      ) /Vol(i,j,k)
 ! -------------------------------------------------------------
       !if(ii.eq.1) write(6,*) Vol_prev(i,j,k)/Vol(i,j,k)
       !if(Vol(i,j,k).le.0) write(6,*) "Vol",i,j,k,Vol(i,j,k)
-      if(f(i,j,k,ii).lt.0.and.cf.ne.0)    write(6,*) "cf",i,j,k,cf,f(i,j,k,ii),fm(i,j,k)
-      if(f(i-1,j,k,ii).lt.0.and.ufm.ne.0) write(6,*) "ufm",i,j,k,ufm,f(i-1,j,k,ii),fm(i-1,j,k)
-      if(f(i+1,j,k,ii).lt.0.and.ufp.ne.0) write(6,*) "ufp",i,j,k,ufp,f(i+1,j,k,ii),fm(i+1,j,k)
-      if(f(i,j-1,k,ii).lt.0.and.vfm.ne.0) write(6,*) "vfm",i,j,k,vfm,f(i,j-1,k,ii),fm(i,j-1,k)
-      if(f(i,j+1,k,ii).lt.0.and.vfp.ne.0) write(6,*) "vfp",i,j,k,vfp,f(i,j+1,k,ii),fm(i,j+1,k)
-      if(f(i,j,km1,ii).lt.0.and.wfm.ne.0) write(6,*) "wfm",i,j,k,wfm,f(i,j,km1,ii),fm(i,j,km1)
-      if(f(i,j,k+1,ii).lt.0.and.wfp.ne.0) write(6,*) "wfp",i,j,k,wfp,f(i,j,k+1,ii),fm(i,j,k+1)
+      if(f_n(i,j,k,ii).lt.0)    then
+             write(6,*) "f_n",ii,i,j,k,f_n(i,j,k,ii),fm(i,j,k)
+          write(6,*) "cf",i,j,k,cf,f(i,j,k,ii),fm(i,j,k)
+          write(6,*) "u of cf", (ux(im1,j,k)-ufm)*vol_ufm - (ux(ip1,j,k)+ufp)*vol_ufp 
+          write(6,*) "v of cf", (vx(i,jm1,k)-vfm)*vol_vfm - (vx(i,jp1,k)+vfp)*vol_vfp 
+          write(6,*) "w of cf", ((w_wsink(i,j,k+1)-wfp)*vol_wfp -(w_wsink(i,j,km1)+wfm))
+       write(6,*) "ufm",i,j,k,ufm,f(im1,j,k,ii),fm(im1,j,k)
+       write(6,*) "uim1",ux(im1,j,k),fm(im1,j,k)
+       write(6,*) "uip1",ux(ip1,j,k),fm(ip1,j,k)
+       write(6,*) "vim1",ux(i,jm1,k),fm(i,jm1,k)
+       write(6,*) "vip1",ux(i,jp1,k),fm(i,jp1,k)
+       write(6,*) "ufp",i,j,k,ufp,f(ip1,j,k,ii),fm(ip1,j,k)
+       write(6,*) "vfm",i,j,k,vfm,f(i,jm1,k,ii),fm(i,jm1,k)
+       write(6,*) "vfp",i,j,k,vfp,f(i,jp1,k,ii),fm(i,jp1,k)
+       write(6,*) "wfm",i,j,k,wfm,f(i,j,km1,ii),fm(i,j,km1)
+       write(6,*) "wfp",i,j,k,wfp,f(i,j,kp1,ii),fm(i,j,kp1)
+       stop
+      endif
+
+!      if(f(i,j,k,ii).lt.0.and.cf.ne.0)    write(6,*) "cf",i,j,k,cf,f(i,j,k,ii),fm(i,j,k)
+!      if(f(i-1,j,k,ii).lt.0.and.ufm.ne.0) write(6,*) "ufm",i,j,k,ufm,f(i-1,j,k,ii),fm(i-1,j,k)
+!      if(f(i+1,j,k,ii).lt.0.and.ufp.ne.0) write(6,*) "ufp",i,j,k,ufp,f(i+1,j,k,ii),fm(i+1,j,k)
+!      if(f(i,j-1,k,ii).lt.0.and.vfm.ne.0) write(6,*) "vfm",i,j,k,vfm,f(i,j-1,k,ii),fm(i,j-1,k)
+!      if(f(i,j+1,k,ii).lt.0.and.vfp.ne.0) write(6,*) "vfp",i,j,k,vfp,f(i,j+1,k,ii),fm(i,j+1,k)
+!      if(f(i,j,km1,ii).lt.0.and.wfm.ne.0) write(6,*) "wfm",i,j,k,wfm,f(i,j,km1,ii),fm(i,j,km1)
+!      if(f(i,j,kp1,ii).lt.0.and.wfp.ne.0) write(6,*) "wfp",i,j,k,wfp,f(i,j,kp1,ii),fm(i,j,kp1)
       end do ! k = 1, nz
       end do !i
       end do !j
