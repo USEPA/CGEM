@@ -82,6 +82,7 @@
    do k=1,numdepths
       CDOM(k) = (CDOM_k(k) - 0.538)/2.933 !ppb to a312
       CDOM(k) = CDOM(k) * exp(-0.016*(490.-312.))
+      CDOM(k) = AMAX1(CDOM(k),0.)
    enddo 
 
 !Initialize counters for Chla, CDOM, and detritus:
@@ -102,15 +103,15 @@
       OM1BC_tot = OM1BC_tot + OM1_BC(k)
 !Calculate absorption coefficients:
       aSw_mid = aw490  !Sea water absorption at mid cell
-      aChl490_mid = astar490 * Chla_tot / d_sfc(k)        !Chla absorption at mid cell
-      aCDOM490_mid = CDOM_tot / d_sfc(k)        !CDOM absorption at mid cell
-      aOM1A490_mid = astarOMA * OM1A_tot / d_sfc(k) ! absorption at mid cell
-      aOM1Z490_mid = astarOMZ * OM1Z_tot / d_sfc(k) ! absorption at mid cell
-      aOM1R490_mid = astarOMR * OM1R_tot / d_sfc(k) ! absorption at mid cell
-      aOM1BC490_mid = astarOMBC * OM1BC_tot / d_sfc(k) ! absorption at mid cell
+      aChl490_mid = astar490 * Chla_tot / k !d_sfc(k)        !Chla absorption at mid cell
+      aCDOM490_mid = CDOM_tot / k !d_sfc(k)        !CDOM absorption at mid cell
+      aOM1A490_mid = astarOMA * OM1A_tot / k !d_sfc(k) ! absorption at mid cell
+      aOM1Z490_mid = astarOMZ * OM1Z_tot / k !d_sfc(k) ! absorption at mid cell
+      aOM1R490_mid = astarOMR * OM1R_tot / k !d_sfc(k) ! absorption at mid cell
+      aOM1BC490_mid = astarOMBC * OM1BC_tot / k !d_sfc(k) ! absorption at mid cell
       a490_mid = aSw_mid + aChl490_mid + aCDOM490_mid + aOM1A490_mid + aOM1Z490_mid + aOM1R490_mid + aOM1BC490_mid
 !Calculate backscattering coefficients:
-      bbChl490_mid = 0.015 * (0.3*((Chla_tot / d_sfc(k))**0.62)*(550./490.)) !Chla backscatter at mid cell
+      bbChl490_mid = 0.015 * (0.3*((Chla_tot / k)**0.62)*(550./490.)) !Chla backscatter at mid cell
       bb490_mid = bbChl490_mid !Only Chla backscatters for now
 ! Calculate PAR at depth
       !Why would we check if a490_mid=0??
@@ -120,7 +121,7 @@
       !     write(6,*) "a490_mid.le.0, =",a490_mid,aSw_mid,aChl490_mid,aCDOM490_mid
       !     !stop
       !  endif
-      call IOP_PARattenuation(AMAX1(a490_mid,0.), bb490_mid, PARsurf, sun_zenith, d_sfc(k), PARdepth(k)) 
+      call IOP_PARattenuation(a490_mid, bb490_mid, PARsurf, sun_zenith, d_sfc(k), PARdepth(k)) 
       PAR_percent(k) = 100.*PARdepth(k)/PARsurf
    enddo
 
@@ -136,7 +137,7 @@
       bbChl490_bot = 0.015 * (0.3*((Chla_tot / numdepths)**0.62)*(550./490.))
 !Chla backscatter at bottom
       bb490_bot = bbChl490_bot !Only Chla backscatters for now
-      call IOP_PARattenuation(AMAX1(a490_bot,0.), bb490_bot, PARsurf, sun_zenith, bottom_depth(numdepths), PARbot)
+      call IOP_PARattenuation(a490_bot, bb490_bot, PARsurf, sun_zenith, bottom_depth(numdepths), PARbot)
 
    END Subroutine Call_IOP_PAR
 !----------------------------------------------------------------------

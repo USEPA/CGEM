@@ -9,15 +9,15 @@ cat("If it doesn't work, specify cgem or gomdom at the command line.\n")
 
 if(args[1]=="gomdom"){
  which_eqs <- "gomdom"
- ncfile <- "gomdom.000000.nc"
- ncfile2 <- "gd_wind=5.nc"
- pdfname <- "gd_doc.pdf"
+ ncfile <- "monod.nc"
+ ncfile2 <- "newpars_droop.nc"
+ pdfname <- "monod_vs_newparsdroop.pdf"
  pdf_layout <- c(4,4) 
 } else {
  which_eqs <- "cgem"
- ncfile <- "cgem.000000.nc"
- ncfile2 <- "G07_wind=5.000000.nc"
- pdfname <- "cgem.doc.pdf"
+ ncfile <-  "cloern.nc"
+ ncfile2 <- "Cloern_Run3/cgem.000000.nc"
+ pdfname <- "cgem.old=black_new=red.pdf"
  pdf_layout <- c(4,4)
 }
 
@@ -25,8 +25,8 @@ if(args[1]=="gomdom"){
 
 source("compare_vars_1D.R")
 if(args[1]=="gomdom"){
-pdfname <- "gomdom_pdiff_doc.pdf"
+pdfname <- "monod_vs_newparmsdroop_pdiff.pdf"
 }else{
-pdfname <- "cgem_pdiff_doc.pdf"
+pdfname <- "cgem_pdiff_old_minus_new.pdf"
 }
 source("compare_vars_sub_1D.R")

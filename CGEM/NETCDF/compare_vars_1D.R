@@ -20,7 +20,8 @@ nc<-nc_open(ncfile)
 nc2<-nc_open(ncfile2)
 
 if(which_eqs=="gomdom"){
-Var <- c("DOC","DIA","GRE","ZOO","LOC","ROC","SRP","DOP","LOP","ROP","NH4","NO3","DON","LON","RON","SA","SU","DO2","TR","DIAN","DIAP","GREN","GREP")
+#Var <- c("DOC","DIA","GRE","ZOO","LOC","ROC","SRP","DOP","LOP","ROP","NH4","NO3","DON","LON","RON","SA","SU","DO2","TR","DIAN","DIAP","GREN","GREP")
+Var <- names(nc$var)
 }else{
 Var <- names(nc$var)
 Var <- Var[Var != "Tr"]
@@ -33,14 +34,14 @@ nvars <- length(Var)
 #for odd files, let user specify:
 if(!exists("firsts")){
 if(which_eqs=="gomdom"){
-firsts <- 1
+firsts <- 7
 }else{
 firsts <- 6
 }
 }
 
 if(which_eqs=="gomdom"){
-Var <- Var[firsts:(firsts+19)]
+Var <- Var[firsts:(nvars)]
 }else{
 Var <- Var[firsts:(nvars-2)]
 }
@@ -75,6 +76,7 @@ par(mfrow=pdf_layout)
 colorlist <- c("black","red","blue","green","purple","orange","yellow","pink","brown")
 
  for(i in 1:nvars){
+ cat("VAR=",Var[i],"\n")
  rdata <- ncvar_get(nc,Var[i])
  rdata2 <- ncvar_get(nc2,Var[i])
  unit <- ncatt_get(nc,Var[i],attname="units")$value

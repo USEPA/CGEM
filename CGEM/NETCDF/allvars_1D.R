@@ -64,11 +64,20 @@ colorlist <- c("black","red","blue","green","purple","orange","yellow","pink","b
  unit <- ncatt_get(nc,Var[i],attname="units")$value
  ymax <- max(rdata,na.rm=TRUE)
  #ymax <- ymax + 0.1*ymax
- timeseries_plot(Var[i],time[1:tt],na.omit(rdata),unit,label=label,range=c(0,ymax))
+ if(rdata[1]>1.e30){
+ timeseries_plot(Var[i],time[2:tt],rdata[2:tt],unit)
+ }else{
+ timeseries_plot(Var[i],time,rdata,unit)
+ }
  if(n_layers >= 2){
  for(j in 2:n_layers){
   rdata <- ncvar_get(nc,Var[i],start=c(1,1,k_layers[j],1),count=c(1,1,1,tt))
+ if(rdata[1]>1.e30){
+  timeseries_addlines(Var[i],time[2:tt],na.omit(rdata[2:tt]),color=colorlist[j])
+ }else{
   timeseries_addlines(Var[i],time[1:tt],na.omit(rdata),color=colorlist[j])
+ }
+
   }
  }
 

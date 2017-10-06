@@ -91,6 +91,14 @@
       call USER_get_masks()
 
       call Set_Vars(Which_code,init_filename) !initialize 'f' array
+!      f(1,1,1,22) = 1/Vol(1,1,1)
+!      f(1,1,2,22) = 2/Vol(1,1,1)
+!      f(1,1,3,22) = 3/Vol(1,1,1)
+!      f(1,1,4,22) = 4/Vol(1,1,1)
+!      f(1,1,5,22) = 5/Vol(1,1,1)
+!      f(1,1,6,22) = 6/Vol(1,1,1)
+!      f(1,1,7,22) = 7/Vol(1,1,1)
+
 
       call Initialize_Output(Which_code,BASE_NETCDF_OUTPUT_FILE_NAME)     !Open file and write initial configuration
 

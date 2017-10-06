@@ -36,7 +36,6 @@
       !Multiply Kh by KH_coeff for h<30
         !L3...Fix this so it is only for h<30
          !!Kh(:,:,1:nz) = Kh(:,:,1:nz)*KH_coeff
-
        if(Which_VMix.ne.0) call VMixing()
 
        ! After Advection and VMixing, return to Q's

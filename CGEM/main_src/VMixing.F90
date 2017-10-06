@@ -30,6 +30,7 @@ write(6,*) "---VMixing---"
 write(6,*) "  Which_VMix=",Which_VMix
 write(6,*) "  nz=",km
 write(6,*) "  At the cell i,j,k=",icent,jcent,km
+write(6,*) "  dz, d_sfc=", dz(icent,jcent,km),d_sfc(icent,jcent,km)
 write(6,*) "    mixing coeff Kh is:",Kh(icent,jcent,km)
 write(6,*)
 #endif

@@ -30,10 +30,11 @@ if(!exists("firsts")){
 if(which_eqs=="cgem") firsts <- 6
 if(which_eqs=="gomdom") firsts <- 7
 }
-firsts <- 6
+#firsts <- 6
 
 if(which_eqs=="gomdom"){
-Var <- c("DOC","DIA","GRE","ZOO","LOC","ROC","SRP","DOP","LOP","ROP","NH4","NO3","DON","LON","RON","SA","SU","DO2","TR","DIAN","DIAP","GREN","GREP")
+#Var <- c("DOC","DIA","GRE","ZOO","LOC","ROC","SRP","DOP","LOP","ROP","NH4","NO3","DON","LON","RON","SA","SU","DO2","TR","DIAN","DIAP","GREN","GREP")
+Var <- Var[firsts:(nvars)]
 nvars <- length(Var)
 }else{
 Var <- names(nc$var)

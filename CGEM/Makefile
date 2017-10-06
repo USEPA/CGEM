@@ -9,7 +9,7 @@
 
 ### Uncomment the next line to enable debugging
 #DFLAGS = -warn -debug all -g -check all -ftrapuv #-DDEBUG #-mcmodel=medium -shared-intel 
-#DFLAGS = -g -Wall -Wextra -pedantic -fimplicit-none -fbacktrace -Dmap_code #-DDEBUG#-D_CGEM #-DRDEBUG -DDEBUGVARS #-DDEBUG_Vars #-DDEBUG1#-DDEBUG 
+#DFLAGS = -g -Wall -Wextra -pedantic -fimplicit-none -fbacktrace -Dmap_code -DDEBUG#-D_CGEM #-DRDEBUG -DDEBUGVARS #-DDEBUG_Vars #-DDEBUG1#-DDEBUG 
 #DFLAGS = -DDEBUG
 #DFLAGS = -DDEBUGVARS -DDEBUG_Vars
 #DFLAGS = -DDEBUG1
