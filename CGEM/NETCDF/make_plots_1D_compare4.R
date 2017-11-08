@@ -10,15 +10,19 @@ cat("If it doesn't work, specify cgem or gomdom at the command line.\n")
 if(args[1]=="gomdom"){
  which_eqs <- "gomdom"
  ncfile <- "gomdom.000000.nc"
- pdfname <- "gomdom_3D.pdf"
+ ncfile2 <- "gd_wind=5.nc"
+ pdfname <- "gd_doc.pdf"
  pdf_layout <- c(4,4) 
 } else {
  which_eqs <- "cgem"
- ncfile <- "cgem.000000.nc"
- pdfname <- "cgem_3D.pdf"
+ ncfile1<- "After_20min_tstep/cgem.000000.nc" #old code
+ ncfile2 <- "After_divide_by_k/cgem.000000.nc" #new code
+ ncfile3<-  "Compare_Cloern/cloern.nc"     #old code
+ ncfile4 <- "Cloern_Run3/cgem.000000.nc"  #new code
+ pdfname <- "compare4_all.pdf"
  pdf_layout <- c(4,4)
 }
 
 }
 
-source("allvars_3D_EFDC.R")
+source("compare_vars_1D_4_all.R")

@@ -2,7 +2,7 @@
 ## source ("timeseries_plot.R")
 
 #Starts a new plot of a 1D time series variable
-timeseries_plot <- function(Var,time,rdata,unit,ilog=FALSE,label=NULL,range=NULL){
+timeseries_plot <- function(Var,time,rdata,unit,ilog=FALSE,label=NULL,range=NULL,uselim=TRUE,xrange=NULL,color="black",linetype="solid"){
 
 if(ilog){
    rdata <- log(rdata) #Might have 'log zero' error, need to add check
@@ -12,17 +12,23 @@ if(ilog){
 }
 
 ylimit <- get_ylim(rdata,range)
+xlimit <- get_ylim(time,xrange)
 
 #yaxt="n"
-plot(time,rdata,yaxt="n",type="l",ylab="",xlab="",main=paste(Var,label),ylim=ylimit);
+plot(time,rdata,yaxt="n",type="l",ylab="",xlab="",main=paste(Var,label),ylim=ylimit,xlim=xlimit,col=color,lty=linetype);
 mtext(paste(logtxt,unit),side=3,line=.2,cex=0.8)
-axis(2, at=get_lab(ylimit), labels=get_lab(ylimit), las=2)
+if(uselim){
+ axis(2, at=get_lab(ylimit), labels=get_lab(ylimit), las=2)
+}else{
+ axis(2, las=2)
+}
+
 }
 
 
 #Adds lines to an existing plot, can change color but not labels or ranges (for comparisons)
-timeseries_addlines <- function(Var,time,rdata,color="red"){
-lines(time,rdata,col=color)
+timeseries_addlines <- function(Var,time,rdata,color="red",linewidth=1,linetype="solid"){
+lines(time,rdata,col=color,lwd=linewidth,lty=linetype)
 }
 
 

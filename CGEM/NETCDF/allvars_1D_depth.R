@@ -35,51 +35,44 @@ time<- as.POSIXct(time, origin=paste(iYr0,"-01-01",sep=""), tz="GMT")
 tt <- length(time) #64
 #length(time)
 
+depth <- ncvar_get(nc,"h")
+nz <- length(depth)
+
 if(!exists("pdfname")){
 if(which_eqs=="cgem") pdfname="cgem_1D.pdf"
 if(which_eqs=="gomdom") pdfname="gomdom_1D.pdf"
 }
 
-pdf(file=pdfname)
+pdf(file=pdfname,paper="USr")
 
-k_layers <- c(1,6,12,20)
-#k_layers <- c(1,2,3,4)
-n_layers <- length(k_layers)
-label <- paste("k=1,6,12,20")
-#label <- paste("k=1,2,3,4")
+which_times <- c(1,121,152,182,213,335)
+n_times <- length(which_times)
 
 if(!exists("pdf_layout")){
-pdf_layout <- c(4,4)
+pdf_layout <- c(1,6)
 }
 
 which_mod <- pdf_layout[1]*pdf_layout[2] 
 
 par(mfrow=pdf_layout)
 
-colorlist <- c("black","red","blue","green","purple","orange","yellow","pink","brown")
-
  for(i in 1:nvars){
+  rdata <- ncvar_get(nc,Var[i])
+  unit <- ncatt_get(nc,Var[i],attname="units")$value
+  #ymax <- max(rdata,na.rm=TRUE)
+  #ymax <- ymax + 0.1*ymax
 
- rdata <- ncvar_get(nc,Var[i],start=c(1,1,k_layers[1],1),count=c(1,1,1,tt))
- unit <- ncatt_get(nc,Var[i],attname="units")$value
- ymax <- max(rdata,na.rm=TRUE)
- #ymax <- ymax + 0.1*ymax
- if(rdata[1]>1.e30){
- timeseries_plot(Var[i],time[2:tt],rdata[2:tt],unit)
- }else{
- timeseries_plot(Var[i],time,rdata,unit)
- }
- if(n_layers >= 2){
- for(j in 2:n_layers){
-  rdata <- ncvar_get(nc,Var[i],start=c(1,1,k_layers[j],1),count=c(1,1,1,tt))
- if(rdata[1]>1.e30){
-  timeseries_addlines(Var[i],time[2:tt],na.omit(rdata[2:tt]),color=colorlist[j])
- }else{
-  timeseries_addlines(Var[i],time[1:tt],na.omit(rdata),color=colorlist[j])
- }
+  for(jj in 1:n_times){
+          j <- which_times[jj]   
+          t_label <- paste(months(time[j]),format(time[j],"%d"))
+   if(rdata[1,j]>1.e30){
+    timeseries_plot(Var[i],rdata[,j+1],depth,time[j+1],range=rev(range(depth)),uselim=FALSE)
+    }else{
+    timeseries_plot(Var[i],rdata[,j],depth,time[j],range=rev(range(depth)),uselim=FALSE)
+    }
+   }
+  #timeseries_addlines(Var[i],time[2:tt],na.omit(rdata[2:tt]),color=colorlist[j])
 
-  }
- }
 
  if(i%%which_mod == 0) {
   par(mfrow=pdf_layout)

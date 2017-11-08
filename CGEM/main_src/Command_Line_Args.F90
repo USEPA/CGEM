@@ -7,6 +7,7 @@
 
       integer c_count
 
+! ./CGEM Which_code InputFile InitializationFile OutputFileBase 
 
 ! --- Command Line Arguments for file names ---
          c_count = command_argument_count()

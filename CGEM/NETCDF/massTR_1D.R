@@ -7,8 +7,8 @@ cat("This only works for cgem or gomdom efdc\n")
 ncfile<-"cgem.000000.nc"
 pdfname2<-"efdc"
 Var<-"Tr"
-im <- 20
-jm <- 33
+im <- 1 
+jm <- 1 
 km <- 7
 
 
@@ -45,12 +45,10 @@ pdiff_mass<-c(tt-1)
 for(t in 1:tt){
  mass[t]<-0
 
- for(i in 1:im){
- for(j in 1:jm){
  for(k in 1:km){
- if(rdata[i,j,k,t]>0. ){ 
-  mass[t] <- mass[t] + rdata[i,j,k,t]
-}}}}}
+ if(rdata[k,t]>0. ){ 
+  mass[t] <- mass[t] + rdata[k,t]
+}}}
 
 
 for(i in 2:tt){

@@ -15,9 +15,9 @@ if(args[1]=="gomdom"){
  pdf_layout <- c(4,4) 
 } else {
  which_eqs <- "cgem"
- ncfile <-  "cloern.nc"
- ncfile2 <- "Cloern_Run3/cgem.000000.nc"
- pdfname <- "cgem.old=black_new=red.pdf"
+ ncfile <-  "original.nc"
+ ncfile2 <- "cgem.000000.nc"
+ pdfname <- "cgem.compare.pdf"
  pdf_layout <- c(4,4)
 }
 
@@ -26,7 +26,13 @@ if(args[1]=="gomdom"){
 source("compare_vars_1D.R")
 if(args[1]=="gomdom"){
 pdfname <- "monod_vs_newparmsdroop_pdiff.pdf"
+pdfname1 <- "gd_depth.pdf"
 }else{
-pdfname <- "cgem_pdiff_old_minus_new.pdf"
+pdfname <- "cgem_pdiff.pdf"
+pdfname2 <- "cgem_depth.pdf"
 }
 source("compare_vars_sub_1D.R")
+
+pdfname <- pdfname2
+pdf_layout <- c(2,3)
+source("compare_vars_depth.R")

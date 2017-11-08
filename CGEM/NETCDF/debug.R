@@ -12,40 +12,22 @@ if(!exists("ncfile")){
 ncfile<-"output.000000.nc"
 }
 
-if(!exists("ncfile2")){
-ncfile<-"output.000000.nc"
-}
-
 nc<-nc_open(ncfile)
-nc2<-nc_open(ncfile2)
 
-if(which_eqs=="gomdom"){
-#Var <- c("DOC","DIA","GRE","ZOO","LOC","ROC","SRP","DOP","LOP","ROP","NH4","NO3","DON","LON","RON","SA","SU","DO2","TR","DIAN","DIAP","GREN","GREP")
-Var <- names(nc$var)
-}else{
-Var <- names(nc$var)
-Var <- Var[Var != "Tr"]
-}
-
+#later, let user define an array of variables, for now we do all of them.
+#Var <- names(nc$var) 
+Var <- "irradiance"
 nvars <- length(Var)
 
 #for CGEM, the first 5 variables are not state variables (put those in later...for now, cut out)
 #for GoMDOM, the first 6 variables
 #for odd files, let user specify:
 if(!exists("firsts")){
-if(which_eqs=="gomdom"){
-firsts <- 7
-}else{
-firsts <- 6
-}
+if(which_eqs=="cgem") firsts <- 6
+if(which_eqs=="gomdom") firsts <- 7
 }
 
-if(which_eqs=="gomdom"){
-Var <- Var[firsts:(nvars)]
-}else{
-Var <- Var[firsts:(nvars-2)]
-}
-
+#Var <- Var[firsts:nvars]
 nvars <- length(Var) 
 
 time <- ncvar_get(nc,"time")
@@ -63,7 +45,7 @@ pdf(file=pdfname)
 
 k_layers <- c(1,6,12,20)
 n_layers <- length(k_layers)
-#label <- paste("k=1,6,12,20")
+label <- paste("k=1,6,12,20")
 
 if(!exists("pdf_layout")){
 pdf_layout <- c(4,4)
@@ -76,25 +58,23 @@ par(mfrow=pdf_layout)
 colorlist <- c("black","red","blue","green","purple","orange","yellow","pink","brown")
 
  for(i in 1:nvars){
- #cat("VAR=",Var[i],"\n")
- rdata <- ncvar_get(nc,Var[i])
- rdata2 <- ncvar_get(nc2,Var[i])
+
+ rdata <- ncvar_get(nc,Var[i],start=c(1,1,k_layers[1],1),count=c(1,1,1,tt))
  unit <- ncatt_get(nc,Var[i],attname="units")$value
-
- for(j in 1:n_layers){
-
- label <- paste("k=",k_layers[j])
- ymin <- min(rdata[k_layers[j],],rdata2[k_layers[j],])
- ymax <- max(rdata[k_layers[j],],rdata2[k_layers[j],])
- timeseries_plot(Var[i],time[1:tt],rdata[k_layers[j],],unit,label=label,range=c(ymin,ymax))
- timeseries_addlines(Var[i],time[1:tt],rdata2[k_layers[j],],color="red")
- 
+ ymax <- max(rdata)
+ #ymax <- ymax + 0.1*ymax
+ timeseries_plot(Var[i],time[1:tt],rdata,unit,label=label,range=c(0,ymax))
+ if(n_layers >= 2){
+ for(j in 2:n_layers){
+  rdata <- ncvar_get(nc,Var[i],start=c(1,1,k_layers[j],1),count=c(1,1,1,tt))
+  timeseries_addlines(Var[i],time[1:tt],rdata,color=colorlist[j])
+  }
  }
 
- if((i*j)%%which_mod == 0) {
+ if(i%%which_mod == 0) {
   par(mfrow=pdf_layout)
  }
-}
 
+}
 
 dev.off()
