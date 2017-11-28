@@ -19,7 +19,7 @@
       real,allocatable,save :: zz(:)  !depth at middle of layer 
       real,allocatable,save :: zl(:)  !depth at top of layer
       real,allocatable,save :: dzz(:) !sigma difference between middle of layers
-      real,allocatable,save :: h(:,:)   !undisturbed water depth at center of cells
+      real,allocatable,save :: h(:,:)   !undisturbed water depth - at center of cells for NCOM, at bottom of cell for POM
       real, allocatable, save :: dz_k(:) !Original (Ko) dz, sigma thickness of layer k
       real, save :: Hs  !reference depth used to calculate sigma values given depths of layer surfaces and centers
 
@@ -42,7 +42,6 @@
       integer(kind=8) :: TC_8
 
       call Grid_allocate()
-
 #ifdef map_code
 write(6,*) "---Set_Grid----"
 write(6,*) "  Allocated Grid in Grid_allocate"
@@ -51,7 +50,7 @@ write(6,*) "  *** nza really should be zero if land, but is set to km here in Se
 write(6,*)
 #endif
 
-      if (Which_gridio .eq. 0 .OR. Which_gridio .eq. 1) then   ! used for basic, EFDC, and NCOM grids
+      if (Which_gridio .eq. 0 .OR. Which_gridio .eq. 1) then   ! used for basic and EFDC grids
          write(filename,'(A, A)') trim(DATADIR),'/nz.dat'
          open(unit=19,file=filename)
          read(19,*)
@@ -59,7 +58,7 @@ write(6,*)
            read(19,*) nza(:,j)
          enddo
          close(19)
-      else if (Which_gridio .eq. 2) then
+      else if (Which_gridio .eq. 2 .OR. Which_gridio .eq. 3) then  ! used for NCOM and POM grids
          nza = km 
       else 
           write(6,*)'Could not read number of layers from file'
@@ -72,7 +71,6 @@ write(6,*)
 !----------------------
       call USER_getLonLat(lat,lon)
 
-
       if (Which_gridio.eq.0) then
         call USER_get_basic_grid(dz,depth,d,d_sfc,area,Vol)
       else if (Which_gridio.eq.1) then
@@ -80,8 +78,9 @@ write(6,*)
         call USER_get_EFDC_grid(TC_8)
       else if (Which_gridio.eq.2) then
         call USER_get_NCOM_grid(TC_8)
+      else if (Which_gridio.eq.3) then
+        call USER_get_POM_grid(TC_8)
       endif
-
 !--------------------------------
 ! --- get land/water and shelf masks
 !--------------------------------
@@ -109,7 +108,7 @@ write(6,*)
       ALLOCATE(fm(im,jm,km))
       ALLOCATE(wsm(im,jm))
 
-      if (Which_gridio .eq. 2) then
+      if (Which_gridio .eq. 2 .or. Which_gridio .eq. 3) then
          ALLOCATE(zz(35))
          ALLOCATE(zl(35))
          ALLOCATE(dzz(35))

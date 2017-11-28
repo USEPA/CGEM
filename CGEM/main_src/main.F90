@@ -46,11 +46,8 @@
       call Command_Line_Args(Which_code,input_filename,init_filename,BASE_NETCDF_OUTPUT_FILE_NAME)
 
       call Set_Model_dim()
-
       call Set_Grid(TC_8)
-
       call Allocate_Input_Vars(Which_code)
-
       call Allocate_Hydro
       !L3 Take care of ws here
 
@@ -67,13 +64,11 @@
 ! the bottom of the loop.
 
       TC_8 = START_SECONDS - (dT / 2) ! Subtract half dT to 'center' of timestep.
-
       if (Which_gridio .gt. 0) then
         call Init_Hydro_NetCDF()
       endif
   
       call Get_Vars(TC_8) !Hydro for initial timestep 
-
 
 ! Initialize time an loop variables
       istep = 0
@@ -83,6 +78,8 @@
         call USER_update_EFDC_grid(TC_8)
       else if (Which_gridio.eq.2) then
         call USER_update_NCOM_grid()
+      else if (Which_gridio.eq.3) then
+        call USER_update_POM_grid()
       endif
 
 !--------------------------------
@@ -100,7 +97,17 @@
 !      f(1,1,7,22) = 7/Vol(1,1,1)
 
 
+#ifdef DEBUG_ADDBLIP
+      write(6,*) "f(60,120,1,10) = ", f(60,120,1,10)
+      f(60,120,1,10) = 500.0
+      write(6,*) " with blip = ", f(60,120,1,10)
+#endif
+
       call Initialize_Output(Which_code,BASE_NETCDF_OUTPUT_FILE_NAME)     !Open file and write initial configuration
+
+#ifdef DEBUG_VMIX
+   write(6,*) "f(60,2,1,10)= ", f(60,2,1,10)
+#endif
 
 #ifdef CALIBRATE
       if(Which_code.eq."CGEM") then
@@ -113,13 +120,18 @@
 !-------------- START TIME LOOP -----------------------------------
       do istep = 1, nstep
        TC_8 = TC_8 + dT
-
+#ifdef DEBUG_TIME
+   write(6,*) "TC_8=", TC_8
+#endif
       if (Which_gridio.eq.1) then
         Vol_prev = Vol
         call USER_update_EFDC_grid(TC_8)
       elseif (Which_gridio.eq.2) then
         Vol_prev = Vol
         call USER_update_NCOM_grid()
+      elseif (Which_gridio.eq.3) then
+        Vol_prev = Vol
+        call USER_update_POM_grid()
       endif
 
        call Get_Vars(TC_8) !Hydro, Solar, Wind, Temp, Salinity

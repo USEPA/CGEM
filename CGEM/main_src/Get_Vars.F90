@@ -42,16 +42,26 @@
             call USER_Read_Wind(TC_in,Wind)
           endif
 
-        else if (Which_gridio.eq.1 .or. Which_gridio.eq.2) then  !EFDC.or.NCOM
-          call interpVar(hydro_info(eSal), TC_8, startIndex(eSal), S)  
+        else if (Which_gridio.eq.1 .or. Which_gridio.eq.2 .or. Which_gridio.eq.3) then  !EFDC.or.NCOM.or.POM
+          if (Which_gridio.ne.3) then
+            call interpVar(hydro_info(eSal), TC_8, startIndex(eSal), S)  
+          else 
+            S = 0.3  !Rough estimate for Lake Michigan  (varies from 0.05 to 0.6 ?)
+          endif
           call interpVar(hydro_info(eTemp), TC_8, startIndex(eTemp), T) 
           call interpVar(hydro_info(eUx), TC_8, startIndex(eUx), Ux)   
           call interpVar(hydro_info(eVx), TC_8, startIndex(eVx), Vx)   
           call interpVar(hydro_info(eWx), TC_8, startIndex(eWx), Wx)   
           call interpVar(hydro_info(eKh), TC_8, startIndex(eKh), Kh)   
           call interpVar(hydro_info(eE), TC_8, startIndex(eE), E)  
-          call getSolar( TC_8, lon, lat, Rad)  !Calculate Solar Radiation for now
-          Wind = 5                             !Set constant wind speed for now
+
+          if (Which_gridio.eq.3) then
+            call interpVar(hydro_info(eRad), TC_8, startIndex(eRad), Rad)
+            call interpVar(hydro_info(eWind), TC_8, startIndex(eWind), Wind)
+          else
+            call getSolar( TC_8, lon, lat, Rad)  !Calculate Solar Radiation for now
+            Wind = 5                             !Set constant wind speed for now
+          endif
         endif 
 
 !--------------------------------

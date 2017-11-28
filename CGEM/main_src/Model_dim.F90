@@ -54,7 +54,7 @@ write(6,*) "Model_dim.txt=",filename
       read(19,*) iYr0
       close(19)
       
-      if(Which_gridio.eq.2) then
+      if(Which_gridio.eq.2 .or. Which_gridio.eq.3) then
          nsl = km + 1 
       else
          nsl = km

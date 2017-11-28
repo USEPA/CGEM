@@ -22,7 +22,7 @@ write(6,*)
       write(filename,'(A, A)') trim(DATADIR),'/latlon.dat'
       open (19,file=filename,status='old')
 
-      if(Which_gridio.eq.2) then
+      if(Which_gridio.eq.2 .OR. Which_gridio.eq.3) then
         read (19,*) !Header, lat 
         read (19,*) tmpj
         do j=1,jm
