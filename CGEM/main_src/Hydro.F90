@@ -14,10 +14,10 @@
       real,allocatable,save :: Wind(:,:) !Wind Speed, m/s
       real,allocatable,save :: Rad(:,:) !Solar Radiation, watts/m2
       
-      type(netCDF_file) :: hydro_info(7)  !indices refer to order declared below in enum, 
+      type(netCDF_file) :: hydro_info(9)  !indices refer to order declared below in enum, 
                                           !omitting Wind Speed and Solar Radiation
-      character(len=200) :: netcdf_fileNames(7)  !holds filenames of hydro netcdf data files
-      integer, dimension(7) :: startIndex ! holds the last time index from netcdf file used for each hydro variable
+      character(len=200) :: netcdf_fileNames(9)  !holds filenames of hydro netcdf data files
+      integer, dimension(9) :: startIndex ! holds the last time index from netcdf file used for each hydro variable
                                           ! used as starting point for next lookup
 
       integer, parameter :: eSal=1      !Salinity
@@ -27,6 +27,10 @@
       integer, parameter :: eWx = 5     !Z- Vertical Current Flux
       integer, parameter :: eKh = 6     !Diffusion Coefficients
       integer, parameter :: eE = 7      !Elevation
+      integer, parameter :: eWind = 8   !Wind
+      integer, parameter :: eRad = 9    !Rad
+
+      integer, save :: fHv, lHv  ! looping index of FirstHydroVar and LastHydroVar (currently allows skipping of vars if they are not needed)
 
       contains
 
@@ -90,24 +94,42 @@ write(6,*)
 
       !Set filenames for netCDF
       if (Which_gridio .eq. 1) then 
-         write(netcdf_fileNames(1), '(A, A)') trim(DATADIR), '/INPUT/Salt.nc'
-         write(netcdf_fileNames(2), '(A, A)') trim(DATADIR), '/INPUT/Temp.nc'
-         write(netcdf_fileNames(3), '(A, A)') trim(DATADIR), '/INPUT/UFlow.nc'
-         write(netcdf_fileNames(4), '(A, A)') trim(DATADIR), '/INPUT/VFlow.nc'
-         write(netcdf_fileNames(5), '(A, A)') trim(DATADIR), '/INPUT/WFlow.nc'
-         write(netcdf_fileNames(6), '(A, A)') trim(DATADIR), '/INPUT/Ev.nc'
-         write(netcdf_fileNames(7), '(A, A)') trim(DATADIR), '/INPUT/SurfaceElev.nc'
+         write(netcdf_fileNames(eSal), '(A, A)') trim(DATADIR), '/INPUT/Salt.nc'
+         write(netcdf_fileNames(eTemp), '(A, A)') trim(DATADIR), '/INPUT/Temp.nc'
+         write(netcdf_fileNames(eUx), '(A, A)') trim(DATADIR), '/INPUT/UFlow.nc'
+         write(netcdf_fileNames(eVx), '(A, A)') trim(DATADIR), '/INPUT/VFlow.nc'
+         write(netcdf_fileNames(eWx), '(A, A)') trim(DATADIR), '/INPUT/WFlow.nc'
+         write(netcdf_fileNames(eKh), '(A, A)') trim(DATADIR), '/INPUT/Ev.nc'
+         write(netcdf_fileNames(eE), '(A, A)') trim(DATADIR), '/INPUT/SurfaceElev.nc'
       else if (Which_gridio .eq. 2) then
-         write(netcdf_fileNames(1), '(A, A)') trim(DATADIR), '/INPUT/S.nc'
-         write(netcdf_fileNames(2), '(A, A)') trim(DATADIR), '/INPUT/T.nc'
-         write(netcdf_fileNames(3), '(A, A)') trim(DATADIR), '/INPUT/U.nc'
-         write(netcdf_fileNames(4), '(A, A)') trim(DATADIR), '/INPUT/V.nc'
-         write(netcdf_fileNames(5), '(A, A)') trim(DATADIR), '/INPUT/W.nc'
-         write(netcdf_fileNames(6), '(A, A)') trim(DATADIR), '/INPUT/KH.nc'
-         write(netcdf_fileNames(7), '(A, A)') trim(DATADIR), '/INPUT/E.nc'
+         write(netcdf_fileNames(eSal), '(A, A)') trim(DATADIR), '/INPUT/S.nc'
+         write(netcdf_fileNames(eTemp), '(A, A)') trim(DATADIR), '/INPUT/T.nc'
+         write(netcdf_fileNames(eUx), '(A, A)') trim(DATADIR), '/INPUT/U.nc'
+         write(netcdf_fileNames(eVx), '(A, A)') trim(DATADIR), '/INPUT/V.nc'
+         write(netcdf_fileNames(eWx), '(A, A)') trim(DATADIR), '/INPUT/W.nc'
+         write(netcdf_fileNames(eKh), '(A, A)') trim(DATADIR), '/INPUT/KH.nc'
+         write(netcdf_fileNames(eE), '(A, A)') trim(DATADIR), '/INPUT/E.nc'
+      else if (Which_gridio .eq. 3) then
+         write(netcdf_fileNames(eSal), '(A, A)') trim(DATADIR), 'NA'  !No salinity input
+         write(netcdf_fileNames(eTemp), '(A, A)') trim(DATADIR), '/INPUT/T.nc'
+         write(netcdf_fileNames(eUx), '(A, A)') trim(DATADIR), '/INPUT/U.nc'
+         write(netcdf_fileNames(eVx), '(A, A)') trim(DATADIR), '/INPUT/V.nc'
+         write(netcdf_fileNames(eWx), '(A, A)') trim(DATADIR), '/INPUT/W.nc'
+         write(netcdf_fileNames(eKh), '(A, A)') trim(DATADIR), '/INPUT/Kh.nc'
+         write(netcdf_fileNames(eE), '(A, A)') trim(DATADIR), '/INPUT/E.nc'
+         write(netcdf_fileNames(eWind), '(A, A)') trim(DATADIR), '/INPUT/Wind.nc'
+         write(netcdf_fileNames(eRad), '(A, A)') trim(DATADIR), '/INPUT/Rad.nc'
       endif
 
-      do i=1,7
+
+      if (Which_gridio .eq. 1 .OR. Which_gridio .eq. 2) then  !EFDC and NCOM do not use Wind or Rad from NetCDF
+         fHv = 1;
+         lHv = 7;
+      else if (Which_gridio .eq. 3) then  !POM does not use Salinity
+         fHv = 2;
+         lHv = 9
+      endif
+      do i=fHv,lHv
         call open_netcdf(netcdf_fileNames(i), 0, hydro_info(i)%ncid)
         hydro_info(i)%fileName = netcdf_fileNames(i)
         call init_info(hydro_info(i))
@@ -131,7 +153,7 @@ write(6,*) "---Close_Hydro_NetCDF----"
 write(6,*)
 #endif
 
-      do i=1,7
+      do i=fHv,lHv
         call close_netcdf(hydro_info(i)%ncid)
       enddo
 

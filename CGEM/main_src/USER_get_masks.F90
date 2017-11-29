@@ -10,6 +10,9 @@
       !integer :: fm(im,jm,km)    ! land(0)/sea(1) mask 
       !integer :: wsm(im,jm)     ! shelf(0)/open ocean(1) mask
       integer i,j,k,nz
+      integer :: fmtemp(im,jm)  !temp array needed for reading in mask for POM grid
+      character(200) filename
+      character(80) fmt
 
 #ifdef map_code
 write(6,*) "---USER_get_masks---"
@@ -50,6 +53,24 @@ write(6,*)
               endif
          enddo
          enddo
+      else if (Which_gridio.eq.3) then !POM
+         ! Read in mask data
+         write(filename, '(A,A)') trim(DATADIR), '/mask.dat'
+         open(19, file=filename, status='old')
+         read(19,*) !Header
+         do j=1,jm
+           read(19,*) fmtemp(:,j)
+           do k=1,km
+             fm(:,:,k) = fmtemp
+           enddo
+         enddo
+         !update nza using mask data
+         do j=1,jm
+          do i=1,im 
+            nza(i,j) = INT(fm(i,j,1)*nza(i,j))
+          enddo
+         enddo
+         close(19)
       else
         write(6,*) "Which_gridio=",Which_gridio," does not exist."
         write(6,*) "Change in Which_gridio in Model_dim.txt to 0==0D, 1==EFDC, or 2==NCOM"
