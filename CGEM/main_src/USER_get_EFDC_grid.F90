@@ -35,7 +35,7 @@ write(6,*)
 
       do j=1,jm
        do i=1,im
-          area(i,j) = dx(i,j)*dy(i,j) *sdetg(i,j)
+          area(i,j) = dx(i,j)*dy(i,j) ! *sdetg(i,j)
        enddo
       enddo
 

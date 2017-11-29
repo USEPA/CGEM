@@ -112,6 +112,7 @@ write(6,*)
 ! -------------------------------------------------------------
       !if(ii.eq.1) write(6,*) Vol_prev(i,j,k)/Vol(i,j,k)
       !if(Vol(i,j,k).le.0) write(6,*) "Vol",i,j,k,Vol(i,j,k)
+#ifdef debug
       if(f_n(i,j,k,ii).lt.0)    then
              write(6,*) "f_n",ii,i,j,k,f_n(i,j,k,ii),fm(i,j,k)
           write(6,*) "cf",i,j,k,cf,f(i,j,k,ii),fm(i,j,k)
@@ -130,7 +131,7 @@ write(6,*)
        write(6,*) "wfp",i,j,k,wfp,f(i,j,kp1,ii),fm(i,j,kp1)
        stop
       endif
-
+#endif
 !      if(f(i,j,k,ii).lt.0.and.cf.ne.0)    write(6,*) "cf",i,j,k,cf,f(i,j,k,ii),fm(i,j,k)
 !      if(f(i-1,j,k,ii).lt.0.and.ufm.ne.0) write(6,*) "ufm",i,j,k,ufm,f(i-1,j,k,ii),fm(i-1,j,k)
 !      if(f(i+1,j,k,ii).lt.0.and.ufp.ne.0) write(6,*) "ufp",i,j,k,ufp,f(i+1,j,k,ii),fm(i+1,j,k)
