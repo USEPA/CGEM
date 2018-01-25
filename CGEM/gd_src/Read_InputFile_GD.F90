@@ -305,6 +305,9 @@ read(999,*) ws(JSU)   ! VSU
 
 ! --- sinking speed: converted from m/s downward positive to m/s negative
       ws = -ws
+      if(Which_Adv.eq.2.or.Which_adv.eq.3) ws = 0.
+      write(6,*) "Which_Adv=",Which_Adv
+      write(6,*) "Which_VMix=",Which_VMix
 
       return
 

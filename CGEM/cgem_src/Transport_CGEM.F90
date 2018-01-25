@@ -27,11 +27,7 @@
        !Advection and Vmixing
 
        !Needs to call advection because that is where sinking is:
-       if(Which_gridio.eq.1) then
-        call Adv3D_EFDC()
-       else
-        call Adv3D()
-       endif
+        call Adv3D() 
 
       !Multiply Kh by KH_coeff for h<30
         !L3...Fix this so it is only for h<30

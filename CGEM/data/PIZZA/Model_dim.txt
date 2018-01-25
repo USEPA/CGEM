@@ -1,8 +1,8 @@
-!Module Model_dim
-20  !INTEGER, PARAMETER :: IM
-33  !INTEGER, PARAMETER :: JM
+!Model_dim
+33  !INTEGER, PARAMETER :: IM
+20  !INTEGER, PARAMETER :: JM
 7  !INTEGER, PARAMETER :: nz_max
-1    !INTEGER, PARAMETER :: nospA =6
-2    !INTEGER, PARAMETER :: nospZ = 2
-1    !Which_gridio 0==fishtank 1==efdc 2==NCOM
-1970 !iYear0
+1  !INTEGER, PARAMETER :: nospA =6
+2  !INTEGER, PARAMETER :: nospZ = 2
+1  !Which_gridio 0==fishtank 1==efdc
+1970 !T0

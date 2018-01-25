@@ -8,13 +8,10 @@
        !Advection and Vmixing
        if(which_gridio.ne.0) then  
 
-       if(Which_gridio.eq.1) then
-        call Adv3D_EFDC()
-       else
         call Adv3D()
-       endif
       
         if(Which_VMix.ne.0) call VMixing()
+
        endif
 
        return

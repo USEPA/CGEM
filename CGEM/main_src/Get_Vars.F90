@@ -1,4 +1,4 @@
-       Subroutine Get_Vars(TC_8) 
+       Subroutine Get_Vars(TC_8,T_8) 
 
        USE Model_dim
        USE INPUT_VARS, ONLY: START_SECONDS,&
@@ -9,7 +9,7 @@
 
        IMPLICIT NONE
 
-       integer(kind=8), intent(in) :: TC_8 ! Current time in seconds since Model_dim::iYr0.
+       integer(kind=8), intent(in) :: TC_8,T_8 ! Current time in seconds since Model_dim::iYr0.
        integer(kind=8) :: TC_in
        integer, save :: init=1
        integer i,j,k
@@ -53,7 +53,8 @@
           call interpVar(hydro_info(eVx), TC_8, startIndex(eVx), Vx)   
           call interpVar(hydro_info(eWx), TC_8, startIndex(eWx), Wx)   
           call interpVar(hydro_info(eKh), TC_8, startIndex(eKh), Kh)   
-          call interpVar(hydro_info(eE), TC_8, startIndex(eE), E)  
+!          call interpVar(hydro_info(eE), TC_8, startIndex(eE), E)  
+          call interpVar(hydro_info(eE), T_8, startIndex(eE), E)
 
           if (Which_gridio.eq.3) then
             call interpVar(hydro_info(eRad), TC_8, startIndex(eRad), Rad)

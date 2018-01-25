@@ -17,12 +17,13 @@
         do i=1,im
           nz=nza(i,j)
           do k=1,nz
-           dumf(i,j,k,iTr) = f(i,j,k,iTr) * Vol(i,j,k)
+            dumf(i,j,k,iTr) = f(i,j,k,iTr) * Vol(i,j,k)
           enddo
          enddo
         enddo
 
         CALL WRITE_DATA( im, jm, km, nf, istep_out, dumf)
+
 
       return
 

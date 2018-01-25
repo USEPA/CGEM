@@ -223,10 +223,11 @@ CONTAINS
 
   ! Define a real 4D variable in a NetCDF file.
   !
-  SUBROUTINE DEFVR4( FILEID, DIMIDS, VARID, VARNAM, VARDES, UNITS )
+  SUBROUTINE DEFVR4( FILEID, DIMIDS, VARID, VARNAM, VARDES, UNITS, IS_POSITIVE )
     IMPLICIT NONE
     INTEGER,INTENT(IN):: FILEID
     INTEGER,DIMENSION(4),INTENT(IN):: DIMIDS
+    INTEGER :: IS_POSITIVE  !=1 if valid range is positive only
     INTEGER,INTENT(OUT):: VARID
     CHARACTER(LEN=*),INTENT(IN):: VARNAM, VARDES, UNITS
     ! Externals:
@@ -241,7 +242,11 @@ CONTAINS
     INTEGER ERR
 
     ERR = NF_DEF_VAR( FILEID, VARNAM, 5, 4, DIMIDS, VARID )
-    ERR = nf_put_att_real(fileid, VARID, "valid_range", 5, 2, (/ 0., 1.e38 /))
+    if(is_positive.eq.1) then
+       ERR = nf_put_att_real(fileid, VARID, "valid_range", 5, 2, (/ 0., 1.e38 /))
+    else
+       ERR = nf_put_att_real(fileid, VARID, "valid_range", 5, 2, (/ -1.e2, 1.e38 /))
+    endif
 
     CALL CHKERR( ERR, 'create variable ' // VARNAM )
     CALL DEFVAR( FILEID, VARID, VARNAM, VARDES, UNITS )

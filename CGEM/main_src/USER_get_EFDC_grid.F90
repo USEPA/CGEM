@@ -5,7 +5,8 @@
       USE Grid
       USE INPUT_VARS, Only:icent,jcent 
 
-      real, dimension(im,jm) :: dx, dy, sdetg
+!      real, dimension(im,jm) :: dx, dy, sdetg
+      real, dimension(im,jm) :: sdetg
       integer :: i,j
       character(200) filename
 #ifdef map_code
@@ -18,34 +19,41 @@ write(6,*)
       read(19,*) !dx
       do j=1,jm
          read(19,*) dx(:,j)
+      !   write(6,*) j,dx(:,j)
       enddo
       read(19,*) !dy
       do j=1,jm
          read(19,*) dy(:,j)
+      !   write(6,*) j,dy(:,j)     
       enddo
       close(19)
 
       write(filename,'(A, A)') trim(DATADIR),'/lxly.dat'
       open(19,file=filename,status='old')
       read(19,*) !sqrt(det(g))
-      do j=1,jm
-         read(19,*) sdetg(:,j)
+      do i=1,im
+         read(19,*) sdetg(i,:)
       enddo
 
 
       do j=1,jm
        do i=1,im
-          area(i,j) = dx(i,j)*dy(i,j) ! *sdetg(i,j)
+          if(nza(i,j)>0) then
+          area(i,j) = dx(i,j)*dy(i,j) !*sdetg(i,j)
+      !    write(6,*) "area",i,j,area(i,j),area(i,j)*sdetg(i,j)
+          !write(6,*) "area*g",area(i,j)*sdetg(i,j)
+          endif
        enddo
       enddo
 
+      !stop
 
       return
 
       end subroutine USER_get_EFDC_grid
 
 
-      subroutine USER_update_EFDC_grid(TC_8)
+      subroutine USER_update_EFDC_grid(TC_8,T_8)
 
       USE Fill_Value
       USE Model_dim
@@ -54,7 +62,7 @@ write(6,*)
       IMPLICIT NONE
 
       integer :: i,j,k, nz
-      integer(kind=8) :: TC_8
+      integer(kind=8) :: TC_8,T_8
       integer, save :: init=1
       real x
 #ifdef map_code
@@ -66,8 +74,11 @@ init=0
 endif
 #endif
 
-      call interpVar(grid_info(eColDepth), TC_8, gridStartIndex(eColDepth), depth)
-      call interpVar(grid_info(eCellDepth), TC_8, gridStartIndex(eCellDepth), dz)
+!      call interpVar(grid_info(eColDepth), TC_8, gridStartIndex(eColDepth), depth)
+!      call interpVar(grid_info(eCellDepth), TC_8, gridStartIndex(eCellDepth), dz)
+      call interpVar(grid_info(eColDepth), T_8, gridStartIndex(eColDepth), depth)
+      call interpVar(grid_info(eCellDepth), T_8, gridStartIndex(eCellDepth), dz)
+
 
       d = fill(0) 
       d_sfc = fill(0) 

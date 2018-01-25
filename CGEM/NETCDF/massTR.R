@@ -7,12 +7,15 @@ cat("This only works for cgem or gomdom efdc\n")
 ncfile<-"cgem.000000.nc"
 pdfname2<-"efdc"
 Var<-"Tr"
-im <- 20
-jm <- 33
+im <- 33
+jm <- 20
 km <- 7
 
 
 if(length(args)==0){       #Default cgem
+ncfile<-"cgem.000000.nc"
+pdfname1<-"cgem"
+Var<-"Tr"
 
 }else if (length(args)>=1){
 

@@ -33,7 +33,7 @@
 ! Declare Variables:    
 !---------------------
       integer, parameter :: exit_code = 0   ! Status 0 when run is successful 
-      integer(kind=8) :: TC_8 ! Current time in seconds since Model_dim::iYr0.
+      integer(kind=8) :: T_8,TC_8 ! Current time in seconds since Model_dim::iYr0.
       integer  :: istep, istep_out
       character(120) input_filename         !Input file
       character(120) init_filename         !Initial conditions file
@@ -63,19 +63,20 @@
 ! Check to see if we can just use START-dT or move the time increment to
 ! the bottom of the loop.
 
+      T_8 = START_SECONDS 
       TC_8 = START_SECONDS - (dT / 2) ! Subtract half dT to 'center' of timestep.
       if (Which_gridio .gt. 0) then
         call Init_Hydro_NetCDF()
       endif
   
-      call Get_Vars(TC_8) !Hydro for initial timestep 
+      call Get_Vars(TC_8,T_8) !Hydro for initial timestep 
 
 ! Initialize time an loop variables
       istep = 0
       istep_out = 0
 
       if (Which_gridio.eq.1) then
-        call USER_update_EFDC_grid(TC_8)
+        call USER_update_EFDC_grid(TC_8,T_8)
       else if (Which_gridio.eq.2) then
         call USER_update_NCOM_grid()
       else if (Which_gridio.eq.3) then
@@ -88,6 +89,9 @@
       call USER_get_masks()
 
       call Set_Vars(Which_code,init_filename) !initialize 'f' array
+!write(6,*) "---After Set_Vars"
+!write(6,*) "f(i19)",f(20,4,1:km,1)
+
 !      f(1,1,1,22) = 1/Vol(1,1,1)
 !      f(1,1,2,22) = 2/Vol(1,1,1)
 !      f(1,1,3,22) = 3/Vol(1,1,1)
@@ -97,6 +101,9 @@
 !      f(1,1,7,22) = 7/Vol(1,1,1)
 
 
+       !f(:,:,:,1) = 1/Vol(:,:,:)
+       !f(6,25,1,1) = f(6,25,1,1) + 10.*f(6,25,1,1) 
+
 #ifdef DEBUG_ADDBLIP
       write(6,*) "f(60,120,1,10) = ", f(60,120,1,10)
       f(60,120,1,10) = 500.0
@@ -104,6 +111,8 @@
 #endif
 
       call Initialize_Output(Which_code,BASE_NETCDF_OUTPUT_FILE_NAME)     !Open file and write initial configuration
+!write(6,*) "---After Init Output"
+!write(6,*) "f(i19)",f(20,4,1:km,1)
 
 #ifdef DEBUG_VMIX
    write(6,*) "f(60,2,1,10)= ", f(60,2,1,10)
@@ -120,12 +129,13 @@
 !-------------- START TIME LOOP -----------------------------------
       do istep = 1, nstep
        TC_8 = TC_8 + dT
+       T_8 = T_8 + dT
 #ifdef DEBUG_TIME
    write(6,*) "TC_8=", TC_8
 #endif
       if (Which_gridio.eq.1) then
         Vol_prev = Vol
-        call USER_update_EFDC_grid(TC_8)
+        call USER_update_EFDC_grid(TC_8,T_8)
       elseif (Which_gridio.eq.2) then
         Vol_prev = Vol
         call USER_update_NCOM_grid()
@@ -134,7 +144,7 @@
         call USER_update_POM_grid()
       endif
 
-       call Get_Vars(TC_8) !Hydro, Solar, Wind, Temp, Salinity
+       call Get_Vars(TC_8,T_8) !Hydro, Solar, Wind, Temp, Salinity
 
 !L3 add when necessary       call USER_update_masks()
 
@@ -148,12 +158,20 @@ write(6,*) "f(i19)",f(1,1,1:km,19)
     
        call Flux(Which_code,istep)
 
+!write(6,*) "---Before Flux"
+!write(6,*) "f(i19)",f(20,4,1:km,1)
+
 #ifdef DEBUG
 write(6,*) "---After Flux"
 write(6,*) "f(i19)",f(1,1,1:km,19)
 write(6,*) 
 #endif
 
+!write(6,*) "---Before Transport"
+!write(6,*) "f(i19)",f(20,4,1:km,1)
+
+!       write(6,*) "step_out",istep_out
+!       write(6,*) "istep=",istep
        call Transport(Which_code)
 
 #ifdef DEBUG

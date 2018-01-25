@@ -5,9 +5,9 @@
 
       real, intent (out) :: dz(im,jm,km)     !cell depth
       real, intent (out) :: d(im,jm,km)      !depth from surface to bottom of cell
-      real, intent (out) :: depth(im,jm)      !total depth of column
+      real, intent (out) :: depth(im,jm)     !total depth of column
       real, intent (out) :: d_sfc(im,jm,km)  !depth from surface to cell center
-      real, intent (out) :: dxdy(im,jm)       !area of cell
+      real, intent (out) :: dxdy(im,jm)      !area of cell
       real, intent (out) :: Vol(im,jm,km)    !Volume of cell
       real :: dx(im,jm), dy(im,jm)
       integer :: i,j,k,nz

@@ -443,7 +443,7 @@ write(6,*) VARIABLE,VARIABLE_NAMES(VARIABLE),VARIABLE_DESCRIPTIONS( VARIABLE),VA
         CALL DEFVR4( FILE_ID, DIM_IDS, F_VAR( VARIABLE ), &
                      TRIM( VARIABLE_NAMES( VARIABLE ) ), &
                      TRIM( VARIABLE_DESCRIPTIONS( VARIABLE ) ), &
-                     TRIM( VARIABLE_UNITS( VARIABLE ) ) )
+                     TRIM( VARIABLE_UNITS( VARIABLE ) ),1 )
       END IF
     END DO
 
@@ -464,7 +464,7 @@ write(6,*) "After Vars"
         CALL DEFVR4( FILE_ID, DIM_IDS, EXTRA_VAR( VARIABLE ), &
                    TRIM( EXTRA_VARIABLE_NAMES( VARIABLE ) ), &
                    TRIM( EXTRA_VARIABLE_DESCRIPTIONS( VARIABLE ) ), &
-                   TRIM( EXTRA_VARIABLE_UNITS( VARIABLE ) ) )
+                   TRIM( EXTRA_VARIABLE_UNITS( VARIABLE ) ),1 )
       END IF
     END DO
 #ifdef DEBUG

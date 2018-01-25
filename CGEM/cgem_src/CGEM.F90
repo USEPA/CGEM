@@ -218,6 +218,11 @@
 !For calibration
     real O2_total
 
+    real, dimension(im,jm,km) :: new_ux, new_vx, new_wx
+
+
+!#ifdef CGEM_MAIN
+
     !fill(1) is for -9999
     fill_val=fill(1)
 
@@ -240,7 +245,15 @@
   uA_ijk =  fill_val
   uSi_ijk =  fill_val
 
-       dTd = dT/SDay           ! Timestep length in units of days
+       do j=1,jm
+        do i=1,im
+         nz = nza(i,j)
+          do k=1,nz
+           dTd = dT/SDay!*Vol_prev(i,j,k)/Vol(i,j,k)           ! Timestep length in units of days
+          enddo
+        enddo
+       enddo
+
        StepsPerDay = SDay / dT ! Time steps in a day
 
        ! Initialize previous day's irradiance for Chl:C calculation
@@ -330,6 +343,11 @@
       select case (Which_chlaC)
       case (1) ! Use fixed C:Chla 
          Chla_tot_k = Fixed_CChla(A_k,nz)
+         do k=1,nz
+                if(Chla_tot_k(k).le.0) then
+                    write(6,*) "le 0",k,Chla_tot_k(k),A_k(:,k)
+                endif
+         enddo
 
       case (2) ! Use Cloern Chl:C ratio
          Chla_tot_k = Chla_Cloern(A_k, Qn_k, Qp_k, N_k, P_k, Si_k, T_k, aDailyRad_k,Chl_C_k,nz)
@@ -416,6 +434,14 @@
          case (1)! Upgraded form of the underwater light model
                  ! developed by Brad Penta of NRL is used
                  !--------------------------------------------
+
+                do k=1,nz
+                  do isp=1,nospA
+                  if( A_k(isp,k) .lt. 0 ) then
+                    write(6,*) "A_k le 0,Chla,A_k",k,Chla_tot_k(k),A_k(isp,k)
+                  endif
+                  enddo
+                enddo
 
                  call Call_IOP_PAR(                                    &
                  & PARsurf    , SunZenithAtm,                          &
@@ -1267,11 +1293,25 @@ enddo
          enddo
          enddo
 !-- End Main GEM Calculations ---------------------------------------------------
-
+!#endif
 !-- Call "Extra" variables for netCDF --------------------------------------------------------
 !--------------------------------------------------------
   ! -- do initialization of first timestep:
       if (   istep .eq. 1 ) then
+
+         new_ux = fill(0) 
+         new_vx = fill(0) 
+         new_wx = fill(0)
+         do j = 1,jm
+         do i = 1,im
+                do k = 1,nza(i,j)
+                new_ux(i,j,k) = ux(i,j,k)
+                new_vx(i,j,k) = vx(i,j,k)
+                new_wx(i,j,k) = wx(i,j,k)
+                enddo
+         enddo
+         enddo
+
                  CALL WRITE_EXTRA_DATA( im, jm, km, EXTRA_VARIABLES, nospA, 0, &
                                      PARdepth_ijk, &
                                   PAR_percent_ijk, &
@@ -1292,11 +1332,24 @@ enddo
                                        Chl_C_ijk,  &
                                               pH,  &
                                          RN2_ijk,  &
-                                         RO2_ijk )
+                                         RO2_ijk,  &
+                                         new_Ux,new_Vx,new_Wx   )
      endif  !end of "if (mod(istep,iout).eq.0)" block if
 
   ! --- dump output when istep is a multiple of iout
       if (  mod( istep, iout ) .eq. 0 ) then
+         new_ux = fill(0)
+         new_vx = fill(0)
+         new_wx = fill(0)
+         do j = 1,jm
+         do i = 1,im
+                do k = 1,nza(i,j)
+                new_ux(i,j,k) = ux(i,j,k)
+                new_vx(i,j,k) = vx(i,j,k)
+                new_wx(i,j,k) = wx(i,j,k)
+                enddo
+         enddo
+         enddo
                  CALL WRITE_EXTRA_DATA( im, jm, km, EXTRA_VARIABLES, nospA, istep_out+1, &
                                      PARdepth_ijk, &
                                   PAR_percent_ijk, &
@@ -1317,7 +1370,8 @@ enddo
                                        Chl_C_ijk,  &
                                               pH,  &
                                           RN2_ijk, &
-                                         RO2_ijk )
+                                         RO2_ijk,  &
+                                           new_Ux,new_Vx,new_Wx )
      endif  !end of "if (mod(istep,iout).eq.0)" block if
 
 

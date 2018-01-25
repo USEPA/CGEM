@@ -46,6 +46,7 @@ write(6,*) "---Allocate_Hydro----"
 write(6,*) "  Allocate and fill these vars:"
 write(6,*) "  S,T,Wind,Rad,Ux,Vx,Wx,Kh,E"
 write(6,*) 
+write(6,*) "Variables allocated for im,jm,nsl=",im,jm,nsl
 #endif
 
       ALLOCATE(S(im,jm,nsl))
@@ -63,12 +64,12 @@ write(6,*)
       T=fill(0) 
       Wind=fill(0)  
       Rad=fill(0) 
-      !Ux=fill(0)
-      !Vx=fill(0)  
-      !Wx=fill(0)
-      Ux = 0.0
-      Vx = 0.0
-      Wx = 0.0 
+      Ux=fill(0)
+      Vx=fill(0)  
+      Wx=fill(0)
+      !Ux = 0.0
+      !Vx = 0.0
+      !Wx = 0.0 
       Kh=fill(0)
       E=fill(0) 
 

@@ -7,8 +7,8 @@
 
       IMPLICIT NONE
  
-      real, dimension(im,jm) :: dx
-      real, dimension(im,jm) :: dy
+!      real, dimension(im,jm) :: dx
+!      real, dimension(im,jm) :: dy
       real, dimension(jm) :: dxy
       integer :: i,j,k
       character(200) filename

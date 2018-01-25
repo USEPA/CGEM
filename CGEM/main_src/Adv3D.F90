@@ -18,7 +18,7 @@
       real :: f_n(im,jm,km,nf) 
 
 ! --- transports
-      real :: w_wsink(im,jm,nsl)
+      real :: w_wsink(im,jm,km+1)
 
 ! --- tmp
       integer :: im1,ip1,jm1,jp1,km1
@@ -31,7 +31,7 @@ write(6,*) "  Which_adv=",Which_adv
 write(6,*) 
 #endif
 
-      if(Which_Adv.eq.0) then
+      if(Which_Adv.eq.0.or.Which_Adv.eq.2) then
        ux=0.
        vx=0.
        wx=0.
@@ -81,6 +81,7 @@ write(6,*)
 
         vfm = amax1( vx(i  ,j,k),0.)
         vfp = amax1(-vx(i,jp1,k),0.)
+
         wfm = amax1(-w_wsink(i,j,k  ),0.)       ! p0/np
         wfp = amax1( w_wsink(i,j,k+1),0.)       ! pp/n0
 !                   p0/nn             pn/n0
@@ -93,23 +94,37 @@ write(6,*)
      &       +( cf*f(i,j,k,ii)                                  &
      &         +( ( (ufm*f(im1,j,k,ii)+ufp*f(ip1,j,k,ii))       &
      &             +(vfm*f(i,jm1,k,ii)+vfp*f(i,jp1,k,ii)) )     &
-     &           +(wfm*f(i,j,km1,ii)+wfp*f(i,j,k+1,ii))) ) *dT  &
+     &           +(wfm*f(i,j,km1,ii)+wfp*f(i,j,min(k+1,nz),ii))) ) *dT  &
      &      ) /Vol(i,j,k)
 ! -------------------------------------------------------------
-      !if(ii.eq.1) write(6,*) Vol_prev(i,j,k)/Vol(i,j,k)
-      !if(Vol(i,j,k).le.0) write(6,*) "Vol",i,j,k,Vol(i,j,k)
-      !if(f(i,j,k,ii).lt.0.and.cf.ne.0)    write(6,*) "cf",i,j,k,cf,f(i,j,k,ii),fm(i,j,k)
-      !if(f(i-1,j,k,ii).lt.0.and.ufm.ne.0) write(6,*) "ufm",i,j,k,ufm,f(i-1,j,k,ii),fm(i-1,j,k)
-      !if(f(i+1,j,k,ii).lt.0.and.ufp.ne.0) write(6,*) "ufp",i,j,k,ufp,f(i+1,j,k,ii),fm(i+1,j,k)
-      !if(f(i,j-1,k,ii).lt.0.and.vfm.ne.0) write(6,*) "vfm",i,j,k,vfm,f(i,j-1,k,ii),fm(i,j-1,k)
-      !if(f(i,j+1,k,ii).lt.0.and.vfp.ne.0) write(6,*) "vfp",i,j,k,vfp,f(i,j+1,k,ii),fm(i,j+1,k)
-      !if(f(i,j,km1,ii).lt.0.and.wfm.ne.0) write(6,*) "wfm",i,j,k,wfm,f(i,j,km1,ii),fm(i,j,km1)
-      !if(f(i,j,k+1,ii).lt.0.and.wfp.ne.0) write(6,*) "wfp",i,j,k,wfp,f(i,j,k+1,ii),fm(i,j,k+1)
+       if(f_n(i,j,k,ii).lt.0) then
+           write(6,*) "f_n(ii,i,j,k) lt zero",ii,i,j,k,f_n(i,j,k,ii)
+           write(6,*) "f,Vol_prev,V/V",f(i,j,k,ii),Vol_prev(i,j,k),Vol_prev(i,j,k)/Vol(i,j,k)
+           write(6,*) "ufm,ufp,vfm,vfp,wfm,wfp",ufm,ufp,vfm,vfp,wfm,wfp
+           write(6,*) "cf,cfh",cf,cfh
+           write(6,*) (ux(i,j,k)-ufm),(ux(ip1,j,k)+ufp),(ux(i,j,k)-ufm) - (ux(ip1,j,k)+ufp)
+           write(6,*) (vx(i,j,k)-vfm),(ux(i,jp1,k)+vfp),(vx(i,j,k)-vfm) - (vx(i,jp1,k)+vfp)
+           write(6,*) "cf_wterms",w_wsink(i,j,k+1),w_wsink(i,j,k),(w_wsink(i,j,k+1)-wfp)-(w_wsink(i,j,k)+wfm)
+           write(6,*) "u,v,w",ux(i,j,k),vx(i,j,k),w_wsink(i,j,k)
+           write(6,*) "u,v,w:p1",ux(ip1,j,k),vx(i,jp1,k),w_wsink(i,j,k+1)
+           write(6,*) "V,Vip1",Vol(i,j,k),Vol(ip1,j,k)
+           write(6,*) "V,Vjp1",Vol(i,j,k),Vol(i,jp1,k)
+           write(6,*) "ufm*fm1,ufp*fp1",ufm*f(im1,j,k,ii),ufp*f(ip1,j,k,ii)
+           write(6,*) "vfm*fm1,vfp*fp1",vfm*f(i,jm1,k,ii),vfp*f(i,jp1,k,ii)
+           write(6,*) "wfm*fm1,wfp*fp1",wfm*f(i,j,km1,ii),vfp*f(i,j,min(k+1,nz),ii)
+           write(6,*)
+           write(6,*) "u",ux(i-2,j,k),ux(im1,j,k),ux(i,j,k),ux(ip1,j,k),ux(i+2,j,k)
+           write(6,*) "u_mps",ux(im1,j,k)*dx(im1,j)/Vol(im1,j,k),ux(i,j,k)*dx(i,j)/Vol(i,j,k),ux(ip1,j,k)*dx(ip1,j)/Vol(ip1,j,k)
+           write(6,*) "v",vx(i,j-2,k),vx(i,jm1,k),vx(i,j,k),vx(i,jp1,k),vx(i,j+2,k)
+           write(6,*) "v_mps",vx(i,jm1,k)*dy(i,jm1)/Vol(i,jm1,k),vx(i,j,k)*dy(i,j)/Vol(i,j,k),vx(i,jp1,k)*dy(i,jp1)/Vol(i,jp1,k)
+           write(6,*) "w",wx(i,j,km1),wx(i,j,k),wx(i,j,k+1)
+           write(6,*) "w_mps",wx(i,j,km1)*dz(i,j,km1)/Vol(i,j,km1),wx(i,j,k)*dz(i,j,k)/Vol(i,j,k),wx(i,j,k+1)*dz(i,j,min(k+1,nz))/Vol(i,j,min(k+1,nz))
+           stop
+       endif
       end do ! k = 1, nz
       end do !i
       end do !j
       end do   ! ii = 1,nf
-      !stop
 
 ! update f for the current timestep
          do j = 1,jm
@@ -117,7 +132,7 @@ write(6,*)
             nz = nza(i,j)
           do k=1,nz
              f(i,j,k,:) = f_n(i,j,k,:)
-         enddo
+          enddo
          enddo
          enddo
 

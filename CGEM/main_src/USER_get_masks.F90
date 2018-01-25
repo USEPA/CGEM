@@ -7,7 +7,7 @@
 #endif
       IMPLICIT NONE
 
-      !integer :: fm(im,jm,km)    ! land(0)/sea(1) mask 
+      integer :: fm_save(im,jm,km)    ! land(0)/sea(1) mask 
       !integer :: wsm(im,jm)     ! shelf(0)/open ocean(1) mask
       integer i,j,k,nz
       integer :: fmtemp(im,jm)  !temp array needed for reading in mask for POM grid
@@ -26,19 +26,40 @@ write(6,*) "  =", nza(icent,jcent),fm(icent,jcent,km),wsm(icent,jcent),depth(ice
 write(6,*) 
 #endif
 
+      fm_save = 0.
+      fm = 0.
+
       if(Which_gridio.eq.0) then !FishTank
          fm  = 1.  !Everything is water
          wsm = 0  !Everything is on the shelf
       else if(Which_gridio.eq.1) then !EFDC
+
          do j=1,jm
           do i=1,im
             nz = nza(i,j)
             do k=1,nz
-               fm(i,j,k) = 1.  
+               fm_save(i,j,k) = 1. 
+               fm(i,j,k) = 1.
             enddo
             !Need mask for shelf if there is open ocean.
           enddo
          enddo
+
+         do j=2,(jm-1)
+         do i=1,im
+            nz = nza(i,j)
+            if(fm_save(i,j-1,1).eq.0) fm(i,j,:) = 0
+!            do k=1,nz
+!               if(fm_save(i,j,k).gt.0) then
+!                  if(int(fm_save(i,j-1,k)).eq.0) fm(i,j,k) = 0
+!                  if(int(fm_save(i,j+1,k)).eq.0) fm(i,j,k) = 0
+                  !if(int(fm_save(i,j-1,k)).eq.0.and.int(fm_save(i,j+1,k)).eq.0) fm(i,j,k) = 0
+!               endif
+         ! write(6,*) i,j,k,fm(i,j,k)
+!         enddo
+         enddo
+         enddo
+        !stop
       else if(Which_gridio.eq.2) then !NCOM 
          do j=1,jm
          do i=1,im

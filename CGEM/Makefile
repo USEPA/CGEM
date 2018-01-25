@@ -19,13 +19,13 @@
 #CFLAGS = -Dtest1d
 #DFLAGS = -DSDM_DEBUG 
 #DFLAGS = -DDEBUG_LIGHT
-#DFLAGS = -Dmap_code -DDEBUG #-DDEBUG_GRID#-DDEBUG
+#DFLAGS = -Dmap_code -g -Wall -Wextra -fbacktrace #-DDEBUG #-DDEBUG_GRID#-DDEBUG
 
 
 ### Build options for specific platforms. 
 ### LIBS has path to netCDF
-SOL_INC	  = -I. -I/usr/local/apps/netcdf-4.3.3/intel-15.0/include/
-SOL_LIBS  = -L/usr/local/apps/netcdf-4.3.3/intel-15.0/lib -lnetcdff -lnetcdf
+#IRIS_INC	  = -I. -I/usr/local/apps/netcdf-4.4.0/intel-15.0/include/
+#IRIS_LIBS  = -L/usr/local/apps/netcdf-4.4.0/intel-15.0/lib -lnetcdff -lnetcdf
 
 IRIS_INC  = -I. -I/usr/local/apps/netcdf-4.4.0/gcc-4.4.7/include/
 IRIS_LIBS = -L. -L/usr/local/apps/netcdf-4.4.0/gcc-4.4.7/lib/ -lnetcdff -lnetcdf
@@ -52,7 +52,7 @@ MY_HOST	  = $(shell hostname)
 ifeq (iris,$(findstring iris,$(MY_HOST)))
   INC	   = $(IRIS_INC)
   LIBS	   = $(IRIS_LIBS)
-  F90      = gfortran #ifort
+  F90      = gfortran #ifort #gfortran
   FFLAGS = -ffree-line-length-none #-Warn all -traceback #-check -debug -g       #-g -fbacktrace -Wall -ffree-line-length-none
   FFLAGS_SDM = -O3 
 else 

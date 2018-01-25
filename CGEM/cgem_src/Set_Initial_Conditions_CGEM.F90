@@ -29,14 +29,25 @@
         do j=1,jm
         do i=1,im
         do k=1,nza(i,j)
+        !f(i,j,k,:)= f(i,j,k,:)/Vol(i,j,k)*Vol(25,16,3)
         f(i,j,k,iTr) = 1./Vol(i,j,k)
+!        write(6,*) "i,j,k,vol",i,j,k,Vol(i,j,k)
         enddo
         enddo
         enddo
+
 
        elseif(InitializeHow.eq.1) then !Salinity Regression Equations
 
         call Salinity_Regression_Init_CGEM()
+
+        do j=1,jm
+        do i=1,im
+        do k=1,nza(i,j)
+        f(i,j,k,iTr) = 1./Vol(i,j,k)
+        enddo
+        enddo
+        enddo
 
        else
           write(6,*) "Unknown, InitializeHow=",InitializeHow," exiting"

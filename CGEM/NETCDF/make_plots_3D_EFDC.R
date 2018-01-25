@@ -21,4 +21,7 @@ if(args[1]=="gomdom"){
 
 }
 
+#pdf_layout <- c(2,1)
+
 source("allvars_3D_EFDC.R")
+#source("twovars_3D_EFDC.R")

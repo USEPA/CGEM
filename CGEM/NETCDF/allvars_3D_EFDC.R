@@ -33,6 +33,7 @@ time <- ncvar_get(nc,"time")
 iYr0 <- ncatt_get(nc,0,attname="iYr0")$value
 time<- as.POSIXct(time, origin=paste(iYr0,"-01-01",sep=""), tz="GMT")
 tt <- length(time)
+#tt<-30
 
 if(!exists("pdfname")){
 if(which_eqs=="cgem") pdfname="cgem_1D.pdf"
@@ -42,8 +43,10 @@ if(which_eqs=="gomdom") pdfname="gomdom_1D.pdf"
 pdf(file=pdfname)
 
 k_layers <- c(1,3,5,7)
+#k_layers <- c(5,3,1)
 n_layers <- length(k_layers)
 label <- paste("k=1,3,5,7")
+#label <- paste("k=1,3,5")
 
 if(!exists("pdf_layout")){
 pdf_layout <- c(4,4)
@@ -57,15 +60,16 @@ colorlist <- c("black","red","blue","green","purple","orange","yellow","pink","b
 
  for(i in 1:nvars){
 
- rdata <- ncvar_get(nc,Var[i],start=c(15,25,k_layers[1],1),count=c(1,1,1,tt))
+ rdata <- ncvar_get(nc,Var[i],start=c(22,8,k_layers[1],1),count=c(1,1,1,tt))
  unit <- ncatt_get(nc,Var[i],attname="units")$value
- ymax <- max(rdata)
+ rdata[is.infinite(rdata)]<-NA
+ ymax <- max(rdata,na.rm=TRUE)
  ymax <- ymax + 0.1*ymax
- timeseries_plot(Var[i],time,rdata,unit,label=label,range=c(0,ymax))
+ timeseries_plot(Var[i],time[1:tt],rdata,unit,label=label,range=c(0,ymax))
  if(n_layers >= 2){
  for(j in 2:n_layers){
-  rdata <- ncvar_get(nc,Var[i],start=c(15,25,k_layers[j],1),count=c(1,1,1,tt))
-  timeseries_addlines(Var[i],time,rdata,color=colorlist[j])
+  rdata <- ncvar_get(nc,Var[i],start=c(22,8,k_layers[j],1),count=c(1,1,1,tt))
+  timeseries_addlines(Var[i],time[1:tt],rdata,color=colorlist[j])
   }
  }
 

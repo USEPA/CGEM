@@ -50,7 +50,6 @@ MAIN_OBJ  =  fillval.o\
 	WQ_Model.o\
 	Transport.o\
 	Adv3D.o\
-        Adv3D_EFDC.o\
         VMixing.o\
 	Model_Output.o\
 	Model_Finalize.o
