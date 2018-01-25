@@ -10,12 +10,12 @@ cat("If it doesn't work, specify cgem or gomdom at the command line.\n")
 if(args[1]=="gomdom"){
  which_eqs <- "gomdom"
  ncfile <- "gomdom.000000.nc"
- pdfname <- "gomdom_3D.pdf"
+ pdfname <- "gomdom_3D.efdc.pdf"
  pdf_layout <- c(4,4) 
 } else {
  which_eqs <- "cgem"
  ncfile <- "cgem.000000.nc"
- pdfname <- "cgem_3D.pdf"
+ pdfname <- "cgem_3D.efdc.pdf"
  pdf_layout <- c(4,4)
 }
 
