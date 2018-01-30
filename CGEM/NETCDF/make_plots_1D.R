@@ -30,6 +30,6 @@ if(args[1]=="gomdom"){
 
 source("allvars_1D.R")
 
-#pdfname <- pdfname2
-#pdf_layout <- c(2,3) 
-#source("allvars_1D_depth.R")
+pdfname <- pdfname2
+pdf_layout <- c(2,3) 
+source("allvars_1D_depth.R")
