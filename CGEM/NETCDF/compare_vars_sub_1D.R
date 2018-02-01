@@ -40,7 +40,7 @@ nvars <- length(Var)
 Var <- names(nc$var)
 Var <- Var[Var != "Tr"]
 nvars <- length(Var)
-Var <- Var[firsts:(nvars-2)]
+Var <- Var[firsts:(nvars)]
 nvars <- length(Var) 
 }
 

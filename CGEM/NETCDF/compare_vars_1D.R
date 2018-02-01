@@ -43,7 +43,7 @@ firsts <- 6
 if(which_eqs=="gomdom"){
 Var <- Var[firsts:(nvars)]
 }else{
-Var <- Var[firsts:(nvars-2)]
+Var <- Var[firsts:(nvars)]
 }
 
 nvars <- length(Var) 

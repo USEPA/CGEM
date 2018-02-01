@@ -9,15 +9,15 @@ cat("If it doesn't work, specify cgem or gomdom at the command line.\n")
 
 if(args[1]=="gomdom"){
  which_eqs <- "gomdom"
- ncfile <- "monod.nc"
- ncfile2 <- "newpars_droop.nc"
- pdfname <- "monod_vs_newparsdroop.pdf"
+ ncfile <- "gomdom.000000.nc"
+ ncfile2 <- "gomdom.noflux.nc"
+ pdfname <- "gomdom.w_woflux.pdf"
  pdf_layout <- c(4,4) 
 } else {
  which_eqs <- "cgem"
- ncfile <-  "original.nc"
- ncfile2 <- "cgem.000000.nc"
- pdfname <- "cgem.compare.pdf"
+ ncfile <-  "cgem.000000.nc"
+ ncfile2 <- "cgem.noflux.nc"
+ pdfname <- "cgem.w_woflux.pdf"
  pdf_layout <- c(4,4)
 }
 
@@ -25,11 +25,11 @@ if(args[1]=="gomdom"){
 
 source("compare_vars_1D.R")
 if(args[1]=="gomdom"){
-pdfname <- "monod_vs_newparmsdroop_pdiff.pdf"
-pdfname1 <- "gd_depth.pdf"
+pdfname <- "gomdom_pdiff.pdf"
+pdfname2 <- "gd.w_woflux_depth.pdf"
 }else{
 pdfname <- "cgem_pdiff.pdf"
-pdfname2 <- "cgem_depth.pdf"
+pdfname2 <- "cgem.w_woflux_depth.pdf"
 }
 source("compare_vars_sub_1D.R")
 
