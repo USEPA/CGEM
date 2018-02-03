@@ -65,11 +65,13 @@
 !----------------------------------------------------------------
 ! Calculate absorption (490 nm) components: seawater, chl, SPM from rivers, CDOM,
 ! detritus (dead cells), fecal pellets ...
-      real Chla_tot, CDOM_tot, OM1A_tot, OM1Z_tot, OM1R_tot, OM1BC_tot, CDOM(km)
+      real Chla_tot(km), CDOM_tot(km), OM1A_tot(km), OM1Z_tot(km), OM1R_tot(km), OM1BC_tot(km), CDOM(km)
+      real Chla_mass(km), CDOM_mass(km), OM1A_mass(km), OM1Z_mass(km), OM1R_mass(km), OM1BC_mass(km)
       real a490_mid, aSw_mid, aChl490_mid, aCDOM490_mid, bbChl490_mid, bb490_mid
       real a490_bot, aSw_bot, aChl490_bot, aCDOM490_bot, bbChl490_bot, bb490_bot
       real aOM1A490_mid, aOM1Z490_mid, aOM1R490_mid, aOM1BC490_mid
       real aOM1A490_bot, aOM1Z490_bot, aOM1R490_bot, aOM1BC490_bot
+      real cell_depth, bd_km1
       integer :: k  
 
 ! First, convert CDOM(ppb) into CDOM, a490 (m-1)
@@ -92,26 +94,55 @@
    OM1Z_tot = 0.
    OM1R_tot = 0.
    OM1BC_tot = 0.
+   bd_km1 = 0.
+
+!Mass in each cell at layer k (area of volume part cancels out)
+!The unit is mg[mmol] / m2
+   do k=1,numdepths
+      cell_depth = bottom_depth(k) - bd_km1
+      bd_km1 = bottom_depth(k)
+      Chla_mass(k) = totChl(k)*cell_depth
+      CDOM_mass(k) = CDOM(k)*cell_depth
+      OM1A_mass(k) = OM1_A(k)*cell_depth
+      OM1Z_mass(k) = OM1_Z(k)*cell_depth
+      OM1R_mass(k) = OM1_R(k)*cell_depth
+      OM1BC_mass(k) = OM1_BC(k)*cell_depth
+   enddo
+
+!Mass from surface to center of cell at layer k
+!Is the sum of the mass of all previous k layers plus 
+!half of the current k layer 
+!Concentration is that divided by the distance
+!from the surface to the center of cell at layer k
+!(Division by d_sfc is in the next loop)  
+      Chla_tot(1) = 0.5*Chla_mass(1)
+      CDOM_tot(1) = 0.5*CDOM_mass(1)
+      OM1A_tot(1) = 0.5*OM1A_mass(1)
+      OM1Z_tot(1) = 0.5*OM1Z_mass(1)
+      OM1R_tot(1) = 0.5*OM1R_mass(1)
+      OM1BC_tot(1) = 0.5*OM1BC_mass(1)
+   do k=2,numdepths
+      Chla_tot(k)  = 0.5*Chla_mass(k) + SUM(Chla_mass(1:k-1))
+      CDOM_tot(k)  = 0.5*CDOM_mass(k) + SUM(CDOM_mass(1:k-1))
+      OM1A_tot(k)  = 0.5*OM1A_mass(k) + SUM(OM1A_mass(1:k-1))
+      OM1Z_tot(k)  = 0.5*OM1Z_mass(k) + SUM(OM1Z_mass(1:k-1))
+      OM1R_tot(k)  = 0.5*OM1R_mass(k) + SUM(OM1R_mass(1:k-1))
+      OM1BC_tot(k) = 0.5*OM1BC_mass(k)+ SUM(OM1BC_mass(1:k-1))
+   enddo
+
 
    do k=1,numdepths
-!Sum components to depth:
-      Chla_tot = Chla_tot + totChl(k)
-      CDOM_tot = CDOM_tot + CDOM(k)
-      OM1A_tot = OM1A_tot + OM1_A(k)
-      OM1Z_tot = OM1Z_tot + OM1_Z(k)
-      OM1R_tot = OM1R_tot + OM1_R(k)
-      OM1BC_tot = OM1BC_tot + OM1_BC(k)
 !Calculate absorption coefficients:
       aSw_mid = aw490  !Sea water absorption at mid cell
-      aChl490_mid = astar490 * Chla_tot / k !d_sfc(k)        !Chla absorption at mid cell
-      aCDOM490_mid = CDOM_tot / k !d_sfc(k)        !CDOM absorption at mid cell
-      aOM1A490_mid = astarOMA * OM1A_tot / k !d_sfc(k) ! absorption at mid cell
-      aOM1Z490_mid = astarOMZ * OM1Z_tot / k !d_sfc(k) ! absorption at mid cell
-      aOM1R490_mid = astarOMR * OM1R_tot / k !d_sfc(k) ! absorption at mid cell
-      aOM1BC490_mid = astarOMBC * OM1BC_tot / k !d_sfc(k) ! absorption at mid cell
+      aChl490_mid = astar490 * Chla_tot(k) / d_sfc(k)        !Chla absorption at mid cell
+      aCDOM490_mid = CDOM_tot(k) / d_sfc(k)        !CDOM absorption at mid cell
+      aOM1A490_mid = astarOMA * OM1A_tot(k) / d_sfc(k) ! absorption at mid cell
+      aOM1Z490_mid = astarOMZ * OM1Z_tot(k) / d_sfc(k) ! absorption at mid cell
+      aOM1R490_mid = astarOMR * OM1R_tot(k) / d_sfc(k) ! absorption at mid cell
+      aOM1BC490_mid = astarOMBC * OM1BC_tot(k) / d_sfc(k) ! absorption at mid cell
       a490_mid = aSw_mid + aChl490_mid + aCDOM490_mid + aOM1A490_mid + aOM1Z490_mid + aOM1R490_mid + aOM1BC490_mid
 !Calculate backscattering coefficients:
-      bbChl490_mid = 0.015 * (0.3*((Chla_tot / k)**0.62)*(550./490.)) !Chla backscatter at mid cell
+      bbChl490_mid = 0.015 * (0.3*((Chla_tot(k) / d_sfc(k))**0.62)*(550./490.)) !Chla backscatter at mid cell
       bb490_mid = bbChl490_mid !Only Chla backscatters for now
 ! Calculate PAR at depth
       !Why would we check if a490_mid=0??
@@ -132,14 +163,14 @@
 
 ! Calculate PAR at sea bottom
       aSw_bot = aw490  !Sea water absorption at bottom of cell
-      aChl490_bot = astar490 * Chla_tot / numdepths !bottom_depth(numdepths) !Chla absorption at bottom
-      aCDOM490_bot = CDOM_tot / numdepths !bottom_depth(numdepths) !CDOM absorption at bottom
-      aOM1A490_bot = astarOMA * OM1A_tot / numdepths !bottom_depth(numdepths)    !A absorption at bottom
-      aOM1Z490_bot = astarOMZ * OM1Z_tot / numdepths !bottom_depth(numdepths) !FP absorption at bottom
-      aOM1R490_bot = astarOMR * OM1R_tot / numdepths !bottom_depth(numdepths) !SPM absorption at bottom
-      aOM1BC490_bot = astarOMbc * OM1BC_tot / numdepths !bottom_depth(numdepths) !INIT/BC absorption at bottom
+      aChl490_bot = astar490 * (Chla_tot(numdepths)+0.5*Chla_mass(numdepths)) / bottom_depth(numdepths) !Chla absorption at bottom
+      aCDOM490_bot = CDOM_tot(numdepths)+(0.5*CDOM_mass(numdepths)) / bottom_depth(numdepths) !CDOM absorption at bottom
+      aOM1A490_bot = astarOMA * (OM1A_tot(numdepths)+0.5*OM1A_mass(numdepths)) / bottom_depth(numdepths)    !A absorption at bottom
+      aOM1Z490_bot = astarOMZ * (OM1Z_tot(numdepths)+0.5*OM1Z_mass(numdepths)) / bottom_depth(numdepths) !FP absorption at bottom
+      aOM1R490_bot = astarOMR * (OM1R_tot(numdepths)+0.5*OM1R_mass(numdepths)) / bottom_depth(numdepths) !SPM absorption at bottom
+      aOM1BC490_bot = astarOMbc * (OM1BC_tot(numdepths)+0.5*OM1BC_mass(numdepths)) / bottom_depth(numdepths) !INIT/BC absorption at bottom
       a490_bot = aSw_bot + aChl490_bot + aCDOM490_bot + aOM1A490_bot + aOM1Z490_bot + aOM1R490_bot + aOM1BC490_bot
-      bbChl490_bot = 0.015 * (0.3*((Chla_tot / numdepths)**0.62)*(550./490.))
+      bbChl490_bot = 0.015 * (0.3*(((Chla_tot(numdepths)+0.5*Chla_mass(numdepths)) / bottom_depth(numdepths))**0.62)*(550./490.))
 !Chla backscatter at bottom
       bb490_bot = bbChl490_bot !Only Chla backscatters for now
       call IOP_PARattenuation(a490_bot, bb490_bot, PARsurf, sun_zenith, bottom_depth(numdepths), PARbot)
