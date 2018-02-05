@@ -1,8 +1,8 @@
-      Subroutine changeA(A,f,T,S,pH,i,j)
+      Subroutine changeA(A,f,T,S,pH,s_x1A,s_y1A,s_z1A,s_x2A,s_y2A,s_z2A,&
+     & s_x1Z,s_y1Z,s_z1Z,s_x2Z,s_y2Z,s_z2Z )
 
       USE Model_dim
       USE CGEM_vars
-      USE STOICH_VARS
       USE INPUT_VARS
       USE INPUT_VARS_CGEM
 
@@ -11,10 +11,9 @@
       real*8, dimension(100), intent(INOUT) :: A
       real, intent(IN) :: f(nf),T,S,pH ! State variables, Temp, Salinity
       real :: R_11
-      integer, intent(IN) :: i,j
-      integer nz,ii
+      real :: s_x1A,s_y1A,s_z1A,s_x2A,s_y2A,s_z2A,s_x1Z,s_y1Z
+      real :: s_z1Z,s_x2Z,s_y2Z,s_z2Z
 
-      nz = nza(i,j)
 
 ! Calculate nitrification, time units are in years, R_11:
       call Nitrification(f(iO2),f(iNH4),KO2,KNH4,nitmax,T,R_11)
@@ -46,8 +45,8 @@
 
 ! OM1=OM1_A + OM1_Z
       if((f(iOM1_A)+f(iOM1_Z)).gt.0.) then
-      A(23) = (s_x1A(i,j,nz)/s_z1A(i,j,nz)*f(iOM1_A) + s_x1Z(i,j,nz)/s_z1Z(i,j,nz)*f(iOM1_Z))/(f(iOM1_A)+f(iOM1_Z)) 
-      A(24) = (s_y1A(i,j,nz)/s_z1A(i,j,nz)*f(iOM1_A) + s_y1Z(i,j,nz)/s_z1Z(i,j,nz)*f(iOM1_Z))/(f(iOM1_A)+f(iOM1_Z)) 
+      A(23) = (s_x1A/s_z1A*f(iOM1_A) + s_x1Z/s_z1Z*f(iOM1_Z))/(f(iOM1_A)+f(iOM1_Z)) 
+      A(24) = (s_y1A/s_z1A*f(iOM1_A) + s_y1Z/s_z1Z*f(iOM1_Z))/(f(iOM1_A)+f(iOM1_Z)) 
       else
       A(23) = 105.
       A(24) = 25.
@@ -68,10 +67,10 @@
 
 ! DOM = Sum of OM
       if((f(iOM1_A)+f(iOM1_Z)+f(iOM1_R)+f(iOM1_BC)).gt.0.) then
-      A(29) = (s_x2A(i,j,nz)/s_z2A(i,j,nz)*f(iOM2_A) + s_x2Z(i,j,nz)/s_z2Z(i,j,nz)*f(iOM2_Z) +     &
+      A(29) = (s_x2A/s_z2A*f(iOM2_A) + s_x2Z/s_z2Z*f(iOM2_Z) +     &
      &       stoich_x2R/stoich_z2R*f(iOM2_R) + stoich_x2BC/stoich_z2BC*f(iOM2_BC)) / &
      &        (f(iOM2_A) + f(iOM2_Z) + f(iOM2_R) + f(iOM2_BC))
-      A(30) = (s_y2A(i,j,nz)/s_z2A(i,j,nz)*f(iOM2_A) + s_y2Z(i,j,nz)/s_z2Z(i,j,nz)*f(iOM2_Z) +     &
+      A(30) = (s_y2A/s_z2A*f(iOM2_A) + s_y2Z/s_z2Z*f(iOM2_Z) +     &
      &       stoich_y2R/stoich_z2R*f(iOM2_R) + stoich_y2BC/stoich_z2BC*f(iOM2_BC)) / &
      &        (f(iOM2_A) + f(iOM2_Z) + f(iOM2_R) + f(iOM2_BC))
       else
@@ -93,11 +92,6 @@
       A(62) = (f(iOM1_A)*ws(iOM1_A)+f(iOM1_Z)*ws(iOM1_Z))*12.
       A(63) = (f(iOM1_R)*ws(iOM1_R)+f(iOM1_BC)*ws(iOM1_BC))*12.
 
-#ifdef SDM_DEBUG
-        do ii=1,64
-          write(*,*)'i=',ii,'A=',A(ii)
-        enddo
-#endif
 
       RETURN
 

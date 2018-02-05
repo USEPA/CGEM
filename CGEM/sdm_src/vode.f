@@ -784,8 +784,13 @@ C-----------------------------------------------------------------------
         DDN = VNORM (N, SAVF, EWT)/TQ(1)
         ETA = ONE/((BIAS1*DDN)**(ONE/FLOTL) + ADDON)
         ENDIF
-      IF (MAXORD .EQ. NQ .AND. NEWQ .EQ. NQ+1) ETA = ETAQ
+      IF (MAXORD .EQ. NQ .AND. NEWQ .EQ. NQ+1) THEN
+        write(6,*) "etaq",ETAQ
+        ETA = ETAQ
+      ENDIF
+
       IF (MAXORD .EQ. NQ-1 .AND. NEWQ .EQ. NQ+1) THEN
+        write(6,*) "etaqm1",ETAQM1
         ETA = ETAQM1
         CALL VJUST (YH, LDYH, -1)
         ENDIF
@@ -2011,400 +2016,1203 @@ c
   100 continue
       return
       end
-      subroutine dgbfa(abd,lda,n,ml,mu,ipvt,info)
-      integer lda,n,ml,mu,ipvt(1),info
-      double precision abd(lda,1)
-c
-c     dgbfa factors a double precision band matrix by elimination.
-c
-c
-      double precision t
-      integer i,idamax,i0,j,ju,jz,j0,j1,k,kp1,l,lm,m,mm,nm1
-c
-c
+!L3 updated linpack 1990
+*DECK DGBFA
+      SUBROUTINE dgbfa (ABD, LDA, N, ML, MU, IPVT, INFO)
+C***BEGIN PROLOGUE  DGBFA
+C***PURPOSE  Factor a band matrix using Gaussian elimination.
+C***CATEGORY  D2A2
+C***TYPE      DOUBLE PRECISION (SGBFA-S, DGBFA-D, CGBFA-C)
+C***KEYWORDS  BANDED, LINEAR ALGEBRA, LINPACK, MATRIX FACTORIZATION
+C***AUTHOR  Moler, C. B., (U. of New Mexico)
+C***DESCRIPTION
+C
+C     DGBFA factors a double precision band matrix by elimination.
+C
+C     DGBFA is usually called by DGBCO, but it can be called
+C     directly with a saving in time if  RCOND  is not needed.
+C
+C     On Entry
+C
+C        ABD     DOUBLE PRECISION(LDA, N)
+C                contains the matrix in band storage.  The columns
+C                of the matrix are stored in the columns of  ABD  and
+C                the diagonals of the matrix are stored in rows
+C                ML+1 through 2*ML+MU+1 of  ABD .
+C                See the comments below for details.
+C
+C        LDA     INTEGER
+C                the leading dimension of the array  ABD .
+C                LDA must be .GE. 2*ML + MU + 1 .
+C
+C        N       INTEGER
+C                the order of the original matrix.
+C
+C        ML      INTEGER
+C                number of diagonals below the main diagonal.
+C                0 .LE. ML .LT.  N .
+C
+C        MU      INTEGER
+C                number of diagonals above the main diagonal.
+C                0 .LE. MU .LT.  N .
+C                More efficient if  ML .LE. MU .
+C     On Return
+C
+C        ABD     an upper triangular matrix in band storage and
+C                the multipliers which were used to obtain it.
+C                The factorization can be written  A = L*U  where
+C                L  is a product of permutation and unit lower
+C                triangular matrices and  U  is upper triangular.
+C
+C        IPVT    INTEGER(N)
+C                an integer vector of pivot indices.
+C
+C        INFO    INTEGER
+C                = 0  normal value.
+C                = K  if  U(K,K) .EQ. 0.0 .  This is not an error
+C                     condition for this subroutine, but it does
+C                     indicate that DGBSL will divide by zero if
+C                     called.  Use  RCOND  in DGBCO for a reliable
+C                     indication of singularity.
+C
+C     Band Storage
+C
+C           If  A  is a band matrix, the following program segment
+C           will set up the input.
+C
+C                   ML = (band width below the diagonal)
+C                   MU = (band width above the diagonal)
+C                   M = ML + MU + 1
+C                   DO 20 J = 1, N
+C                      I1 = MAX(1, J-MU)
+C                      I2 = MIN(N, J+ML)
+C                      DO 10 I = I1, I2
+C                         K = I - J + M
+C                         ABD(K,J) = A(I,J)
+C                10    CONTINUE
+C                20 CONTINUE
+C
+C           This uses rows  ML+1  through  2*ML+MU+1  of  ABD .
+C           In addition, the first  ML  rows in  ABD  are used for
+C           elements generated during the triangularization.
+C           The total number of rows needed in  ABD  is  2*ML+MU+1 .
+C           The  ML+MU by ML+MU  upper left triangle and the
+C           ML by ML  lower right triangle are not referenced.
+C
+C***REFERENCES  J. J. Dongarra, J. R. Bunch, C. B. Moler, and G. W.
+C                 Stewart, LINPACK Users' Guide, SIAM, 1979.
+C***ROUTINES CALLED  DAXPY, DSCAL, IDAMAX
+C***REVISION HISTORY  (YYMMDD)
+C   780814  DATE WRITTEN
+C   890531  Changed all specific intrinsics to generic.  (WRB)
+C   890831  Modified array declarations.  (WRB)
+C   890831  REVISION DATE from Version 3.2
+C   891214  Prologue converted to Version 4.0 format.  (BAB)
+C   900326  Removed duplicate information from DESCRIPTION section.
+C           (WRB)
+C   920501  Reformatted the REFERENCES section.  (WRB)
+C***END PROLOGUE  DGBFA
+      INTEGER LDA,N,ML,MU,IPVT(*),INFO
+      DOUBLE PRECISION ABD(lda,*)
+C
+      DOUBLE PRECISION T
+      INTEGER I,IDAMAX,I0,J,JU,JZ,J0,J1,K,KP1,L,LM,M,MM,NM1
+C
+C***FIRST EXECUTABLE STATEMENT  DGBFA
       m = ml + mu + 1
       info = 0
-c
-c     zero initial fill-in columns
-c
+C
+C     ZERO INITIAL FILL-IN COLUMNS
+C
       j0 = mu + 2
-      j1 = min0(n,m) - 1
-      if (j1 .lt. j0) go to 30
-      do 20 jz = j0, j1
+      j1 = min(n,m) - 1
+      IF (j1 .LT. j0) GO TO 30
+      DO 20 jz = j0, j1
          i0 = m + 1 - jz
-         do 10 i = i0, ml
+         DO 10 i = i0, ml
             abd(i,jz) = 0.0d0
-   10    continue
-   20 continue
-   30 continue
+   10    CONTINUE
+   20 CONTINUE
+   30 CONTINUE
       jz = j1
       ju = 0
-c
-c     gaussian elimination with partial pivoting
-c
+C
+C     GAUSSIAN ELIMINATION WITH PARTIAL PIVOTING
+C
       nm1 = n - 1
-      if (nm1 .lt. 1) go to 130
-      do 120 k = 1, nm1
+      IF (nm1 .LT. 1) GO TO 130
+      DO 120 k = 1, nm1
          kp1 = k + 1
-c
-c        zero next fill-in column
-c
+C
+C        ZERO NEXT FILL-IN COLUMN
+C
          jz = jz + 1
-         if (jz .gt. n) go to 50
-         if (ml .lt. 1) go to 50
-            do 40 i = 1, ml
+         IF (jz .GT. n) GO TO 50
+         IF (ml .LT. 1) GO TO 50
+            DO 40 i = 1, ml
                abd(i,jz) = 0.0d0
-   40       continue
-   50    continue
-c
-c        find l = pivot index
-c
-         lm = min0(ml,n-k)
+   40       CONTINUE
+   50    CONTINUE
+C
+C        FIND L = PIVOT INDEX
+C
+         lm = min(ml,n-k)
          l = idamax(lm+1,abd(m,k),1) + m - 1
          ipvt(k) = l + k - m
-c
-c        zero pivot implies this column already triangularized
-c
-         if (abd(l,k) .eq. 0.0d0) go to 100
-c
-c           interchange if necessary
-c
-            if (l .eq. m) go to 60
+C
+C        ZERO PIVOT IMPLIES THIS COLUMN ALREADY TRIANGULARIZED
+C
+         IF (abd(l,k) .EQ. 0.0d0) GO TO 100
+C
+C           INTERCHANGE IF NECESSARY
+C
+            IF (l .EQ. m) GO TO 60
                t = abd(l,k)
                abd(l,k) = abd(m,k)
                abd(m,k) = t
-   60       continue
-c
-c           compute multipliers
-c
+   60       CONTINUE
+C
+C           COMPUTE MULTIPLIERS
+C
             t = -1.0d0/abd(m,k)
-            call dscal(lm,t,abd(m+1,k),1)
-c
-c           row elimination with column indexing
-c
-            ju = min0(max0(ju,mu+ipvt(k)),n)
+            CALL dscal(lm,t,abd(m+1,k),1)
+C
+C           ROW ELIMINATION WITH COLUMN INDEXING
+C
+            ju = min(max(ju,mu+ipvt(k)),n)
             mm = m
-            if (ju .lt. kp1) go to 90
-            do 80 j = kp1, ju
+            IF (ju .LT. kp1) GO TO 90
+            DO 80 j = kp1, ju
                l = l - 1
                mm = mm - 1
                t = abd(l,j)
-               if (l .eq. mm) go to 70
+               IF (l .EQ. mm) GO TO 70
                   abd(l,j) = abd(mm,j)
                   abd(mm,j) = t
-   70          continue
-               call daxpy(lm,t,abd(m+1,k),1,abd(mm+1,j),1)
-   80       continue
-   90       continue
-         go to 110
-  100    continue
+   70          CONTINUE
+               CALL daxpy(lm,t,abd(m+1,k),1,abd(mm+1,j),1)
+   80       CONTINUE
+   90       CONTINUE
+         GO TO 110
+  100    CONTINUE
             info = k
-  110    continue
-  120 continue
-  130 continue
+  110    CONTINUE
+  120 CONTINUE
+  130 CONTINUE
       ipvt(n) = n
-      if (abd(m,n) .eq. 0.0d0) info = n
-      return
-      end
-      subroutine dgbsl(abd,lda,n,ml,mu,ipvt,b,job)
-      integer lda,n,ml,mu,ipvt(1),job
-      double precision abd(lda,1),b(1)
-c
-c     dgbsl solves the double precision band system
-c     a * x = b  or  trans(a) * x = b
-c     using the factors computed by dgbco or dgbfa.
-c
-c
-      double precision ddot,t
-      integer k,kb,l,la,lb,lm,m,nm1
-c
+      IF (abd(m,n) .EQ. 0.0d0) info = n
+      RETURN
+      END
+!L3 updated BLAS 1993 
+*> \brief \b DCOPY
+*
+*  =========== DOCUMENTATION ===========
+*
+* Online html documentation available at
+*            http://www.netlib.org/lapack/explore-html/
+*
+*  Definition:
+*  ===========
+*
+*       SUBROUTINE DCOPY(N,DX,INCX,DY,INCY)
+*
+*       .. Scalar Arguments ..
+*       INTEGER INCX,INCY,N
+*       ..
+*       .. Array Arguments ..
+*       DOUBLE PRECISION DX(*),DY(*)
+*       ..
+*
+*
+*> \par Purpose:
+*  =============
+*>
+*> \verbatim
+*>
+*>    DCOPY copies a vector, x, to a vector, y.
+*>    uses unrolled loops for increments equal to 1.
+*> \endverbatim
+*
+*  Arguments:
+*  ==========
+*
+*> \param[in] N
+*> \verbatim
+*>          N is INTEGER
+*>         number of elements in input vector(s)
+*> \endverbatim
+*>
+*> \param[in] DX
+*> \verbatim
+*>          DX is DOUBLE PRECISION array, dimension ( 1 + ( N - 1 )*abs( INCX ) )
+*> \endverbatim
+*>
+*> \param[in] INCX
+*> \verbatim
+*>          INCX is INTEGER
+*>         storage spacing between elements of DX
+*> \endverbatim
+*>
+*> \param[out] DY
+*> \verbatim
+*>          DY is DOUBLE PRECISION array, dimension ( 1 + ( N - 1 )*abs( INCY ) )
+*> \endverbatim
+*>
+*> \param[in] INCY
+*> \verbatim
+*>          INCY is INTEGER
+*>         storage spacing between elements of DY
+*> \endverbatim
+*
+*  Authors:
+*  ========
+*
+*> \author Univ. of Tennessee
+*> \author Univ. of California Berkeley
+*> \author Univ. of Colorado Denver
+*> \author NAG Ltd.
+*
+*> \date December 2016
+*
+*> \ingroup double_blas_level1
+*
+*> \par Further Details:
+*  =====================
+*>
+*> \verbatim
+*>
+*>     jack dongarra, linpack, 3/11/78.
+*>     modified 12/3/93, array(1) declarations changed to array(*)
+*> \endverbatim
+*>
+*  =====================================================================
+      SUBROUTINE dcopy(N,DX,INCX,DY,INCY)
+*
+*  -- Reference BLAS level1 routine (version 3.7.0) --
+*  -- Reference BLAS is a software package provided by Univ. of Tennessee,    --
+*  -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--
+*     December 2016
+*
+*     .. Scalar Arguments ..
+      INTEGER INCX,INCY,N
+*     ..
+*     .. Array Arguments ..
+      DOUBLE PRECISION DX(*),DY(*)
+*     ..
+*
+*  =====================================================================
+*
+*     .. Local Scalars ..
+      INTEGER I,IX,IY,M,MP1
+*     ..
+*     .. Intrinsic Functions ..
+      INTRINSIC mod
+*     ..
+      IF (n.LE.0) RETURN
+      IF (incx.EQ.1 .AND. incy.EQ.1) THEN
+*
+*        code for both increments equal to 1
+*
+*
+*        clean-up loop
+*
+         m = mod(n,7)
+         IF (m.NE.0) THEN
+            DO i = 1,m
+               dy(i) = dx(i)
+            END DO
+            IF (n.LT.7) RETURN
+         END IF
+         mp1 = m + 1
+         DO i = mp1,n,7
+            dy(i) = dx(i)
+            dy(i+1) = dx(i+1)
+            dy(i+2) = dx(i+2)
+            dy(i+3) = dx(i+3)
+            dy(i+4) = dx(i+4)
+            dy(i+5) = dx(i+5)
+            dy(i+6) = dx(i+6)
+         END DO
+      ELSE
+*
+*        code for unequal increments or equal increments
+*          not equal to 1
+*
+         ix = 1
+         iy = 1
+         IF (incx.LT.0) ix = (-n+1)*incx + 1
+         IF (incy.LT.0) iy = (-n+1)*incy + 1
+         DO i = 1,n
+            dy(iy) = dx(ix)
+            ix = ix + incx
+            iy = iy + incy
+         END DO
+      END IF
+      RETURN
+      END
+!L3 updated BLAS 1993
+*> \brief \b DDOT
+*
+*  =========== DOCUMENTATION ===========
+*
+* Online html documentation available at
+*            http://www.netlib.org/lapack/explore-html/
+*
+*  Definition:
+*  ===========
+*
+*       DOUBLE PRECISION FUNCTION DDOT(N,DX,INCX,DY,INCY)
+*
+*       .. Scalar Arguments ..
+*       INTEGER INCX,INCY,N
+*       ..
+*       .. Array Arguments ..
+*       DOUBLE PRECISION DX(*),DY(*)
+*       ..
+*
+*
+*> \par Purpose:
+*  =============
+*>
+*> \verbatim
+*>
+*>    DDOT forms the dot product of two vectors.
+*>    uses unrolled loops for increments equal to one.
+*> \endverbatim
+*
+*  Arguments:
+*  ==========
+*
+*> \param[in] N
+*> \verbatim
+*>          N is INTEGER
+*>         number of elements in input vector(s)
+*> \endverbatim
+*>
+*> \param[in] DX
+*> \verbatim
+*>          DX is DOUBLE PRECISION array, dimension ( 1 + ( N - 1 )*abs( INCX ) )
+*> \endverbatim
+*>
+*> \param[in] INCX
+*> \verbatim
+*>          INCX is INTEGER
+*>         storage spacing between elements of DX
+*> \endverbatim
+*>
+*> \param[in] DY
+*> \verbatim
+*>          DY is DOUBLE PRECISION array, dimension ( 1 + ( N - 1 )*abs( INCY ) )
+*> \endverbatim
+*>
+*> \param[in] INCY
+*> \verbatim
+*>          INCY is INTEGER
+*>         storage spacing between elements of DY
+*> \endverbatim
+*
+*  Authors:
+*  ========
+*
+*> \author Univ. of Tennessee
+*> \author Univ. of California Berkeley
+*> \author Univ. of Colorado Denver
+*> \author NAG Ltd.
+*
+*> \date December 2016
+*
+*> \ingroup double_blas_level1
+*
+*> \par Further Details:
+*  =====================
+*>
+*> \verbatim
+*>
+*>     jack dongarra, linpack, 3/11/78.
+*>     modified 12/3/93, array(1) declarations changed to array(*)
+*> \endverbatim
+*>
+*  =====================================================================
+      DOUBLE PRECISION FUNCTION ddot(N,DX,INCX,DY,INCY)
+*
+*  -- Reference BLAS level1 routine (version 3.7.0) --
+*  -- Reference BLAS is a software package provided by Univ. of Tennessee,    --
+*  -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--
+*     December 2016
+*
+*     .. Scalar Arguments ..
+      INTEGER INCX,INCY,N
+*     ..
+*     .. Array Arguments ..
+      DOUBLE PRECISION DX(*),DY(*)
+*     ..
+*
+*  =====================================================================
+*
+*     .. Local Scalars ..
+      DOUBLE PRECISION DTEMP
+      INTEGER I,IX,IY,M,MP1
+*     ..
+*     .. Intrinsic Functions ..
+      INTRINSIC mod
+*     ..
+      ddot = 0.0d0
+      dtemp = 0.0d0
+      IF (n.LE.0) RETURN
+      IF (incx.EQ.1 .AND. incy.EQ.1) THEN
+*
+*        code for both increments equal to 1
+*
+*
+*        clean-up loop
+*
+         m = mod(n,5)
+         IF (m.NE.0) THEN
+            DO i = 1,m
+               dtemp = dtemp + dx(i)*dy(i)
+            END DO
+            IF (n.LT.5) THEN
+               ddot=dtemp
+            RETURN
+            END IF
+         END IF
+         mp1 = m + 1
+         DO i = mp1,n,5
+          dtemp = dtemp + dx(i)*dy(i) + dx(i+1)*dy(i+1) +
+     $            dx(i+2)*dy(i+2) + dx(i+3)*dy(i+3) + dx(i+4)*dy(i+4)
+         END DO
+      ELSE
+*
+*        code for unequal increments or equal increments
+*          not equal to 1
+*
+         ix = 1
+         iy = 1
+         IF (incx.LT.0) ix = (-n+1)*incx + 1
+         IF (incy.LT.0) iy = (-n+1)*incy + 1
+         DO i = 1,n
+            dtemp = dtemp + dx(ix)*dy(iy)
+            ix = ix + incx
+            iy = iy + incy
+         END DO
+      END IF
+      ddot = dtemp
+      RETURN
+      END
+!L3 updated linpack 1992
+*DECK DGBSL
+      SUBROUTINE dgbsl (ABD, LDA, N, ML, MU, IPVT, B, JOB)
+C***BEGIN PROLOGUE  DGBSL
+C***PURPOSE  Solve the real band system A*X=B or TRANS(A)*X=B using
+C            the factors computed by DGBCO or DGBFA.
+C***CATEGORY  D2A2
+C***TYPE      DOUBLE PRECISION (SGBSL-S, DGBSL-D, CGBSL-C)
+C***KEYWORDS  BANDED, LINEAR ALGEBRA, LINPACK, MATRIX, SOLVE
+C***AUTHOR  Moler, C. B., (U. of New Mexico)
+C***DESCRIPTION
+C
+C     DGBSL solves the double precision band system
+C     A * X = B  or  TRANS(A) * X = B
+C     using the factors computed by DGBCO or DGBFA.
+C
+C     On Entry
+C
+C        ABD     DOUBLE PRECISION(LDA, N)
+C                the output from DGBCO or DGBFA.
+C
+C        LDA     INTEGER
+C                the leading dimension of the array  ABD .
+C
+C        N       INTEGER
+C                the order of the original matrix.
+C
+C        ML      INTEGER
+C                number of diagonals below the main diagonal.
+C
+C        MU      INTEGER
+C                number of diagonals above the main diagonal.
+C
+C        IPVT    INTEGER(N)
+C                the pivot vector from DGBCO or DGBFA.
+C
+C        B       DOUBLE PRECISION(N)
+C                the right hand side vector.
+C
+C        JOB     INTEGER
+C                = 0         to solve  A*X = B ,
+C                = nonzero   to solve  TRANS(A)*X = B , where
+C                            TRANS(A)  is the transpose.
+C
+C     On Return
+C
+C        B       the solution vector  X .
+C
+C     Error Condition
+C
+C        A division by zero will occur if the input factor contains a
+C        zero on the diagonal.  Technically this indicates singularity
+C        but it is often caused by improper arguments or improper
+C        setting of LDA .  It will not occur if the subroutines are
+C        called correctly and if DGBCO has set RCOND .GT. 0.0
+C        or DGBFA has set INFO .EQ. 0 .
+C
+C     To compute  INVERSE(A) * C  where  C  is a matrix
+C     with  P  columns
+C           CALL DGBCO(ABD,LDA,N,ML,MU,IPVT,RCOND,Z)
+C           IF (RCOND is too small) GO TO ...
+C           DO 10 J = 1, P
+C              CALL DGBSL(ABD,LDA,N,ML,MU,IPVT,C(1,J),0)
+C        10 CONTINUE
+C
+C***REFERENCES  J. J. Dongarra, J. R. Bunch, C. B. Moler, and G. W.
+C                 Stewart, LINPACK Users' Guide, SIAM, 1979.
+C***ROUTINES CALLED  DAXPY, DDOT
+C***REVISION HISTORY  (YYMMDD)
+C   780814  DATE WRITTEN
+C   890531  Changed all specific intrinsics to generic.  (WRB)
+C   890831  Modified array declarations.  (WRB)
+C   890831  REVISION DATE from Version 3.2
+C   891214  Prologue converted to Version 4.0 format.  (BAB)
+C   900326  Removed duplicate information from DESCRIPTION section.
+C           (WRB)
+C   920501  Reformatted the REFERENCES section.  (WRB)
+C***END PROLOGUE  DGBSL
+      INTEGER LDA,N,ML,MU,IPVT(*),JOB
+      DOUBLE PRECISION ABD(lda,*),B(*)
+C
+      DOUBLE PRECISION DDOT,T
+      INTEGER K,KB,L,LA,LB,LM,M,NM1
+C***FIRST EXECUTABLE STATEMENT  DGBSL
       m = mu + ml + 1
       nm1 = n - 1
-      if (job .ne. 0) go to 50
-c
-c        job = 0 , solve  a * x = b
-c        first solve l*y = b
-c
-         if (ml .eq. 0) go to 30
-         if (nm1 .lt. 1) go to 30
-            do 20 k = 1, nm1
-               lm = min0(ml,n-k)
+      IF (job .NE. 0) GO TO 50
+C
+C        JOB = 0 , SOLVE  A * X = B
+C        FIRST SOLVE L*Y = B
+C
+         IF (ml .EQ. 0) GO TO 30
+         IF (nm1 .LT. 1) GO TO 30
+            DO 20 k = 1, nm1
+               lm = min(ml,n-k)
                l = ipvt(k)
                t = b(l)
-               if (l .eq. k) go to 10
+               IF (l .EQ. k) GO TO 10
                   b(l) = b(k)
                   b(k) = t
-   10          continue
-               call daxpy(lm,t,abd(m+1,k),1,b(k+1),1)
-   20       continue
-   30    continue
-c
-c        now solve  u*x = y
-c
-         do 40 kb = 1, n
+   10          CONTINUE
+               CALL daxpy(lm,t,abd(m+1,k),1,b(k+1),1)
+   20       CONTINUE
+   30    CONTINUE
+C
+C        NOW SOLVE  U*X = Y
+C
+         DO 40 kb = 1, n
             k = n + 1 - kb
             b(k) = b(k)/abd(m,k)
-            lm = min0(k,m) - 1
+            lm = min(k,m) - 1
             la = m - lm
             lb = k - lm
             t = -b(k)
-            call daxpy(lm,t,abd(la,k),1,b(lb),1)
-   40    continue
-      go to 100
-   50 continue
-c
-c        job = nonzero, solve  trans(a) * x = b
-c        first solve  trans(u)*y = b
-c
-         do 60 k = 1, n
-            lm = min0(k,m) - 1
+            CALL daxpy(lm,t,abd(la,k),1,b(lb),1)
+   40    CONTINUE
+      GO TO 100
+   50 CONTINUE
+C
+C        JOB = NONZERO, SOLVE  TRANS(A) * X = B
+C        FIRST SOLVE  TRANS(U)*Y = B
+C
+         DO 60 k = 1, n
+            lm = min(k,m) - 1
             la = m - lm
             lb = k - lm
             t = ddot(lm,abd(la,k),1,b(lb),1)
             b(k) = (b(k) - t)/abd(m,k)
-   60    continue
-c
-c        now solve trans(l)*x = y
-c
-         if (ml .eq. 0) go to 90
-         if (nm1 .lt. 1) go to 90
-            do 80 kb = 1, nm1
+   60    CONTINUE
+C
+C        NOW SOLVE TRANS(L)*X = Y
+C
+         IF (ml .EQ. 0) GO TO 90
+         IF (nm1 .LT. 1) GO TO 90
+            DO 80 kb = 1, nm1
                k = n - kb
-               lm = min0(ml,n-k)
+               lm = min(ml,n-k)
                b(k) = b(k) + ddot(lm,abd(m+1,k),1,b(k+1),1)
                l = ipvt(k)
-               if (l .eq. k) go to 70
+               IF (l .EQ. k) GO TO 70
                   t = b(l)
                   b(l) = b(k)
                   b(k) = t
-   70          continue
-   80       continue
-   90    continue
-  100 continue
-      return
-      end
-      subroutine daxpy(n,da,dx,incx,dy,incy)
-c
-c     constant times a vector plus a vector.
-c     uses unrolled loops for increments equal to one.
-c     jack dongarra, linpack, 3/11/78.
-c
-      double precision dx(1),dy(1),da
-      integer i,incx,incy,ix,iy,m,mp1,n
-c
-      if(n.le.0)return
-      if (da .eq. 0.0d0) return
-      if(incx.eq.1.and.incy.eq.1)go to 20
-c
-c        code for unequal increments or equal increments
-c          not equal to 1
-c
-      ix = 1
-      iy = 1
-      if(incx.lt.0)ix = (-n+1)*incx + 1
-      if(incy.lt.0)iy = (-n+1)*incy + 1
-      do 10 i = 1,n
-        dy(iy) = dy(iy) + da*dx(ix)
-        ix = ix + incx
-        iy = iy + incy
-   10 continue
-      return
-c
-c        code for both increments equal to 1
-c
-c
-c        clean-up loop
-c
-   20 m = mod(n,4)
-      if( m .eq. 0 ) go to 40
-      do 30 i = 1,m
-        dy(i) = dy(i) + da*dx(i)
-   30 continue
-      if( n .lt. 4 ) return
-   40 mp1 = m + 1
-      do 50 i = mp1,n,4
-        dy(i) = dy(i) + da*dx(i)
-        dy(i + 1) = dy(i + 1) + da*dx(i + 1)
-        dy(i + 2) = dy(i + 2) + da*dx(i + 2)
-        dy(i + 3) = dy(i + 3) + da*dx(i + 3)
-   50 continue
-      return
-      end
-      subroutine dscal(n,da,dx,incx)
-c
-c     scales a vector by a constant.
-c     uses unrolled loops for increment equal to one.
-c     jack dongarra, linpack, 3/11/78.
-c
-      double precision da,dx(1)
-      integer i,incx,m,mp1,n,nincx
-c
-      if(n.le.0)return
-      if(incx.eq.1)go to 20
-c
-c        code for increment not equal to 1
-c
-      nincx = n*incx
-      do 10 i = 1,nincx,incx
-        dx(i) = da*dx(i)
-   10 continue
-      return
-c
-c        code for increment equal to 1
-c
-c
-c        clean-up loop
-c
-   20 m = mod(n,5)
-      if( m .eq. 0 ) go to 40
-      do 30 i = 1,m
-        dx(i) = da*dx(i)
-   30 continue
-      if( n .lt. 5 ) return
-   40 mp1 = m + 1
-      do 50 i = mp1,n,5
-        dx(i) = da*dx(i)
-        dx(i + 1) = da*dx(i + 1)
-        dx(i + 2) = da*dx(i + 2)
-        dx(i + 3) = da*dx(i + 3)
-        dx(i + 4) = da*dx(i + 4)
-   50 continue
-      return
-      end
-      double precision function ddot(n,dx,incx,dy,incy)
-c
-c     forms the dot product of two vectors.
-c     uses unrolled loops for increments equal to one.
-c     jack dongarra, linpack, 3/11/78.
-c
-      double precision dx(1),dy(1),dtemp
-      integer i,incx,incy,ix,iy,m,mp1,n
-c
-      ddot = 0.0d0
-      dtemp = 0.0d0
-      if(n.le.0)return
-      if(incx.eq.1.and.incy.eq.1)go to 20
-c
-c        code for unequal increments or equal increments
-c          not equal to 1
-c
-      ix = 1
-      iy = 1
-      if(incx.lt.0)ix = (-n+1)*incx + 1
-      if(incy.lt.0)iy = (-n+1)*incy + 1
-      do 10 i = 1,n
-        dtemp = dtemp + dx(ix)*dy(iy)
-        ix = ix + incx
-        iy = iy + incy
-   10 continue
-      ddot = dtemp
-      return
-c
-c        code for both increments equal to 1
-c
-c
-c        clean-up loop
-c
-   20 m = mod(n,5)
-      if( m .eq. 0 ) go to 40
-      do 30 i = 1,m
-        dtemp = dtemp + dx(i)*dy(i)
-   30 continue
-      if( n .lt. 5 ) go to 60
-   40 mp1 = m + 1
-      do 50 i = mp1,n,5
-        dtemp = dtemp + dx(i)*dy(i) + dx(i + 1)*dy(i + 1) +
-     *   dx(i + 2)*dy(i + 2) + dx(i + 3)*dy(i + 3) + dx(i + 4)*dy(i + 4)
-   50 continue
-   60 ddot = dtemp
-      return
-      end
-      integer function idamax(n,dx,incx)
-c
-c     finds the index of element having max. absolute value.
-c     jack dongarra, linpack, 3/11/78.
-c
-      double precision dx(1),dmax
-      integer i,incx,ix,n
-c
+   70          CONTINUE
+   80       CONTINUE
+   90    CONTINUE
+  100 CONTINUE
+      RETURN
+      END
+!L3 swap updated BLAS 12/3/93
+*> \brief \b DAXPY
+*
+*  =========== DOCUMENTATION ===========
+*
+* Online html documentation available at
+*            http://www.netlib.org/lapack/explore-html/
+*
+*  Definition:
+*  ===========
+*
+*       SUBROUTINE DAXPY(N,DA,DX,INCX,DY,INCY)
+*
+*       .. Scalar Arguments ..
+*       DOUBLE PRECISION DA
+*       INTEGER INCX,INCY,N
+*       ..
+*       .. Array Arguments ..
+*       DOUBLE PRECISION DX(*),DY(*)
+*       ..
+*
+*
+*> \par Purpose:
+*  =============
+*>
+*> \verbatim
+*>
+*>    DAXPY constant times a vector plus a vector.
+*>    uses unrolled loops for increments equal to one.
+*> \endverbatim
+*
+*  Arguments:
+*  ==========
+*
+*> \param[in] N
+*> \verbatim
+*>          N is INTEGER
+*>         number of elements in input vector(s)
+*> \endverbatim
+*>
+*> \param[in] DA
+*> \verbatim
+*>          DA is DOUBLE PRECISION
+*>           On entry, DA specifies the scalar alpha.
+*> \endverbatim
+*>
+*> \param[in] DX
+*> \verbatim
+*>          DX is DOUBLE PRECISION array, dimension ( 1 + ( N - 1 )*abs( INCX ) )
+*> \endverbatim
+*>
+*> \param[in] INCX
+*> \verbatim
+*>          INCX is INTEGER
+*>         storage spacing between elements of DX
+*> \endverbatim
+*>
+*> \param[in,out] DY
+*> \verbatim
+*>          DY is DOUBLE PRECISION array, dimension ( 1 + ( N - 1 )*abs( INCY ) )
+*> \endverbatim
+*>
+*> \param[in] INCY
+*> \verbatim
+*>          INCY is INTEGER
+*>         storage spacing between elements of DY
+*> \endverbatim
+*
+*  Authors:
+*  ========
+*
+*> \author Univ. of Tennessee
+*> \author Univ. of California Berkeley
+*> \author Univ. of Colorado Denver
+*> \author NAG Ltd.
+*
+*> \date December 2016
+*
+*> \ingroup double_blas_level1
+*
+*> \par Further Details:
+*  =====================
+*>
+*> \verbatim
+*>
+*>     jack dongarra, linpack, 3/11/78.
+*>     modified 12/3/93, array(1) declarations changed to array(*)
+*> \endverbatim
+*>
+*  =====================================================================
+       SUBROUTINE daxpy(N,DA,DX,INCX,DY,INCY)
+**
+*  -- Reference BLAS level1 routine (version 3.7.0) --
+*  -- Reference BLAS is a software package provided by Univ. of Tennessee,    --
+*  -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--
+*     December 2016
+*
+*     .. Scalar Arguments ..
+      DOUBLE PRECISION da
+      INTEGER incx,incy,n
+*     ..
+*     .. Array Arguments ..
+      DOUBLE PRECISION dx(*),dy(*)
+*     ..
+*
+*  =====================================================================
+*
+*     .. Local Scalars ..
+      INTEGER i,ix,iy,m,mp1
+*     ..
+*     .. Intrinsic Functions ..
+      INTRINSIC mod
+*     ..
+      IF (n.LE.0) RETURN
+      IF (da.EQ.0.0d0) RETURN
+      IF (incx.EQ.1 .AND. incy.EQ.1) THEN
+*
+*        code for both increments equal to 1
+*
+*
+*        clean-up loop
+*
+         m = mod(n,4)
+         IF (m.NE.0) THEN
+            DO i = 1,m
+               dy(i) = dy(i) + da*dx(i)
+            END DO
+         END IF
+         IF (n.LT.4) RETURN
+         mp1 = m + 1
+         DO i = mp1,n,4
+            dy(i) = dy(i) + da*dx(i)
+            dy(i+1) = dy(i+1) + da*dx(i+1)
+            dy(i+2) = dy(i+2) + da*dx(i+2)
+            dy(i+3) = dy(i+3) + da*dx(i+3)
+         END DO
+      ELSE
+*
+*        code for unequal increments or equal increments
+*          not equal to 1
+*
+         ix = 1
+         iy = 1
+         IF (incx.LT.0) ix = (-n+1)*incx + 1
+         IF (incy.LT.0) iy = (-n+1)*incy + 1
+         DO i = 1,n
+          dy(iy) = dy(iy) + da*dx(ix)
+          ix = ix + incx
+          iy = iy + incy
+         END DO
+      END IF
+      RETURN
+      END
+!L3 swap updated BLAS 12/3/93
+*> \brief \b DSCAL
+*
+*  =========== DOCUMENTATION ===========
+*
+* Online html documentation available at
+*            http://www.netlib.org/lapack/explore-html/
+*
+*  Definition:
+*  ===========
+*
+*       SUBROUTINE DSCAL(N,DA,DX,INCX)
+*
+*       .. Scalar Arguments ..
+*       DOUBLE PRECISION DA
+*       INTEGER INCX,N
+*       ..
+*       .. Array Arguments ..
+*       DOUBLE PRECISION DX(*)
+*       ..
+*
+*
+*> \par Purpose:
+*  =============
+*>
+*> \verbatim
+*>
+*>    DSCAL scales a vector by a constant.
+*>    uses unrolled loops for increment equal to 1.
+*> \endverbatim
+*
+*  Arguments:
+*  ==========
+*
+*> \param[in] N
+*> \verbatim
+*>          N is INTEGER
+*>         number of elements in input vector(s)
+*> \endverbatim
+*>
+*> \param[in] DA
+*> \verbatim
+*>          DA is DOUBLE PRECISION
+*>           On entry, DA specifies the scalar alpha.
+*> \endverbatim
+*>
+*> \param[in,out] DX
+*> \verbatim
+*>          DX is DOUBLE PRECISION array, dimension ( 1 + ( N - 1 )*abs( INCX ) )
+*> \endverbatim
+*>
+*> \param[in] INCX
+*> \verbatim
+*>          INCX is INTEGER
+*>         storage spacing between elements of DX
+*> \endverbatim
+*
+*  Authors:
+*  ========
+*
+*> \author Univ. of Tennessee
+*> \author Univ. of California Berkeley
+*> \author Univ. of Colorado Denver
+*> \author NAG Ltd.
+*
+*> \date December 2016
+*
+*> \ingroup double_blas_level1
+*
+*> \par Further Details:
+*  =====================
+*>
+*> \verbatim
+*>
+*>     jack dongarra, linpack, 3/11/78.
+*>     modified 3/93 to return if incx .le. 0.
+*>     modified 12/3/93, array(1) declarations changed to array(*)
+*> \endverbatim
+*>
+*  =====================================================================
+      SUBROUTINE dscal(N,DA,DX,INCX)
+*
+*  -- Reference BLAS level1 routine (version 3.7.0) --
+*  -- Reference BLAS is a software package provided by Univ. of Tennessee,    --
+*  -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--
+*     December 2016
+*
+*     .. Scalar Arguments ..
+      DOUBLE PRECISION da
+      INTEGER incx,n
+*     ..
+*     .. Array Arguments ..
+      DOUBLE PRECISION dx(*)
+*     ..
+*
+*  =====================================================================
+*
+*     .. Local Scalars ..
+      INTEGER i,m,mp1,nincx
+*     ..
+*     .. Intrinsic Functions ..
+      INTRINSIC mod
+*     ..
+      IF (n.LE.0 .OR. incx.LE.0) RETURN
+      IF (incx.EQ.1) THEN
+*
+*        code for increment equal to 1
+*
+*
+*        clean-up loop
+*
+         m = mod(n,5)
+         IF (m.NE.0) THEN
+            DO i = 1,m
+               dx(i) = da*dx(i)
+            END DO
+            IF (n.LT.5) RETURN
+         END IF
+         mp1 = m + 1
+         DO i = mp1,n,5
+            dx(i) = da*dx(i)
+            dx(i+1) = da*dx(i+1)
+            dx(i+2) = da*dx(i+2)
+            dx(i+3) = da*dx(i+3)
+            dx(i+4) = da*dx(i+4)
+         END DO
+      ELSE
+*
+*        code for increment not equal to 1
+*
+         nincx = n*incx
+         DO i = 1,nincx,incx
+            dx(i) = da*dx(i)
+         END DO
+      END IF
+      RETURN
+      END
+!L3 swap updated BLAS 12/3/93
+*> \brief \b IDAMAX
+*
+*  =========== DOCUMENTATION ===========
+*
+* Online html documentation available at
+*            http://www.netlib.org/lapack/explore-html/
+*
+*  Definition:
+*  ===========
+*
+*       INTEGER FUNCTION IDAMAX(N,DX,INCX)
+*
+*       .. Scalar Arguments ..
+*       INTEGER INCX,N
+*       ..
+*       .. Array Arguments ..
+*       DOUBLE PRECISION DX(*)
+*       ..
+*
+*
+*> \par Purpose:
+*  =============
+*>
+*> \verbatim
+*>
+*>    IDAMAX finds the index of the first element having maximum absolute value.
+*> \endverbatim
+*
+*  Arguments:
+*  ==========
+*
+*> \param[in] N
+*> \verbatim
+*>          N is INTEGER
+*>         number of elements in input vector(s)
+*> \endverbatim
+*>
+*> \param[in] DX
+*> \verbatim
+*>          DX is DOUBLE PRECISION array, dimension ( 1 + ( N - 1 )*abs( INCX ) )
+*> \endverbatim
+*>
+*> \param[in] INCX
+*> \verbatim
+*>          INCX is INTEGER
+*>         storage spacing between elements of SX
+*> \endverbatim
+*
+*  Authors:
+*  ========
+*
+*> \author Univ. of Tennessee
+*> \author Univ. of California Berkeley
+*> \author Univ. of Colorado Denver
+*> \author NAG Ltd.
+*
+*> \date December 2016
+*
+*> \ingroup aux_blas
+*
+*> \par Further Details:
+*  =====================
+*>
+*> \verbatim
+*>
+*>     jack dongarra, linpack, 3/11/78.
+*>     modified 3/93 to return if incx .le. 0.
+*>     modified 12/3/93, array(1) declarations changed to array(*)
+*> \endverbatim
+*>
+*  =====================================================================
+      INTEGER FUNCTION idamax(N,DX,INCX)
+*
+*  -- Reference BLAS level1 routine (version 3.7.0) --
+*  -- Reference BLAS is a software package provided by Univ. of Tennessee,    --
+*  -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--
+*     December 2016
+*
+*     .. Scalar Arguments ..
+      INTEGER incx,n
+*     ..
+*     .. Array Arguments ..
+      DOUBLE PRECISION dx(*)
+*     ..
+*
+*  =====================================================================
+*
+*     .. Local Scalars ..
+      DOUBLE PRECISION dmax
+      INTEGER i,ix
+*     ..
+*     .. Intrinsic Functions ..
+      INTRINSIC dabs
+*     ..
       idamax = 0
-      if( n .lt. 1 ) return
+      IF (n.LT.1 .OR. incx.LE.0) RETURN
       idamax = 1
-      if(n.eq.1)return
-      if(incx.eq.1)go to 20
-c
-c        code for increment not equal to 1
-c
-      ix = 1
-      dmax = dabs(dx(1))
-      ix = ix + incx
-      do 10 i = 2,n
-         if(dabs(dx(ix)).le.dmax) go to 5
-         idamax = i
-         dmax = dabs(dx(ix))
-    5    ix = ix + incx
-   10 continue
-      return
-c
-c        code for increment equal to 1
-c
-   20 dmax = dabs(dx(1))
-      do 30 i = 2,n
-         if(dabs(dx(i)).le.dmax) go to 30
-         idamax = i
-         dmax = dabs(dx(i))
-   30 continue
-      return
-      end
-      subroutine  dcopy(n,dx,incx,dy,incy)
-c
-c     copies a vector, x, to a vector, y.
-c     uses unrolled loops for increments equal to one.
-c     jack dongarra, linpack, 3/11/78.
-c
-      double precision dx(1),dy(1)
-      integer i,incx,incy,ix,iy,m,mp1,n
-c
-      if(n.le.0)return
-      if(incx.eq.1.and.incy.eq.1)go to 20
-c
-c        code for unequal increments or equal increments
-c          not equal to 1
-c
-      ix = 1
-      iy = 1
-      if(incx.lt.0)ix = (-n+1)*incx + 1
-      if(incy.lt.0)iy = (-n+1)*incy + 1
-      do 10 i = 1,n
-        dy(iy) = dx(ix)
-        ix = ix + incx
-        iy = iy + incy
-   10 continue
-      return
-c
-c        code for both increments equal to 1
-c
-c
-c        clean-up loop
-c
-   20 m = mod(n,7)
-      if( m .eq. 0 ) go to 40
-      do 30 i = 1,m
-        dy(i) = dx(i)
-   30 continue
-      if( n .lt. 7 ) return
-   40 mp1 = m + 1
-      do 50 i = mp1,n,7
-        dy(i) = dx(i)
-        dy(i + 1) = dx(i + 1)
-        dy(i + 2) = dx(i + 2)
-        dy(i + 3) = dx(i + 3)
-        dy(i + 4) = dx(i + 4)
-        dy(i + 5) = dx(i + 5)
-        dy(i + 6) = dx(i + 6)
-   50 continue
-      return
-      end
+      IF (n.EQ.1) RETURN
+      IF (incx.EQ.1) THEN
+*
+*        code for increment equal to 1
+*
+         dmax = dabs(dx(1))
+         DO i = 2,n
+            IF (dabs(dx(i)).GT.dmax) THEN
+               idamax = i
+               dmax = dabs(dx(i))
+            END IF
+         END DO
+      ELSE
+*
+*        code for increment not equal to 1
+*
+         ix = 1
+         dmax = dabs(dx(1))
+         ix = ix + incx
+         DO i = 2,n
+            IF (dabs(dx(ix)).GT.dmax) THEN
+              idamax = i
+               dmax = dabs(dx(ix))
+            END IF
+            ix = ix + incx
+         END DO
+      END IF
+      RETURN
+      END
+!L3 swap updated BLAS 12/3/93
+*> \brief \b DSWAP
+*
+*  =========== DOCUMENTATION ===========
+*
+* Online html documentation available at
+*            http://www.netlib.org/lapack/explore-html/
+*
+*  Definition:
+*  ===========
+*
+*       SUBROUTINE DSWAP(N,DX,INCX,DY,INCY)
+*
+*       .. Scalar Arguments ..
+*       INTEGER INCX,INCY,N
+*       ..
+*       .. Array Arguments ..
+*       DOUBLE PRECISION DX(*),DY(*)
+*       ..
+*
+*
+*> \par Purpose:
+*  =============
+*>
+*> \verbatim
+*>
+*>    DSWAP interchanges two vectors.
+*>    uses unrolled loops for increments equal to 1.
+*> \endverbatim
+*
+*  Arguments:
+*  ==========
+*
+*> \param[in] N
+*> \verbatim
+*>          N is INTEGER
+*>         number of elements in input vector(s)
+*> \endverbatim
+*>
+*> \param[in,out] DX
+*> \verbatim
+*>          DX is DOUBLE PRECISION array, dimension ( 1 + ( N - 1 )*abs( INCX ) )
+*> \endverbatim
+*>
+*> \param[in] INCX
+*> \verbatim
+*>          INCX is INTEGER
+*>         storage spacing between elements of DX
+*> \endverbatim
+*>
+*> \param[in,out] DY
+*> \verbatim
+*>          DY is DOUBLE PRECISION array, dimension ( 1 + ( N - 1 )*abs( INCY ) )
+*> \endverbatim
+*>
+*> \param[in] INCY
+*> \verbatim
+*>          INCY is INTEGER
+*>         storage spacing between elements of DY
+*> \endverbatim
+*
+*  Authors:
+*  ========
+*
+*> \author Univ. of Tennessee
+*> \author Univ. of California Berkeley
+*> \author Univ. of Colorado Denver
+*> \author NAG Ltd.
+*
+*> \date December 2016
+*
+*> \ingroup double_blas_level1
+*
+*> \par Further Details:
+*  =====================
+*>
+*> \verbatim
+*>
+*>     jack dongarra, linpack, 3/11/78.
+*>     modified 12/3/93, array(1) declarations changed to array(*)
+*> \endverbatim
+*>
+*  =====================================================================
+      SUBROUTINE dswap(N,DX,INCX,DY,INCY)
+*
+*
+*  -- Reference BLAS level1 routine (version 3.7.0) --
+*  -- Reference BLAS is a software package provided by Univ. of Tennessee,    --
+*  -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--
+*     December 2016
+*
+*     .. Scalar Arguments ..
+      INTEGER incx,incy,n
+*     ..
+*     .. Array Arguments ..
+      DOUBLE PRECISION dx(*),dy(*)
+*     ..
+*
+*  =====================================================================
+*
+*     .. Local Scalars ..
+      INTEGER i,ix,iy,m,mp1
+*     ..
+*     .. Intrinsic Functions ..
+      INTRINSIC mod
+*     ..
+      IF (n.LE.0) RETURN
+      IF (incx.EQ.1 .AND. incy.EQ.1) THEN
+*
+*        code for both increments equal to 1
+*
+*
+*        clean-up loop
+*
+         m = mod(n,7)
+         IF (m.NE.0) THEN
+            DO i = 1,m
+               dy(i) = dx(i)
+            END DO
+            IF (n.LT.7) RETURN
+         END IF
+         mp1 = m + 1
+         DO i = mp1,n,7
+            dy(i) = dx(i)
+            dy(i+1) = dx(i+1)
+            dy(i+2) = dx(i+2)
+            dy(i+3) = dx(i+3)
+            dy(i+4) = dx(i+4)
+            dy(i+5) = dx(i+5)
+            dy(i+6) = dx(i+6)
+         END DO
+      ELSE
+*
+*        code for unequal increments or equal increments
+*          not equal to 1
+*
+         ix = 1
+         iy = 1
+         IF (incx.LT.0) ix = (-n+1)*incx + 1
+         IF (incy.LT.0) iy = (-n+1)*incy + 1
+         DO i = 1,n
+            dy(iy) = dx(ix)
+            ix = ix + incx
+            iy = iy + incy
+         END DO
+      END IF
+      RETURN
+      END
 C
 C
 C

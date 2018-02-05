@@ -8,9 +8,10 @@ USE TEMP_VARS
 USE STOICH_VARS
 USE MASS_BALANCE_CGEM
 USE DailyRad
-USE SDM
+!USE SDM
 USE JWMod
 USE OUTPUT_NETCDF_CGEM
+USE Which_Flux
 
 IMPLICIT NONE
 
@@ -24,7 +25,7 @@ IMPLICIT NONE
          call STOICH_VARS_allocate()
          call MASS_BALANCE_CGEM_allocate()
          call DailyRad_allocate()
-         call SDM_allocate()
+!         if(Which_Fluxes(iSDM).eq.1) call SDM_allocate()
          call JWMod_allocate()
          call OUTPUT_NETCDF_CGEM_allocate()
          call Allocate_CGEM_Flux()

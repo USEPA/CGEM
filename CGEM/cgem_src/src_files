@@ -8,7 +8,6 @@ CGEM_OBJ  =  CGEM_Flux.o\
 	INPUT_VARS_CGEM.o\
 	OUTPUT_NETCDF_CGEM.o\
 	SDM.o\
-	nparray.o\
 	T_GoMDOM.o\
 	Light_GoMDOM.o\
 	MASS_BALANCE_CGEM.o\

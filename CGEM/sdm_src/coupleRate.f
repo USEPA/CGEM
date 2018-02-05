@@ -1,52 +1,3 @@
-!     Last change:  PME  17 Jan 2008    6:30 pm
-!
-!   PROGRAMMED by Dr. PETER M. ELDRIDGE, The initial archtecture of this
-!   program was developed by Dr. Bernard P. Boudreau for OM and O2.
-!   The program has been revised to include the other constituents below
-!   variable porosity, and various input option. The reaction scheme
-!   was revised from Dr. P. Vancapellen with help from Dr. John Morse.
-!   CO2 system is from Whitfield and Turner.
-!
-!   New formulation from CANDI (Boudreau, 1997) for Tortuousty
-!   relating it to porosity is now included in this model. To reduce
-!   the number of free parameters in the model, we are assuming
-!   'steady state' compaction.
-! 
-!
-!	Solves  DIAGENETIC Model with a finite 
-!	differencing using the depth variable x.
-!       includes:
-!            OM1    - organic matter 1
-!            OM2    - organic matter 2
-!            DOM    - dissolved organic matter
-!            O2     - oxygen
-!            NO3-   - nitrate
-!            NH3    - ammonia
-!            MnO2   - Manganese solid
-!            Mn+2   - Manganese porewater
-!            Fe+3   - ferric
-!            Fe+2   - ferrous
-!            SO4-2  - sulfate
-!            HS-    - sulfide
-!            FeS    - pyrite
-!            TC     - Total inorganoc carbon
-!            ALK    - Carbonate alkalinity
-!
-!	- irrigation can occur and is modelled as a nonlocal
-!	  sink/source as per Boudreau (1984, JMR)
-!	- transport processes for solutes are molecular diffusion, 
-!	  bioturbation, advection (burial) and irrigation
-!	- transport processes for solids are bioturbation and burial
-!
-!	UNITS
-!
-!		- LENGTHS in CM
-!		- TIME in YEARS 
-!		- CONC. of porewater in Micro-MOLES/CC of porewater
-!		- CONC. of Organic Matter in % OF SOLIDS
-!		- FLUX of Organic Matter in Micro-Mole/(cm^2)/yr
-
-
 !
 !-----------------------------------------------------------------------
 !  SUBROUTINE CASES: provides initial conditions from a steady state
@@ -54,30 +5,28 @@
 !-----------------------------------------------------------------------
 !
 !
-
-      SUBROUTINE CASES(value1,value2,YY,ISTATE,Ainp,ppH_init)
+      SUBROUTINE CASES(value1,value2,Y,ppH,ISTATE,IFLAG,Ainp)
       IMPLICIT REAL*8 (A-H,O-Z)
       EXTERNAL FEX2,JEX
       INTEGER IWORK,LRW,LIW,MU,ML,ITASK,ISTATE,IOPT,ITOL,IPAR
-      INTEGER, SAVE :: IFLAG=1
       PARAMETER (MAXNEQ=27000)
       PARAMETER (NSPECIES=17)
       PARAMETER (NCOMPART=17)
-!      PARAMETER (MXSTEP =30000)
-      PARAMETER (MXSTEP =30)
+      PARAMETER (MXSTEP =30000)
       PARAMETER (MU=NCOMPART,ML=MU)
       PARAMETER (LRW=22+11*MAXNEQ+(3*ML+2*MU)*MAXNEQ)
 C     PARAMETER (LRW=22+9*MAXNEQ+2*MAXNEQ**2)
       PARAMETER (LIW=30+MAXNEQ)
       DIMENSION Y(MAXNEQ),RWORK(LRW),IWORK(LIW),RPAR(MAXNEQ)
-      DIMENSION YY(MAXNEQ),pH(2000),ppH(2000),ppH_init(2000)
+      DIMENSION YY(MAXNEQ),pH(2000),ppH(2000)
       DIMENSION Ainp(100)
       COMMON /SPECIES/ NS,NPOINTS
       COMMON /SROOT/ ZROOT, WROOT
       COMMON /TEMPERATURE/ TEMP, SAL, PRESS,pH0
+      COMMON /GETY/ YY
       COMMON /pHes/ pH
       COMMON /GRIDPOINT/ NEQ
-      COMMON /GETPH/ ppH
+!L3      COMMON /GETPH/ ppH
 
 
       NS = NSPECIES
@@ -92,38 +41,59 @@ C     PARAMETER (LRW=22+9*MAXNEQ+2*MAXNEQ**2)
       MF = 25
       IWORK(6) = MXSTEP
 
+!      write(6,*) "In CASES, Y1=",Y(1)
+
+!      IF (IFLAG .EQ. 1) THEN
+
+!       This sets some values according to Ainp, so always do this
+        CALL FILEDATA2(RPAR,Ainp)
+
+
+!   Y comes into the subroutine initialized at t=0 in Flux_CGEM, and Y goes out
+
+!        DO I=1, NEQ
+!           Y(I)= YY(I)
+!        ENDDO
+!        IFLAG = 0
+!        write(*,*) 'NPOINTS',NPOINTS
+!        write(*,*) 'NEQ', NEQ
+!      ENDIF
+
 
 !
-      IF (IFLAG .EQ. 1) THEN
-        CALL FILEDATA2(RPAR,Ainp)
-        DO I=1, NEQ
-           Y(I)= YY(I)
-           !write(6,*) i,yy(i)
-        ENDDO
-        IFLAG = 0
-      ENDIF
 ! -------- provide new T and tout
 !
 
       T= value1
       TOUT= value2
-      !write(6,*) T,TOUT
-      !write(6,*) ppH_init(1) 
 
 !
 ! --------  Provide pH profile 
 !
 
+!L3 ppH goes into the subroutine, cannot pass it as 'pH' because it is
+!in a common block, If it gets reset, we'll reset it at the end
         DO I=1,NPOINTS
-           !write(6,*) ppH_init(I)
-           pH(I) = ppH_init(I)
+           pH(I) = ppH(I)
         ENDDO
 
 !----- Get DATA forthe water-column model
-
+!      write(*,*) "In CASES,before DVODE, Y1=",Y(1)
+!      write(*,*) "In CASES,before DVODE, pH1=",pH(1)
+!      write(*,*) 'NPOINTS',NPOINTS
+!      write(*,*) 'NEQ', NEQ
+!      write(*,*) "Value1,Value2",value1,value2
 
       CALL DVODE(FEX2,NEQ,Y,T,TOUT,ITOL,RTOL,ATOL,ITASK,
      #    ISTATE,IOPT,RWORK,LRW,IWORK,LIW,JEX,MF,RPAR,IPAR)
+
+!      write(6,*) "In CASES,after DVODE, Y1=",Y(1)
+!      write(6,*) "In CASES,after DVODE, pH1=",pH(1)
+
+!L3 I don't even think that pH gets updated, but in case, then here:
+        DO I=1,NPOINTS
+           ppH(I) = pH(I)
+        ENDDO
 
 
       RETURN
@@ -142,9 +112,11 @@ C     PARAMETER (LRW=22+9*MAXNEQ+2*MAXNEQ**2)
       DIMENSION Y(NEQ),YDOT(NEQ),RATE(MAXNEQ)
       DIMENSION POROVEC(1500),rIRRO2(1500),rIRRTC(1500)
       DIMENSION rIRRNO(1500),rIRRNH(1500),rIRRSO(1500)
+!L3 adding more irrigation terms
+      DIMENSION rIRRALK(1500),rIRRDOM(1500)
       DIMENSION RPAR(*)
       DIMENSION Rc(25)
-      DIMENSION pH(2000),dy(2),FLUXES(9)
+      DIMENSION pH(2000),dy(2),FLUXES(10)
 
       COMMON /SPECIES/ NS,NPOINTS
       COMMON /DEPTH/ XL,DH
@@ -156,11 +128,12 @@ C     PARAMETER (LRW=22+9*MAXNEQ+2*MAXNEQ**2)
       COMMON /DESORB/ KANH4
       COMMON /CONC2/ MNO0,MN20,FE30,FE20,FES0,TC0,ALK0,DOM0,DOMI
       COMMON /DIFF/ DO2,DNO3,DNH3,DMN2,DFE2,DSO4,DHS,DTC,DALK
-      COMMON /FLUXCOMMON/   FG1,FG2
+      COMMON /FLUXCOMMON/   FG1,FG2  !Changed name of common block, Cconflicted with module
       COMMON /SEDFLUX/ FLUXES
       COMMON /DISSOL/ a, PER_DIS
       COMMON /IRRIG/ ALPHAA,XIRRIG
-      COMMON /FIRRG/ rIRRO2,rIRRTC,rIRRNO,rIRRNH,rIRRSO
+!L3 Add to common block
+      COMMON /FIRRG/ rIRRO2,rIRRTC,rIRRNO,rIRRNH,rIRRSO,rIRRALK,rIRRDOM
 
       COMMON /RATES/ RATE
       COMMON /pHes/ pH
@@ -192,8 +165,8 @@ C     PARAMETER (LRW=22+9*MAXNEQ+2*MAXNEQ**2)
 
       Tq1 = TEMP
       Tq2 = dtemp
-      ALPHA0 = ALPHAA*exp(0.06*(Tq2-Tq1))
-
+! JCL commented out      ALPHA0 = ALPHAA*exp(0.06*(Tq1-Tq2))
+      ALPHA0 = ALPHAA
 !
 !  Provide values and derivatives for porosity and tortuosity
 !
@@ -310,13 +283,13 @@ C
 C  711  format(5 f9.3)
 C.......................................................................
 !L3 "I" undefined, I will set it to one:
-!      I = 1
-       I = 0
+      I = 1
+!       I = 0
 !L3 end modification
-!Sed pH to 1
+
       CALL REACTION_SDM (TESTOM1,TESTOM2,TESTDOM,TESTO2,TESTNIT,TESTNH3,
      *   TESTSO4,TESTTS,TESTFE3,TESTFE2,TESTMNO,TESTMN2,TESTFES,
-     *   TESTTC,TESTALK,Rc,pH(1),F,dtemp)
+     *   TESTTC,TESTALK,Rc,pH(I),F,dtemp)
         RCH2O1= Rc(1)
         RCH2O2= Rc(2)
         RDOM=   Rc(3)
@@ -348,16 +321,10 @@ C
       YDOT(3) = DIFF2+ADV2+IRRIG+RO2
       RATE(3) = RO2
       rIRRO2(1) =IRRIG*DH
-      !write(6,*) "O2",FO2
-      !!write(6,*) "DO2/T2*P*(Y(3) - Y(37))/TWO/DH + U*P*Y(20)"
-      !write(6,*) "DO2,T2,P,Y(3),Y(37),DH,U,Y(20)"
-      !write(6,*) DO2,T2,P,Y(3),Y(37),DH,U,Y(20)
-      !write(6,*) " irrig",rIRRO2(1)
-
-
 C 
-C NO3
-      FNO3= DNO3/T2*P*(Y(4) - Y(38))/TWO/DH + W*P*Y(21)
+C NO3, JCL changed advective flux from W to U
+!     FNO3= DNO3/T2*P*(Y(4) - Y(38))/TWO/DH + W*P*Y(21)
+      FNO3= DNO3/T2*P*(Y(4) - Y(38))/TWO/DH + U*P*Y(21)
       DIFF2 = (DB(X)+DNO3/T2)*(Y(21)-TWO*Y(4)+NO30)/DH/DH
       DGDX = ((ONE-SW)*Y(21)+TWO*SW*Y(4)-(ONE+SW)*NO30)/TWO/DH
       ADV2 = (AGTG + ADVC)/P*DGDX
@@ -384,8 +351,9 @@ C NH3
 !     RATE(5) = RNH4
 !     rIRRNH(1) =IRRIG*DH
 
-C NH3
-      FNH3= DNH3/T2*(Y(5) - Y(39))/TWO/DH + U*P*Y(22)
+C NH3, JCL added variable 'P' to calculation of FNH3
+!      FNH3= DNH3/T2*(Y(5) - Y(39))/TWO/DH + U*P*Y(22)
+      FNH3= DNH3/T2*P*(Y(5) - Y(39))/TWO/DH + U*P*Y(22)
       KADS_p = PS/P*KANH4
       DIFF2 = ONE/(ONE+KADS_p)*(KADS_p*DB(X)+DNH3/T2)*
      *       (Y(22)-TWO*Y(5)+NH30)/DH/DH
@@ -508,6 +476,9 @@ C
       ENDIF
       YDOT(14)=  DIFF2+ADV2+IRRIG+RALK
       RATE(14) = pH(1)
+!L3 adding irrigation terms for ALK
+      rIRRALK(1) = IRRIG*DH
+
 !
 !  DOC (DISSOLVED PHASE) 
 !......................................................................
@@ -522,6 +493,8 @@ C
       ENDIF
       YDOT(15) = DIFF2+ADV2+IRRIG+RDOM+disOM
       RATE(15) = RDOM
+!L3 Adding irrigation terms for DOM
+      rIRRDOM(I) = IRRIG*DH
 
 !
 !   ABV (above pycnocline water)
@@ -543,12 +516,7 @@ C
       ADV1 = AGST/PS*DGDX    
       YDOT(18) = DIFF1 + ADV1 + RCH2O1 - disOM1
       RATE(18) = RCH2O1
-      !write(6,*)
-      !write(6,*) "OM1",FOM1
-      !!write(6,*) "DB0*PS*(Y(1) -Y(35))/TWO/DH + W*PS*Y(18)"
-      !write(6,*) " DB0,PS,Y(1),Y(35),DH,W,Y(18)"
-      !write(6,*) DB0,PS,Y(1),Y(35),DH,W,Y(18)
-      !write(6,*)
+!
 ! OM
       FOM2= DB0*PS*(Y(2) -Y(36))/TWO/DH + W*PS*Y(19)
       DIFF1 = DB(X)*(Y(36)-TWO*Y(19)+Y(2))/DH/DH
@@ -567,14 +535,17 @@ C
         FLUXES(6) = FOM1
         FLUXES(7) = FOM2
         FLUXES(9) = FALK
-
+        FLUXES(10) = FDOM
+  
 !      write(*,'(A4,2X,f12.2)') 'FO2',FO2  ! check HS concentrations
 !  FOR THE INTERVENING POINTS IN THE GRID TO X2:
 !  Following statements gives the # of midpoints NPOINTS -1
-      DO 10 I=2,NPM1
+!L3      DO 10 I=2,NPM1
+      DO I=2,NPM1
        II = I
        X = RPAR(I)
-       IF(X.GE.X2) GO TO 20
+!L3       IF(X.GE.X2) GO TO 20
+       IF(X.GE.X2) EXIT 
        M = I*NS              ! starts at 18 for 9 species
 !
 !  Provide values and derivatives for porosity and tortuosity
@@ -667,7 +638,6 @@ C
        TESTTC    = Y(MID13)
        TESTALK   = Y(MID14)
        TESTDOM   = Y(MID15)
-
 C
 C      IF (TESTOM1 .GT. 3.0D+03) write(*,*) ' 1 OM1 ',TESTOM1
 C      IF (TESTOM2 .GT. 3.0D+03) write(*,*) ' 1 OM2 ',TESTOM2
@@ -913,12 +883,16 @@ C OM2
        ADV1= AGST/PS*DGDX
        YDOT(MID2) = DIFF1 + ADV1 + RCH2O2 - disOM2
        RATE(MID2) = RCH2O2
-   10 CONTINUE
+!L3   10 CONTINUE
+       ENDDO
+
 C
 C  FOR THE INTERVENING POINTS IN THE GRID FROM X2 TO XL-DH:
 C
-   20 CONTINUE
-      DO 30 I=II,NPM1
+!L3   20 CONTINUE
+
+!L3      DO 30 I=II,NPM1
+       DO I=II,NPM1
        X = RPAR(I)
        M = I*NS
        CALL SED(X,P,DPDX,U,W) 
@@ -1002,8 +976,7 @@ C
 C
 C.......................................................................
 C
-
-      CALL REACTION_SDM (TESTOM1,TESTOM2,TESTDOM,TESTO2,TESTNIT,TESTNH3,
+       CALL REACTION_SDM (TESTOM1,TESTOM2,TESTDOM,TESTO2,TESTNIT,TESTNH3,
      *   TESTSO4,TESTTS,TESTFE3,TESTFE2,TESTMNO,TESTMN2,TESTFES,
      *   TESTTC,TESTALK,Rc,pH(I),F,dtemp)
         RCH2O1= Rc(1)
@@ -1228,7 +1201,8 @@ C
       ADV1 = - W*DGDX
       YDOT(MID2) = ADV1 + RCH2O2 - disOM2
       RATE(MID2) = RCH2O2
-   30 CONTINUE
+!L3   30 CONTINUE
+      ENDDO
 C
 C  FOR THE LAST POINT IN THE GRID:
 C
@@ -1487,6 +1461,10 @@ C
       ENDIF
       YDOT(MID14) = DIFF2+IRRIG + RALK
       RATE(MID14) = pH(I)
+!L3 adding irrigation terms for ALK
+      rIRRALK(I) = IRRIG*DH
+
+
 C
 C DOM (DISSOLVED PHASE) 
 C
@@ -1500,7 +1478,8 @@ C.......................................................................
       ENDIF
       YDOT(MID15) = DIFF2+IRRIG+RDOM+disOM
       RATE(MID15) = RDOM
-
+!L3 Adding irrigation terms for DOM
+      rIRRDOM(I) = IRRIG*DH
 C
 C   ABV (above pycnocline water)
 C
@@ -1545,7 +1524,7 @@ C
       END
 	  
 C ----------------------------------------------------------------
-C REACTIONS
+C REACTION_SDMS
 C PURPOSE:  Provides all reaction rates for the model
 C ----------------------------------------------------------------
 C
@@ -1568,6 +1547,8 @@ C
 C
       DATA ZERO/0.0D+00/,ONE/1.0D+00/,TWO/2.0D+00/,HUN/1.0D+02/
       DATA THREE/3.0D+00/,FOUR/4.0D+00/,FIVE/5.0D+00/,EIGHT/8.0D+00/
+
+
 C
 C   STOICHIOMETRY (Cappellen and Wang 1996)
 C          (Primary reactants)
@@ -1599,12 +1580,12 @@ C
       rq2=  KG2
       rq3=  KDOM
       Tq1 = TEMP
-      Tq2 = dtemp 
-      rq21= LOG10(rq1)-LOG10(2.)*((Tq1-Tq2)/10.)
+      Tq2 = dtemp
+      rq21= LOG10(rq1)-LOG10(2.)*((Tq2-Tq1)/10.)
       rq21= 10.0**rq21
-      rq22= LOG10(rq2)-LOG10(2.)*((Tq1-Tq2)/10.)
+      rq22= LOG10(rq2)-LOG10(2.)*((Tq2-Tq1)/10.)
       rq22= 10.0**rq22
-      rq23= LOG10(rq3)-LOG10(2.)*((Tq1-Tq2)/10.)
+      rq23= LOG10(rq3)-LOG10(2.)*((Tq2-Tq1)/10.)
       rq23= 10.0**rq23
 
 C
@@ -1612,9 +1593,9 @@ C  ------ Now for the chemolithoautotrophic processes
 C
       rq1= k11
       rq2= k11
-      rq11= LOG10(rq1)-LOG10(2.)*((Tq1-Tq2)/10.)
+      rq11= LOG10(rq1)-LOG10(2.)*((Tq2-Tq1)/10.)
       rq11= 10.0**rq11
-      rq12= LOG10(rq2)-LOG10(2.)*((Tq1-Tq2)/10.)
+      rq12= LOG10(rq2)-LOG10(2.)*((Tq2-Tq1)/10.)
       rq12= 10.0**rq12
 
 C
@@ -1741,7 +1722,7 @@ C......................................................................
       RFEOH3 = - FOUR*(R1(4)+R2(4)+R3(4)/F)+R8/F-TWO*R14
       RFES   = -R15+R23-R_23
       RTC    = F*(R1(1)+R1(2)+R1(3)+R1(4)+R1(5)+R2(1)+R2(2)
-     *         +R1(3)+R2(4)+R2(5))
+     *         +R2(3)+R2(4)+R2(5))
      *         +R3(1)+R3(2)+R3(3)+R3(4)+R3(5)
 C      RTS    = F*((R1(5)+R2(5))/TWO-R14-(TWO*(R23+R_23))+
 C     *         R3(5)/TWO-R12
@@ -1902,8 +1883,8 @@ C
       COMMON /KINETICS/ KG1,KG2,KDOM,KO2,KNO3,KMNO,KFE3,KSO4
       DATA ZERO/0.0D+00/,ONE/1.0D+00/,TWO/2.0D+00/,HUN/1.0D+02/
       DATA TEN/1.0D+01/
-C
-       KPO2= KO2/HUN
+! JCL, note that KO2 from hypox_input is modified, I removed /HUN
+       KPO2= KO2
        PO2=O20
        IF (PO2 .LT. ZERO)  PO2 = ZERO
        RNITRATE_SDM=KPO2/(KPO2 + PO2)
@@ -1925,9 +1906,9 @@ C
       COMMON /KINETICS/ KG1,KG2,KDOM,KO2,KNO3,KMNO,KFE3,KSO4
       DATA ZERO/0.0D+00/,ONE/1.0D+00/,TWO/2.0D+00/,HUN/1.0D+02/
       DATA TEN/1.0D+01/,TWENTY/2.0D+01/,FIFTY/3.0D+02/
-C
-      KPO2= KO2/FIFTY
-      KPNO3= KNO3/FIFTY
+! JCL, note that KO2 and KNO3 from hypox_input are modified here, removed/FIFTY
+      KPO2= KO2
+      KPNO3= KNO3
       PO2=O20
       IF (PO2 .LT. ZERO)  PO2 = ZERO
       PNO3=NO30
@@ -1954,10 +1935,10 @@ C
       DATA ZERO/0.0D+00/,ONE/1.0D+00/,TWO/2.0D+00/,HUN/1.5D+02/
       DATA TEN/1.0D+01/,FIFTY/5.0D+01/,SEVENTY/7.0D+1/
       DATA FIVEHUN/5.0D+02/
-C     was fifty
-      KPO2= KO2/HUN
-      KPNO3= KNO3/HUN
-      KPMNO= KMNO/HUN
+! JCL, note that KO2,KNO3, KMNO from hypox_input are modified here, removed /HUN
+      KPO2= KO2
+      KPNO3= KNO3
+      KPMNO= KMNO
 
       PO2=O20
       IF (PO2 .LT. ZERO)  PO2 = ZERO
@@ -1986,11 +1967,11 @@ C
       COMMON /KINETICS/ KG1,KG2,KDOM,KO2,KNO3,KMNO,KFE3,KSO4
       DATA ZERO/0.0D+00/,ONE/1.0D+00/,TWO/2.0D+00/,HUN/1.0D+02/
       DATA TEN/1.0D+01/,TWENTY/2.0D+01/,THIRTY/3.0D+01/
-C      was twenty
-      KPO2= KO2/THIRTY
-      KPNO3= KNO3/THIRTY
-      KPMNO= KMNO/THIRTY
-      KPFE3= KFE3/THIRTY
+! JCL, note that KO2,KNO3,KMNO, KFE3 from hypox_input are modified here, removed /THIRTY
+      KPO2= KO2
+      KPNO3= KNO3
+      KPMNO= KMNO
+      KPFE3= KFE3
 C     KPO2= KO2
 C     KPNO3= KNO3
 C     KPFE3= KFE3
@@ -2021,8 +2002,8 @@ C
       REAL*8 KPSO4
       COMMON /KINETICS/ KG1,KG2,KDOM,KO2,KNO3,KMNO,KFE3,KSO4
       DATA ZERO/0.0D+00/,HUN/1.0D+02/
-C
-       KPSO4= KSO4/HUN
+! JCL, note that KS04 is modified here, removed /HUN
+       KPSO4= KSO4
        PHS=HS
        IF (PHS .LT. ZERO)  PHS = ZERO
        rMandy=KPSO4/(KPSO4 +  PHS)
@@ -2161,8 +2142,8 @@ C
 !
 !***********************************************************************
 
-      SUBROUTINE FILL_Y(NEQ,np,nss,Y,G1,G2,O2,rNO3,rNH4,rMN2, 
-     &                  FE3,FE2,SO4,HS,FES,TC,ALK,DOM,Os,Ob)
+      SUBROUTINE FILL_Y(NEQ,np,nss,Y,G1,G2,O2,rNO3,rNH4,rMN2,
+     *                  FE3,FE2,SO4,HS,FES,TC,ALK,DOM,Os,Ob)
       IMPLICIT REAL*8 (A-H,O-Z)
       PARAMETER (MAXNEQ=27000)
       DIMENSION Y(NEQ+2)
@@ -2399,24 +2380,35 @@ C
 
 !    ----- PROCEDURE provides input for diagenetic model
 
-        subroutine datain(A,mrow)
+        subroutine datain(A,mrow,ncol)
         IMPLICIT REAL*8 (A-H,O-Z)
-        DIMENSION A(100)
-        character*20 cdum1
-        character*35 cdum2
+        DIMENSION A(100,6)
+        character*25 cdum1
+        integer nits
+        real*8 steps
+
         open(11,file='SDM/hypox_input.csv')
-!       first, skip over first five lines
+!L3 Modify to read in nits and steps
+        read(11,*) nits 
+        read(11,*) steps
+!       first, skip over next five lines
         read(11,*)
         read(11,*)
         read(11,*)
         read(11,*)
         read(11,*)
-        write(*,*)'mrow=',mrow
+        write(*,*)'mrow=',mrow,'ncol=',ncol
         do ilin=1,mrow
-         read(11,*)dum1,cdum1,cdum2,cdum1, A(ilin)
-          write(*,*)'i=',ilin,cdum2,'A=',A(ilin)
+!         read(11,*)dum1,cdum1,cdum1,cdum1,(a(ilin,j),j=1,ncol)
+         read(11,*)dum1,cdum1,cdum1,cdum1, a(ilin,1)
+          write(*,*)'i=',ilin,'A=',a(ilin,1)
         enddo
         close(11)
+!L3 Put nits and steps at the end of "A"
+        a(mrow+1,1) = nits
+        a(mrow+2,1) = steps
+        !write(6,*) "n_its",nits
+        !write(6,*) "step_in",steps
       return
       END
 
@@ -2432,7 +2424,6 @@ C
       SUBROUTINE FILEDATA2(RPAR,Ainp)
 
       IMPLICIT REAL*8 (A-H,O-Z)
-
 C
       PARAMETER (MAXNEQ=27000)
       DIMENSION RPAR(MAXNEQ)
@@ -2444,7 +2435,7 @@ C
       REAL*8 k15,k23,k_23,KpFES
 
       DIMENSION Ainp(100)
-      DIMENSION :: DF(24),rk(9)
+      DIMENSION DF(24),rk(9),ppH(2000),YY(MAXNEQ)
       DIMENSION day(1100),gulfdo(1100)
       COMMON /SPECIES/ NS,NPOINTS
       COMMON /GRIDPOINT/ NEQ
@@ -2460,13 +2451,15 @@ C
       COMMON /FLUXCOMMON/ FG1,FG2
       COMMON /POROS/ P0,P00,BP
       COMMON /SROOT/ ZROOT, WROOT
-      COMMON /IRRIG/ ALPHAA,XIRRIG
+      COMMON /IRRIG/ ALPHA0,XIRRIG
       COMMON /KINETICS/ KG1,KG2,KDOM,KO2,KNO3,KMNO,KFE3,KSO4
       COMMON /CONSTANT2/ KpFES
       COMMON /CONSTANT3/ k8,k10,k11,k12,k13,k14,k15,k23,k_23
       COMMON /DISSOL/ a, PER_DIS
       COMMON /STOIC/ SC1,SN1,SP1,SC2,SN2,SP2,SC3,SN3,SP3
       COMMON /TEMPERATURE/ TEMP, SAL, PRESS,pH0
+      COMMON /GETY/ YY
+!L3      COMMON /GETPH/ ppH
       COMMON /DESORB/ KANH4
       COMMON /hydro/ aa, bb, gg, zz
 
@@ -2490,10 +2483,9 @@ C
        SAL= Ainp(2)
        PRESS= Ainp(3)
        pH0= Ainp(4)
+
       CALL DDIFCOEF(V,DF,SAL,TEMP,PRESS)
       DO2  = DF(2)*YEAR
-
-
       DNO3 = DF(12)*YEAR
       DMN2= DF(22)*YEAR
       DNH3 = DF(10)*YEAR
@@ -2572,7 +2564,7 @@ C
       IRRG   = 0
 !     IS THERE IRRIGATION (INTEGER):YES = 1  NO=0
       IRRG = INT(Ainp(37))
-      ALPHAA = Ainp(38)
+      ALPHA0 = Ainp(38)
       XIRRIG = Ainp(39)
 
 !     ADVECTIVE VELOCITY
@@ -2586,6 +2578,9 @@ C
 
 !     PARAMETERS NEEDED FOR THE NUMERICS
 !     NUMBER OF POINTS NEEDED (UP TO 400) INTEGER
+!L3   These are set in Flux_CGEM.  Need to be set here too to
+!L3   define the common block.  Do not change Ainp(44) outside
+!L3   of Flux_CGEM.
       NPOINTS = Ainp(44)
       NEQ = NPOINTS*NSPECIES+2
 
@@ -2628,12 +2623,25 @@ C
 !     FOR FLUX BOUNDARY CONDITIONS ON THE ORGANIC MATTER
       IF(IFG.EQ.2) THEN
 !     INTERFACIAL FLUX OM1, OM2
-       FG1 = Ainp(62)*365./10000.*1000./12. ! from mg C m-2 d >umol C cm-2 y-1
-       FG2 = Ainp(63)*365./10000.*1000./12. ! from mg C m-2 d >umol C cm-2 y-1 
+       FG1 = Ainp(62)*365./10000.*1000./12 ! from mg C m-2 d >umol C cm-2 y-1
+       FG2 = Ainp(63)*365./10000.*1000./12 ! from mg C m-2 d >umol C cm-2 y-1 
       ENDIF
 
 !    SWICH options: USE initial guess 1
       KANH4 = (Ainp(64))
+
+
+!These are read in in Flux_CGEM
+!L3      OPEN(11,STATUS='UNKNOWN', file='ph2bprofile.dat')
+!L3        READ(11,*) (ppH(i),i=1,NPOINTS)
+!L3     CLOSE(11)
+
+!        OPEN(11,STATUS='UNKNOWN', file='standard2b.dat')
+!L3        OPEN(11,STATUS='UNKNOWN', file='normoxia.dat')
+!L3          READ(11,*) (YY(i),i=1,NEQ)
+!L3        CLOSE(11)
+
+
 
       CALL thermowater(rK,SAL,TEMP)
       rK1=rK(4)
