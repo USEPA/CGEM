@@ -142,7 +142,7 @@ CONTAINS
 
     !populate dim locations
     info%dimLocs=-1
-    do i=1, info%nvars
+    do i=1, info%ndims
       if(info%dimNames(i).eq.'X' .or. info%dimNames(i).eq.'x' .or. info%dimNames(i).eq.'I' .or. info%dimNames(i).eq.'i') then
         info%dimLocs(1) = i
       else if (info%dimNames(i).eq.'Y' .or. info%dimNames(i).eq.'y' .or. info%dimNames(i).eq.'J' .or. info%dimNames(i).eq.'j') then
@@ -348,6 +348,7 @@ CONTAINS
     !write(6,*) " tdim_index = ", tdim_index
    
 #ifdef DEBUG_CWS
+    write(6,*)"Inside interpVar3d"
     write(6,*)"Calling getTimeIndex for ", info%filename
     write(6,*)"tdim_index = ", tdim_index
     write(6,*)"tvar_index = ", tvar_index
@@ -404,6 +405,12 @@ CONTAINS
     !write(6,*) " tdim_index = ", tdim_index
 
 
+#ifdef DEBUG_CWS
+    write(6,*)"Inside interpVar2d"
+    write(6,*)"Calling getTimeIndex for ", info%filename
+    write(6,*)"tdim_index = ", tdim_index
+    write(6,*)"tvar_index = ", tvar_index
+#endif 
     call getTimeIndex(info%ncid, t_current, tdim_index, tvar_index, tstep, t1, t2)
 
     allocate(var1(IM,JM))
