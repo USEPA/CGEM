@@ -31,9 +31,8 @@ data/MyFiles.inp
 
 #
 # Keep directories but not contents. [Not sure if this works.]
-CGEM/NETCDF/*
-CGEM/output/*
-CGEM/CGEM
+NETCDF/*
+output/*
 
 # Subversion
 .svn/
@@ -48,11 +47,11 @@ error
 *.out
 
 # Customized runtime files
-CGEM/submit.sh
-CGEM/my_submit.sh
-CGEM/GEM_InputFile
-CGEM/GOMDOM_InputFile
-CGEM/modules.sh
+submit.sh
+my_submit.sh
+GEM_InputFile
+GOMDOM_InputFile
+modules.sh
 
 # Misc
 tags
