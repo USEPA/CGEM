@@ -116,7 +116,7 @@
 0.018		!CF_SPM: conversion factor for river OM to river SPM
 
 !Other including Boundary Conditions
-1		!Which_VMix: 0==No VMixing, 1==Yes VMixing   
+1 1		!Which_VMix/Adv: 0==No VMixing/Adv, 1==Yes VMixing/Adv   
 1		!KH_coeff: multiplying factor for KH in VMixing  
 0		!Which_Outer_BC: 0==Salinity, 1==zero nutrients at lateral bc, 2=zero nutrients lateral and open ocean, 3==small gradient, 
                 !                4==GoMDOM,   5==no flow boundaries, 6==Salinity with Depth attenuation
