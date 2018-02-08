@@ -1,0 +1,59 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+
+# These are simple regular expression (glob) patterns
+# for files and directories that Git should ignore
+
+# Editor (e.g., Emacs) temp files
+*~
+\#*\#
+
+# Compiled code and objects
+*.exe
+*.EXE
+*.a
+*.so
+*.o
+*__genmod.f90
+*__genmod.mod
+*.mod
+CGEM
+
+# Binary data files
+*.bin
+*.2001-2008
+
+#input files
+data/*
+data/MyFiles.inp
+
+#
+# Keep directories but not contents. [Not sure if this works.]
+CGEM/NETCDF/*
+CGEM/output/*
+CGEM/CGEM
+
+# Subversion
+.svn/
+
+# log and output files
+logfile*
+out
+out.time
+error
+*.pdf
+*.txt
+*.out
+
+# Customized runtime files
+CGEM/submit.sh
+CGEM/my_submit.sh
+CGEM/GEM_InputFile
+CGEM/GOMDOM_InputFile
+CGEM/modules.sh
+
+# Misc
+tags
+TAGS
