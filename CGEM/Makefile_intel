@@ -38,7 +38,7 @@ cgemdir=cgem_src
 gddir=gd_src
 
 ### These lines should seldom change! ###
-EXE	= FishTank.exe
+EXE	= CGEM 
 MY_HOST	  = $(shell hostname)
 ifeq (iris,$(findstring iris,$(MY_HOST)))
   INC	   = $(IRIS_INC)

@@ -65,6 +65,8 @@ write(6,*)
          do i=1,im
               if (depth(i,j).gt.0.) then  !Mask to determine if cell is land or ocean  (contains number of layers, with 0 layers = land)
                fm(i,j,:) = 1.
+              else
+               nza(i,j) = 0
               endif
               !Open ocean mask
               if (depth(i,j).le.100) then !Mask to determine if cell is on the shelf or open ocean

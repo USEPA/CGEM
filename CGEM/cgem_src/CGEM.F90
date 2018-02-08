@@ -1264,7 +1264,7 @@ enddo
        ff(i,j,k,iCDOM) =  AMAX1(f(i,j,k,iCDOM)*(1.0 - KGcdom*dTd), 0.0)  
 
 #ifdef DEBUG
-  write(6,*) istep,"CDOM f,ff",f(i,j,k,iCDOM),ff(i,j,k,iCDOM),(1.0 - KGcdom*dTd)
+!  write(6,*) istep,"CDOM f,ff",f(i,j,k,iCDOM),ff(i,j,k,iCDOM),(1.0 - KGcdom*dTd)
 #endif
 
 !---------------------------------------------------------------------

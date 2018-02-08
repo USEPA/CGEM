@@ -13,7 +13,7 @@
       USE Grid, ONLY: dz,d_sfc,d,dzz
       USE State_Vars
       USE Hydro, ONLY: Kh
-#ifdef DEBUG
+#ifdef DEBUG_V
       USE INPUT_VARS, ONLY: icent,jcent,Which_VMix
 #endif
 
@@ -25,7 +25,7 @@
       real  A(50),C(50),E(50),G(50)
       real  Gk(50)
 
-#ifdef DEBUG
+#ifdef DEBUG_V
 write(6,*) "---VMixing---"
 write(6,*) "  Which_VMix=",Which_VMix
 write(6,*) "  nz=",km

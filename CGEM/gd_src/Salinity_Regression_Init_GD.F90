@@ -13,17 +13,15 @@
       real temp
       integer i,j,k,nz
 
+#ifdef DEBUG
+write(6,*) "---Salinity_Regression_Init_GD"
+#endif
+
 
       do j = 1,jm
       do i = 1,im
             nz = nza(i,j)
          do k=1,nz
-
-#ifdef DEBUG
-write(6,*) "---Salinity_Regression_Init_GD"
-write(6,*) " S, d_sfc at i,j=",icent,jcent
-write(6,*) S(icent,jcent,km),d_sfc(icent,jcent,km)
-#endif
 
 !Regression y  =  b1*Salinity + b2*Depth + b3*Salinity^2 + b4*Depth^2 + Intercept
      !DOC

@@ -63,7 +63,7 @@ write(6,*)
 !     at bottom (w=0) add settling or deep ocean (wsm=1)
       w_wsink (i,j,nz+1) = wx(i,j,nz+1) + ws(ii)*real(wsm(i,j),4)*area(i,j)
 
-#ifdef DEBUG
+#ifdef DEBUG_A
 write(6,*) "nz=",nz
 write(6,*)
 write(6,*) "At the cell i,j,k=",icent,jcent,nz

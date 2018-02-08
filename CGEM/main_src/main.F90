@@ -153,7 +153,7 @@
 #ifdef DEBUG
 write(6,*) "---After WQ_Model"
 write(6,*) "istep=",istep
-write(6,*) "f(i19)",f(1,1,1:km,19)
+!write(6,*) "f(i19)",f(1,1,1:km,19)
 #endif
     
        call Flux(Which_code,istep)
@@ -163,7 +163,7 @@ write(6,*) "f(i19)",f(1,1,1:km,19)
 
 #ifdef DEBUG
 write(6,*) "---After Flux"
-write(6,*) "f(i19)",f(1,1,1:km,19)
+!write(6,*) "f(i19)",f(1,1,1:km,19)
 write(6,*) 
 #endif
 
@@ -176,7 +176,7 @@ write(6,*)
 
 #ifdef DEBUG
 write(6,*) "---After Transport"
-write(6,*) "f(i19)",f(1,1,1:km,19)
+!write(6,*) "f(i19)",f(1,1,1:km,19)
 #endif
 
       ! -------------- BEGIN OUTPUT DATA

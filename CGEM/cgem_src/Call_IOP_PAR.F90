@@ -12,6 +12,7 @@
 !---------------------------------------------------------------------
   USE Model_dim
   USE LIGHT_VARS 
+  USE Grid, ONLY: fm
 
   IMPLICIT NONE 
 
@@ -158,6 +159,9 @@
       if(PARdepth(k).ne.PARdepth(k)) then
           write(6,*) "k,d,Par,a,b,Rad,zenith",k,d_sfc(k),PARdepth(k),a490_mid, bb490_mid, PARsurf, sun_zenith
           write(6,*) "k,Sw,Chl,CDOM,OM1A,OM1Z,OM1R,OM1BC",k,aSw_mid,aChl490_mid, aCDOM490_mid , aOM1A490_mid , aOM1Z490_mid , aOM1R490_mid,aOM1BC490_mid
+          write(6,*) "numdepths,d_sfc(:)",numdepths,d_sfc
+          write(6,*) "fm",fm
+          stop
       endif
    enddo
 
