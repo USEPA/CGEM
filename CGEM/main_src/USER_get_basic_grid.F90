@@ -13,12 +13,6 @@
       integer :: i,j,k,nz
       character(200) filename
 
-#ifdef map_code
-write(6,*) "-----Calling USER_get_basic_grid-----"
-write(6,*) "  Which_gridio=",Which_gridio
-write(6,*) "  Setting dx, dy, depth, dxdy, dz, d_sfc, d, Vol"
-write(6,*)
-#endif
 
       write(filename,'(A, A)') trim(DATADIR),'/dxdy.dat'
       open(19,file=filename,status='old')
@@ -56,6 +50,13 @@ write(6,*)
           enddo
        enddo
       enddo
+
+#ifdef DEBUG 
+write(6,*) "-----Calling USER_get_basic_grid-----"
+write(6,*) "  Which_gridio=",Which_gridio
+write(6,*) "  Setting dx, dy, depth, dxdy, dz, d_sfc, d, Vol"
+write(6,*)
+#endif
 
       return
 

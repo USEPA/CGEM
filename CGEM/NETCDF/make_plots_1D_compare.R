@@ -15,9 +15,9 @@ if(args[1]=="gomdom"){
  pdf_layout <- c(4,4) 
 } else {
  which_eqs <- "cgem"
- ncfile <-  "cgem.000000.nc"
- ncfile2 <- "cgem.noflux.nc"
- pdfname <- "cgem.w_woflux.pdf"
+ ncfile <-  "cgem.gcc.nc"
+ ncfile2 <- "cgem.intel.nc"
+ pdfname <- "cgem.gcc_m_intel.pdf"
  pdf_layout <- c(4,4)
 }
 
@@ -28,8 +28,8 @@ if(args[1]=="gomdom"){
 pdfname <- "gomdom_pdiff.pdf"
 pdfname2 <- "gd.w_woflux_depth.pdf"
 }else{
-pdfname <- "cgem_pdiff.pdf"
-pdfname2 <- "cgem.w_woflux_depth.pdf"
+pdfname <- "cgem_pdiff_gcc_m_intel.pdf"
+pdfname2 <- "cgem.depth_gcc_m_intel.pdf"
 }
 source("compare_vars_sub_1D.R")
 

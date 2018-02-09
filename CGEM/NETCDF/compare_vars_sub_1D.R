@@ -91,7 +91,7 @@ colorlist <- c("black","red","blue","green","purple","orange","yellow","pink","b
  pdiff_mean <- c(1:tt)
  pdiff_mean <- pdiff_mean*0
  pdiff_mean <- pdiff_mean + mean(pdiff)
- label <- paste(round(100.*(rdata[k_layers[j],1] - rdata2[k_layers[j],1])/rdata[k_layers[j],1],5))
+ #label <- paste(round(100.*(rdata[k_layers[j],1] - rdata2[k_layers[j],1])/rdata[k_layers[j],1],5))
  timeseries_plot(Var[i],time[1:tt],pdiff,paste("m%d=",round(pdiff_mean[1],3)),label=label,range=c(ymin,ymax))
  timeseries_addlines(Var[i],time[1:tt],zeros,color="red")
  timeseries_addlines(Var[i],time[1:tt],pdiff_mean,color="blue")

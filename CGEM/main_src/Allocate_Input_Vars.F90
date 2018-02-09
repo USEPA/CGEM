@@ -7,12 +7,6 @@ IMPLICIT NONE
 
 character(6), intent(in) :: Which_code
 
-#ifdef map_code
-write(6,*) "---Allocate_Input---"
-write(6,*) "   first separate for CGEM and GD, then for shared"
-write(6,*)
-#endif
-
 if(Which_code.eq."CGEM") then !CGEM
 
          call Allocate_Input_CGEM()
@@ -43,8 +37,11 @@ endif
           write(6,*) "jcent>jm"
           stop
          endif
+
+write(6,*) "---Allocate_Input---"
+write(6,*) "   first separate for CGEM and GD, then for shared"
+write(6,*)
 #endif
 
 return
 END SUBROUTINE Allocate_INPUT_VARS
-

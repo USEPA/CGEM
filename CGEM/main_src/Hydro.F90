@@ -41,14 +41,6 @@
 
       IMPLICIT NONE
 
-#ifdef map_code
-write(6,*) "---Allocate_Hydro----"
-write(6,*) "  Allocate and fill these vars:"
-write(6,*) "  S,T,Wind,Rad,Ux,Vx,Wx,Kh,E"
-write(6,*) 
-write(6,*) "Variables allocated for im,jm,nsl=",im,jm,nsl
-#endif
-
       ALLOCATE(S(im,jm,nsl))
       ALLOCATE(T(im,jm,nsl))
       ALLOCATE(Wind(im,jm))
@@ -85,13 +77,6 @@ write(6,*) "Variables allocated for im,jm,nsl=",im,jm,nsl
       IMPLICIT NONE
 
       integer :: i
-
-#ifdef map_code
-write(6,*) "---Init_Hydro_NetCDF----"
-write(6,*) "  Opening netCDF for Which_gridio=",Which_gridio
-write(6,*) "  1==EFDC, 2==NCOM"
-write(6,*)
-#endif
 
       !Set filenames for netCDF
       if (Which_gridio .eq. 1) then 
@@ -140,6 +125,13 @@ write(6,*)
       enddo
 
       startIndex = 1
+
+#ifdef DEBUG 
+write(6,*) "---Init_Hydro_NetCDF----"
+write(6,*) "  Opening netCDF for Which_gridio=",Which_gridio
+write(6,*) "  1==EFDC, 2==NCOM, 3==POM "
+write(6,*)
+#endif
       
       End Subroutine Init_Hydro_NetCDF
 

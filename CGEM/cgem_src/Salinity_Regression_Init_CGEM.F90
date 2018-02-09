@@ -18,7 +18,6 @@ Subroutine Salinity_Regression_Init_CGEM()
   real, dimension(1) :: pdbar, rhois !pressure, density
   integer i,j,k,isp
 
-    !f(:,:,:,iTr) = 0.
 
     do j = 1,jm
       do i = 1,im 

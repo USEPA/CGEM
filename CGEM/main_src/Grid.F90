@@ -37,23 +37,18 @@
 
       contains
 
-      Subroutine Set_Grid(TC_8)
+      Subroutine Set_Grid(myid,numprocs)
 
       IMPLICIT NONE
 
       integer j
       character(200) filename
-      integer(kind=8) :: TC_8
+      integer, intent(in) :: myid,numprocs
+      integer mpierr
 
-      call Grid_allocate()
-#ifdef map_code
-write(6,*) "---Set_Grid----"
-write(6,*) "  Allocated Grid in Grid_allocate"
-write(6,*) "  Reading nza for 0D and EFDC, setting nza=km for NCOM"
-write(6,*) "  *** nza really should be zero if land, but is set to km here in Set_Grid"
-write(6,*)
-#endif
+      call Grid_allocate(myid)
 
+if(myid.eq.0) then
       if (Which_gridio .eq. 0 .OR. Which_gridio .eq. 1) then   ! used for basic and EFDC grids
          write(filename,'(A, A)') trim(DATADIR),'/nz.dat'
          open(unit=19,file=filename)
@@ -69,36 +64,65 @@ write(6,*)
           write(6,*)'...stopping execution'
           stop
       endif
+endif
+if(numprocs.gt.1) then
+     call MPI_BCAST(nza,im*jm,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
+endif
 
 !----------------------
 ! --- get grid location
 !----------------------
+if(myid.eq.0) then
       call USER_getLonLat(lat,lon)
+endif
+if(numprocs.gt.1) then
+     call MPI_BCAST(lat,im*jm,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+     call MPI_BCAST(lon,im*jm,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+endif
 
+if(myid.eq.0) then
       if (Which_gridio.eq.0) then
         call USER_get_basic_grid(dz,depth,d,d_sfc,area,Vol)
       else if (Which_gridio.eq.1) then
         gridStartIndex=1
-        call USER_get_EFDC_grid(TC_8)
+        call USER_get_EFDC_grid()
       else if (Which_gridio.eq.2) then
-        call USER_get_NCOM_grid(TC_8)
+        call USER_get_NCOM_grid()
       else if (Which_gridio.eq.3) then
-        call USER_get_POM_grid(TC_8)
+        call USER_get_POM_grid()
       endif
+endif
+if(numprocs.gt.1) then
+     call MPI_BCAST(dz,im*jm*km,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+     call MPI_BCAST(depth,im*jm,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+     call MPI_BCAST(d,im*jm*km,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+     call MPI_BCAST(d_sfc,im*jm*km,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+     call MPI_BCAST(area,im*jm,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+     call MPI_BCAST(Vol,im*jm*km,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+endif
 !--------------------------------
 ! --- get land/water and shelf masks
 !--------------------------------
 !      call USER_get_masks() !No, need to calculate depth first!!
+#ifdef DEBUG 
+write(6,*) "---Set_Grid----"
+write(6,*) "  Allocated Grid in Grid_allocate"
+write(6,*) "  Reading nza for 0D and EFDC, setting nza=km for NCOM"
+write(6,*) "  *** nza really should be zero if land, but is set to km here in Set_Grid"
+write(6,*)
+#endif
 
       return
 
       End Subroutine Set_Grid
 
-      Subroutine Grid_allocate()
+      Subroutine Grid_allocate(myid)
 
       USE Fill_Value
 
       IMPLICIT NONE
+
+      integer, intent(in) :: myid
 
       ALLOCATE(lat(im,jm))
       ALLOCATE(lon(im,jm))
@@ -131,13 +155,6 @@ write(6,*)
          h=fill(0)
       endif
 
-#ifdef map_code
-write(6,*) "----Grid_allocate"
-write(6,*) "  Allocating NaN for stuff the code should never access"
-write(6,*) "  Also Open_Grid_NetCDF"
-write(6,*) 
-#endif
-
       lat=fill(0)  !Fill values for netCDF
       lon=fill(0)  
       depth=fill(0) 
@@ -149,11 +166,20 @@ write(6,*)
       fm=0. !Default land, real zero
       wsm=0 !Default shelf, integer zero
 
+if(myid.eq.0) then
       if (Which_gridio.eq.1) then
        write(grid_info(eColDepth)%fileName, '(A,A)')trim(DATADIR),'/INPUT/WaterDepth.nc'
        write(grid_info(eCellDepth)%fileName, '(A,A)')trim(DATADIR),'/INPUT/LayerDepth.nc'
        call Open_Grid_NetCDF()
       endif
+endif
+    
+#ifdef DEBUG 
+write(6,*) "----Grid_allocate"
+write(6,*) "  Allocating NaN for stuff the code should never access"
+write(6,*) "  Also Open_Grid_NetCDF"
+write(6,*)
+#endif
 
       return
 
@@ -165,11 +191,6 @@ write(6,*)
       IMPLICIT NONE
       integer :: i
 
-#ifdef map_code
-write(6,*) "---Open_Grid_NetCDF--"
-write(6,*) "  numGridFiles=",numGridFiles
-write(6,*) 
-#endif
       do i=1,numGridFiles
         call open_netcdf(grid_info(i)%fileName, 0, grid_info(i)%ncid)
         call init_info(grid_info(i))

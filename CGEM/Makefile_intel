@@ -10,21 +10,21 @@
 ### Uncomment the next line to enable debugging
 #DFLAGS = -DDEBUG
 #DFLAGS = -g -warn -debug all -g -check all -ftrapuv#  -DDEBUG #-mcmodel=medium -shared-intel 
-#DFLAGS = -Wall -Wextra -pedantic -fimplicit-none -fbacktrace -D_CGEM -DRDEBUG -DDEBUG 
 #DFLAGS = -g
 
 ### Build options for specific platforms. 
 ### LIBS has path to netCDF
-SOL_INC	  = -I. -I/usr/local/apps/netcdf-4.3.3/intel-15.0/include/
-SOL_LIBS  = -L/usr/local/apps/netcdf-4.3.3/intel-15.0/lib -lnetcdff -lnetcdf
+#SOL_INC	  = -I. -I/usr/local/apps/netcdf-4.3.3/intel-15.0/include/
+#SOL_LIBS  = -L/usr/local/apps/netcdf-4.3.3/intel-15.0/lib -lnetcdff -lnetcdf
 
-IRIS_INC  = -I. -I/usr/local/apps/netcdf-4.4.0/gcc-4.4.7/include/
-IRIS_LIBS = -L. -L/usr/local/apps/netcdf-4.4.0/gcc-4.4.7/lib/ -lnetcdff -lnetcdf
+IRIS_INC  = -I/usr/local/apps/netcdf-4.4.1/intel-17.0/include/
+IRIS_LIBS = -L/usr/local/apps/netcdf-4.4.1/intel-17.0/lib -lnetcdff -lnetcdf 
 
-OTHER_INC   = -I. -I/usr/local/include
-OTHER_LIBS  = -L/usr/local/lib -lnetcdff -L/usr/local/bin -lnetcdf 
+#OTHER_INC   = -I. -I/usr/local/include
+#OTHER_LIBS  = -L/usr/local/lib -lnetcdff -L/usr/local/bin -lnetcdf 
 
 ### =============== End User Modifiable Section  =============== ####
+include main_src/serial_src_files
 include main_src/src_files
 include moc_src/src_files
 include sdm_src/src_files
@@ -39,28 +39,20 @@ gddir=gd_src
 
 ### These lines should seldom change! ###
 EXE	= CGEM 
-MY_HOST	  = $(shell hostname)
-ifeq (iris,$(findstring iris,$(MY_HOST)))
+
+#MY_HOST	  = $(shell hostname)
+#ifeq (iris,$(findstring iris,$(MY_HOST)))
   INC	   = $(IRIS_INC)
   LIBS	   = $(IRIS_LIBS)
   F90      = ifort
-  FFLAGS = -warn all -traceback -no-diag-error-limit -implicitnone -convert big_endian -ftz #-check -debug -g       #-g -fbacktrace -Wall 
-else 
-ifeq (sol,$(findstring sol,$(MY_HOST)))
-  INC	   = $(SOL_INC)
-  LIBS	   = $(SOL_LIBS)
-  F90     = gfortran 
-  FFLAGS =  
-else
-  INC      = $(OTHER_INC)
-  LIBS     = $(OTHER_LIBS)
-  F90     = gfortran 
-  FFLAGS = -lgfortran 
-endif
-endif
+  FFLAGS = -warn all -traceback -no-diag-error-limit -implicitnone -convert big_endian -ftz 
+#else 
+#else
+#endif
+#endif
 
-FishTank: ${MAIN_OBJ} ${MOC_OBJ} ${CGEM_OBJ} ${SDM_OBJ} ${GD_OBJ}
-	$(F90) -o $(EXE) $(FFLAGS) $(DFLAGS) $(INC) $(MAIN_OBJ) ${MOC_OBJ} ${CGEM_OBJ} ${SDM_OBJ} ${GD_OBJ} $(LIBS)
+FishTank: ${SERIAL_OBJ} ${MAIN_OBJ} ${MOC_OBJ} ${CGEM_OBJ} ${SDM_OBJ} ${GD_OBJ}
+	$(F90) -o $(EXE) $(FFLAGS) $(DFLAGS) $(INC) $(SERIAL_OBJ) $(MAIN_OBJ) ${MOC_OBJ} ${CGEM_OBJ} ${SDM_OBJ} ${GD_OBJ} $(LIBS)
 
 
 #
@@ -77,6 +69,9 @@ $(SDM_OBJ): %.o: $(sdmdir)/%.f
 
 $(MAIN_OBJ):%.o: $(maindir)/%.F90
 	$(F90) -c $(FFLAGS) $(DFLAGS)  $<
+
+$(SERIAL_OBJ):%.o: $(maindir)/%.F90
+	$(F90) -c  $<
 
 $(MOC_OBJ):%.o: $(mocdir)/%.F90
 	$(F90) -c $(FFLAGS) $(DFLAGS)  $<

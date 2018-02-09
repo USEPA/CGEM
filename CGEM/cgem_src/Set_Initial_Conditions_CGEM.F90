@@ -15,12 +15,6 @@
        character(120), intent(in) :: init_filename
        integer i,j,k
 
-#ifdef DEBUG
-      write(6,*) "In Set Initial Conditions"
-      write(6,*) "start,dT",START_SECONDS, dT
-#endif
-
-
        if(InitializeHow.eq.0) then 
 
         write(filename,'(A,A,A)') trim(DATADIR),"/",trim(init_filename)
@@ -29,9 +23,7 @@
         do j=1,jm
         do i=1,im
         do k=1,nza(i,j)
-        !f(i,j,k,:)= f(i,j,k,:)/Vol(i,j,k)*Vol(25,16,3)
         f(i,j,k,iTr) = 1./Vol(i,j,k)
-!        write(6,*) "i,j,k,vol",i,j,k,Vol(i,j,k)
         enddo
         enddo
         enddo
@@ -55,7 +47,10 @@
        endif
 
        !call InitError_Check_CGEM()
-
+#ifdef DEBUG
+      write(6,*) "In Set Initial Conditions"
+      write(6,*) "start,dT",START_SECONDS, dT
+#endif
        return
 
        End Subroutine Set_Initial_Conditions_CGEM 

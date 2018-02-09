@@ -11,14 +11,6 @@
       character(*),intent(in) :: filename
       real init(nf)
 
-#ifdef map_code
-write(6,*) "------USER_Set_Initial_Conditions--"
-write(6,*) "  Read one value for each state variable"
-write(6,*) "  Then set grid constant"
-write(6,*) "  filename=",filename
-write(6,*) 
-#endif
-
 isum=0
 ! Read in from "InitialConditions.txt" which has 1 value for each state variable.
 ! There is no header line.
@@ -47,13 +39,18 @@ isum=0
           do k = 1, nz
              do ii=1,nf
              f(i,j,k,ii) = init(ii)
-#ifdef DEBUG
-         write(6,*) "f,i,j,k,kk",i,j,k,ii,f(i,j,k,ii)
-#endif
              enddo
           enddo
        enddo
       enddo
+
+#ifdef DEBUG 
+write(6,*) "------USER_Set_Initial_Conditions--"
+write(6,*) "  Read one value for each state variable"
+write(6,*) "  Then set grid constant"
+write(6,*) "  filename=",filename
+write(6,*)
+#endif
 
       return
 

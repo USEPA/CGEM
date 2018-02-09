@@ -1,4 +1,4 @@
-       Subroutine Get_Vars(TC_8,T_8) 
+       Subroutine Get_Vars(TC_8,T_8,myid,numprocs) 
 
        USE Model_dim
        USE INPUT_VARS, ONLY: START_SECONDS,&
@@ -11,8 +11,13 @@
 
        integer(kind=8), intent(in) :: TC_8,T_8 ! Current time in seconds since Model_dim::iYr0.
        integer(kind=8) :: TC_in
+       integer, intent(in) :: myid,numprocs
        integer, save :: init=1
-       integer i,j,k
+       integer i,j,k,mpierr
+
+
+
+      if(myid.eq.0) then
 
         TC_in = TC_8
 
@@ -78,7 +83,19 @@
         endif
 
         init=0
+      endif
 
+      if(numprocs.gt.1) then
+        call MPI_BCAST(S,im*jm*nsl,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+        call MPI_BCAST(T,im*jm*nsl,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+        call MPI_BCAST(Wind,im*jm,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+        call MPI_BCAST(Rad,im*jm,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+        call MPI_BCAST(Ux,im*jm*nsl,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+        call MPI_BCAST(Vx,im*jm*nsl,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+        call MPI_BCAST(Wx,im*jm*nsl,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+        call MPI_BCAST(Kh,im*jm*nsl,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+        call MPI_BCAST(E,im*jm,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+      endif 
 
        return
 

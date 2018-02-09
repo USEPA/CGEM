@@ -1,4 +1,4 @@
-Subroutine Read_InputFile_CGEM(filename)
+Subroutine Read_InputFile_CGEM(filename,myid,numprocs)
 
 USE Model_dim
 USE INPUT_VARS
@@ -11,15 +11,18 @@ USE STOICH_VARS
 
 IMPLICIT NONE
 
+integer, intent(in) :: myid, numprocs
+character(120),intent(in) :: filename
 
-integer i,j,k,icent_jcent_units
+integer i,j,k,icent_jcent_units,mpierr
 integer isp,isz
 real i_in,j_in,tot,x
 real, parameter :: SDay = 86400.0  ! # of sec in 24 hr day
-character(120) filename
 real eps
 
 ws(1:nf) = 0.
+
+if(myid.eq.0) then
 !--Code Identifier--------------
 open(unit=999,file=filename,form='formatted',status='old')
 read(999,*) code_ID
@@ -170,6 +173,149 @@ read(999,*) Which_Output
 close(999)
 
  call Check_InputFile()
+endif
+
+if(numprocs.gt.1) then
+call MPI_BCAST(code_ID,50,MPI_CHARACTER,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(iDayE,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(iDayS,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(iHrE,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(iHrS,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(iMinE,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(iMinS,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(iMonE,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(iMonS,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(iSecE,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(iSecS,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(iYrE,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(iYrS,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(dT,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(dT_out,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(i_in,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(j_in,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
+
+call MPI_BCAST(Which_fluxes,8,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
+
+call MPI_BCAST(Which_temperature,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(Which_uptake,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(Which_quota,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(Which_irradiance,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(Which_chlaC,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(Which_photosynthesis,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(Which_growth,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
+
+call MPI_BCAST(Read_Solar,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(Read_Wind,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(Read_T,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(Read_Sal,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
+
+call MPI_BCAST(InitializeHow,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
+
+call MPI_BCAST(Kw,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(Kcdom,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(Kspm,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(Kchla,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+
+call MPI_BCAST(astar490,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(aw490,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(astarOMA,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(astarOMZ,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(astarOMR,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(astarOMBC,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(ws,nf,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(PARfac,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+
+call MPI_BCAST(Tref,nospA+nospZ,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(KTg1,nospA+nospZ,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(KTg2,nospA+nospZ,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(Ea,nospA+nospZ,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(ediblevector,nospA*nospZ,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(umax,nospA,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(CChla,nospA,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(alpha,nospA,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(beta,nospA,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(respg,nospA,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(respb,nospA,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(QminN,nospA,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(QminP,nospA,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(QmaxN,nospA,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(QmaxP,nospA,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(Kn,nospA,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(Kp,nospA,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(Ksi,nospA,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(KQn,nospA,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(KQp,nospA,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(nfQs,nospA,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(vmaxN,nospA,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(vmaxP,nospA,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(vmaxSi,nospA,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(aN,nospA,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(volcell,nospA,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(Qc,nospA,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(Athresh,nospA,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(mA,nospA,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(A_wt,nospA,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+
+call MPI_BCAST(Zeffic,nospZ,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(Zslop,nospZ,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(Zvolcell,nospZ,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(ZQc,nospZ,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(ZQn,nospZ,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(ZQp,nospZ,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(ZKa,nospZ,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(Zrespg,nospZ,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(Zrespb,nospZ,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(Zumax,nospZ,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(Zm,nospZ,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+
+call MPI_BCAST(KG1,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(KG2,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(KG1_R,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(KG2_R,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(KG1_BC,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(KG2_BC,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(KNH4,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(nitmax,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(KO2,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(KstarO2,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(KNO3,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(pCO2,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(stoich_x1R,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(stoich_y1R,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(stoich_x2R,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(stoich_y2R,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(stoich_x1BC,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(stoich_y1BC,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(stoich_x2BC,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(stoich_y2BC,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(KGcdom,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(CF_SPM,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+
+call MPI_BCAST(Which_Vmix,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(Which_Adv,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(KH_coeff,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(Which_Outer_BC,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(wt_l,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(wt_o,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(wt_pl,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(wt_po,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(m_OM_init,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(m_OM_BC,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(m_OM_sh,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(Stoich_x1A_init,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(Stoich_y1A_init,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(Stoich_x2A_init,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(Stoich_y2A_init,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(Stoich_x1Z_init,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(Stoich_y1Z_init,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(Stoich_x2Z_init,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(Stoich_y2Z_init,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(KG_bot,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(MC,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(Which_Output,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
+
+endif
+
 
 stoich_z1R = 1.
 stoich_z2R = 1.

@@ -25,12 +25,6 @@
       real :: ufm,ufp,vfm,vfp,wfm,wfp
       real :: cfh,cf
 
-#ifdef DEBUG
-write(6,*) "---Adv3D---"
-write(6,*) "  Which_adv=",Which_adv
-write(6,*) 
-#endif
-
       if(Which_Adv.eq.0.or.Which_Adv.eq.2) then
        ux=0.
        vx=0.
@@ -135,6 +129,12 @@ write(6,*)
           enddo
          enddo
          enddo
+
+#ifdef DEBUG
+write(6,*) "---Adv3D---"
+write(6,*) "  Which_adv=",Which_adv
+write(6,*)
+#endif
 
       RETURN 
       END 

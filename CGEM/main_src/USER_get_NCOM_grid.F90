@@ -13,13 +13,6 @@
 
       integer :: nzr, ns
 
-#ifdef map_code
-     write(6,*) "----Calling USER_get_NCOM_grid-----"
-     write(6,*) "  setting dxy, area, zl, zz, dz_k, and h"
-     write(6,*) "  Not setting depths, because don't have E"  
-     write(6,*) 
-#endif
-
       write(filename,'(A, A)') trim(DATADIR),'/dxdy.dat'
       open(19,file=filename,status='old')
       read(19,*) 
@@ -92,6 +85,13 @@
        enddo
       enddo
 
+#ifdef map_code
+     write(6,*) "----Calling USER_get_NCOM_grid-----"
+     write(6,*) "  setting dxy, area, zl, zz, dz_k, and h"
+     write(6,*) "  Not setting depths, because don't have E"
+     write(6,*)
+#endif
+
       return
       end subroutine USER_get_NCOM_grid
 
@@ -106,27 +106,8 @@
 
       IMPLICIT NONE
 
-      real :: dp !d previous
       integer :: i,j,k,nz
       integer :: init=1
-
-#ifdef map_code 
-     if(init.eq.1) then
-      write(6,*) "----Calling USER_update_NCOM_grid-----"
-      write(6,*) "  setting dxy, area, zl, zz, dz_k, and h"
-      write(6,*) "  Not setting depths, because don't have E"
-      write(6,*)
-     init=0
-     endif
-#endif
-#ifdef DEBUG
-     write(6,*) "----Calling USER_get_NCOM_grid-----"
-     write(6,*) "  setting dxy, area, zl, zz, dz_k, and h"
-     write(6,*) "  For cell i,j,k=",icent,jcent,km
-     write(6,*) "h,E,d,zz,area,d_sfc,Vol="
-     write(6,*) h(icent,jcent),E(icent,jcent),d(icent,jcent,km)
-     write(6,*) zz(km),area(icent,jcent),d_sfc(icent,jcent,km),Vol(icent,jcent,km)
-#endif
 
        do j=1,jm
         do i=1,im
@@ -138,29 +119,23 @@
        do j=1,jm
         do i=1,im
            nz = nza(i,j)
-           dp = depth(i,j)
            do k=1,nz
             dz(i,j,k) = depth(i,j)*dz_k(k)
             d_sfc(i,j,k) = depth(i,j)*zz(k)
             Vol(i,j,k) = area(i,j) *dz(i,j,k)
             d(i,j,k) = sum(dz(i,j,1:k)) 
-            dp = d(i,j,k)
-#ifdef DEBUG_GRID
-  write(6,*) "for cell i,j,k=",i,j,k
-  write(6,*) "h",h(i,j)
-  write(6,*) "depth",depth(i,j)
-  write(6,*) "E",E(i,j)
-  write(6,*) "d",d(i,j,k)
-  write(6,*) "dz",dz(i,j,k)
-  write(6,*) "zz",zz(k)
-  write(6,*) "area",area(i,j)
-  write(6,*) "d_sfc",d_sfc(i,j,k)
-  write(6,*) "Vol",Vol(i,j,k)
-#endif
-
         enddo
        enddo
       enddo  
+
+#ifdef DEBUG
+     write(6,*) "----Calling USER_get_NCOM_grid-----"
+     write(6,*) "  setting dxy, area, zl, zz, dz_k, and h"
+     write(6,*) "  For cell i,j,k=",icent,jcent,km
+     write(6,*) "h,E,d,zz,area,d_sfc,Vol="
+     write(6,*) h(icent,jcent),E(icent,jcent),d(icent,jcent,km)
+     write(6,*) zz(km),area(icent,jcent),d_sfc(icent,jcent,km),Vol(icent,jcent,km)
+#endif
 
       end subroutine USER_update_NCOM_grid
 

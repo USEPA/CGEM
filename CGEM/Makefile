@@ -8,30 +8,21 @@
 ### =============== User Modifiable Section =============== ###
 
 ### Uncomment the next line to enable debugging
-#DFLAGS = -warn -debug all -g -check all -ftrapuv #-DDEBUG #-mcmodel=medium -shared-intel 
-#DFLAGS = -g -Wall -Wextra -pedantic -fimplicit-none -fbacktrace -Dmap_code -DDEBUG#-D_CGEM #-DRDEBUG -DDEBUGVARS #-DDEBUG_Vars #-DDEBUG1#-DDEBUG 
-#DFLAGS = -DDEBUG
-#DFLAGS = -DDEBUGVARS -DDEBUG_Vars
-#DFLAGS = -DDEBUG1
-#CFLAGS = -DCALIBRATE -DCAL_LT -DCAL_O2
-#CFLAGS = -DCALIBRATE -DCAL_DK -DCAL_O2
-#CFLAGS = -DCALIBRATE -DCAL_LTNT -DCAL_O2
-#CFLAGS = -Dtest1d
-#DFLAGS = -DSDM_DEBUG 
-#DFLAGS = -DDEBUG_LIGHT
-#DFLAGS = -Dmap_code -g -Wall -Wextra -fbacktrace #-DDEBUG #-DDEBUG_GRID#-DDEBUG
-
+DFLAGS = -DDEBUG
+#DFLAGS = -g -warn -debug all -g -check all -ftrapuv#  -DDEBUG #-mcmodel=medium -shared-intel 
+#DFLAGS = -Wall -Wextra -pedantic -fimplicit-none -fbacktrace -D_CGEM -DRDEBUG -DDEBUG 
+#DFLAGS = -g
 
 ### Build options for specific platforms. 
 ### LIBS has path to netCDF
-#IRIS_INC	  = -I. -I/usr/local/apps/netcdf-4.4.0/intel-15.0/include/
-#IRIS_LIBS  = -L/usr/local/apps/netcdf-4.4.0/intel-15.0/lib -lnetcdff -lnetcdf
+SOL_INC	  = -I. -I/usr/local/apps/netcdf-4.3.3/intel-15.0/include/
+SOL_LIBS  = -L/usr/local/apps/netcdf-4.3.3/intel-15.0/lib -lnetcdff -lnetcdf
 
 IRIS_INC  = -I. -I/usr/local/apps/netcdf-4.4.0/gcc-4.4.7/include/
 IRIS_LIBS = -L. -L/usr/local/apps/netcdf-4.4.0/gcc-4.4.7/lib/ -lnetcdff -lnetcdf
 
 OTHER_INC   = -I. -I/usr/local/include
-OTHER_LIBS  = -L. -L/usr/local/apps/netcdf-4.4.1/gcc-4.8.5/lib -lnetcdff -lnetcdf 
+OTHER_LIBS  = -L/usr/local/lib -lnetcdff -L/usr/local/bin -lnetcdf 
 
 ### =============== End User Modifiable Section  =============== ####
 include main_src/src_files
@@ -52,9 +43,8 @@ MY_HOST	  = $(shell hostname)
 ifeq (iris,$(findstring iris,$(MY_HOST)))
   INC	   = $(IRIS_INC)
   LIBS	   = $(IRIS_LIBS)
-  F90      = gfortran #ifort #gfortran
-  FFLAGS = -ffree-line-length-none #-Warn all -traceback #-check -debug -g       #-g -fbacktrace -Wall -ffree-line-length-none
-  FFLAGS_SDM = -O3 
+  F90      = mpiifort
+  FFLAGS = -warn all -traceback -no-diag-error-limit -implicitnone -convert big_endian -ftz -D_MPI#-check -debug -g       #-g -fbacktrace -Wall 
 else 
 ifeq (sol,$(findstring sol,$(MY_HOST)))
   INC	   = $(SOL_INC)
@@ -65,12 +55,12 @@ else
   INC      = $(OTHER_INC)
   LIBS     = $(OTHER_LIBS)
   F90     = gfortran 
-  FFLAGS = -ffree-line-length-none 
+  FFLAGS = -lgfortran 
 endif
 endif
 
 FishTank: ${MAIN_OBJ} ${MOC_OBJ} ${CGEM_OBJ} ${SDM_OBJ} ${GD_OBJ}
-	$(F90) -o $(EXE) $(FFLAGS) $(DFLAGS) $(CFLAGS) $(INC) $(MAIN_OBJ) ${MOC_OBJ} ${CGEM_OBJ} ${SDM_OBJ} ${GD_OBJ} $(LIBS)
+	$(F90) -o $(EXE) $(FFLAGS) $(DFLAGS) $(INC) $(MAIN_OBJ) ${MOC_OBJ} ${CGEM_OBJ} ${SDM_OBJ} ${GD_OBJ} $(LIBS)
 
 
 #
@@ -79,14 +69,14 @@ FishTank: ${MAIN_OBJ} ${MOC_OBJ} ${CGEM_OBJ} ${SDM_OBJ} ${GD_OBJ}
 
 # These items must have compiler optimization disabled
 $(NO_OPT_OBJS): %.o: %.F90
-	$(F90) -c -O0 $(FFLAGS) $(INC) $(DFLAGS) $<
+	$(F90) -c -O0 $(FFLAGS) $(DFLAGS) $<
 
 # No Implicit None flag
 $(SDM_OBJ): %.o: $(sdmdir)/%.f
 	$(F90) -c $(FFLAGS_SDM) $<
 
 $(MAIN_OBJ):%.o: $(maindir)/%.F90
-	$(F90) -c $(FFLAGS) $(CFLAGS) $(DFLAGS)  $<
+	$(F90) -c $(FFLAGS) $(DFLAGS)  $<
 
 $(MOC_OBJ):%.o: $(mocdir)/%.F90
 	$(F90) -c $(FFLAGS) $(DFLAGS)  $<
@@ -95,10 +85,10 @@ $(OBJ):%.o: %.F90
 	$(F90) -c $(FFLAGS) $(DFLAGS) $<
 
 $(CGEM_OBJ):%.o: $(cgemdir)/%.F90
-	$(F90) -c $(FFLAGS) $(CFLAGS) $(DFLAGS)   $<
+	$(F90) -c $(FFLAGS) $(DFLAGS)   $<
 
 $(GD_OBJ):%.o: $(gddir)/%.F90
-	$(F90) -c $(FFLAGS) $(CFLAGS) $(DFLAGS)  $<
+	$(F90) -c $(FFLAGS) $(DFLAGS)  $<
 
 
 ## Generic implicit rules

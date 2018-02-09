@@ -9,11 +9,7 @@
       real, dimension(im,jm) :: sdetg
       integer :: i,j
       character(200) filename
-#ifdef map_code
-write(6,*) "---USER_get_EFDC grid----"
-write(6,*) "  only setting dx, dy, dxdy, and area"
-write(6,*)
-#endif
+
       write(filename,'(A, A)') trim(DATADIR),'/dxdy.dat'
       open(19,file=filename,status='old')
       read(19,*) !dx
@@ -47,6 +43,12 @@ write(6,*)
       enddo
 
       !stop
+
+#ifdef DEBUG
+write(6,*) "---USER_get_EFDC grid----"
+write(6,*) "  only setting dx, dy, dxdy, and area"
+write(6,*)
+#endif
 
       return
 

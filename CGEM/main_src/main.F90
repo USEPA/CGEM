@@ -29,6 +29,10 @@
 
       IMPLICIT NONE
 
+#ifdef _MPI
+!      include "mpif.h"
+#endif
+
 !---------------------
 ! Declare Variables:    
 !---------------------
@@ -39,42 +43,63 @@
       character(120) init_filename         !Initial conditions file
       character(6) Which_code
       character(100) :: BASE_NETCDF_OUTPUT_FILE_NAME
-      integer i,j,k
 !------------------------------------------------ 
+!---------------------
+! MPI variables
+!---------------------
+#ifndef _MPI
+      integer, parameter :: MPI_COMM_WORLD=0
+      integer, parameter :: MPI_CHARACTER=0
+      integer, parameter :: MPI_INTEGER=0
+      integer, parameter :: MPI_REAL=0
+      real*8 :: MPI_WTIME
+#endif
+      integer :: myid=0
+      integer :: numprocs=1
+      real*8  mpitime1,mpitime2   !timing
+      integer mpierr
+!------------------------------------------------
+!Initialize MPI
+      call MPI_INIT(mpierr)
+      call MPI_COMM_RANK(MPI_COMM_WORLD, myid, mpierr)
+      call MPI_COMM_SIZE(MPI_COMM_WORLD, numprocs, mpierr)
+      mpitime1 = MPI_WTIME()
 
 ! --- Command Line Arguments for file names ---
-      call Command_Line_Args(Which_code,input_filename,init_filename,BASE_NETCDF_OUTPUT_FILE_NAME)
+      if(myid.eq.0) call Command_Line_Args(Which_code,input_filename,init_filename,BASE_NETCDF_OUTPUT_FILE_NAME)
+      if(numprocs.gt.1) then 
+       call MPI_BCAST(Which_code,6,MPI_CHARACTER,0,MPI_COMM_WORLD,mpierr)
+       call MPI_BCAST(input_filename,120,MPI_CHARACTER,0,MPI_COMM_WORLD,mpierr)
+       call MPI_BCAST(init_filename,120,MPI_CHARACTER,0,MPI_COMM_WORLD,mpierr)
+       call MPI_BCAST(BASE_NETCDF_OUTPUT_FILE_NAME,100,MPI_CHARACTER,0,MPI_COMM_WORLD,mpierr)
+      endif
 
-      call Set_Model_dim()
-      call Set_Grid(TC_8)
+      call Set_Model_dim(myid,numprocs)
+      call Set_Grid(myid,numprocs)
       call Allocate_Input_Vars(Which_code)
       call Allocate_Hydro
-      !L3 Take care of ws here
 
 ! Read_InputFile must define nstep, iout, dT, START_SECONDS
-      call Read_InputFile(input_filename,Which_code) 
+      call Read_InputFile(input_filename,Which_code,myid,numprocs) 
 
 #ifdef DEBUG
       write(6,*) "----After Read_InputFile"
       write(6,*) "  start,dT",START_SECONDS, dT
 #endif
 
-!L3--- This next line is from Ko, but I have no idea why this is necessary.
-! Check to see if we can just use START-dT or move the time increment to
-! the bottom of the loop.
-
       T_8 = START_SECONDS 
       TC_8 = START_SECONDS - (dT / 2) ! Subtract half dT to 'center' of timestep.
-      if (Which_gridio .gt. 0) then
+      if (Which_gridio .gt. 0.and.myid.eq.0) then
         call Init_Hydro_NetCDF()
       endif
   
-      call Get_Vars(TC_8,T_8) !Hydro for initial timestep 
+      call Get_Vars(TC_8,T_8,myid,numprocs) !Hydro for initial timestep 
 
 ! Initialize time an loop variables
       istep = 0
       istep_out = 0
 
+    if(myid.eq.0) then
       if (Which_gridio.eq.1) then
         call USER_update_EFDC_grid(TC_8,T_8)
       else if (Which_gridio.eq.2) then
@@ -82,6 +107,7 @@
       else if (Which_gridio.eq.3) then
         call USER_update_POM_grid()
       endif
+    endif
 
 !--------------------------------
 ! --- get land/water and shelf masks
@@ -89,50 +115,18 @@
       call USER_get_masks()
 
       call Set_Vars(Which_code,init_filename) !initialize 'f' array
-!write(6,*) "---After Set_Vars"
-!write(6,*) "f(i19)",f(20,4,1:km,1)
-
-!      f(1,1,1,22) = 1/Vol(1,1,1)
-!      f(1,1,2,22) = 2/Vol(1,1,1)
-!      f(1,1,3,22) = 3/Vol(1,1,1)
-!      f(1,1,4,22) = 4/Vol(1,1,1)
-!      f(1,1,5,22) = 5/Vol(1,1,1)
-!      f(1,1,6,22) = 6/Vol(1,1,1)
-!      f(1,1,7,22) = 7/Vol(1,1,1)
-
-
-       !f(:,:,:,1) = 1/Vol(:,:,:)
-       !f(6,25,1,1) = f(6,25,1,1) + 10.*f(6,25,1,1) 
-
-#ifdef DEBUG_ADDBLIP
-      write(6,*) "f(60,120,1,10) = ", f(60,120,1,10)
-      f(60,120,1,10) = 500.0
-      write(6,*) " with blip = ", f(60,120,1,10)
-#endif
 
       call Initialize_Output(Which_code,BASE_NETCDF_OUTPUT_FILE_NAME)     !Open file and write initial configuration
-!write(6,*) "---After Init Output"
-!write(6,*) "f(i19)",f(20,4,1:km,1)
 
-#ifdef DEBUG_VMIX
-   write(6,*) "f(60,2,1,10)= ", f(60,2,1,10)
-#endif
-
-#ifdef CALIBRATE
-      if(Which_code.eq."CGEM") then
-       write(6,*) "O2 initial: ",f(1,1,1,10)
-      else
-       write(6,*) "O2 initial: ",f(1,1,1,18)
-      endif
-#endif
 
 !-------------- START TIME LOOP -----------------------------------
       do istep = 1, nstep
        TC_8 = TC_8 + dT
        T_8 = T_8 + dT
-#ifdef DEBUG_TIME
+#ifdef DEBUG
    write(6,*) "TC_8=", TC_8
 #endif
+    if(myid.eq.0) then
       if (Which_gridio.eq.1) then
         Vol_prev = Vol
         call USER_update_EFDC_grid(TC_8,T_8)
@@ -143,102 +137,41 @@
         Vol_prev = Vol
         call USER_update_POM_grid()
       endif
+    endif
 
-       call Get_Vars(TC_8,T_8) !Hydro, Solar, Wind, Temp, Salinity
+       call Get_Vars(TC_8,T_8,myid,numprocs) !Hydro, Solar, Wind, Temp, Salinity
 
 !L3 add when necessary       call USER_update_masks()
 
        call WQ_Model(Which_code,TC_8,istep,istep_out)
 
-#ifdef DEBUG
-write(6,*) "---After WQ_Model"
-write(6,*) "istep=",istep
-!write(6,*) "f(i19)",f(1,1,1:km,19)
-#endif
-    
        call Flux(Which_code,istep)
 
-!write(6,*) "---Before Flux"
-!write(6,*) "f(i19)",f(20,4,1:km,1)
-
-#ifdef DEBUG
-write(6,*) "---After Flux"
-!write(6,*) "f(i19)",f(1,1,1:km,19)
-write(6,*) 
-#endif
-
-!write(6,*) "---Before Transport"
-!write(6,*) "f(i19)",f(20,4,1:km,1)
-
-!       write(6,*) "step_out",istep_out
-!       write(6,*) "istep=",istep
        call Transport(Which_code)
-
-#ifdef DEBUG
-write(6,*) "---After Transport"
-!write(6,*) "f(i19)",f(1,1,1:km,19)
-#endif
 
       ! -------------- BEGIN OUTPUT DATA
       ! --- dump output when istep is a multiple of iout
        if (  mod( istep, iout ) .eq. 0 ) then
         istep_out = istep_out + 1
-        if(Which_gridio.ne.0) write(6,*) "output=",istep_out+1
+        if(Which_gridio.ne.0.and.myid.eq.0) write(6,*) "output=",istep_out+1
         call Model_Output(Which_Code,istep_out)
        endif
 
-#ifdef DEBUG
-write(6,*) "---After Model_Output"
-#endif
-
       enddo
 
-      Call Model_Finalize(Which_code) ! Closes the output NetCDF file and whatever else
-      if (Which_gridio.eq.1) then
-        Call Close_Hydro_NetCDF()
-        Call Close_Grid_NetCDF()
-      endif
+      Call Model_Finalize(Which_code,Which_gridio) ! Closes the NetCDF files and whatever else
 
-#ifdef CALIBRATE
-      if(Which_code.eq."CGEM") then
-       write(6,*) "O2 final: ",f(1,1,1,10)
-      else
-       write(6,*) "O2 final: ",f(1,1,1,18)
-      endif
-#endif
+      mpitime2 = MPI_WTIME()
+      if(myid.eq.0) write(6,*) "Code took",mpitime2-mpitime1,"seconds"
 
-#ifdef CAL_LT
-      if(Which_code.eq."CGEM") then
-        write(6,*) "Percent Error Light (measured=229.57) = ",(229.57 - f(1,1,1,10))/229.57 * 100
-      else
-        !Convert 229.57 to kg/m3, multiply by 32e-6:
-        write(6,*) "Percent Error Light (measured=0.00734624) = ",(0.00734624 - f(1,1,1,18))/0.00734624 * 100
-      endif
-#endif
-#ifdef CAL_DK
-      if(Which_code.eq."CGEM") then
-      write(6,*) "Percent Error Dark (measured=195.51) = ",(195.51 - f(1,1,1,10))/195.51 * 100
-      else
-        !Convert 195.51 to kg/m3, multiply by 32e-6:
-      write(6,*) "Percent Error Dark (measured=0.00625632) = ",(0.00625632 - f(1,1,1,18))/0.00625632 * 100
-      endif
-
-#endif
-#ifdef CAL_LTNT
-      if(Which_code.eq."CGEM") then
-      write(6,*) "Percent Error LTNT (measured=253.43) = ",(253.43 - f(1,1,1,10))/253.43 * 100
-      else
-        !Convert 253.43 to kg/m3, multiply by 32e-6:
-      write(6,*) "Percent Error LTNT (measured=0.00810976) = ",(0.00810976 - f(1,1,1,18))/0.00810976 * 100
-      endif
-
-#endif
+      call MPI_FINALIZE(mpierr)
 
 !----------------------------------------------------------------
 ! If we get here, there will be a normal exit from the program and
 ! exit code will be set to 0
 !----------------------------------------------------------------
       call EXIT(exit_code)
+
 
 !-----------------------------------      
       END PROGRAM main 
