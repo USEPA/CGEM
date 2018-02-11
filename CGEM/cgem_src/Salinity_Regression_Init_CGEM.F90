@@ -16,11 +16,12 @@ Subroutine Salinity_Regression_Init_CGEM()
 
   real temp,temp_OM1,temp_OM2,total_chl(nospA)
   real, dimension(1) :: pdbar, rhois !pressure, density
-  integer i,j,k,isp
+  integer i,j,k,isp,myi
 
 
     do j = 1,jm
-      do i = 1,im 
+          myi=1
+        do i=myi_start,myi_end
 
         do k=1,nza(i,j)
 
@@ -33,39 +34,39 @@ Subroutine Salinity_Regression_Init_CGEM()
             ! Convert total Chl to cells
             ! Divide by number of groups
             do isp=1,nospA
-             f( i, j, k, iA(isp) ) = total_chl(isp) * CChla(isp)/12./Qc(isp) 
+             f( myi, j, k, iA(isp) ) = total_chl(isp) * CChla(isp)/12./Qc(isp) 
             enddo
 
             ! Zooplankton based on E&R ratio (1000 zooplankton)
-            f( i, j, k, iZ(1) ) = 2.e-6 * SUM(f( i, j, k, iA(:)))/3./real(nospZ)   
+            f( myi, j, k, iZ(1) ) = 2.e-6 * SUM(f(myi , j, k, iA(:)))/3./real(nospZ)   
             do isp=2,nospZ
-             f( i, j, k, iZ(isp) ) = 2.e-5 * SUM(f( i, j, k, iA(:)))/3./real(nospZ)
+             f( myi, j, k, iZ(isp) ) = 2.e-5 * SUM(f( myi, j, k, iA(:)))/3./real(nospZ)
             enddo
 
             !NO3
             temp = -7.57*S(i,j,k) + 0.04*d_sfc(i,j,k) + 0.11*S(i,j,k)*S(i,j,k) + 125.32
-            f( i, j, k, iNO3 ) = AMAX1(temp,0.01)
+            f( myi, j, k, iNO3 ) = AMAX1(temp,0.01)
 
             !NH4
             temp = -0.06*S(i,j,k) + 3.14
-            f( i, j, k, iNH4 ) = AMAX1(temp,0.01)
+            f( myi, j, k, iNH4 ) = AMAX1(temp,0.01)
 
             !Si
             temp = -5.08*S(i,j,k) + 0.07*d_sfc(i,j,k) + 0.08*S(i,j,k)*S(i,j,k) - 0.00029*d_sfc(i,j,k)*d_sfc(i,j,k) + 86.97
-            f( i, j, k, iSi ) = AMAX1(temp,0.01)
+            f( myi, j, k, iSi ) = AMAX1(temp,0.01)
 
             !PO4 = DIP
             temp = -0.11*S(i,j,k) + 1.77
-            f( i, j, k, iPO4 ) = AMAX1(temp,0.01)
+            f( myi, j, k, iPO4 ) = AMAX1(temp,0.01)
 
             !DIC
             temp = -36.89*S(i,j,k) + 3.06*d_sfc(i,j,k) + 0.81*S(i,j,k)*S(i,j,k) - 0.04*d_sfc(i,j,k)*d_sfc(i,j,k) + 2438.05
-            f( i, j, k, iDIC ) = AMAX1(temp,0.01)
+            f( myi, j, k, iDIC ) = AMAX1(temp,0.01)
 
             !O2
             temp = -18.02*S(i,j,k) -0.37*d_sfc(i,j,k) +0.23*S(i,j,k)*S(i,j,k) + 521.72
             temp = AMAX1(temp,0.01)
-            f( i, j, k, iO2 ) = AMIN1(temp,415.)
+            f( myi, j, k, iO2 ) = AMIN1(temp,415.)
 
             !CDOM
             temp = -0.36*S(i,j,k) + 1.37
@@ -75,30 +76,30 @@ Subroutine Salinity_Regression_Init_CGEM()
             temp = temp * exp(-0.016*(312.-412.))
             !CONVERT CDOM 312 to ppb:
             ! calculate CDOM (QSE ppb): CDOM (QSE ppb) = a(312)*2.933 + 0.538
-            f(i, j, k, iCDOM) = temp * 2.933 + 0.538
+            f(myi, j, k, iCDOM) = temp * 2.933 + 0.538
 
-            f( i, j, k, iOM1_A ) = 0.
-            f( i, j, k, iOM2_A ) = 0.
-            f( i, j, k, iOM1_Z ) = 0.
-            f( i, j, k, iOM2_Z ) = 0.
-            f( i, j, k, iOM1_R ) = 0.
-            f( i, j, k, iOM2_R ) = 0.
+            f( myi, j, k, iOM1_A ) = 0.
+            f( myi, j, k, iOM2_A ) = 0.
+            f( myi, j, k, iOM1_Z ) = 0.
+            f( myi, j, k, iOM2_Z ) = 0.
+            f( myi, j, k, iOM1_R ) = 0.
+            f( myi, j, k, iOM2_R ) = 0.
 
             !Initialize POC and DIC into OM_BC terms times a multiplier specified at input
             !PC==OM1
             temp = -3.97 * S(i,j,k) - 0.01 * d_sfc(i,j,k) + 157.42
             temp_OM1 = AMAX1(temp,0.01)
-            f( i, j, k, iOM1_BC ) = temp_OM1 * m_OM_init
+            f( myi, j, k, iOM1_BC ) = temp_OM1 * m_OM_init
             !write(6,*) "INIT",temp_OM1 , m_OM_init
 
             !DOC==OM2
             temp = -6.39 * S(i,j,k) - 0.40 * d_sfc(i,j,k) + 338.89
             temp_OM2 = AMAX1(temp,0.01)
-            f( i, j, k, iOM2_BC )= temp_OM2 * m_OM_init
+            f( myi, j, k, iOM2_BC )= temp_OM2 * m_OM_init
 
             do isp=1,nospA
-             f( i, j, k, iQn(isp) ) = 15.*QmaxP(isp)
-             f( i, j, k, iQp(isp) ) = QmaxP(isp)
+             f( myi, j, k, iQn(isp) ) = 15.*QmaxP(isp)
+             f( myi, j, k, iQp(isp) ) = QmaxP(isp)
             enddo
 
             !Set Alkalinity, use Figure 2 from Cai 2003, in mmol/kg, convert to mmol/m3
@@ -107,13 +108,21 @@ Subroutine Salinity_Regression_Init_CGEM()
 
             call rhoinsitu(S(i,j,k), T(i,j,k), pdbar, 1, rhois)
 
-            f(i,j,k,iALK) = (-0.01586*S(i,j,k) + 2.9573)*rhois(1)
+            f(myi,j,k,iALK) = (-0.01586*S(i,j,k) + 2.9573)*rhois(1)
 
-            f(i, j, k, iTr) = 1./Vol(i,j,k)
+            f(myi, j, k, iTr) = 1./Vol(i,j,k)
           
       enddo
+      myi = myi + 1
     enddo
     enddo
+
+#ifdef DEBUG
+ write(6,*) "-Salinity_Regression_Init_CGEM--"
+ write(6,*) "CDOM, i,j,k=",f(icent,jcent,1,iCDOM),icent,jcent,1
+ write(6,*) 
+#endif
+
 
 END Subroutine Salinity_Regression_Init_CGEM
 

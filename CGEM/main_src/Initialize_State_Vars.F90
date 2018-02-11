@@ -1,7 +1,5 @@
 Subroutine Initialize_State_Vars(Which_code)
 
-USE Model_dim
-USE INPUT_VARS, ONLY: InitializeHow
 IMPLICIT NONE
 
 character(6), intent(in) :: Which_code

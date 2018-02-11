@@ -1,5 +1,5 @@
 !======================================================================     
-    Subroutine CGEM( TC_8, istep, istep_out )
+    Subroutine CGEM( TC_8, istep, istep_out, myid, numprocs )
 
 !======================================================================
      USE Model_dim
@@ -30,10 +30,13 @@
     integer(kind=8), intent(in) :: TC_8         ! Model time (seconds from beginning of Jan 1, 2002)
     integer, intent(in)  :: istep     ! Current time step
     integer, intent(in)  :: istep_out      ! Current output step 
+    integer, intent(in)  :: myid
+    integer, intent(in)  :: numprocs
 !---------------------------------------------------------------------------------------
 ! Local Variables
 !-----------------------------------------------------
-    real ::  ff(im,jm,km,nf)        ! Holds the nf state vectors
+    real ::  ff(0:(myim+1),jm,km,nf)        ! Holds the nf state vectors
+    integer :: myi                       !Loop index for state variable array f
     integer        ::  i, j, k, isp, isz ! Loop indicies, isp/isz is for phytoplankton/zooplankton species
     integer, save  ::  init  = 1         ! Declare some variables only at first subroutine call
     integer        ::  Is_Day            ! Switch for day/night for phytoplankton nutrient uptake only, Is_Day=0 means night
@@ -218,23 +221,18 @@
 !For calibration
     real O2_total
 
-    real, dimension(im,jm,km) :: new_ux, new_vx, new_wx
-
-
-!#ifdef CGEM_MAIN
-
-    !fill(1) is for -9999
-    fill_val=fill(1)
-
-#ifdef DEBUGVARS
-   write(6,*) "T,S=",T,S
-#endif
 
    if(init.eq.1) then  
 
+  !fill(1) is for -9999
+  fill_val=fill(1)
+
 !Initialize netCDF output variables
   RN2_ijk = 0.
-  RO2_ijk = 0. 
+  RO2_A_ijk = 0. 
+  RO2_Z_ijk = 0.
+  RO2_BC_ijk = 0.
+  RO2_R_ijk = 0.
   Chl_C_ijk = fill_val 
   Chla_tot_ijk =  fill_val
   Esed =  fill_val
@@ -245,38 +243,33 @@
   uA_ijk =  fill_val
   uSi_ijk =  fill_val
 
-       do j=1,jm
-        do i=1,im
-         nz = nza(i,j)
-          do k=1,nz
-           dTd = dT/SDay!*Vol_prev(i,j,k)/Vol(i,j,k)           ! Timestep length in units of days
-          enddo
-        enddo
-       enddo
+       dTd = dT/SDay         ! Timestep length in units of days
 
        StepsPerDay = SDay / dT ! Time steps in a day
 
        ! Initialize previous day's irradiance for Chl:C calculation
        ! These duplicated lines execute only once for init
        do j = 1,jm
-          do i = 1,im 
+          myi=1
+          do i = myi_start,myi_end
                 nz = nza(i,j)
                 do k = 1, nz
                    do isp = 1, nospA          
-                      A_k(isp,k) = f(i,j,k,isp) ! Phytoplankton in group isp, cells/m3
+                      A_k(isp,k) = f(myi,j,k,isp) ! Phytoplankton in group isp, cells/m3
                    enddo 
-                   CDOM_k(k)  = f(i,j,k,iCDOM)  ! CDOM is in ppb
+                   CDOM_k(k)  = f(myi,j,k,iCDOM)  ! CDOM is in ppb
                                  ! Convert mmol/m3 to g carbon/m3; CF_SPM is river specific
                                  ! and converts river OM to riverine SPM
-                   OM1SPM_k(k) = (f(i,j,k,iOM1_R) * C_cf) / CF_SPM 
-                   OM1Z_k(k)   = f(i,j,k,iOM1_Z)  * C_cf   ! Convert mmol/m3 to g carbon/m3
-                   OM1A_k(k)   = f(i,j,k,iOM1_A)  * C_cf   ! Convert mmol/m3 to g carbon/m3
-                   OM1BC_k(k)  = f(i,j,k,iOM1_BC) * C_cf   ! Convert mmol/m3 to g carbon/m3
+                   OM1SPM_k(k) = (f(myi,j,k,iOM1_R) * C_cf) / CF_SPM 
+                   OM1Z_k(k)   = f(myi,j,k,iOM1_Z)  * C_cf   ! Convert mmol/m3 to g carbon/m3
+                   OM1A_k(k)   = f(myi,j,k,iOM1_A)  * C_cf   ! Convert mmol/m3 to g carbon/m3
+                   OM1BC_k(k)  = f(myi,j,k,iOM1_BC) * C_cf   ! Convert mmol/m3 to g carbon/m3
                 enddo
                 call DailyRad_init(TC_8, lat(i,j), lon(i,j), d(i,j,:), d_sfc(i,j,:), A_k, &
                      & CDOM_k, OM1A_k, OM1Z_k, OM1SPM_k, OM1BC_k, aDailyRad_k,nz)
                 aDailyRad(i,j,:) = aDailyRad_k(:)
-          enddo     
+          myi=myi+1
+          enddo 
        enddo     
 
     init=0
@@ -295,7 +288,8 @@
 !   calculations at time-level istep
 !-----------------------------------------------------------------
  do j = 1,jm
-     do i = 1,im 
+         myi=1
+         do i = myi_start,myi_end
          nz = nza(i,j)
  !---------------------------------------------------------
  ! Calculate and convert variables needed for light routine
@@ -303,34 +297,34 @@
       do k = 1, nz
    !Get algae counts and Nitrogen/phosphorus quotas
              do isp = 1, nospA          
-               A_k(isp,k) = f(i,j,k,isp) ! Phytoplankton in group isp, cells/m3
-               Qn_k(isp,k) = f(i,j,k,iQn(1)-1+isp)
-               Qp_k(isp,k) = f(i,j,k,iQp(1)-1+isp)
+               A_k(isp,k) = f(myi,j,k,isp) ! Phytoplankton in group isp, cells/m3
+               Qn_k(isp,k) = f(myi,j,k,iQn(1)-1+isp)
+               Qp_k(isp,k) = f(myi,j,k,iQp(1)-1+isp)
              enddo 
          !Save Zooplanton to k array
              do isp = 1,nospZ
-                Z_k(isp,k) = f(i,j,k,iZ(isp)) ! Zooplankton in group isp, ind./m3
+                Z_k(isp,k) = f(myi,j,k,iZ(isp)) ! Zooplankton in group isp, ind./m3
              enddo
 
          ! Save Temperature (celsius) and Salinity in columns
-           T_k(k)       = T(i,j,k)
+           T_k(k)     = T(i,j,k)
            S_k(k)     = S(i,j,k)
          ! Silica is mmol Si/m3
-           N_k(k)     = f(i,j,k,iNO3)+f(i,j,k,iNH4)
-           P_k(k)     = f(i,j,k,iPO4)
-           Si_k(k)     = f(i,j,k,iSi)
+           N_k(k)     = f(myi,j,k,iNO3)+f(myi,j,k,iNH4)
+           P_k(k)     = f(myi,j,k,iPO4)
+           Si_k(k)    = f(myi,j,k,iSi)
          ! CDOM is in ppb
-           CDOM_k(k)  = f(i,j,k,iCDOM)
+           CDOM_k(k)  = f(myi,j,k,iCDOM)
          ! Below is mmol/m3 Organic Matter from rivers converted to equivalent g carbon/m3
-           OM1SPM_k(k) = f(i,j,k,iOM1_R) * C_cf 
+           OM1SPM_k(k) = f(myi,j,k,iOM1_R) * C_cf 
          ! There is 1.8% Organic Matter in SPM originating from the rivers.
            OM1SPM_k(k) = OM1SPM_k(k)/0.018
          ! Below is mmol/m3 Organic Matter from fecal pellets converted to equivalent g carbon/m3
-           OM1Z_k(k) = f(i,j,k,iOM1_Z) * C_cf 
+           OM1Z_k(k) = f(myi,j,k,iOM1_Z) * C_cf 
          ! Below is mmol/m3 Organic Matter from dead phytoplankton converted to equivalent g carbon/m3
-           OM1A_k(k)  = f(i,j,k,iOM1_A) * C_cf 
+           OM1A_k(k)  = f(myi,j,k,iOM1_A) * C_cf 
          ! Below is mmol/m3 Organic Matter from initial and boundary conditions converted to equivalent g carbon/m3
-           OM1BC_k(k)  = f(i,j,k,iOM1_BC) * C_cf 
+           OM1BC_k(k)  = f(myi,j,k,iOM1_BC) * C_cf 
            aDailyRad_k(k) = aDailyRad(i,j,k)
       enddo ! End of the "DO k = 1, nz" block DO loop
 
@@ -565,7 +559,7 @@
 !---------------------------------------------------------------------	   
   !Initialize variables
 !  Zooplankton groups
-   Z(:)         = f(i,j,k,iZ(:))
+   Z(:)         = f(myi,j,k,iZ(:))
 
           do isp = 1, nospA
              Abiovol       = A_k(isp,k)*volcell(isp) 
@@ -601,20 +595,20 @@
 ! Set the scalar variables that are common to all three reaction
 ! subroutines
 !----------------------------------------------------------------
-        O2        = f(i,j,k,iO2)
-        NO3       = f(i,j,k,iNO3)
-        NH4       = f(i,j,k,iNH4)
-        Si        = f(i,j,k,iSi)
-        PO4       = f(i,j,k,iPO4)
-        DIC       = f(i,j,k,iDIC)
-        OM1_A     = f(i,j,k,iOM1_A)
-        OM2_A     = f(i,j,k,iOM2_A)
-        OM1_Z    = f(i,j,k,iOM1_Z)
-        OM2_Z    = f(i,j,k,iOM2_Z)
-        OM1_R    = f(i,j,k,iOM1_R)
-        OM2_R    = f(i,j,k,iOM2_R)
-        OM1_BC    = f(i,j,k,iOM1_BC)
-        OM2_BC    = f(i,j,k,iOM2_BC)
+        O2        = f(myi,j,k,iO2)
+        NO3       = f(myi,j,k,iNO3)
+        NH4       = f(myi,j,k,iNH4)
+        Si        = f(myi,j,k,iSi)
+        PO4       = f(myi,j,k,iPO4)
+        DIC       = f(myi,j,k,iDIC)
+        OM1_A     = f(myi,j,k,iOM1_A)
+        OM2_A     = f(myi,j,k,iOM2_A)
+        OM1_Z    = f(myi,j,k,iOM1_Z)
+        OM2_Z    = f(myi,j,k,iOM2_Z)
+        OM1_R    = f(myi,j,k,iOM1_R)
+        OM2_R    = f(myi,j,k,iOM2_R)
+        OM1_BC    = f(myi,j,k,iOM1_BC)
+        OM2_BC    = f(myi,j,k,iOM2_BC)
 
 !--------------------------------------
 ! Call temperature and growth functions
@@ -751,21 +745,13 @@
 !---------------------------------------------------------
 !-A; Phytoplankton number density (cells/m3);
 !---------------------------------------------------------
-      ff(i,j,k,iA(isp)) = AMAX1(f(i,j,k,iA(isp))                              &
+      ff(myi,j,k,iA(isp)) = AMAX1(f(myi,j,k,iA(isp))                              &
       & + ( Agrow - Aresp - ZgrazA_tot(isp) - Amort(isp) )*dTd,1.)
-#ifdef CAL_PHYTO
-      if (  mod( istep, iout ) .eq. 0 ) then
-        write(6,300) "Agrow,Aresp,ZgrazA,Amort,total",Agrow,-Aresp, &
-      & -ZgrazA_tot(isp), - Amort(isp),  Agrow - Aresp - ZgrazA_tot(isp) - Amort(isp)
-      endif
-300 format(A,5E12.2)
-#endif
-
 
 !----------------------------------------------------------------------
 !-Qn: Phytoplankton Nitrogen Quota (mmol-N/cell)
 !----------------------------------------------------------------------
-      Qn = f(i,j,k,iQn(isp))                              &
+      Qn = f(myi,j,k,iQn(isp))                              &
     &               + (vN - Qn*uA)*dTd
 
 ! Enforce minima, also enforce maxima if not equal Droop (Which_quota=1)
@@ -775,12 +761,12 @@
            Qn = AMIN1(AMAX1(Qn,QminN(isp)),QmaxN(isp))
       endif
 
-      ff(i,j,k,iQn(1)-1+isp) = Qn
+      ff(myi,j,k,iQn(1)-1+isp) = Qn
  
 !----------------------------------------------------------------------
 !-Qp: Phytoplankton Phosphorus Quota (mmol-P/cell)
 !----------------------------------------------------------------------
-      Qp = f(i,j,k,iQp(isp))                              &
+      Qp = f(myi,j,k,iQp(isp))                              &
        &               + (vP - Qp*uA)*dTd
 
 ! Enforce minima, also enforce maxima if not equal Droop (Which_quota=1)
@@ -790,7 +776,7 @@
            Qp = AMIN1(AMAX1(Qp,QminP(isp)),QmaxP(isp))
       endif
 
-      ff(i,j,k,iQp(1)-1+isp) = Qp      
+      ff(myi,j,k,iQp(1)-1+isp) = Qp      
 
 !----------------------------------------------------------------------- 
       enddo  ! END OF do isp = 1, nospA 
@@ -875,7 +861,7 @@
 !---------------------------------------------------------
 !-G; Zooplankton number density (individuals/m3);
 !---------------------------------------------------------
-      ff(i,j,k,iZ(:))  = AMAX1( f(i,j,k,iZ(:))                         &
+      ff(myi,j,k,iZ(:))  = AMAX1( f(myi,j,k,iZ(:))                         &
       &      + (Zgrow(:) - Zresp(:) - Zmort(:))*dTd, 1.)
 
 #ifdef CAL_ZOO
@@ -907,17 +893,10 @@
 ! Carbon Chemistry
 !--------------------------------------------------------------
 !!! MOCSY alkalinity expressions:
-!#ifdef DEBUGVARS
-!if(istep.gt.200) then
-!write(6,*) "i,j,k",i,j,k
-!write(6,*) "temp=",T(i,j,k)
-!write(6,*) "DIC=",f(i,j,k,iDIC)
-!endif
-!#endif
-        m_alk = f(i,j,k,iALK)/1000.
-        m_dic = f(i,j,k,iDIC)/1000.
-        m_si  = f(i,j,k,iSi)/1000.
-        m_po4 = f(i,j,k,iPO4)/1000.
+        m_alk = f(myi,j,k,iALK)/1000.
+        m_dic = f(myi,j,k,iDIC)/1000.
+        m_si  = f(myi,j,k,iSi)/1000.
+        m_po4 = f(myi,j,k,iPO4)/1000.
         call vars(ph_calc, pco2_calc, fco2, co2, hco3, co3, OmegaA, OmegaC, BetaD_calc, rhoSW, p, tempis,&
          &    T(i,j,k), S(i,j,k), m_alk, m_dic, m_si, m_po4, patm, d_sfc(i,j,k), lat(i,j), 1, &
          &    'mol/m3', 'Tinsitu', 'm ', 'u74', 'l  ', 'pf ', 'Pzero  ')
@@ -1016,7 +995,11 @@
   RN2   = RN2_A + RN2_Z + RN2_R + RN2_BC         ! (mmol-N2/m3/d)
        !Save for netCDF
        RN2_ijk(i,j,k) = RN2_ijk(i,j,k) + (2*RN2)*dTd
-       RO2_ijk(i,j,k) = RO2_ijk(i,j,k) + (RO2)*dTd 
+       RO2_A_ijk(i,j,k) = RO2_A_ijk(i,j,k) + (RO2_A)*dTd 
+       RO2_Z_ijk(i,j,k) = RO2_Z_ijk(i,j,k) + (RO2_Z)*dTd
+       RO2_R_ijk(i,j,k) = RO2_R_ijk(i,j,k) + (RO2_R)*dTd
+       RO2_BC_ijk(i,j,k) = RO2_BC_ijk(i,j,k) + (RO2_BC)*dTd
+
 
 ! Save RO2 as CBODW
   CBODW(i,j) = RO2 !The last time this happens, k=nz, so will be the bottom
@@ -1163,156 +1146,136 @@ enddo
 !-------------------------------
 !-NO3; (mmol-N/m3)
 !-------------------------------     
-       ff(i,j,k,iNO3) = AMAX1(f(i,j,k,iNO3)                            &
+       ff(myi,j,k,iNO3) = AMAX1(f(myi,j,k,iNO3)                            &
        &  + ( RNO3 - AupN*NO3/(NO3+NH4) )*dTd, 0.0 )              
 
 !--------------------------------
 !-NH4; Ammonium (mmol-N/m3)
 !--------------------------------
-       ff(i,j,k,iNH4) = AMAX1(f(i,j,k,iNH4)                            &
+       ff(myi,j,k,iNH4) = AMAX1(f(myi,j,k,iNH4)                            &
        & + ( RNH4 - AupN*NH4/(NO3+NH4) + AexudN + SUM(ZexN)  )*dTd, 0.0)          
 
 !----------------------------
 !-Silica: (mmol-Si/m3)
 !----------------------------
-       ff(i,j,k,iSi) =  AMAX1(f(i,j,k,iSi)                             &
+       ff(myi,j,k,iSi) =  AMAX1(f(myi,j,k,iSi)                             &
        & + ( RSi - AupSi + SUM(ZegSi) + SUM(ZunSi) )*dTd, 0.0)
 
 !---------------------------------------------
 !-PO4: Phosphate (mmol-P/m3)
 !--------------------------------------
-      ff(i,j,k,iPO4) = AMAX1(f(i,j,k,iPO4)                             &
+      ff(myi,j,k,iPO4) = AMAX1(f(myi,j,k,iPO4)                             &
       & + ( RPO4 - AupP + AexudP + SUM(ZexP)  )*dTd, 0.0)
 
 !---------------------------------------------------------
 !-DIC: Dissolved Inorganic Carbon (mmol-C/m3)
 !---------------------------------------------------------
-       ff(i,j,k,iDIC) = AMAX1(f(i,j,k,iDIC)                            &
+       ff(myi,j,k,iDIC) = AMAX1(f(myi,j,k,iDIC)                            &
        &  + ( RDIC - PrimProd + ArespC  + ZrespC )*dTd, 0.0)  
  
 !-----------------------------------------------------------------------      
 !-O2: Oxygen (mmol O2 m-3) 
 !-------------------------------------------------------------------      
-       ff(i,j,k,iO2)  = AMAX1(f(i,j,k,iO2)                             &  
+       ff(myi,j,k,iO2)  = AMAX1(f(myi,j,k,iO2)                             &  
        &  + ( PrimProd - ArespC + RO2 - ZrespC)*dTd, 0.0)
-#ifdef CAL_O2
-      if (  mod( istep, iout ) .eq. 0 ) then
-        O2_total = PrimProd - ArespC + RO2 - ZrespC 
-        write(6,200) "PP,resp,decay,Zresp,total",PrimProd,-ArespC,RO2,-ZrespC,O2_total
-      endif
-200 format(A,5E12.2)
-#endif
+
 !-----------------------------------------
 !-OM1_A: (mmol-C/m3-- Dead Phytoplankton Particulate)
 !-----------------------------------------
-       ff(i,j,k,iOM1_A) = AMAX1(f(i,j,k,iOM1_A)                       &
+       ff(myi,j,k,iOM1_A) = AMAX1(f(myi,j,k,iOM1_A)                       &
        &   + ( (ROM1_A) + OM1_CA )*dTd, 0.0)       
 
 !----------------------------------------------------------------------
 !---------------------------------------------
 !-OM2_A: (mmol-C/m3-- Dead Phytoplankton Dissolved)
 !---------------------------------------------
-       ff(i,j,k,iOM2_A) = AMAX1(f(i,j,k,iOM2_A)                       &
+       ff(myi,j,k,iOM2_A) = AMAX1(f(myi,j,k,iOM2_A)                       &
        &   + (ROM2_A + OM2_CA )*dTd, 0.0)              
 
 !----------------------------------------------------------------------
 !------------------------------------------
 !-OM1_Z:(mmol-C/m3--G particulate)
 !------------------------------------------
-       ff(i,j,k,iOM1_Z) = AMAX1(f(i,j,k,iOM1_Z)                     &
+       ff(myi,j,k,iOM1_Z) = AMAX1(f(myi,j,k,iOM1_Z)                     &
        &   +( ROM1_Z + OM1_CZ)*dTd, 0.0)              
 
 !---------------------------------------------------------------------
 !-----------------------------------------------
 !-OM2_Z:(mmol-C/m3--G dissolved)
 !-----------------------------------------------
-       ff(i,j,k,iOM2_Z) = AMAX1(f(i,j,k,iOM2_Z)                      &
+       ff(myi,j,k,iOM2_Z) = AMAX1(f(myi,j,k,iOM2_Z)                      &
        &   + ( ROM2_Z + OM2_CZ )*dTd, 0.0)              
 
 !---------------------------------------------------------------------
 !-------------------------------------------
 !-OM1_R: (mmol-C/m3--SPM particulate)
 !-------------------------------------------
-       ff(i,j,k,iOM1_R) = AMAX1(f(i,j,k,iOM1_R)                      &
+       ff(myi,j,k,iOM1_R) = AMAX1(f(myi,j,k,iOM1_R)                      &
        &   + ( ROM1_R )*dTd, 0.0)              
 
 !---------------------------------------------------------------------
 !------------------------------------------------
 !-OM2_R: (mmol-C/m3--SPM dissolved)
 !------------------------------------------------
-       ff(i,j,k,iOM2_R) =  AMAX1(f(i,j,k,iOM2_R)                     &
+       ff(myi,j,k,iOM2_R) =  AMAX1(f(myi,j,k,iOM2_R)                     &
        &   + ( ROM2_R )*dTd, 0.0)       
 
 !---------------------------------------------------------------------
 !-------------------------------------------
 !-OM1_BC: (mmol-C/m3--initial and boundary condition OM particulate)
 !-------------------------------------------
-       ff(i,j,k,iOM1_BC) = AMAX1(f(i,j,k,iOM1_BC)                      &
+       ff(myi,j,k,iOM1_BC) = AMAX1(f(myi,j,k,iOM1_BC)                      &
        &   + ( ROM1_BC )*dTd, 0.0)
 
 !---------------------------------------------------------------------
 !------------------------------------------------
 !-OM2_BC: (mmol-C/m3--initial and boundary condition OM dissolved)
 !------------------------------------------------
-       ff(i,j,k,iOM2_BC) =  AMAX1(f(i,j,k,iOM2_BC)                     &
+       ff(myi,j,k,iOM2_BC) =  AMAX1(f(myi,j,k,iOM2_BC)                     &
        &   + ( ROM2_BC )*dTd, 0.0)
 
 !---------------------------------------------------------------------
 !----------------------------
 !-CDOM: (ppb) 
 !----------------------------
-       ff(i,j,k,iCDOM) =  AMAX1(f(i,j,k,iCDOM)*(1.0 - KGcdom*dTd), 0.0)  
-
-#ifdef DEBUG
-!  write(6,*) istep,"CDOM f,ff",f(i,j,k,iCDOM),ff(i,j,k,iCDOM),(1.0 - KGcdom*dTd)
-#endif
+       ff(myi,j,k,iCDOM) =  AMAX1(f(myi,j,k,iCDOM)*(1.0 - KGcdom*dTd), 0.0)  
 
 !---------------------------------------------------------------------
 !----------------------------
 !-ALK: (mmol-HCO3/m3)
 !----------------------------
-       ff(i,j,k,iALK) =  AMAX1(f(i,j,k,iALK) +                 &
+       ff(myi,j,k,iALK) =  AMAX1(f(myi,j,k,iALK) +                 &
       & (RALK + AupN*NO3/(NO3+NH4) - AupN*NH4/(NO3+NH4) + AupP + 4.8*AupP)*dTd, 0.0) 
                 
 !Tracer
-       ff(i,j,k,iTr) =  f(i,j,k,iTr)       
+       ff(myi,j,k,iTr) =  f(myi,j,k,iTr)       
       
 !--------------------------------------------------------------------
         enddo   ! end of  "do k = 1, nz" 
-
+       myi = myi + 1
    enddo      ! end of do i block do loop
  enddo      ! end of do j block do loop
 ! ----------------------------------------------------------------------
 
 !update f for the current timestep
          do j = 1,jm
-         do i = 1,im 
+         myi = 1
+         do i = myi_start,myi_end
                 do k = 1,nza(i,j)
-                 f(i,j,k,:) = ff(i,j,k,:)
+                 f(myi,j,k,:) = ff(myi,j,k,:)
                 enddo
+         myi = myi + 1
          enddo
          enddo
 !-- End Main GEM Calculations ---------------------------------------------------
 !#endif
+
 !-- Call "Extra" variables for netCDF --------------------------------------------------------
 !--------------------------------------------------------
   ! -- do initialization of first timestep:
       if (   istep .eq. 1 ) then
 
-         new_ux = fill(0) 
-         new_vx = fill(0) 
-         new_wx = fill(0)
-         do j = 1,jm
-         do i = 1,im
-                do k = 1,nza(i,j)
-                new_ux(i,j,k) = ux(i,j,k)
-                new_vx(i,j,k) = vx(i,j,k)
-                new_wx(i,j,k) = wx(i,j,k)
-                enddo
-         enddo
-         enddo
-
-                 CALL WRITE_EXTRA_DATA( im, jm, km, EXTRA_VARIABLES, nospA, 0, &
+                 CALL WRITE_EXTRA_DATA( myi_start,myim, 1,jm, 1,km, 0, &
                                      PARdepth_ijk, &
                                   PAR_percent_ijk, &
                                         uN_ijk, &
@@ -1332,25 +1295,13 @@ enddo
                                        Chl_C_ijk,  &
                                               pH,  &
                                          RN2_ijk,  &
-                                         RO2_ijk,  &
-                                         new_Ux,new_Vx,new_Wx   )
-     endif  !end of "if (mod(istep,iout).eq.0)" block if
+                                         RO2_A_ijk,  &
+                                         RO2_Z_ijk,RO2_BC_ijk,RO2_R_ijk   )
+     endif  !end of EXTRA_DATA initialization 
 
   ! --- dump output when istep is a multiple of iout
       if (  mod( istep, iout ) .eq. 0 ) then
-         new_ux = fill(0)
-         new_vx = fill(0)
-         new_wx = fill(0)
-         do j = 1,jm
-         do i = 1,im
-                do k = 1,nza(i,j)
-                new_ux(i,j,k) = ux(i,j,k)
-                new_vx(i,j,k) = vx(i,j,k)
-                new_wx(i,j,k) = wx(i,j,k)
-                enddo
-         enddo
-         enddo
-                 CALL WRITE_EXTRA_DATA( im, jm, km, EXTRA_VARIABLES, nospA, istep_out+1, &
+                 CALL WRITE_EXTRA_DATA( myi_start,myim,1,jm, 1,km, istep_out+1, &
                                      PARdepth_ijk, &
                                   PAR_percent_ijk, &
                                         uN_ijk, &
@@ -1370,10 +1321,9 @@ enddo
                                        Chl_C_ijk,  &
                                               pH,  &
                                           RN2_ijk, &
-                                         RO2_ijk,  &
-                                           new_Ux,new_Vx,new_Wx )
+                                         RO2_A_ijk,  &
+                                         RO2_Z_ijk,RO2_BC_ijk,RO2_R_ijk   )
      endif  !end of "if (mod(istep,iout).eq.0)" block if
-
 
    return
    END Subroutine CGEM 

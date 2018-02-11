@@ -65,6 +65,11 @@
       Kh=fill(0)
       E=fill(0) 
 
+#ifdef DEBUG
+        write(6,*) "Allocate_Hydro"
+        write(6,*)
+#endif
+      
       return
 
       End Subroutine Allocate_Hydro 
@@ -132,7 +137,8 @@ write(6,*) "  Opening netCDF for Which_gridio=",Which_gridio
 write(6,*) "  1==EFDC, 2==NCOM, 3==POM "
 write(6,*)
 #endif
-      
+      return
+ 
       End Subroutine Init_Hydro_NetCDF
 
 
@@ -141,14 +147,16 @@ write(6,*)
       IMPLICIT NONE
       integer :: i
 
-#ifdef map_code
+      do i=fHv,lHv
+        call close_netcdf(hydro_info(i)%ncid)
+      enddo
+
+#ifdef DEBUG
 write(6,*) "---Close_Hydro_NetCDF----"
 write(6,*)
 #endif
 
-      do i=fHv,lHv
-        call close_netcdf(hydro_info(i)%ncid)
-      enddo
+      return
 
       End Subroutine Close_Hydro_NetCDF
 

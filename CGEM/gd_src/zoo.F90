@@ -48,7 +48,7 @@ SUBROUTINE ZOO(f,DTM,TEMP,i,j,k)
 !- Revised: 04/09/99  M. Settles      :  WQM_COM,WTRANS merger -> WTRBLK
 !-
 !------------------------------------------------------------------------------
-USE Model_dim
+USE Model_dim, ONLY:nf
 USE STATES
 USE EUT
 

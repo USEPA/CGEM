@@ -1,4 +1,4 @@
-      Subroutine Model_Output_GD(istep_out)
+      Subroutine Model_Output_GD(istep_out,myid,numprocs)
 
       USE Model_dim
       USE State_Vars
@@ -9,21 +9,24 @@
       IMPLICIT NONE
 
       integer,intent(in)  :: istep_out !current output counter
-      integer :: i,j,k,nz
-      real :: dumf(im,jm,km,nf)
+      integer,intent(in) :: myid,numprocs
+      integer :: i,j,k,myi,nz
+      real :: dumf(myim,jm,km,nf)
 
         dumf = f
         do j=1,jm
-        do i=1,im
+         myi = 1
+         do i=myi_start,myi_end
           nz=nza(i,j)
           do k=1,nz
-            dumf(i,j,k,JTR) = f(i,j,k,JTR) * Vol(i,j,k)
+            dumf(myi,j,k,JTR) = f(myi,j,k,JTR) * Vol(i,j,k)
           enddo
+          myi = myi + 1
          enddo
         enddo
 
-        CALL WRITE_DATA( im, jm, km, nf, istep_out, dumf)
-        CALL WRITE_EXTRA_DATA( IM, JM, KM, EXTRA_VARIABLES, istep_out) 
+        CALL WRITE_DATA( myi_start,myim, 1, jm, 1, km, nf, istep_out, dumf)
+        CALL WRITE_EXTRA_DATA( myi_start, myIM,1, JM, 1,KM, EXTRA_VARIABLES, istep_out) 
 
       return
 

@@ -3,6 +3,7 @@
 # Note modules must be compiled in bottom-up dependency order.
 
 MAIN_OBJ  =  fillval.o\
+	error.o\
 	Model_dim.o\
         netcdf_utils.o\
 	Grid.o\
@@ -14,7 +15,7 @@ MAIN_OBJ  =  fillval.o\
 	Which_Flux.o\
 	TEMP_VARS.o\
 	DATE_TIME.o\
-	NETCDF_UTILITIES.o\
+	PNETCDF_UTILITIES.o\
 	main.o\
 	MOD_UTILITIES.o\
 	Conversions.o\
@@ -28,7 +29,6 @@ MAIN_OBJ  =  fillval.o\
 	Flux.o\
 	Nitrification.o\
 	Q10_T.o\
-	USER_close_file.o\
 	USER_get_basic_grid.o\
         USER_get_EFDC_grid.o\
         USER_get_NCOM_grid.o\

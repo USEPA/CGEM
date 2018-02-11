@@ -1,5 +1,9 @@
 Module Model_dim
 
+#ifndef _MPI
+use serial
+#endif
+
 IMPLICIT NONE
 
 
@@ -17,10 +21,10 @@ IMPLICIT NONE
       CHARACTER(200), SAVE :: DATADIR
       INTEGER, SAVE :: iYr0 ! Reference year all timestamps are relative to.
 !For parallel runs
-      INTEGER, SAVE :: my_im !Number of cells in i direction on the processor
-      INTEGER, SAVE :: my_imstart !location of first array index WRT full grid
-      INTEGER, SAVE :: my_imend !location of last array index WRT full grid
-
+      INTEGER, SAVE :: myim !Number of cells in i direction on the processor
+      INTEGER, SAVE :: myi_start !location of first array index WRT full grid
+      INTEGER, SAVE :: myi_end !location of last array index WRT full grid
+      INTEGER, SAVE :: myimp2  !Number of i in f array (myim + 2 boundary cells)
 #ifdef _MPI
 include 'mpif.h'
 #endif
@@ -79,24 +83,20 @@ if(numprocs.gt.1) then
 endif
 
 !Divide grid among processors
-      call Decomp1D(im, numprocs, myid, my_imstart, my_imend)
+      call Decomp1D(im, numprocs, myid, myi_start, myi_end)
 
 !Define Loop Bounds
-      my_im = my_imend - my_imstart + 1
+      myim = myi_end - myi_start + 1
+      myimp2 = myim + 2
 
-      write(6,*) "im,my_im",im,my_im
-      write(6,*) "my_imstart,end",my_imstart,my_imend
-
-      call Model_dim_allocate(im)
-
-#ifdef map_code
-write(6,*) "---Set_Model_dim----"
-write(6,*)
-#endif
+      call Model_dim_allocate()
 
 #ifdef DEBUG
+write(6,*) "---Set_Model_dim----"
 write(6,*) "Model_dim.txt=",filename
 write(6,*) "im,jm,km,nsl",im,jm,km,nsl
+write(6,*) "im,myim",im,myim
+write(6,*) "myi_start,end",myi_start,myi_end
 write(6,*)
 #endif
 
@@ -105,15 +105,16 @@ Return
 End Subroutine
 
 
-Subroutine Model_dim_allocate(dim_i)
+Subroutine Model_dim_allocate()
 
 USE Fill_Value
 
 IMPLICIT NONE
 
-integer, intent(in) :: dim_i 
+integer ierr
 
-ALLOCATE(nza(dim_i,jm))
+ALLOCATE(nza(im,jm),stat=ierr)
+if(ierr.ne.0) call error("nza",ierr)
 
 !Initialize for netCDF
 nza=fill(0)

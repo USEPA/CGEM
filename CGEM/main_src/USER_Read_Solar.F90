@@ -2,7 +2,7 @@
 
       USE Model_dim
       USE DATE_TIME
-      USE INPUT_VARS, ONLY:START_SECONDS
+
       IMPLICIT NONE
 
       integer*8, intent (in) :: TC_8
@@ -28,15 +28,6 @@
 
         !Solar Radiation
         write(filename,'(A, A)') trim(DATADIR),'/INPUT/Solar.dat'
-#ifdef CAL_LT
-          write(filename,'(A, A)') trim(DATADIR),'/INPUT/Solar.lt.dat'
-#endif
-#ifdef CAL_DK
-          write(filename,'(A, A)') trim(DATADIR),'/INPUT/Solar.dk.dat'
-#endif
-#ifdef CAL_LTNT
-          write(filename,'(A, A)') trim(DATADIR),'/INPUT/Solar.ltnt.dat'
-#endif
         open(unit=ifile,file=filename,status="old")
 
         !First line
@@ -61,7 +52,12 @@
         t2 = TOTAL_SECONDS( iYr0, iYr, iMon, iDay, iHour, iMin, iSec )
 
 #ifdef DEBUG
-          write(6,*) "t1,t2,T8",t1,t2,TC_8
+        write(6,*) "Read_Solar"
+        write(6,*) "iYr0",iYr0,iYr,iMon,iDay,iHour,iMin,iSec
+        write(6,*) "t1",t1,real(t1,4)/3600/24/365
+        write(6,*) "TC_8",TC_8,real(TC_8,4)/3600/24/365
+        write(6,*) "diff_days",(TC_8-t1)/3600./24.
+        write(6,*)
 #endif
 
         do

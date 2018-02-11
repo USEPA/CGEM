@@ -10,33 +10,23 @@
 
       USE Model_dim
       USE INPUT_VARS, ONLY: dT
-      USE Grid, ONLY: dz,d_sfc,d,dzz
+      USE Grid, ONLY: dz,d_sfc
       USE State_Vars
       USE Hydro, ONLY: Kh
-#ifdef DEBUG_V
       USE INPUT_VARS, ONLY: icent,jcent,Which_VMix
-#endif
 
       IMPLICIT NONE
 
-      integer i,j,k,ii,nz
+      integer i,j,k,ii,nz,myi
 
 ! --- Tmp:
       real  A(50),C(50),E(50),G(50)
       real  Gk(50)
 
-#ifdef DEBUG_V
-write(6,*) "---VMixing---"
-write(6,*) "  Which_VMix=",Which_VMix
-write(6,*) "  nz=",km
-write(6,*) "  At the cell i,j,k=",icent,jcent,km
-write(6,*) "  dz, d_sfc=", dz(icent,jcent,km),d_sfc(icent,jcent,km)
-write(6,*) "    mixing coeff Kh is:",Kh(icent,jcent,km)
-write(6,*)
-#endif
 
        do j = 1, jm
-         do i = 1, im
+         myi = 1
+         do i = myi_start, myi_end 
              nz = nza(i,j)
              do k = 2, nz
                  A(k-1) = -dT*Kh(i,j,k)                       &
@@ -54,23 +44,31 @@ write(6,*)
              do ii = 1, nf
        
                ! --- No flux at surface
-               G(1) = -f(i,j,1,ii)/(A(1)-1.)
+               G(1) = -f(myi,j,1,ii)/(A(1)-1.)
                do k=2,nz-1
-                 G(k) = (C(k)*G(k-1)-f(i,j,k,ii))*Gk(k)
+                 G(k) = (C(k)*G(k-1)-f(myi,j,k,ii))*Gk(k)
                end do
                ! --- No flux at bottom
-               f(i,j,nz,ii) = (C(nz)*G(nz-1)-f(i,j,nz,ii)) &
+               f(myi,j,nz,ii) = (C(nz)*G(nz-1)-f(myi,j,nz,ii)) &
               &              /(C(nz)*(1.-E(nz-1))-1.)
          
                do k=nz-1, 1, -1
-                 f(i,j,k,ii) = E(k)*f(i,j,k+1,ii)+G(k)
+                 f(myi,j,k,ii) = E(k)*f(myi,j,k+1,ii)+G(k)
                end do
-       
              end do
-
+        myi = myi + 1
         enddo
       enddo
 
+#ifdef DEBUG
+write(6,*) "---VMixing---"
+write(6,*) "  Which_VMix=",Which_VMix
+write(6,*) "  nz=",km
+write(6,*) "  At the cell i,j,k=",icent,jcent,2
+write(6,*) "  dz, d_sfc=", dz(icent,jcent,2),d_sfc(icent,jcent,2)
+write(6,*) "    mixing coeff Kh is:",Kh(icent,jcent,2)
+write(6,*)
+#endif
 
       return
       end

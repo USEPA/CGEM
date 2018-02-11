@@ -1,4 +1,4 @@
-      Subroutine Model_Output_CGEM(istep_out)
+      Subroutine Model_Output_CGEM(istep_out,myid,numprocs)
 
       USE Model_dim
       USE State_Vars
@@ -9,21 +9,23 @@
       IMPLICIT NONE
 
       integer,intent(in)  :: istep_out !current output counter
-      real :: dumf(im,jm,km,nf)
-      integer :: i,j,k,nz
+      integer, intent(in) :: myid,numprocs
+      real :: dumf(myim,jm,km,nf)
+      integer :: i,j,k,nz,myi
 
         dumf = f
         do j=1,jm
-        do i=1,im
+        myi = 1
+        do i=myi_start,myi_end
           nz=nza(i,j)
           do k=1,nz
-            dumf(i,j,k,iTr) = f(i,j,k,iTr) * Vol(i,j,k)
+            dumf(myi,j,k,iTr) = f(myi,j,k,iTr) * Vol(i,j,k)
           enddo
-         enddo
+          myi = myi + 1
+        enddo
         enddo
 
-        CALL WRITE_DATA( im, jm, km, nf, istep_out, dumf)
-
+        CALL WRITE_DATA( myi_start,myim, 1,jm, 1, km, istep_out, dumf)
 
       return
 

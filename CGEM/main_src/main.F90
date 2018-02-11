@@ -26,6 +26,7 @@
       USE Hydro
       USE State_Vars
       USE INPUT_VARS
+      USE serial
 
       IMPLICIT NONE
 
@@ -47,17 +48,12 @@
 !---------------------
 ! MPI variables
 !---------------------
-#ifndef _MPI
-      integer, parameter :: MPI_COMM_WORLD=0
-      integer, parameter :: MPI_CHARACTER=0
-      integer, parameter :: MPI_INTEGER=0
-      integer, parameter :: MPI_REAL=0
-      real*8 :: MPI_WTIME
-#endif
       integer :: myid=0
       integer :: numprocs=1
       real*8  mpitime1,mpitime2   !timing
       integer mpierr
+      real*8 :: MPI_WTIME
+
 !------------------------------------------------
 !Initialize MPI
       call MPI_INIT(mpierr)
@@ -99,7 +95,7 @@
       istep = 0
       istep_out = 0
 
-    if(myid.eq.0) then
+    if(myid.eq.0) then  !Sets depth,d,dz,d_sfc,Vol
       if (Which_gridio.eq.1) then
         call USER_update_EFDC_grid(TC_8,T_8)
       else if (Which_gridio.eq.2) then
@@ -108,16 +104,28 @@
         call USER_update_POM_grid()
       endif
     endif
+    if(numprocs.gt.1) then
+      call MPI_BCAST(depth,im*jm,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+      call MPI_BCAST(d,im*jm*km,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+      call MPI_BCAST(dz,im*jm*km,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+      call MPI_BCAST(d_sfc,im*jm*km,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+      call MPI_BCAST(Vol,im*jm*km,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+    endif
+
 
 !--------------------------------
 ! --- get land/water and shelf masks
 !--------------------------------
-      call USER_get_masks()
+     if(myid.eq.0) call USER_get_masks()
+     if(numprocs.gt.1) then 
+      call MPI_BCAST(nza,im*jm,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
+      call MPI_BCAST(wsm,im*jm,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
+      call MPI_BCAST(fm,im*jm*km,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+     endif
 
-      call Set_Vars(Which_code,init_filename) !initialize 'f' array
+      call Set_Vars(Which_code,init_filename,myid,numprocs) !initialize 'f' array
 
-      call Initialize_Output(Which_code,BASE_NETCDF_OUTPUT_FILE_NAME)     !Open file and write initial configuration
-
+      call Initialize_Output(Which_code,BASE_NETCDF_OUTPUT_FILE_NAME,myid,numprocs)     !Open file and write initial configuration
 
 !-------------- START TIME LOOP -----------------------------------
       do istep = 1, nstep
@@ -128,38 +136,46 @@
 #endif
     if(myid.eq.0) then
       if (Which_gridio.eq.1) then
-        Vol_prev = Vol
+        !Vol_prev = Vol
         call USER_update_EFDC_grid(TC_8,T_8)
       elseif (Which_gridio.eq.2) then
-        Vol_prev = Vol
+        !Vol_prev = Vol
         call USER_update_NCOM_grid()
       elseif (Which_gridio.eq.3) then
-        Vol_prev = Vol
+        !Vol_prev = Vol
         call USER_update_POM_grid()
       endif
+    endif
+      Vol_prev = Vol
+    if(numprocs.gt.1) then
+      call MPI_BCAST(depth,im*jm,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+      call MPI_BCAST(d,im*jm*km,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+      call MPI_BCAST(dz,im*jm*km,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+      call MPI_BCAST(d_sfc,im*jm*km,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+      call MPI_BCAST(Vol,im*jm*km,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
     endif
 
        call Get_Vars(TC_8,T_8,myid,numprocs) !Hydro, Solar, Wind, Temp, Salinity
 
-!L3 add when necessary       call USER_update_masks()
+       call USER_update_masks()
 
-       call WQ_Model(Which_code,TC_8,istep,istep_out)
+       call WQ_Model(Which_code,TC_8,istep,istep_out,myid,numprocs)
 
        call Flux(Which_code,istep)
 
-       call Transport(Which_code)
+       call Transport(Which_code,myid,numprocs)
 
       ! -------------- BEGIN OUTPUT DATA
       ! --- dump output when istep is a multiple of iout
        if (  mod( istep, iout ) .eq. 0 ) then
         istep_out = istep_out + 1
         if(Which_gridio.ne.0.and.myid.eq.0) write(6,*) "output=",istep_out+1
-        call Model_Output(Which_Code,istep_out)
+        call Model_Output(Which_Code,istep_out,myid,numprocs)
        endif
 
       enddo
 
-      Call Model_Finalize(Which_code,Which_gridio) ! Closes the NetCDF files and whatever else
+      Call Model_Finalize(Which_code,Which_gridio,myid,numprocs) ! Closes the NetCDF files and whatever else
 
       mpitime2 = MPI_WTIME()
       if(myid.eq.0) write(6,*) "Code took",mpitime2-mpitime1,"seconds"

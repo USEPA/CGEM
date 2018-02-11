@@ -1,10 +1,12 @@
-       Subroutine Model_Finalize_GD()
+       Subroutine Model_Finalize_GD(myid,numprocs)
 
        USE OUTPUT_NETCDF_GD
 
        IMPLICIT NONE
 
-       CALL CLOSE_FILE()
+       integer, intent(in) :: myid,numprocs
+
+       if(myid.eq.0) CALL CLOSE_FILE()
 
        return
 

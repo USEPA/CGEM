@@ -24,8 +24,8 @@ IRIS_LIBS = -L/usr/local/apps/netcdf-4.4.1/intel-17.0/lib -lnetcdff -lnetcdf
 #OTHER_LIBS  = -L/usr/local/lib -lnetcdff -L/usr/local/bin -lnetcdf 
 
 ### =============== End User Modifiable Section  =============== ####
-include main_src/serial_src_files
-include main_src/src_files
+include main_src/src_just_serial
+include main_src/src_files_serial
 include moc_src/src_files
 include sdm_src/src_files
 include cgem_src/src_files
@@ -51,8 +51,8 @@ EXE	= CGEM
 #endif
 #endif
 
-FishTank: ${SERIAL_OBJ} ${MAIN_OBJ} ${MOC_OBJ} ${CGEM_OBJ} ${SDM_OBJ} ${GD_OBJ}
-	$(F90) -o $(EXE) $(FFLAGS) $(DFLAGS) $(INC) $(SERIAL_OBJ) $(MAIN_OBJ) ${MOC_OBJ} ${CGEM_OBJ} ${SDM_OBJ} ${GD_OBJ} $(LIBS)
+FishTank: ${Ser_OBJ} ${MAIN_OBJ} ${MOC_OBJ} ${CGEM_OBJ} ${SDM_OBJ} ${GD_OBJ}
+	$(F90) -o $(EXE) $(FFLAGS) $(DFLAGS) $(INC) $(Ser_OBJ) $(MAIN_OBJ) ${MOC_OBJ} ${CGEM_OBJ} ${SDM_OBJ} ${GD_OBJ} $(LIBS)
 
 
 #
@@ -70,14 +70,15 @@ $(SDM_OBJ): %.o: $(sdmdir)/%.f
 $(MAIN_OBJ):%.o: $(maindir)/%.F90
 	$(F90) -c $(FFLAGS) $(DFLAGS)  $<
 
-$(SERIAL_OBJ):%.o: $(maindir)/%.F90
-	$(F90) -c  $<
-
 $(MOC_OBJ):%.o: $(mocdir)/%.F90
 	$(F90) -c $(FFLAGS) $(DFLAGS)  $<
 
 $(OBJ):%.o: %.F90
 	$(F90) -c $(FFLAGS) $(DFLAGS) $<
+
+$(Ser_OBJ):%.o: $(maindir)/%.F90
+	$(F90) -c $<
+
 
 $(CGEM_OBJ):%.o: $(cgemdir)/%.F90
 	$(F90) -c $(FFLAGS) $(DFLAGS)   $<

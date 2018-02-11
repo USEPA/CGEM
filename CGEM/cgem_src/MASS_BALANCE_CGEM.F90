@@ -5,7 +5,11 @@ IMPLICIT NONE
 SAVE
 
 real, dimension(:,:,:), allocatable :: RN2_ijk 
-real, dimension(:,:,:), allocatable :: RO2_ijk
+real, dimension(:,:,:), allocatable :: RO2_A_ijk
+real, dimension(:,:,:), allocatable :: RO2_Z_ijk
+real, dimension(:,:,:), allocatable :: RO2_R_ijk
+real, dimension(:,:,:), allocatable :: RO2_BC_ijk
+
 
 contains
 
@@ -18,8 +22,15 @@ IMPLICIT NONE
 
 ALLOCATE(RN2_ijk(im,jm,km))
 RN2_ijk = fill(0)
-ALLOCATE(RO2_ijk(im,jm,km))
-RO2_ijk = fill(0)
+
+ALLOCATE(RO2_A_ijk(im,jm,km))
+RO2_A_ijk = fill(0)
+ALLOCATE(RO2_Z_ijk(im,jm,km))
+RO2_Z_ijk = fill(0)
+ALLOCATE(RO2_R_ijk(im,jm,km))
+RO2_R_ijk = fill(0)
+ALLOCATE(RO2_BC_ijk(im,jm,km))
+RO2_BC_ijk = fill(0)
 
 return
 

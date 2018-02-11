@@ -25,9 +25,9 @@ USE STATES
 IMPLICIT NONE
 
 REAL, INTENT(IN) :: f(nf)
-REAL, INTENT(IN) :: TEMP,Vol
+REAL, INTENT(IN) :: TEMP,Vol,dT
 REAL, INTENT(INOUT) :: DTM(nf)
-INTEGER, INTENT(IN) :: i,j,k,dT
+INTEGER, INTENT(IN) :: i,j,k
 
 
 REAL :: ALG               ! Phytoplankton concentration (dia+gre)

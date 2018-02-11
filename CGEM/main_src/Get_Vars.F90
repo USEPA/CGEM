@@ -97,6 +97,12 @@
         call MPI_BCAST(E,im*jm,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
       endif 
 
+#ifdef DEBUG
+write(6,*) "Subroutine Get_Vars,myid=",myid
+write(6,*) "S,T,Wind,Rad,Ux,Vx,Wx,Kh,E"
+write(6,*) 
+#endif
+
        return
 
        End Subroutine Get_Vars 

@@ -85,10 +85,15 @@
        enddo
       enddo
 
-#ifdef map_code
+#ifdef DEBUG
      write(6,*) "----Calling USER_get_NCOM_grid-----"
      write(6,*) "  setting dxy, area, zl, zz, dz_k, and h"
      write(6,*) "  Not setting depths, because don't have E"
+     write(6,*) "  For cell i,j,k=",icent,jcent,1
+     write(6,*) dxy(jcent),area(icent,jcent),zl(1),zz(1)
+     write(6,*) dz_k(1),h(icent,jcent)
+     write(6,*)
+
      write(6,*)
 #endif
 
@@ -102,12 +107,11 @@
       USE Model_dim
       USE Grid
       USE Hydro, ONLY: E
-      USE INPUT_VARS
+      USE INPUT_VARS, ONLY: icent,jcent
 
       IMPLICIT NONE
 
       integer :: i,j,k,nz
-      integer :: init=1
 
        do j=1,jm
         do i=1,im
@@ -129,12 +133,13 @@
       enddo  
 
 #ifdef DEBUG
-     write(6,*) "----Calling USER_get_NCOM_grid-----"
-     write(6,*) "  setting dxy, area, zl, zz, dz_k, and h"
-     write(6,*) "  For cell i,j,k=",icent,jcent,km
-     write(6,*) "h,E,d,zz,area,d_sfc,Vol="
-     write(6,*) h(icent,jcent),E(icent,jcent),d(icent,jcent,km)
-     write(6,*) zz(km),area(icent,jcent),d_sfc(icent,jcent,km),Vol(icent,jcent,km)
+     write(6,*) "----Calling USER_update_NCOM_grid-----"
+     write(6,*) "  setting depth,d,dz,d_sfc,Vol"
+     write(6,*) "  For cell i,j,k=",icent,jcent,1
+     write(6,*) "depth,d,dz,d_sfc,Vol="
+     write(6,*) depth(icent,jcent),d(icent,jcent,1),dz(icent,jcent,1)
+     write(6,*) d_sfc(icent,jcent,1),d_sfc(icent,jcent,1),Vol(icent,jcent,1)
+     write(6,*) 
 #endif
 
       end subroutine USER_update_NCOM_grid

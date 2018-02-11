@@ -13,8 +13,8 @@
 
        character(100) :: BASE_NETCDF_OUTPUT_FILE_NAME
        character(256) :: NETCDF_OUTPUT_FILE_NAME
-       integer ::  tinit=0, i,j,k,nz
-       real :: dumf(im,jm,km,nf)
+       integer ::  tinit=0, i,j,k,nz,myi
+       real :: dumf(myim,jm,km,nf)
 
        ! Change True/False parameters for netCDF Write Variables
        !L3 add Which_Output to GD InputFile
@@ -40,15 +40,17 @@
 
         dumf = f
         do j=1,jm
-        do i=1,im
+        myi = 1
+        do i=myi_start,myi_end
           nz=nza(i,j)
           do k=1,nz
-            dumf(i,j,k,JTR) = f(i,j,k,JTR) * Vol(i,j,k)
+            dumf(myi,j,k,JTR) = f(myi,j,k,JTR) * Vol(i,j,k)
           enddo
+          myi = myi + 1
          enddo
         enddo
 
-       CALL WRITE_DATA( im, jm, km, nf, tinit, dumf)
+        CALL WRITE_DATA( myi_start, myim, 1,jm, 1, km, nf,0, dumf)
 
        return
        End Subroutine Init_Output_GD

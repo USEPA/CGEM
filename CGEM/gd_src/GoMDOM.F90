@@ -20,7 +20,7 @@ IMPLICIT NONE
 INTEGER*8, INTENT(IN) :: TC_8
 REAL :: DTM(im,jm,km,nf),PAR(im,jm,km)
 REAL :: SETRATE(nf)
-INTEGER :: i,j,k,nz
+INTEGER :: i,j,k,nz,myi
 REAL dTime
 
 dTime = real(dT)
@@ -46,36 +46,40 @@ endif
 
 if(DoDroop.eq.1) then
  do j = 1,jm
-     do i = 1,im
+     myi=1
+     do i = myi_start,myi_end
          nz = nza(i,j)
       do k = 1, nz
          DTM(i,j,k,:) = 0.
-         CALL ZOO(f(i,j,k,:),DTM(i,j,k,:),T(i,j,k),i,j,k)                ! Zooplankton kinetics
-         CALL DIATOMS_droop(f(i,j,k,:),DTM(i,j,k,:),T(i,j,k),PAR(i,j,k),Vol(i,j,k),dTime,i,j,k)            ! Diatom kinetics
-         CALL GREENS_droop(f(i,j,k,:),DTM(i,j,k,:),T(i,j,k),PAR(i,j,k),Vol(i,j,k),dTime,i,j,k)             ! Greens kinetics
-         CALL CARBON(f(i,j,k,:),DTM(i,j,k,:),T(i,j,k),i,j,k)         ! Carbon (detritus) kinetics
-         CALL PHOSPH_droop(f(i,j,k,:),DTM(i,j,k,:),PAR(i,j,k),i,j,k)                      ! Phosphorous kinetics
-         CALL NITROG_droop(f(i,j,k,:),DTM(i,j,k,:),T(i,j,k),PAR(i,j,k),i,j,k)         ! Nitrogen kinetics
-         CALL SILICA(f(i,j,k,:),DTM(i,j,k,:),T(i,j,k),i,j,k)             ! Silica kinetics
-         CALL DISSOLVED_OXYGEN(f(i,j,k,:),DTM(i,j,k,:),T(i,j,k),Vol(i,j,k),dTime,i,j,k)   ! Dissolved Oxygen
+         CALL ZOO(f(myi,j,k,:),DTM(i,j,k,:),T(i,j,k),i,j,k)                ! Zooplankton kinetics
+         CALL DIATOMS_droop(f(myi,j,k,:),DTM(i,j,k,:),T(i,j,k),PAR(i,j,k),Vol(i,j,k),dTime,i,j,k)            ! Diatom kinetics
+         CALL GREENS_droop(f(myi,j,k,:),DTM(i,j,k,:),T(i,j,k),PAR(i,j,k),Vol(i,j,k),dTime,i,j,k)             ! Greens kinetics
+         CALL CARBON(f(myi,j,k,:),DTM(i,j,k,:),T(i,j,k),i,j,k)         ! Carbon (detritus) kinetics
+         CALL PHOSPH_droop(f(myi,j,k,:),DTM(i,j,k,:),PAR(i,j,k),i,j,k)                      ! Phosphorous kinetics
+         CALL NITROG_droop(f(myi,j,k,:),DTM(i,j,k,:),T(i,j,k),PAR(i,j,k),i,j,k)         ! Nitrogen kinetics
+         CALL SILICA(f(myi,j,k,:),DTM(i,j,k,:),T(i,j,k),i,j,k)             ! Silica kinetics
+         CALL DISSOLVED_OXYGEN(f(myi,j,k,:),DTM(i,j,k,:),T(i,j,k),Vol(i,j,k),dTime,i,j,k)   ! Dissolved Oxygen
       enddo
+      myi = myi + 1
    enddo      ! end of do i block do loop
  enddo      ! end of do j block do loop
 else
  do j = 1,jm
-     do i = 1,im
+     myi=1
+     do i = myi_start,myi_end
          nz = nza(i,j)
       do k = 1, nz
          DTM(i,j,k,:) = 0.
-         CALL ZOO(f(i,j,k,:),DTM(i,j,k,:),T(i,j,k),i,j,k)                !  Zooplankton kinetics
-         CALL DIATOMS(f(i,j,k,:),DTM(i,j,k,:),T(i,j,k),PAR(i,j,k),Vol(i,j,k),dTime,i,j,k) ! Diatom kinetics
-         CALL GREENS(f(i,j,k,:),DTM(i,j,k,:),T(i,j,k),PAR(i,j,k),Vol(i,j,k),dTime,i,j,k) ! Greens kinetics
-         CALL CARBON(f(i,j,k,:),DTM(i,j,k,:),T(i,j,k),i,j,k)         ! Carbon (detritus) kinetics
-         CALL PHOSPH(f(i,j,k,:),DTM(i,j,k,:),i,j,k)                      !  Phosphorous kinetics
-         CALL NITROG(f(i,j,k,:),DTM(i,j,k,:),T(i,j,k),i,j,k)         ! Nitrogen kinetics
-         CALL SILICA(f(i,j,k,:),DTM(i,j,k,:),T(i,j,k),i,j,k)             !  Silica kinetics
-         CALL DISSOLVED_OXYGEN(f(i,j,k,:),DTM(i,j,k,:),T(i,j,k),Vol(i,j,k),dTime,i,j,k)   !  Dissolved Oxygen
+         CALL ZOO(f(myi,j,k,:),DTM(i,j,k,:),T(i,j,k),i,j,k)                !  Zooplankton kinetics
+         CALL DIATOMS(f(myi,j,k,:),DTM(i,j,k,:),T(i,j,k),PAR(i,j,k),Vol(i,j,k),dTime,i,j,k) ! Diatom kinetics
+         CALL GREENS(f(myi,j,k,:),DTM(i,j,k,:),T(i,j,k),PAR(i,j,k),Vol(i,j,k),dTime,i,j,k) ! Greens kinetics
+         CALL CARBON(f(myi,j,k,:),DTM(i,j,k,:),T(i,j,k),i,j,k)         ! Carbon (detritus) kinetics
+         CALL PHOSPH(f(myi,j,k,:),DTM(i,j,k,:),i,j,k)                      !  Phosphorous kinetics
+         CALL NITROG(f(myi,j,k,:),DTM(i,j,k,:),T(i,j,k),i,j,k)         ! Nitrogen kinetics
+         CALL SILICA(f(myi,j,k,:),DTM(i,j,k,:),T(i,j,k),i,j,k)             !  Silica kinetics
+         CALL DISSOLVED_OXYGEN(f(myi,j,k,:),DTM(i,j,k,:),T(i,j,k),Vol(i,j,k),dTime,i,j,k)   !  Dissolved Oxygen
       enddo
+      myi = myi + 1
    enddo      ! end of do i block do loop
  enddo      ! end of do j block do loop
 endif
@@ -86,27 +90,31 @@ if(Which_Fluxes(iInRemin).eq.1) then
 if(DoDroop.eq.1) then
 !Do settling fluxes for instant remineralization
  do j = 1,jm
-     do i = 1,im
+     myi=1
+     do i = myi_start,myi_end
          nz = nza(i,j)
        if(nz.ge.0.and.wsm(i,j).eq.0) then !If on shelf
-         CALL EXCHANGE_droop(f(i,j,nz,:),area(i,j),Vol(i,j,nz),dTime,i,j,SETRATE(:))      ! Calculate IR fluxes and settling rates
+         CALL EXCHANGE_droop(f(myi,j,nz,:),area(i,j),Vol(i,j,nz),dTime,i,j,SETRATE(:))      ! Calculate IR fluxes and settling rates
          TSOD(i,j) = TSOD(i,j)/Vol(i,j,nz)
          SED_NO3_RATE(i,j) = SED_NO3_RATE(i,j)/Vol(i,j,nz)
          SED_NH3_RATE(i,j) = SED_NH3_RATE(i,j)/Vol(i,j,nz)
        endif !End of if(nza(i,j) statement
+      myi = myi + 1
    enddo      ! end of do i block do loop
  enddo      ! end of do j block do loop
 else
 !Do settling fluxes for instant remineralization
  do j = 1,jm
-     do i = 1,im
+     myi=1
+     do i = myi_start,myi_end
          nz = nza(i,j)
        if(nz.gt.0.and.wsm(i,j).eq.0) then !If on shelf
-         CALL EXCHANGE(f(i,j,nz,:),area(i,j),Vol(i,j,nz),dTime,i,j,SETRATE(:))      !  Calculate IR fluxes and settling rates
+         CALL EXCHANGE(f(myi,j,nz,:),area(i,j),Vol(i,j,nz),dTime,i,j,SETRATE(:))      !  Calculate IR fluxes and settling rates
          TSOD(i,j) = TSOD(i,j)/Vol(i,j,nz)
          SED_NO3_RATE(i,j) = SED_NO3_RATE(i,j)/Vol(i,j,nz)
          SED_NH3_RATE(i,j) = SED_NH3_RATE(i,j)/Vol(i,j,nz)
        endif !End of if(nza(i,j) statement
+      myi = myi + 1
    enddo      ! end of do i block do loop
  enddo      ! end of do j block do loop
 endif
@@ -115,35 +123,41 @@ endif
 
 
  do j = 1,jm
-     do i = 1,im 
+     myi=1
+     do i = myi_start,myi_end
          nz = nza(i,j)
       do k = 1, nz
-         f(i,j,k,:) = max(f(i,j,k,:) + DTM(i,j,k,:) * dTime,0.)
+         f(myi,j,k,:) = max(f(myi,j,k,:) + DTM(i,j,k,:) * dTime,0.)
       enddo
+      myi = myi + 1
    enddo      ! end of do i block do loop
  enddo      ! end of do j block do loop
 
 
 if(Which_Fluxes(iInRemin).eq.1) then
  do j = 1,jm
-     do i = 1,im
+     myi=1
+     do i = myi_start,myi_end
          nz = nza(i,j)
        if(nz.ge.0.and.wsm(i,j).eq.0) then
-         f(i,j,nz,:) = max(f(i,j,nz,:)  - (SETRATE(:)/Vol(i,j,nz)) * dTime,0.)
+         f(myi,j,nz,:) = max(f(myi,j,nz,:)  - (SETRATE(:)/Vol(i,j,nz)) * dTime,0.)
        endif !End of if(nza(i,j) statement
+      myi = myi + 1
    enddo      ! end of do i block do loop
  enddo      ! end of do j block do loop
 endif
 
 if(Which_Fluxes(iInRemin).eq.2) then
  do j = 1,jm
-     do i = 1,im
+     myi=1
+     do i = myi_start,myi_end
          nz = nza(i,j)
        if(nz.ge.0.and.wsm(i,j).eq.0) then
-         SETRATE(:) = f(i,j,nz,:)*area(i,j)*(-ws(:))
-         f(i,j,nz,:) = max(f(i,j,nz,:)  - (SETRATE(:)/Vol(i,j,nz)) * dTime,0.)
+         SETRATE(:) = f(myi,j,nz,:)*area(i,j)*(-ws(:))
+         f(myi,j,nz,:) = max(f(myi,j,nz,:)  - (SETRATE(:)/Vol(i,j,nz)) * dTime,0.)
        endif !End of if(nza(i,j) statement
    enddo      ! end of do i block do loop
+      myi = myi + 1
  enddo      ! end of do j block do loop
 endif
 

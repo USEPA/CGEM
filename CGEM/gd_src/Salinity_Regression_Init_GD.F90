@@ -11,15 +11,12 @@
       implicit none
  
       real temp
-      integer i,j,k,nz
-
-#ifdef DEBUG
-write(6,*) "---Salinity_Regression_Init_GD"
-#endif
+      integer i,j,k,nz,myi
 
 
       do j = 1,jm
-      do i = 1,im
+      myi = 1
+      do i = myi_start,myi_end
             nz = nza(i,j)
          do k=1,nz
 
@@ -104,9 +101,14 @@ write(6,*) "---Salinity_Regression_Init_GD"
 
 
       enddo
+      myi = myi + 1
       enddo
       enddo
 
+#ifdef DEBUG
+write(6,*) "---Salinity_Regression_Init_GD"
+write(6,*) 
+#endif
 
 
 

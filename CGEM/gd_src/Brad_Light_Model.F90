@@ -10,7 +10,7 @@
   IMPLICIT NONE
 
   real, intent(in)    :: Rad(im,jm)     !Irradiance just below sea surface
-  real, intent(in)    :: f(im,jm,km,nf)
+  real, intent(in)    :: f(0:(myim+1),jm,km,nf)
   real, intent(in)    :: lat(im,jm),lon(im,jm)    !Latitude and longitude of each grid cell
   real, intent(out)   :: IOPpar(im,jm,km)  !Par at the middle of layer k
   real, intent(in)    :: d_sfc(im,jm,km)   !Depth at center of cell k from surface
@@ -34,7 +34,7 @@
     integer         :: julianDay     ! Holds Julian Day
     integer         :: mdate_julian  ! Function calculates Julian Day
     logical         :: leapyr        ! Logical, is leap year
-  integer i,j,nz,numdepths
+  integer i,j,nz,numdepths,myi
 
 
  !--Begin Calculate atmospheric model --------------------------------
@@ -67,17 +67,18 @@
       julianDay = mdate_julian(iMonTC,iDayTC,leapyr)
 
    do j = 1,jm
-     do i = 1,im
+     myi = 1
+     do i = myi_start,myi_end
         nz=nza(i,j)
         if(nz.gt.0) then
 
          sun_zenith = calc_solar_zenith(lat(i,j),lon(i,j),HrTC,julianDay,leapyr)
 
-         totChl(1:nz) = (f(i,j,1:nz,JDIA) * 1.0E6 / CCHLD) + (f(i,j,1:nz,JGRE) * 1.0E6 / CCHLG)
+         totChl(1:nz) = (f(myi,j,1:nz,JDIA) * 1.0E6 / CCHLD) + (f(myi,j,1:nz,JGRE) * 1.0E6 / CCHLG)
          OM1_A(1:nz) = 0.
-         OM1_Z(1:nz) = f(i,j,1:nz,JZOO) * 1.0E3
-         OM1_R(1:nz) = f(i,j,1:nz,JROC) * 1.0E3
-         OM1_BC(1:nz) = f(i,j,1:nz,JLOC) * 1.0E3
+         OM1_Z(1:nz) = f(myi,j,1:nz,JZOO) * 1.0E3
+         OM1_R(1:nz) = f(myi,j,1:nz,JROC) * 1.0E3
+         OM1_BC(1:nz) = f(myi,j,1:nz,JLOC) * 1.0E3
          CDOM_k(1:nz) = astarOMA 
          numdepths = nz
 
@@ -92,6 +93,7 @@
 
 
        endif
+       myi = myi + 1
      enddo
    enddo
 

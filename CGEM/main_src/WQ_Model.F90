@@ -1,18 +1,24 @@
-       Subroutine WQ_Model(Which_code,TC_8,istep, istep_out)
+       Subroutine WQ_Model(Which_code,TC_8,istep, istep_out, myid, numprocs)
 
        IMPLICIT NONE
 
        integer(kind=8), intent(in) :: TC_8 ! Current time in seconds since Model_dim::iYr0.
-       integer, intent(in)  :: istep, istep_out
+       integer, intent(in)  :: istep, istep_out, myid, numprocs
        character(6), intent(in) :: Which_code
 
        if(Which_code.eq."CGEM") then !CGEM
-         call CGEM( TC_8, istep, istep_out )
+
+         call CGEM( TC_8, istep, istep_out, myid, numprocs )
+
        else if(Which_code.eq."GOMDOM") then !GOMDOM
+
          call GOMDOM( TC_8 )
+
        else
+
          write(6,*) "Model ",Which_code," not found, Exiting."
          stop
+
        endif
 
        return

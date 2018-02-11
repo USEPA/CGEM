@@ -38,18 +38,19 @@ IMPLICIT NONE
 
 integer ierr
 
-#ifdef map_code
-write(6,*) "---INPUT_VARS---"
-write(6,*) " general allocate, just ws, default is no sinking"
-write(6,*) 
-#endif
-
 !----Sinking Terms----------------------------------
 ALLOCATE( ws(nf),stat=ierr ) 
-if(ierr.ne.0) write(6,*) "error allocate"
-return
+if(ierr.ne.0) call error("ws",ierr)
 
 ws= 0.  !Default is no sinking
+
+#ifdef DEBUG
+write(6,*) "---INPUT_VARS---"
+write(6,*) " general allocate, just ws, default is no sinking"
+write(6,*)
+#endif
+
+return
 
 END Subroutine Allocate_Input
 

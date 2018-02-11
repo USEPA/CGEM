@@ -16,7 +16,7 @@ integer, intent(in) :: which !What type of fill value?
 
 if(which.eq.1) then
 ! x = -1.
- fv = -9999.
+ fv =-9999.
 
 else
 

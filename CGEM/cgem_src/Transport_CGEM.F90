@@ -1,4 +1,4 @@
-       Subroutine Transport_CGEM()
+       Subroutine Transport_CGEM(myid,numprocs)
 
        USE Model_dim
        USE INPUT_VARS_CGEM, ONLY: KH_coeff
@@ -9,25 +9,28 @@
 
        IMPLICIT NONE
 
-       integer :: i, j, k, nz 
+       integer, intent(in) :: myid,numprocs 
+       integer :: i, j, k, nz, myi
  
        if(which_gridio.ne.0) then
 
        ! Before Advection and VMixing, combine A's and Q's
          do j=1, jm
-           do i=1, im
+           myi = 1
+           do i=myi_start, myi_end 
              nz = nza(i,j)
              do k=1,nz
-             f(i,j,k,iQn(:)) = f(i,j,k,iQn(:)) * f(i,j,k,iA(:))
-             f(i,j,k,iQp(:)) = f(i,j,k,iQp(:)) * f(i,j,k,iA(:))
-           enddo
+             f(myi,j,k,iQn(:)) = f(myi,j,k,iQn(:)) * f(myi,j,k,iA(:))
+             f(myi,j,k,iQp(:)) = f(myi,j,k,iQp(:)) * f(myi,j,k,iA(:))
+             enddo
+             myi = myi + 1
          enddo
        enddo
 
        !Advection and Vmixing
 
        !Needs to call advection because that is where sinking is:
-        call Adv3D() 
+        call Adv3D(myid,numprocs) 
 
       !Multiply Kh by KH_coeff for h<30
         !L3...Fix this so it is only for h<30
@@ -36,12 +39,14 @@
 
        ! After Advection and VMixing, return to Q's
          do j=1, jm
-           do i=1, im
+           myi = 1
+           do i=myi_start, myi_end 
              nz = nza(i,j)
              do k=1,nz
-             f(i,j,k,iQn(:)) = f(i,j,k,iQn(:)) / f(i,j,k,iA(:))
-             f(i,j,k,iQp(:)) = f(i,j,k,iQp(:)) / f(i,j,k,iA(:))
-           enddo
+             f(myi,j,k,iQn(:)) = f(myi,j,k,iQn(:)) / f(myi,j,k,iA(:))
+             f(myi,j,k,iQp(:)) = f(myi,j,k,iQp(:)) / f(myi,j,k,iA(:))
+             enddo
+            myi = myi + 1
          enddo
        enddo
 

@@ -33,6 +33,7 @@
        REAL, PARAMETER :: pco2 = 395
 
        INTEGER nz !layers
+       integer myi
 
 ! -- SURFACE FLUXES -------------------------------------------------------------
 
@@ -58,7 +59,8 @@ endif
 
 ! -- Loop over i,j; k will be 1 (surface)
          do j = 1,jm
-         do i = 1,im
+         myi = 1
+         do i = myi_start,myi_end
              if(nza(i,j).gt.0) then
 
 
@@ -68,7 +70,7 @@ if(Which_Fluxes(iO2surf).eq.1) then
 !--------------------------------------------------------------
                T_sfc    = T(i,j,1)     ! temp(deg C)      in sfc layer, k=1
                Sal_sfc  = S(i,j,1)     ! sal (psu)        in sfc layer, k=1
-               O2_sfc   = f(i,j,1,JDO2)/cnvt_O2 ! O2 (mmolE-O2/m3) in sfc layer, k=1
+               O2_sfc   = f(myi,j,1,JDO2)/cnvt_O2 ! O2 (mmolE-O2/m3) in sfc layer, k=1
 
                Sc       = SchmidtNumber(Sal_sfc,T_sfc,0)  ! Schmidt number,
                                                           !   0 (zero) for O2
@@ -111,7 +113,7 @@ if(Which_Fluxes(iO2surf).eq.1) then
                                                        ! ((mmolE-O2/m2/sec)
                                                        ! negative means into
                O2_atF = O2_atF*cnvt_O2
-               f(i,j,1,JDO2) = AMAX1(f(i,j,1,JDO2) - O2_atF/dz(i,j,1)*dT,0.)
+               f(myi,j,1,JDO2) = AMAX1(f(myi,j,1,JDO2) - O2_atF/dz(i,j,1)*dT,0.)
 endif 
 
 
@@ -134,43 +136,45 @@ endif
 !endif
 
    endif !End of if(nza(i,j) statement
+   myi = myi + 1
    END DO      ! end of do i block do loop
    END DO      ! end of do j block do loop
 
 !-- BOTTOM FLUXES -------------------------------------------------------------------------
          do j = 1,jm
-         do i = 1,im 
+         myi = 1
+         do i = myi_start,myi_end
                 nz = nza(i,j)
              if(nz.gt.0) then  !water cell
               if(wsm(i,j).eq.0) then !If we are on the shelf
 
 if(Which_Fluxes(iSOC).eq.1) then
 !Murrell and Lehrter sediment oxygen consumption
-               f(i,j,nz,JDO2) = AMAX1(f(i,j,nz,JDO2) - 0.0235*2.**(.1*T(i,j,nz))*  &
-     & f(i,j,nz,JDO2)/dz(i,j,nz)*dT/SDay,0.)
+               f(myi,j,nz,JDO2) = AMAX1(f(myi,j,nz,JDO2) - 0.0235*2.**(.1*T(i,j,nz))*  &
+     & f(myi,j,nz,JDO2)/dz(i,j,nz)*dT/SDay,0.)
 endif
 
 if(Which_Fluxes(iNutEx).eq.1) then
 !NO3 Exchange
-       NO3_Ex = 0.0057*f(i,j,nz,JDO2)/cnvt_O2 - 0.52
-               f(i,j,nz,JNO3) = AMAX1(f(i,j,nz,JNO3) + cnvt_N*NO3_Ex/ &
+       NO3_Ex = 0.0057*f(myi,j,nz,JDO2)/cnvt_O2 - 0.52
+               f(myi,j,nz,JNO3) = AMAX1(f(myi,j,nz,JNO3) + cnvt_N*NO3_Ex/ &
      & dz(i,j,nz)*dT/SDay,0.)
 
 !NH4 Exchange
        NH4_Ex = -1.55*NO3_Ex + 0.69
-               f(i,j,nz,JNH4) = AMAX1(f(i,j,nz,JNH4) + cnvt_N*NH4_Ex/ &
+               f(myi,j,nz,JNH4) = AMAX1(f(myi,j,nz,JNH4) + cnvt_N*NH4_Ex/ &
      & dz(i,j,nz)*dT/SDay,0.)
 
 !PO4 Exchange
       PO4_Ex = 0.094*NH4_Ex - 0.0125
-               f(i,j,nz,JSRP) = AMAX1(f(i,j,nz,JSRP) + cnvt_P*PO4_Ex/ &
+               f(myi,j,nz,JSRP) = AMAX1(f(myi,j,nz,JSRP) + cnvt_P*PO4_Ex/ &
      & dz(i,j,nz)*dT/SDay,0.)
 endif
 
 if(Which_Fluxes(iInRemin).eq.1) then
-      f(i,j,nz,JDO2) = AMAX1(f(i,j,nz,JDO2) - TSOD(i,j)*dT,0.)
-      f(i,j,nz,JNO3) = AMAX1(f(i,j,nz,JNO3) + SED_NO3_RATE(i,j)*dT,0.)
-      f(i,j,nz,JNH4) = AMAX1(f(i,j,nz,JNH4) + SED_NH3_RATE(i,j)*dT,0.)
+      f(myi,j,nz,JDO2) = AMAX1(f(myi,j,nz,JDO2) - TSOD(i,j)*dT,0.)
+      f(myi,j,nz,JNO3) = AMAX1(f(myi,j,nz,JNO3) + SED_NO3_RATE(i,j)*dT,0.)
+      f(myi,j,nz,JNH4) = AMAX1(f(myi,j,nz,JNH4) + SED_NH3_RATE(i,j)*dT,0.)
 endif
 
 
@@ -187,15 +191,15 @@ if(Which_Fluxes(iSDM).eq.1) then
 endif
 
 if(Which_Fluxes(i_Si).eq.1) then
-      f(i,j,nz,JSA)  = AMAX1(f(i,j,nz,JSA)  + Si_Ex(i,j,1)/   &
+      f(myi,j,nz,JSA)  = AMAX1(f(myi,j,nz,JSA)  + Si_Ex(i,j,1)/   &
         Vol(i,j,nz)*dT,0.)
-      f(i,j,nz,JSRP) = AMAX1(f(i,j,nz,JSRP) + Si_Ex(i,j,2)/   &
+      f(myi,j,nz,JSRP) = AMAX1(f(myi,j,nz,JSRP) + Si_Ex(i,j,2)/   &
         Vol(i,j,nz)*dT,0.)
 endif
 
    endif !end shelf
-
    endif !End of if(nza(i,j) statement
+   myi = myi+1
    END DO      ! end of do i block do loop
    END DO      ! end of do j block do loop
 

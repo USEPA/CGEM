@@ -12,13 +12,13 @@ USE LIGHT_VARS, ONLY:PARfac
 
 IMPLICIT NONE
 
-REAL, INTENT(INOUT) :: f(im,jm,km,nf)
+REAL, INTENT(INOUT) :: f(0:(myim+1),jm,km,nf)
 REAL, INTENT(IN)    :: S(im,jm,km),Rad(im,jm)
 REAL, INTENT(IN) :: dz(im,jm,km)
 REAL, INTENT(OUT) :: PAR(im,jm,km)
 REAL :: KESS(km),SAL_TERM,CHL_TERM,POC_TERM
 REAL :: IATTOP, IATBOT(im,jm,km),OPTDEPTH,Rad_Watts(im,jm)
-INTEGER :: i,j,k,nz
+INTEGER :: i,j,k,nz,myi
 
 !
 !------------------------------------------------------------------------------
@@ -34,21 +34,22 @@ if(Read_Solar.eq.2) Rad_Watts = Rad/4.57
 
 !GoMDOM LIGHT MODEL, No Wind Speed
  do j = 1,jm
-     do i = 1,im
+     myi = 1
+     do i = myi_start,myi_end
         nz = nza(i,j)
        if(nz.ge.0) then
       do k = 1, nz
          SAL_TERM = 1.084E-06 * (S(i,j,k)**4)
 
-          IF ((f(i,j,k,JDIA) + f(i,j,k,JGRE)) < 1.0E-07) THEN
+          IF ((f(myi,j,k,JDIA) + f(myi,j,k,JGRE)) < 1.0E-07) THEN
                CHL_TERM = 0.0
           ELSE
-               CHL_TERM = 0.2085 * LOG( (f(i,j,k,JDIA) * 1.0E6 / CCHLD) + &
-                        & (f(i,j,k,JGRE) * 1.0E6 / CCHLG) )
+               CHL_TERM = 0.2085 * LOG( (f(myi,j,k,JDIA) * 1.0E6 / CCHLD) + &
+                        & (f(myi,j,k,JGRE) * 1.0E6 / CCHLG) )
           ENDIF
 
-          POC_TERM = 0.7640 * SQRT( (f(i,j,k,JLOC) * 1.0E3) +  &
-                   & (f(i,j,k,JROC) * 1.0E3) + (f(i,j,k,JZOO) * 1.0E3) )
+          POC_TERM = 0.7640 * SQRT( (f(myi,j,k,JLOC) * 1.0E3) +  &
+                   & (f(myi,j,k,JROC) * 1.0E3) + (f(myi,j,k,JZOO) * 1.0E3) )
 
           KESS(k) = ( ( -0.10 * (-0.5606 - SAL_TERM + CHL_TERM + POC_TERM) ) &
                   &  + 1 ) ** (1.0/(-0.10))
@@ -69,6 +70,7 @@ if(Read_Solar.eq.2) Rad_Watts = Rad/4.57
        END DO
       ENDIF
        endif !End of if(nza(i,j) statement
+       myi = myi + 1
    enddo      ! end of do i block do loop
  enddo      ! end of do j block do loop
 

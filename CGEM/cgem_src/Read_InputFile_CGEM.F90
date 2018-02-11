@@ -16,7 +16,7 @@ character(120),intent(in) :: filename
 
 integer i,j,k,icent_jcent_units,mpierr
 integer isp,isz
-real i_in,j_in,tot,x
+real tot,x
 real, parameter :: SDay = 86400.0  ! # of sec in 24 hr day
 real eps
 
@@ -33,7 +33,7 @@ read(999,*) iYrS,iMonS,iDayS,iHrS,iMinS,iSecS
 read(999,*) iYrE,iMonE,iDayE,iHrE,iMinE,iSecE
 read(999,*) dT, dT_out
 read(999,*) icent_jcent_units
-read(999,*) i_in, j_in
+read(999,*) icent, jcent
 read(999,*)
 !--Switches in GEM---------
 read(999,*)
@@ -191,8 +191,8 @@ call MPI_BCAST(iYrE,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
 call MPI_BCAST(iYrS,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
 call MPI_BCAST(dT,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
 call MPI_BCAST(dT_out,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
-call MPI_BCAST(i_in,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
-call MPI_BCAST(j_in,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(icent,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(jcent,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
 
 call MPI_BCAST(Which_fluxes,8,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
 

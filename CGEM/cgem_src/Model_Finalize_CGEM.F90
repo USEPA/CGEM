@@ -1,10 +1,12 @@
-       Subroutine Model_Finalize_CGEM()
+       Subroutine Model_Finalize_CGEM(myid,numprocs)
 
        USE OUTPUT_NETCDF_CGEM
 
        IMPLICIT NONE
 
-       CALL CLOSE_FILE()
+       integer, intent(in) :: myid,numprocs
+
+       if(myid.eq.0) CALL CLOSE_FILE()
 
        return
 

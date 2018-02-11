@@ -6,20 +6,11 @@
       USE INPUT_VARS , ONLY: icent,jcent
 
       IMPLICIT NONE
- 
-!      real, dimension(im,jm) :: dx
-!      real, dimension(im,jm) :: dy
-      real, dimension(jm) :: dxy
+
+      real, dimension(im,jm) :: dx,dy 
       integer :: i,j,k
       character(200) filename
       integer :: nzr, ns
-
-#ifdef map_code
-     write(6,*) "----Calling USER_get_NCOM_grid-----"
-     write(6,*) "  setting dxy, area, zl, zz, dz_k, and h"
-     write(6,*) "  Not setting depths, because don't have E"  
-     write(6,*) 
-#endif
 
       write(filename,'(A, A)') trim(DATADIR),'/dxdy.dat'
       open(19,file=filename,status='old')
@@ -31,13 +22,6 @@
 
       do j=1,jm
        do i=1,im
-#ifdef DEBUG_GRID
-if (i.eq.250) then
-  write(6,*) "for cell i,j=",i,j
-  write(6,*) "dx", dx(i,j)
-  write(6,*) "dy", dy(i,j)
-endif
-#endif
           area(i,j) = dx(i,j)*dy(i,j)
        enddo
       enddo
@@ -64,11 +48,11 @@ endif
       enddo
       close(19)
 
-#ifdef DEBUG_GRID
-      i=250
-      do j=1,jm
-      write(6,*) "i=",i,", j=",j,", h=",h(i,j)
-      enddo
+#ifdef DEBUG 
+     write(6,*) "----Calling USER_get_POM_grid-----"
+     write(6,*) "  setting dxy, area, zl, zz, dz_k, and h"
+     write(6,*) "  Not setting depths, because don't have E"
+     write(6,*)
 #endif
 
       return
@@ -88,24 +72,6 @@ endif
       real :: dp !d previous
       integer :: i,j,k,nz
       integer :: init=1
-
-#ifdef map_code 
-     if(init.eq.1) then
-      write(6,*) "----Calling USER_update_NCOM_grid-----"
-      write(6,*) "  setting dxy, area, zl, zz, dz_k, and h"
-      write(6,*) "  Not setting depths, because don't have E"
-      write(6,*)
-     init=0
-     endif
-#endif
-#ifdef DEBUG
-     write(6,*) "----Calling USER_get_NCOM_grid-----"
-     write(6,*) "  setting dxy, area, zl, zz, dz_k, and h"
-     write(6,*) "  For cell i,j,k=",icent,jcent,km
-     write(6,*) "h,E,d,zz,area,d_sfc,Vol="
-     write(6,*) h(icent,jcent),E(icent,jcent),d(icent,jcent,km)
-     write(6,*) zz(km),area(icent,jcent),d_sfc(icent,jcent,km),Vol(icent,jcent,km)
-#endif
 
        do j=1,jm
         do i=1,im
@@ -127,26 +93,19 @@ endif
              d_sfc(i,j,k) = depth(i,j) * zz(k)
              Vol(i,j,k) = area(i,j) * dz(i,j,k)
              d(i,j,k) = sum(dz(i,j,1:k))
-
-#ifdef DEBUG_GRID
-if (k.eq.5 .AND. i.eq.250) then
-  write(6,*) "for cell i,j,k=",i,j,k
-  write(6,*) "h",h(i,j)
-  write(6,*) "depth",depth(i,j)
-  write(6,*) "E",E(i,j)
-  write(6,*) "zl",zl(k)
-  write(6,*) "d",d(i,j,k)
-  write(6,*) "dz",dz(i,j,k)
-  write(6,*) "zz",zz(k)
-  write(6,*) "area",area(i,j)
-  write(6,*) "d_sfc",d_sfc(i,j,k)
-  write(6,*) "Vol",Vol(i,j,k)
-endif
-#endif
-
         enddo
        enddo
       enddo  
 
+
+#ifdef DEBUG
+     write(6,*) "----Calling USER_get_POM_grid-----"
+     write(6,*) "  setting dxy, area, zl, zz, dz_k, and h"
+     write(6,*) "  For cell i,j,k=",icent,jcent,km
+     write(6,*) "h,E,d,zz,area,d_sfc,Vol="
+     write(6,*) h(icent,jcent),E(icent,jcent),d(icent,jcent,km)
+     write(6,*) zz(km),area(icent,jcent),d_sfc(icent,jcent,km),Vol(icent,jcent,km)
+#endif
+      return
       end subroutine USER_update_POM_grid
 

@@ -1,4 +1,4 @@
-       Subroutine Init_Output_CGEM(BASE_NETCDF_OUTPUT_FILE_NAME)
+       Subroutine Init_Output_CGEM(BASE_NETCDF_OUTPUT_FILE_NAME,myid,numprocs)
 
        USE Model_dim
        USE INPUT_VARS, ONLY: nstep,dT_out,IYRS,IMONS,&
@@ -14,58 +14,53 @@
 
        character(100),intent(in) :: BASE_NETCDF_OUTPUT_FILE_NAME
        character(256) :: NETCDF_OUTPUT_FILE_NAME
-       real :: dumf(im,jm,km,nf)
-       integer :: i,j,k,nz
+       real :: dumf(myim,jm,km,nf)
+       integer :: i,j,k,nz,myi,myid,numprocs,mpierr
 
-#ifdef map_code
-write(6,*) "---- Init_Output_CGEM ---"
-#endif
 
        ! Change True/False parameters for netCDF Write Variables
        if(Which_chlaC.ne.2) call OUTPUT_NotCloern() !Gets rid of unused vars (Cloern)
        if(Which_Output.eq.1) call OUTPUT_NRL() !Limit Outputs
        if(Which_Output.eq.2) call OUTPUT_ALL_FALSE()
 
-      !write(6,*) d
-      !write(6,*) dz
 
       WRITE ( NETCDF_OUTPUT_FILE_NAME, '(A, I6.6, A)' )&
               trim(BASE_NETCDF_OUTPUT_FILE_NAME), 0, '.nc'
+
+      if(myid.eq.0) then
           CALL CREATE_FILE( trim(NETCDF_OUTPUT_FILE_NAME), &
-                            im, jm, km, nstep, nf, EXTRA_VARIABLES, &
-                            iYr0, &
+                            myi_start, myim, 1, jm, 1, km, nstep, iYr0,       & 
                             IYRS, IMONS, IDAYS, IHRS, IMINS, ISECS, &
                             IYRE, IMONE, IDAYE, IHRE, IMINE, ISECE, &
                             DT_OUT, &
                             LON, LAT, d, FM, &
                             DZ )
           CALL CLOSE_FILE()
-
-#ifdef DEBUG
-write(6,*) "After Set_Vars"
-#endif
+      endif
+      CALL MPI_BARRIER( MPI_COMM_WORLD, mpierr ) ! Wait until file is created.
 
 ! Opens the output file for writing:
-       CALL OPEN_FILE( trim(NETCDF_OUTPUT_FILE_NAME), nf, EXTRA_VARIABLES, 0 )
+       CALL OPEN_FILE( trim(NETCDF_OUTPUT_FILE_NAME), 0 )
 
-#ifdef DEBUG
-write(6,*) "After Set_Vars"
-#endif
         dumf = f
 
         do j=1,jm
-        do i=1,im
+         myi = 1
+         do i=myi_start,myi_end
           nz = nza(i,j)
           do k=1,nz
-           dumf(i,j,k,iTr) = f(i,j,k,iTr) * Vol(i,j,k)
+           dumf(myi,j,k,iTr) = f(myi,j,k,iTr) * Vol(i,j,k)
           enddo
+          myi = myi+1
          enddo
         enddo
 
-       CALL WRITE_DATA( im, jm, km, nf, 0, dumf)
+        write(6,*) "myi_start,myim",myi_start,myim
+        CALL WRITE_DATA( myi_start, myim, 1,jm, 1, km, 0, dumf)
 
 #ifdef DEBUG
-write(6,*) "After Write_Data"
+write(6,*) "---- Init_Output_CGEM ---"
+write(6,*) 
 #endif
 
        End Subroutine Init_Output_CGEM

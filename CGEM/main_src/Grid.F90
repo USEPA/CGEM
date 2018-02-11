@@ -23,11 +23,6 @@
       real, allocatable, save :: dz_k(:) !Original (Ko) dz, sigma thickness of layer k
       real, save :: Hs  !reference depth used to calculate sigma values given depths of layer surfaces and centers
 
-!Temporary variables to debug Advection for EFDC
-      real,allocatable,save :: dx(:,:)  !dx
-      real,allocatable,save :: dy(:,:)  !dy
-  
- 
       integer, parameter :: numGridFiles = 2
       type(netCDF_file), save :: grid_info(numGridFiles)    ! 1-column depth, 2-cell depth
       integer, dimension(numGridFiles), save :: gridStartIndex  ! holds the last time index accessed from netcdf file for each grid variable
@@ -135,13 +130,6 @@ write(6,*)
       ALLOCATE(d_sfc(im,jm,km))
       ALLOCATE(fm(im,jm,km))
       ALLOCATE(wsm(im,jm))
-
-!Temporary variables to debug Advection for EFDC
-      ALLOCATE(dx(im,jm))  !dx
-      ALLOCATE(dy(im,jm))  !dy
-      dx=fill(0)  !Fill values for netCDF
-      dy=fill(0)
-
 
       if (Which_gridio .eq. 2 .or. Which_gridio .eq. 3) then
          ALLOCATE(zz(35))

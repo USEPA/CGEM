@@ -5,8 +5,7 @@
       USE Grid
       USE INPUT_VARS, Only:icent,jcent 
 
-!      real, dimension(im,jm) :: dx, dy, sdetg
-      real, dimension(im,jm) :: sdetg
+      real, dimension(im,jm) :: dx, dy, sdetg
       integer :: i,j
       character(200) filename
 
@@ -65,16 +64,7 @@ write(6,*)
 
       integer :: i,j,k, nz
       integer(kind=8) :: TC_8,T_8
-      integer, save :: init=1
       real x
-#ifdef map_code
-if(init.eq.1) then
-write(6,*) "---USER_update_EFDC_grid----"
-write(6,*) "  setting depth, dz, d_sfc, d, Vol"
-write(6,*)
-init=0
-endif
-#endif
 
 !      call interpVar(grid_info(eColDepth), TC_8, gridStartIndex(eColDepth), depth)
 !      call interpVar(grid_info(eCellDepth), TC_8, gridStartIndex(eCellDepth), dz)
