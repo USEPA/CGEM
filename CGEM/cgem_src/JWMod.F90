@@ -12,7 +12,7 @@
       
       IMPLICIT NONE
 
-      allocate (CBODS(im,jm))
+      allocate (CBODS(myim,jm))
 
       END Subroutine JWMod_allocate
 

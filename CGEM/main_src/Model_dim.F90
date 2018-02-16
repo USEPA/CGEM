@@ -16,7 +16,6 @@ IMPLICIT NONE
       INTEGER, SAVE :: nospA  !Read in by main.F90 in data/Model_dim.txt
       INTEGER, SAVE :: nospZ 
       INTEGER, SAVE :: nf 
-      INTEGER, SAVE :: EXTRA_VARIABLES
       INTEGER, SAVE :: Which_gridio
       CHARACTER(200), SAVE :: DATADIR
       INTEGER, SAVE :: iYr0 ! Reference year all timestamps are relative to.

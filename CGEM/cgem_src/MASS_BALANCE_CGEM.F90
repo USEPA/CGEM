@@ -20,16 +20,16 @@ USE Model_dim
 
 IMPLICIT NONE
 
-ALLOCATE(RN2_ijk(im,jm,km))
+ALLOCATE(RN2_ijk(myim,jm,km))
 RN2_ijk = fill(0)
 
-ALLOCATE(RO2_A_ijk(im,jm,km))
+ALLOCATE(RO2_A_ijk(myim,jm,km))
 RO2_A_ijk = fill(0)
-ALLOCATE(RO2_Z_ijk(im,jm,km))
+ALLOCATE(RO2_Z_ijk(myim,jm,km))
 RO2_Z_ijk = fill(0)
-ALLOCATE(RO2_R_ijk(im,jm,km))
+ALLOCATE(RO2_R_ijk(myim,jm,km))
 RO2_R_ijk = fill(0)
-ALLOCATE(RO2_BC_ijk(im,jm,km))
+ALLOCATE(RO2_BC_ijk(myim,jm,km))
 RO2_BC_ijk = fill(0)
 
 return

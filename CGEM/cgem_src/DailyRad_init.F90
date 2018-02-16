@@ -35,10 +35,7 @@ Subroutine DailyRad_init(TC_8, lat, lon, d, d_sfc, A_k, CDOM_k, &
   integer :: iSec
   integer :: iHr, iMin ! Not used but needed for call
   integer :: k, isp
-  logical :: leapyr
   integer :: jul_day
-  integer :: JY ! function
-  integer :: mdate_julian
   real :: rhr ! decimal hour with fraction thereof
   real :: bottom_depth(km)
   real :: Zenith,  calc_solar_zenith !Solar Zenith Angle
@@ -70,18 +67,12 @@ Subroutine DailyRad_init(TC_8, lat, lon, d, d_sfc, A_k, CDOM_k, &
 
   CALL DATE_TIMESTAMP( iYr0, TC_8, iYr, iMon, iDay, iHr, iMin, iSec )
 
-  if (JY(iYr) == 1) then
-     leapyr = .FALSE.
-  else 
-     leapyr = .TRUE.
-  endif 
-
-  ! Assume that the day is from midnight to midnight
-  jul_day = mdate_julian(iMon, iDay, leapyr)
+! Now calculate the Julian Day associated with model time TC_8
+      jul_day = JDAY_IN_YEAR(iYr, iMon, iDay)
 
   do iSec = 1, iSDay, dT
      rhr = REAL(iSec) / REAL(3600)
-     Zenith = calc_solar_zenith(lat,lon,rhr,jul_day,leapyr)
+     Zenith = calc_solar_zenith(lat,lon,rhr,jul_day)
      SfcRad = solconst * AMAX1( COS(Zenith), 0.0)    ! COS(Z)<= 0 means night
 
      if(SfcRad .gt. 0.) then
@@ -96,5 +87,7 @@ Subroutine DailyRad_init(TC_8, lat, lon, d, d_sfc, A_k, CDOM_k, &
   ! Copy result to return variable
   ! Need to convert from quanta/cm2/s to average mol quanta/m2/d
   aDailyRad_k(:) = aRadSum(:) * RADCONV * dT
+
+  return
 
 END Subroutine DailyRad_init

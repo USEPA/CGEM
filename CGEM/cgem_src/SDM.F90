@@ -48,9 +48,9 @@ OPEN(11,STATUS='UNKNOWN', file='SDM/normoxia.dat')
 READ(11,*) (dummy2(i),i=1,NEQ)
 CLOSE(11)
 
-allocate (sedflux(im,jm,nsed))
-allocate (ppH_init(im,jm,NPOINTS))
-allocate (YY_init(im,jm,NEQ))
+allocate (sedflux(myim,jm,nsed))
+allocate (ppH_init(myim,jm,NPOINTS))
+allocate (YY_init(myim,jm,NEQ))
 
 !Initialize whole grid to the initial values
 do i=1,NPOINTS

@@ -28,6 +28,7 @@
          myi = 1
          do i = myi_start, myi_end 
              nz = nza(i,j)
+             if(nz.gt.0) then
              do k = 2, nz
                  A(k-1) = -dT*Kh(i,j,k)                       &
             &                /(dz(i,j,k-1)*(d_sfc(i,j,k)-d_sfc(i,j,k-1)))           
@@ -56,6 +57,7 @@
                  f(myi,j,k,ii) = E(k)*f(myi,j,k+1,ii)+G(k)
                end do
              end do
+            endif
         myi = myi + 1
         enddo
       enddo

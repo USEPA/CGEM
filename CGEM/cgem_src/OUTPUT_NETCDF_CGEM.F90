@@ -8,18 +8,23 @@
 MODULE OUTPUT_NETCDF_CGEM
 
 !  USE netcdf
+  USE xnetcdf
   USE NETCDF_UTILITIES ! For CHKERR, DEFDIM, DEFVI1, CONVERT_LONGITUDES, etc.
   USE DATE_TIME ! For TOTAL_SECONDS
-
-  USE Model_dim, ONLY: nospA,nospZ,nf,EXTRA_VARIABLES
+  USE OUTPUT, ONLY:EXTRA_VARIABLES,STATE_VARIABLES
   USE INPUT_VARS
+  USE Model_dim, ONLY:nospA,nospZ
 
   IMPLICIT NONE
+
+#ifdef _MPI
+!  include 'mpif.h'
+#endif
 
   ! Private
 
   INTEGER TIME_VAR ! NetCDF ID for time array variable.
-  INTEGER FILE_ID ! NetCDF ID for file.
+  INTEGER,SAVE :: FILE_ID ! NetCDF ID for file.
   INTEGER FILE_FIRST_TIMESTEP ! 0-based model timestep number of current file.
   INTEGER SECONDS_PER_TIMESTEP ! Output timestep size in seconds.
   INTEGER(8) SECONDS0 ! Seconds since Model_dim::iYr0.
@@ -41,7 +46,7 @@ CONTAINS
   ! then call CLOSE_FILE then
   ! worker processes should call OPEN_FILE, WRITE_DATA, CLOSE_FILE.
   !
-  SUBROUTINE CREATE_FILE( NAME, IMSTART, IM, JMSTART, JM, KMSTART, KM, NSTEP, IYR0, &
+  SUBROUTINE CREATE_FILE( NAME, IM, JM, KM, NSTEP, IYR0, &
                           IYRS, IMONS, IDAYS, IHRS, IMINS, ISECS, &
                           IYRE, IMONE, IDAYE, IHRE, IMINE, ISECE, &
                           DT_OUT, RLON, RLAT, depth, FM, DZ)
@@ -54,8 +59,8 @@ CONTAINS
     USE STOICH_VARS
 
     IMPLICIT NONE
+    include 'netcdf.inc'
     CHARACTER(LEN=*),INTENT(IN):: NAME
-    INTEGER,INTENT(IN):: IMSTART, JMSTART, KMSTART
     INTEGER,INTENT(IN):: IM, JM, KM
     INTEGER,INTENT(IN):: NSTEP
     INTEGER,INTENT(IN):: IYR0 ! Reference year (before start of model run).
@@ -66,25 +71,31 @@ CONTAINS
     REAL,DIMENSION(IM,JM):: RLAT
     REAL,DIMENSION(IM, JM, KM):: DZ
     REAL, DIMENSION(IM,JM,KM) :: depth 
-    REAL,INTENT(IN):: FM(IM,JM,KM)
-   ! External NetCDF routines:
-    INTEGER NF_CREATE, NF_ENDDEF, NF_PUT_VAR_INT, NF_PUT_VAR_REAL, NF_SYNC
-    EXTERNAL NF_CREATE, NF_ENDDEF, NF_PUT_VAR_INT, NF_PUT_VAR_REAL, NF_SYNC
+    REAL :: FM(IM,JM,KM)
    ! Locals:
     INTEGER IM_DIM, JM_DIM, KM_DIM, NSTEPP1_DIM
     INTEGER RLON_VAR, RLAT_VAR, H_VAR, FM_VAR
     INTEGER DZ_VAR
-    INTEGER K, i, J
+    INTEGER K, i, J, INFO
     INTEGER ERR, VARIABLE, DIM_IDS( 4 )
+!    INTEGER NF_CLOBBER, NF_64BIT_OFFSET
+!    EXTERNAL NF_CLOBBER, NF_64BIT_OFFSET
     REAL,DIMENSION(IM,JM):: RLON_COPY
     CHARACTER(LEN=40):: TIME_UNITS
     CHARACTER(LEN=14):: var
+    INTEGER(KIND=MPI_OFFSET_KIND) :: nospAZ, nospA_m, nospZ_m
     FILE_ID = -1
+    nospAZ=nospA+nospZ
+    nospA_m = nospA
+    nospZ_m = nospZ
 
-
+    CALL MPI_INFO_CREATE( INFO, ERR )
+    CALL MPI_INFO_SET( INFO, 'ind_wr_buffer_size', '16777216', ERR )
     ! Create/overwrite NetCDF output file:
-    ERR = NF_CREATE( trim(NAME), 770, FILE_ID) 
+    ERR = ncdf_CREATE( MPI_COMM_SELF,trim(NAME), IOR( NF_CLOBBER, NF_64BIT_OFFSET ), INFO, FILE_ID) 
     CALL CHKERR( ERR, 'create NetCDF output file ' // NAME )
+    CALL MPI_INFO_FREE( INFO, ERR )
+
     ! Create dimensions:
     CALL DEFDIM( FILE_ID, IM_DIM, 'longitude', IM )
     CALL DEFDIM( FILE_ID, JM_DIM, 'latitude', JM )
@@ -191,56 +202,56 @@ CONTAINS
     CALL DEFRAT( FILE_ID, 'PARfac', PARfac  )
 !Temperature
     CALL DEFTAT( FILE_ID, 'Calibration3', 'Temperature in GEM.')
-    CALL DEFRATX( FILE_ID, 'Tref', Tref, nospA+nospZ )
-    CALL DEFRATX( FILE_ID, 'KTg1', KTg1, nospA+nospZ )
-    CALL DEFRATX( FILE_ID, 'KTg2', KTg2, nospA+nospZ )
-    CALL DEFRATX( FILE_ID, 'Ea', Ea, nospA+nospZ )
+    CALL DEFRATX( FILE_ID, 'Tref', Tref, nospAZ )
+    CALL DEFRATX( FILE_ID, 'KTg1', KTg1, nospAZ )
+    CALL DEFRATX( FILE_ID, 'KTg2', KTg2, nospAZ )
+    CALL DEFRATX( FILE_ID, 'Ea', Ea, nospAZ )
 !Phytoplankton
     CALL DEFTAT( FILE_ID, 'Calibration4', 'Phytoplankton in GEM.')
     do i=1,nospZ
        write(var,'(A12,i2)') 'ediblevector',i
-       CALL DEFRATX( FILE_ID, var, ediblevector(i,:), nospA )
+       CALL DEFRATX( FILE_ID, var, ediblevector(i,:), nospA_m )
     enddo
-    CALL DEFRATX( FILE_ID, 'umax', umax, nospA )
-    CALL DEFRATX( FILE_ID, 'CChla', CChla, nospA )
-    CALL DEFRATX( FILE_ID, 'alpha', alpha, nospA )
-    CALL DEFRATX( FILE_ID, 'beta', beta, nospA )
-    CALL DEFRATX( FILE_ID, 'respg', respg, nospA )
-    CALL DEFRATX( FILE_ID, 'respb', respb, nospA )
-    CALL DEFRATX( FILE_ID, 'QminN', QminN, nospA  )
-    CALL DEFRATX( FILE_ID, 'QminP', QminP, nospA )
-    CALL DEFRATX( FILE_ID, 'QmaxN', QmaxN, nospA )
-    CALL DEFRATX( FILE_ID, 'QmaxP', QmaxP, nospA  )
-    CALL DEFRATX( FILE_ID, 'Kn', Kn, nospA  )
-    CALL DEFRATX( FILE_ID, 'Kp', Kp, nospA  )
-    CALL DEFRATX( FILE_ID, 'Ksi', Ksi, nospA  )
-    CALL DEFRATX( FILE_ID, 'KQn', KQn, nospA )
-    CALL DEFRATX( FILE_ID, 'KQp', KQp, nospA  )
-    CALL DEFRATX( FILE_ID, 'nfQs', nfQs, nospA )
-    CALL DEFRATX( FILE_ID, 'vmaxN', vmaxN, nospA  )
-    CALL DEFRATX( FILE_ID, 'vmaxP', vmaxP, nospA  )
-    CALL DEFRATX( FILE_ID, 'vmaxSi', vmaxSi, nospA  )
-    CALL DEFRATX( FILE_ID, 'aN', aN, nospA )
-    CALL DEFRATX( FILE_ID, 'volcell', volcell, nospA  )
-    CALL DEFRATX( FILE_ID, 'Qc', Qc, nospA  )
-    CALL DEFRATX( FILE_ID, 'Athresh', Athresh, nospA )
-    CALL DEFRATX( FILE_ID, 'sink A', ws(iA(1):iA(nospA)), nospA  )
-    CALL DEFRATX( FILE_ID, 'mA', mA, nospA )
-    CALL DEFRATX( FILE_ID, 'A_wt', A_wt, nospA )
+    CALL DEFRATX( FILE_ID, 'umax', umax, nospA_m )
+    CALL DEFRATX( FILE_ID, 'CChla', CChla, nospA_m )
+    CALL DEFRATX( FILE_ID, 'alpha', alpha, nospA_m )
+    CALL DEFRATX( FILE_ID, 'beta', beta, nospA_m )
+    CALL DEFRATX( FILE_ID, 'respg', respg, nospA_m )
+    CALL DEFRATX( FILE_ID, 'respb', respb, nospA_m )
+    CALL DEFRATX( FILE_ID, 'QminN', QminN, nospA_m  )
+    CALL DEFRATX( FILE_ID, 'QminP', QminP, nospA_m )
+    CALL DEFRATX( FILE_ID, 'QmaxN', QmaxN, nospA_m )
+    CALL DEFRATX( FILE_ID, 'QmaxP', QmaxP, nospA_m  )
+    CALL DEFRATX( FILE_ID, 'Kn', Kn, nospA_m  )
+    CALL DEFRATX( FILE_ID, 'Kp', Kp, nospA_m  )
+    CALL DEFRATX( FILE_ID, 'Ksi', Ksi, nospA_m  )
+    CALL DEFRATX( FILE_ID, 'KQn', KQn, nospA_m )
+    CALL DEFRATX( FILE_ID, 'KQp', KQp, nospA_m  )
+    CALL DEFRATX( FILE_ID, 'nfQs', nfQs, nospA_m )
+    CALL DEFRATX( FILE_ID, 'vmaxN', vmaxN, nospA_m  )
+    CALL DEFRATX( FILE_ID, 'vmaxP', vmaxP, nospA_m  )
+    CALL DEFRATX( FILE_ID, 'vmaxSi', vmaxSi, nospA_m  )
+    CALL DEFRATX( FILE_ID, 'aN', aN, nospA_m )
+    CALL DEFRATX( FILE_ID, 'volcell', volcell, nospA_m  )
+    CALL DEFRATX( FILE_ID, 'Qc', Qc, nospA_m  )
+    CALL DEFRATX( FILE_ID, 'Athresh', Athresh, nospA_m )
+    CALL DEFRATX( FILE_ID, 'sink A', ws(iA(1):iA(nospA)), nospA_m  )
+    CALL DEFRATX( FILE_ID, 'mA', mA, nospA_m )
+    CALL DEFRATX( FILE_ID, 'A_wt', A_wt, nospA_m )
 
 !Zooplankton
     CALL DEFTAT( FILE_ID, 'Calibration5', 'Zooplankton in GEM.')
-    CALL DEFRATX( FILE_ID, 'Zeffic', Zeffic, nospZ )
-    CALL DEFRATX( FILE_ID, 'Zslop', Zslop, nospZ )
-    CALL DEFRATX( FILE_ID, 'Zvolcell', Zvolcell, nospZ )
-    CALL DEFRATX( FILE_ID, 'ZQc', ZQc, nospZ )
-    CALL DEFRATX( FILE_ID, 'ZQn', ZQn, nospZ )
-    CALL DEFRATX( FILE_ID, 'ZQp', ZQp, nospZ )
-    CALL DEFRATX( FILE_ID, 'ZKa', ZKa, nospZ )
-    CALL DEFRATX( FILE_ID, 'Zrespg', Zrespg, nospZ )
-    CALL DEFRATX( FILE_ID, 'Zrespb', Zrespb, nospZ )
-    CALL DEFRATX( FILE_ID, 'Zumax', Zumax, nospZ )
-    CALL DEFRATX( FILE_ID, 'Zm', Zm, nospZ )
+    CALL DEFRATX( FILE_ID, 'Zeffic', Zeffic, nospZ_m )
+    CALL DEFRATX( FILE_ID, 'Zslop', Zslop, nospZ_m )
+    CALL DEFRATX( FILE_ID, 'Zvolcell', Zvolcell, nospZ_m )
+    CALL DEFRATX( FILE_ID, 'ZQc', ZQc, nospZ_m )
+    CALL DEFRATX( FILE_ID, 'ZQn', ZQn, nospZ_m )
+    CALL DEFRATX( FILE_ID, 'ZQp', ZQp, nospZ_m )
+    CALL DEFRATX( FILE_ID, 'ZKa', ZKa, nospZ_m )
+    CALL DEFRATX( FILE_ID, 'Zrespg', Zrespg, nospZ_m )
+    CALL DEFRATX( FILE_ID, 'Zrespb', Zrespb, nospZ_m )
+    CALL DEFRATX( FILE_ID, 'Zumax', Zumax, nospZ_m )
+    CALL DEFRATX( FILE_ID, 'Zm', Zm, nospZ_m )
 
 !Organic Matter
     CALL DEFTAT( FILE_ID, 'Calibration6', 'Optics in GEM.')
@@ -329,7 +340,7 @@ CONTAINS
     DIM_IDS( 3 ) = KM_DIM
     DIM_IDS( 4 ) = NSTEPP1_DIM
 
-    DO VARIABLE = 1, nf 
+    DO VARIABLE = 1, STATE_VARIABLES
       IF ( WRITE_VARIABLE( VARIABLE ) ) THEN
         CALL DEFVR4( FILE_ID, DIM_IDS, F_VAR( VARIABLE ), &
                      TRIM( VARIABLE_NAMES( VARIABLE ) ), &
@@ -355,10 +366,16 @@ CONTAINS
       END IF
     END DO
 
+    write(6,*) "ev1--------",EXTRA_VAR
+    write(6,*) EXTRA_VARIABLE_NAMES
+    write(6,*) EXTRA_VARIABLE_DESCRIPTIONS
+    write(6,*) EXTRA_VARIABLE_UNITS
     ! End of NetCDF header:
 
-    ERR = NF_ENDDEF( FILE_ID )
+    ERR = ncdf_ENDDEF( FILE_ID )
     CALL CHKERR( ERR, 'create NetCDF output header' )
+    ERR = ncdf_BEGIN_INDEP_DATA( FILE_ID )
+    CALL CHKERR( ERR, 'begin independent data access mode' )
 
     ! Write non-time-varying array variables:
 
@@ -368,23 +385,23 @@ CONTAINS
       CALL CONVERT_LONGITUDES( IM, RLON_COPY(:,J))
     ENDDO
 
-    ERR = NF_PUT_VAR_REAL( FILE_ID, RLON_VAR, RLON_COPY )
+    ERR = ncdf_PUT_VAR_REAL( FILE_ID, RLON_VAR, RLON_COPY )
     CALL CHKERR( ERR, 'write output variable rlon' )
 
-    ERR = NF_PUT_VAR_REAL( FILE_ID, RLAT_VAR, RLAT )
+    ERR = ncdf_PUT_VAR_REAL( FILE_ID, RLAT_VAR, RLAT )
     CALL CHKERR( ERR, 'write output variable rlat' )
 
     ! Write h
-    ERR = NF_PUT_VAR_REAL( FILE_ID, H_VAR, depth )
+    ERR = ncdf_PUT_VAR_REAL( FILE_ID, H_VAR, depth )
     CALL CHKERR( ERR, 'write output variable h' )
 
 
     ! Write fm in 3D
 
-    ERR = NF_PUT_VAR_REAL( FILE_ID, FM_VAR, FM )
+    ERR = ncdf_PUT_VAR_REAL( FILE_ID, FM_VAR, FM )
     CALL CHKERR( ERR, 'write output variable fm' )
 
-    ERR = NF_PUT_VAR_REAL( FILE_ID, DZ_VAR, DZ )
+    ERR = ncdf_PUT_VAR_REAL( FILE_ID, DZ_VAR, DZ )
     CALL CHKERR( ERR, 'write output variable dz' )
 
 
@@ -404,29 +421,36 @@ CONTAINS
   !
   SUBROUTINE OPEN_FILE( NAME, FIRST_TIMESTEP )
     USE OUTPUT 
+
     IMPLICIT NONE
+
+    include 'netcdf.inc'
+
     CHARACTER(LEN=*),INTENT(IN):: NAME
     INTEGER,INTENT(IN):: FIRST_TIMESTEP
-    ! External NetCDF routines:
-    INTEGER NF__OPEN, NF_INQ_VARID, NF_GET_ATT_INT, NF_GET_ATT_REAL
-    EXTERNAL NF__OPEN, NF_INQ_VARID, NF_GET_ATT_INT, NF_GET_ATT_REAL
     ! Locals:
     INTEGER ERR, VARIABLE
     INTEGER DT_OUT
     INTEGER IYR0 ! Reference year (before start of model run).
     INTEGER IYRS, IMONS, IDAYS, IHRS, IMINS, ISECS ! Run start.
     INTEGER(8) SECONDS_FROM_YEAR0
-    INTEGER BUFFER_SIZE
+    INTEGER BUFFER_SIZE,INFO
+
+    CALL MPI_INFO_CREATE( INFO, ERR )
+    CALL MPI_INFO_SET( INFO, 'ind_wr_buffer_size', '16777216', ERR )
 
     ! Open existing shared 64-bit NetCDF output file for writing:
-!!!!ERR = NF_OPEN( NAME, 2565, FILE_ID )
-    BUFFER_SIZE = 256 * 1024
-    ERR = NF__OPEN( NAME, 775, BUFFER_SIZE, FILE_ID ) ! 1+4+256+2+512 64-bit
+!    ERR = ncdf_OPEN( NAME, 2565, FILE_ID )
+    ERR = ncdf_OPEN( MPI_COMM_WORLD, trim(NAME), &
+                      IOR( NF_WRITE, NF_64BIT_OFFSET ), INFO, FILE_ID )
+    !BUFFER_SIZE = 256 * 1024
+    !ERR = ncdf_OPEN( NAME, NUM, BUFFER_SIZE, FILE_ID ) ! 1+4+256+2+512 64-bit
     CALL CHKERR( ERR, 'open existing shared writable output file ' // NAME )
+    CALL MPI_INFO_FREE( INFO, ERR )
 
     ! Get time variable id:
 
-    ERR = NF_INQ_VARID( FILE_ID, 'time', TIME_VAR )
+    ERR = ncdf_INQ_VARID( FILE_ID, 'time', TIME_VAR )
     CALL CHKERR( ERR, 'inquire NetCDF variable ID ' )
 
     ! Read time attributes to compute SECONDS0:
@@ -450,10 +474,10 @@ CONTAINS
 
     ! Get time-varying array variable ids:
 
-    DO VARIABLE = 1, nf 
+    DO VARIABLE = 1, STATE_VARIABLES 
 
       IF ( WRITE_VARIABLE( VARIABLE ) ) THEN
-        ERR = NF_INQ_VARID( FILE_ID, TRIM(VARIABLE_NAMES( VARIABLE )), &
+        ERR = ncdf_INQ_VARID( FILE_ID, TRIM(VARIABLE_NAMES( VARIABLE )), &
                                F_VAR( VARIABLE ) )
         CALL CHKERR( ERR, 'inquire NetCDF variable ID ' )
       END IF
@@ -464,7 +488,7 @@ CONTAINS
     DO VARIABLE = 1, EXTRA_VARIABLES
 
       IF ( WRITE_EXTRA_VARIABLE( VARIABLE ) ) THEN
-        ERR = NF_INQ_VARID( FILE_ID, TRIM(EXTRA_VARIABLE_NAMES( VARIABLE )), &
+        ERR = ncdf_INQ_VARID( FILE_ID, TRIM(EXTRA_VARIABLE_NAMES( VARIABLE )), &
                                EXTRA_VAR( VARIABLE ) )
         CALL CHKERR( ERR, 'inquire NetCDF variable ID ' )
       END IF
@@ -479,11 +503,9 @@ CONTAINS
   !
   SUBROUTINE CLOSE_FILE()
     IMPLICIT NONE
-    INTEGER NF_CLOSE 
-    EXTERNAL NF_CLOSE
     INTEGER ERR
 
-    ERR = NF_CLOSE( FILE_ID )
+    ERR = ncdf_CLOSE( FILE_ID )
     CALL CHKERR( ERR, 'close NetCDF output file ' )
     FILE_ID = -1
 
@@ -496,47 +518,61 @@ CONTAINS
   !
 
   SUBROUTINE WRITE_DATA( IMSTART, IM, JMSTART, JM, KMSTART, KM, TIMESTEP, F ) 
-    USE OUTPUT 
+    USE OUTPUT
     IMPLICIT NONE
     INTEGER,INTENT(IN):: IMSTART, JMSTART, KMSTART
     INTEGER,INTENT(IN):: IM, JM, KM, TIMESTEP ! Model TIMESTEP is 0-based.
-    REAL,DIMENSION(IM, JM, KM, nf):: F
-    ! External NetCDF routines:
-    INTEGER NF_PUT_VARA_REAL, NF_PUT_VARA_DOUBLE, NF_SYNC
-    EXTERNAL NF_PUT_VARA_REAL, NF_PUT_VARA_DOUBLE, NF_SYNC
+    REAL,DIMENSION(IM, JM, KM, STATE_VARIABLES):: F
     ! Locals:
     REAL(8):: SECONDS(1) ! TIME_VAR.
     INTEGER ERR, VARIABLE, FILE_TIMESTEP
-    INTEGER STARTS(4),COUNTS(4)
+    INTEGER(KIND=MPI_OFFSET_KIND) STARTS(4),COUNTS(4)
+    INTEGER(KIND=MPI_OFFSET_KIND) STARTS1(1),COUNTS1(1)
+    INTEGER REQUEST_COUNT,REQUEST
+    INTEGER,DIMENSION(STATE_VARIABLES+1):: REQUESTS, STATUSES
 
     FILE_TIMESTEP = TIMESTEP - FILE_FIRST_TIMESTEP
+    write(6,*) "FILE_TIMESTEP",FILE_TIMESTEP
 
     ! Write time variable as an 8-byte real since NetCDF lacks 8-byte integer:
 
-    STARTS( 1 ) = FILE_TIMESTEP + 1
-    COUNTS( 1 ) = 1
+    STARTS1( 1 ) = FILE_TIMESTEP + 1
+    COUNTS1( 1 ) = 1
     SECONDS( 1 ) = SECONDS0 + FILE_TIMESTEP * SECONDS_PER_TIMESTEP
-    ERR = NF_PUT_VARA_DOUBLE( FILE_ID, TIME_VAR, STARTS, COUNTS, SECONDS) 
+    write(6,*) "seconds",seconds
+    ERR = ncdf_PUT_VARA_DOUBLE( FILE_ID, TIME_VAR, STARTS1, COUNTS1, SECONDS, REQUESTS(1)) 
     CALL CHKERR( ERR, 'write output variable time' )
+    write(6,*) "double",FILE_ID, TIME_VAR, STARTS1, COUNTS1, SECONDS, REQUESTS(1)    
 
+    REQUEST_COUNT = 1
 
-    STARTS( 1 ) = 1 
-    STARTS( 2 ) = 1
-    STARTS( 3 ) = 1 
+    STARTS( 1 ) = IMSTART  
+    STARTS( 2 ) = JMSTART 
+    STARTS( 3 ) = KMSTART
     STARTS( 4 ) = FILE_TIMESTEP + 1 ! NetCDF follows FORTRAN 1-based convention
     COUNTS( 1 ) = IM
     COUNTS( 2 ) = JM
     COUNTS( 3 ) = KM
     COUNTS( 4 ) = 1
 
-    DO VARIABLE = 1, nf 
+
+    DO VARIABLE = 1, STATE_VARIABLES 
 
       IF ( WRITE_VARIABLE( VARIABLE ) ) THEN
-        ERR = NF_PUT_VARA_REAL( FILE_ID, F_VAR( VARIABLE ), &
-                  STARTS, COUNTS, F( 1, 1, 1, VARIABLE ))
+        REQUEST_COUNT = REQUEST_COUNT + 1
+        ERR = ncdf_PUT_VARA_REAL( FILE_ID, F_VAR( VARIABLE ), &
+              STARTS, COUNTS, F( 1, 1, 1, VARIABLE ), REQUESTS( REQUEST_COUNT ))
         CALL CHKERR( ERR, 'write output variable ' // VARIABLE_NAMES(VARIABLE))
       END IF
     END DO
+
+    ERR = ncdf_WAIT_ALL( FILE_ID, REQUEST_COUNT, REQUESTS, STATUSES )
+    CALL CHKERR( ERR, 'implement non-blocking interface' )
+
+    DO REQUEST = 1, REQUEST_COUNT
+      CALL CHKERR( STATUSES( REQUEST ), 'nonblocking call ' )
+    END DO
+
 
     ! check status of each nonblocking call
 
@@ -554,7 +590,8 @@ CONTAINS
                                TIMESTEP, IRRADIANCE, IRRADIANCE_FRACTION,    &
                                UN, UP, UE, UA, CHLA_MG_TOT,                  &
                                S_X1A, S_Y1A, S_X2A, S_Y2A,                   &
-                               S_X1FP, S_Y1FP, S_X2FP, S_Y2FP, USI, ChlC, pH, RN2, RO2, Ux,Vx,Wx )
+                               S_X1FP, S_Y1FP, S_X2FP, S_Y2FP, USI, ChlC, pH, RN2, RO2A, RO2Z,RO2BC,RO2R )
+
     USE OUTPUT 
     IMPLICIT NONE
     INTEGER,INTENT(IN):: IMSTART, JMSTART, KMSTART
@@ -572,39 +609,49 @@ CONTAINS
     REAL,DIMENSION(IM, JM, KM):: S_X1FP, S_Y1FP, S_X2FP, S_Y2FP
     REAL,DIMENSION(IM, JM, KM):: pH
     REAL,DIMENSION(IM, JM, KM):: RN2
-    REAL,DIMENSION(IM, JM, KM):: RO2
-    REAL,DIMENSION(IM, JM, KM):: Ux,Vx,Wx 
+    REAL,DIMENSION(IM, JM, KM):: RO2A
+    REAL,DIMENSION(IM, JM, KM):: RO2Z,RO2BC,RO2R 
+    INTEGER,DIMENSION(EXTRA_VARIABLES):: REQUESTS, STATUSES
 
-
-    ! External NetCDF routines:
-    INTEGER NF_PUT_VARA_REAL, NF_SYNC
-    EXTERNAL NF_PUT_VARA_REAL, NF_SYNC
     ! Locals:
     INTEGER ERR, FILE_TIMESTEP, VARIABLE, INDEX
-    INTEGER STARTS(4),COUNTS(4)
+    INTEGER(KIND=MPI_OFFSET_KIND) STARTS(4),COUNTS(4)
+    INTEGER REQUEST_COUNT
 
     FILE_TIMESTEP = TIMESTEP - FILE_FIRST_TIMESTEP
 
     ! Define write subset indices for variables:
 
-    STARTS( 1 ) = 1 
-    STARTS( 2 ) = 1 
-    STARTS( 3 ) = 1 
+    STARTS( 1 ) = IMSTART 
+    STARTS( 2 ) = JMSTART 
+    STARTS( 3 ) = KMSTART 
     STARTS( 4 ) = FILE_TIMESTEP + 1 ! NetCDF follows FORTRAN 1-based convention.
     COUNTS( 1 ) = IM
     COUNTS( 2 ) = JM
     COUNTS( 3 ) = KM
     COUNTS( 4 ) = 1
 
+
+    write(6,*) IMSTART, JMSTART, KMSTART, IM, JM, KM, TIMESTEP
+write(6,*) "9 RN2_ijk",RN2(28,18,1)
+write(6,*) "9 PARdepth_ijk",irradiance(28,18,1)
+write(6,*) "PARpercent",irradiance_fraction(28,18,1)
+write(6,*) "un",uN(28,18,1,:)
+write(6,*) "Chla",Chla_mg_tot(28,18,1)
+write(6,*) "9 s_y1Z",s_y1FP(28,18,1)
+
     ! Write each extra variable (if selected to be written):
 
+    write(6,*) "ev", EXTRA_VAR
+    REQUEST_COUNT = 0
 
     VARIABLE = 1 ! IRRADIANCE:
 
     IF ( WRITE_EXTRA_VARIABLE( VARIABLE ) ) THEN
-      ERR = NF_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
+    REQUEST_COUNT = REQUEST_COUNT + 1
+      ERR = ncdf_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
                                   STARTS, COUNTS, &
-                                  IRRADIANCE( 1, 1, 1 ))
+                                  IRRADIANCE( 1, 1, 1 ),REQUESTS(REQUEST_COUNT))
       CALL CHKERR( ERR, 'write output variable  ' &
                    // EXTRA_VARIABLE_NAMES( VARIABLE ) )
     END IF
@@ -612,9 +659,10 @@ CONTAINS
     VARIABLE = 2 ! IRRADIANCE_FRACTION:
 
     IF ( WRITE_EXTRA_VARIABLE( VARIABLE ) ) THEN
-      ERR = NF_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
+    REQUEST_COUNT = REQUEST_COUNT + 1
+      ERR = ncdf_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
                                   STARTS, COUNTS, &
-                                  IRRADIANCE_FRACTION( 1, 1, 1 ))
+                                  IRRADIANCE_FRACTION( 1, 1, 1),REQUESTS(REQUEST_COUNT))
       CALL CHKERR( ERR, 'write output variable  ' &
                    // EXTRA_VARIABLE_NAMES( VARIABLE ) )
     END IF
@@ -622,22 +670,27 @@ CONTAINS
     DO INDEX = 1, nospA ! UN(:,:,:,SPECIES):
       VARIABLE = VARIABLE + 1
 
+      write(6,*) "UN before",index,"of",nospA,variable,UN(1,1,1,index)
+
       IF ( WRITE_EXTRA_VARIABLE( VARIABLE ) ) THEN
-        ERR = NF_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
+    REQUEST_COUNT = REQUEST_COUNT + 1
+        ERR = ncdf_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
                                     STARTS, COUNTS, &
-                                    UN( 1, 1, 1, INDEX ))
+                                    UN( 1, 1, 1, INDEX ),REQUESTS(REQUEST_COUNT))
         CALL CHKERR( ERR, 'write output variable  ' &
                      // EXTRA_VARIABLE_NAMES( VARIABLE ) )
       END IF
     END DO
-
+      write(6,*) "UN after",index,variable,UN(1,1,1,index-1)
+      write(6,*) EXTRA_VAR
     DO INDEX = 1, nospA ! UP(:,:,:,SPECIES):
       VARIABLE = VARIABLE + 1
 
       IF ( WRITE_EXTRA_VARIABLE( VARIABLE ) ) THEN
-        ERR = NF_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
+    REQUEST_COUNT = REQUEST_COUNT + 1
+        ERR = ncdf_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
                                     STARTS, COUNTS, &
-                                    UP( 1, 1, 1, INDEX ))
+                                    UP( 1, 1, 1, INDEX ),REQUESTS(REQUEST_COUNT))
         CALL CHKERR( ERR, 'write output variable  ' &
                      // EXTRA_VARIABLE_NAMES( VARIABLE ) )
       END IF
@@ -647,9 +700,10 @@ CONTAINS
       VARIABLE = VARIABLE + 1
 
       IF ( WRITE_EXTRA_VARIABLE( VARIABLE ) ) THEN
-        ERR = NF_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
+    REQUEST_COUNT = REQUEST_COUNT + 1
+        ERR = ncdf_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
                                     STARTS, COUNTS, &
-                                    UE( 1, 1, 1, INDEX ))
+                                    UE( 1, 1, 1, INDEX ),REQUESTS(REQUEST_COUNT))
         CALL CHKERR( ERR, 'write output variable  ' &
                      // EXTRA_VARIABLE_NAMES( VARIABLE ) )
       END IF
@@ -659,9 +713,10 @@ CONTAINS
       VARIABLE = VARIABLE + 1
 
       IF ( WRITE_EXTRA_VARIABLE( VARIABLE ) ) THEN
-        ERR = NF_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
+    REQUEST_COUNT = REQUEST_COUNT + 1
+        ERR = ncdf_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
                                     STARTS, COUNTS, &
-                                    UA( 1, 1, 1, INDEX ))
+                                    UA( 1, 1, 1, INDEX ),REQUESTS(REQUEST_COUNT))
         CALL CHKERR( ERR, 'write output variable  ' &
                      // EXTRA_VARIABLE_NAMES( VARIABLE ) )
       END IF
@@ -670,9 +725,10 @@ CONTAINS
     VARIABLE = VARIABLE + 1 ! CHLA_MG_TOT:
 
     IF ( WRITE_EXTRA_VARIABLE( VARIABLE ) ) THEN
-      ERR = NF_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
+    REQUEST_COUNT = REQUEST_COUNT + 1
+      ERR = ncdf_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
                                   STARTS, COUNTS, &
-                                  CHLA_MG_TOT( 1, 1, 1 ))
+                                  CHLA_MG_TOT( 1, 1, 1 ),REQUESTS(REQUEST_COUNT))
       CALL CHKERR( ERR, 'write output variable  ' &
                    // EXTRA_VARIABLE_NAMES( VARIABLE ) )
     END IF
@@ -680,9 +736,10 @@ CONTAINS
     VARIABLE = VARIABLE + 1 ! S_X1A:
 
     IF ( WRITE_EXTRA_VARIABLE( VARIABLE ) ) THEN
-      ERR = NF_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
+    REQUEST_COUNT = REQUEST_COUNT + 1
+      ERR = ncdf_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
                                   STARTS, COUNTS, &
-                                  S_X1A( 1, 1, 1 ))
+                                  S_X1A( 1, 1, 1 ),REQUESTS(REQUEST_COUNT))
       CALL CHKERR( ERR, 'write output variable  ' &
                    // EXTRA_VARIABLE_NAMES( VARIABLE ) )
     END IF
@@ -690,9 +747,10 @@ CONTAINS
     VARIABLE = VARIABLE + 1 ! S_Y1A:
 
     IF ( WRITE_EXTRA_VARIABLE( VARIABLE ) ) THEN
-      ERR = NF_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
+    REQUEST_COUNT = REQUEST_COUNT + 1
+      ERR = ncdf_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
                                   STARTS, COUNTS, &
-                                  S_Y1A( 1, 1, 1 ))
+                                  S_Y1A( 1, 1, 1 ),REQUESTS(REQUEST_COUNT))
       CALL CHKERR( ERR, 'write output variable  ' &
                    // EXTRA_VARIABLE_NAMES( VARIABLE ) )
     END IF
@@ -700,9 +758,10 @@ CONTAINS
     VARIABLE = VARIABLE + 1 ! S_X2A:
 
     IF ( WRITE_EXTRA_VARIABLE( VARIABLE ) ) THEN
-      ERR = NF_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
+    REQUEST_COUNT = REQUEST_COUNT + 1
+      ERR = ncdf_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
                                   STARTS, COUNTS, &
-                                  S_X2A( 1, 1, 1 ))
+                                  S_X2A( 1, 1, 1 ),REQUESTS(REQUEST_COUNT))
       CALL CHKERR( ERR, 'write output variable  ' &
                    // EXTRA_VARIABLE_NAMES( VARIABLE ) )
     END IF
@@ -710,9 +769,10 @@ CONTAINS
     VARIABLE = VARIABLE + 1 ! S_Y2A:
 
     IF ( WRITE_EXTRA_VARIABLE( VARIABLE ) ) THEN
-      ERR = NF_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
+    REQUEST_COUNT = REQUEST_COUNT + 1
+      ERR = ncdf_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
                                   STARTS, COUNTS, &
-                                  S_Y2A( 1, 1, 1 ))
+                                  S_Y2A( 1, 1, 1 ),REQUESTS(REQUEST_COUNT))
       CALL CHKERR( ERR, 'write output variable  ' &
                    // EXTRA_VARIABLE_NAMES( VARIABLE ) )
     END IF
@@ -720,9 +780,10 @@ CONTAINS
     VARIABLE = VARIABLE + 1 ! S_X1FP:
 
     IF ( WRITE_EXTRA_VARIABLE( VARIABLE ) ) THEN
-      ERR = NF_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
+    REQUEST_COUNT = REQUEST_COUNT + 1
+      ERR = ncdf_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
                                   STARTS, COUNTS, &
-                                  S_X1FP( 1, 1, 1 ))
+                                  S_X1FP( 1, 1, 1 ),REQUESTS(REQUEST_COUNT))
       CALL CHKERR( ERR, 'write output variable  ' &
                    // EXTRA_VARIABLE_NAMES( VARIABLE ) )
     END IF
@@ -730,9 +791,10 @@ CONTAINS
     VARIABLE = VARIABLE + 1 ! S_Y1FP:
 
     IF ( WRITE_EXTRA_VARIABLE( VARIABLE ) ) THEN
-      ERR = NF_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
+    REQUEST_COUNT = REQUEST_COUNT + 1
+      ERR = ncdf_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
                                   STARTS, COUNTS, &
-                                  S_Y1FP( 1, 1, 1 ))
+                                  S_Y1FP( 1, 1, 1 ),REQUESTS(REQUEST_COUNT))
       CALL CHKERR( ERR, 'write output variable  ' &
                    // EXTRA_VARIABLE_NAMES( VARIABLE ) )
     END IF
@@ -740,9 +802,10 @@ CONTAINS
     VARIABLE = VARIABLE + 1 ! S_X2FP:
 
     IF ( WRITE_EXTRA_VARIABLE( VARIABLE ) ) THEN
-      ERR = NF_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
+    REQUEST_COUNT = REQUEST_COUNT + 1
+      ERR = ncdf_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
                                   STARTS, COUNTS, &
-                                  S_X2FP( 1, 1, 1 ))
+                                  S_X2FP( 1, 1, 1 ),REQUESTS(REQUEST_COUNT))
       CALL CHKERR( ERR, 'write output variable  ' &
                    // EXTRA_VARIABLE_NAMES( VARIABLE ) )
     END IF
@@ -750,9 +813,10 @@ CONTAINS
     VARIABLE = VARIABLE + 1 ! S_Y2FP:
 
     IF ( WRITE_EXTRA_VARIABLE( VARIABLE ) ) THEN
-      ERR = NF_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
+    REQUEST_COUNT = REQUEST_COUNT + 1
+      ERR = ncdf_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
                                   STARTS, COUNTS, &
-                                  S_Y2FP( 1, 1, 1 ))
+                                  S_Y2FP( 1, 1, 1 ),REQUESTS(REQUEST_COUNT))
       CALL CHKERR( ERR, 'write output variable  ' &
                    // EXTRA_VARIABLE_NAMES( VARIABLE ) )
     END IF
@@ -761,9 +825,10 @@ CONTAINS
       VARIABLE = VARIABLE + 1
 
       IF ( WRITE_EXTRA_VARIABLE( VARIABLE ) ) THEN
-        ERR = NF_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
+    REQUEST_COUNT = REQUEST_COUNT + 1
+        ERR = ncdf_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
                                     STARTS, COUNTS, &
-                                    USI( 1, 1, 1, INDEX ))
+                                    USI( 1, 1, 1, INDEX),REQUESTS(REQUEST_COUNT))
         CALL CHKERR( ERR, 'write output variable  ' &
                      // EXTRA_VARIABLE_NAMES( VARIABLE ) )
       END IF
@@ -773,9 +838,10 @@ CONTAINS
       VARIABLE = VARIABLE + 1
 
       IF ( WRITE_EXTRA_VARIABLE( VARIABLE ) ) THEN
-        ERR = NF_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
+    REQUEST_COUNT = REQUEST_COUNT + 1
+        ERR = ncdf_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
                                     STARTS, COUNTS, &
-                                    ChlC( 1, 1, 1, INDEX ))
+                                    ChlC( 1, 1, 1, INDEX),REQUESTS(REQUEST_COUNT))
         CALL CHKERR( ERR, 'write output variable  ' &
                      // EXTRA_VARIABLE_NAMES( VARIABLE ) )
       END IF
@@ -785,9 +851,10 @@ CONTAINS
     VARIABLE = VARIABLE + 1 ! pH:
 
     IF ( WRITE_EXTRA_VARIABLE( VARIABLE ) ) THEN
-      ERR = NF_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
+    REQUEST_COUNT = REQUEST_COUNT + 1
+      ERR = ncdf_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
                                   STARTS, COUNTS, &
-                                   pH( 1, 1, 1 ))
+                                   pH( 1, 1, 1 ),REQUESTS(REQUEST_COUNT))
       CALL CHKERR( ERR, 'write output variable  ' &
                    // EXTRA_VARIABLE_NAMES( VARIABLE ) )
     END IF
@@ -795,53 +862,64 @@ CONTAINS
     VARIABLE = VARIABLE + 1 ! RN2:
 
     IF ( WRITE_EXTRA_VARIABLE( VARIABLE ) ) THEN
-      ERR = NF_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
+    REQUEST_COUNT = REQUEST_COUNT + 1
+      ERR = ncdf_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
                                   STARTS, COUNTS, &
-                                   RN2( 1, 1, 1 ))
+                                   RN2( 1, 1, 1 ),REQUESTS(REQUEST_COUNT))
       CALL CHKERR( ERR, 'write output variable  ' &
                    // EXTRA_VARIABLE_NAMES( VARIABLE ) )
     END IF
 
-    VARIABLE = VARIABLE + 1 ! RN2:
+    VARIABLE = VARIABLE + 1 ! RO2A:
 
     IF ( WRITE_EXTRA_VARIABLE( VARIABLE ) ) THEN
-      ERR = NF_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
+    REQUEST_COUNT = REQUEST_COUNT + 1
+      ERR = ncdf_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
                                   STARTS, COUNTS, &
-                                   RO2( 1, 1, 1 ))
+                                   RO2A( 1, 1, 1 ),REQUESTS(REQUEST_COUNT))
       CALL CHKERR( ERR, 'write output variable  ' &
                    // EXTRA_VARIABLE_NAMES( VARIABLE ) )
     END IF
 
-    VARIABLE = VARIABLE + 1 ! Ux:
+    VARIABLE = VARIABLE + 1 ! RO2Z 
 
     IF ( WRITE_EXTRA_VARIABLE( VARIABLE ) ) THEN
-      ERR = NF_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
+    REQUEST_COUNT = REQUEST_COUNT + 1
+      ERR = ncdf_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
                                   STARTS, COUNTS, &
-                                   Ux( 1, 1, 1 ))
+                                   RO2Z( 1, 1, 1 ),REQUESTS(REQUEST_COUNT))
       CALL CHKERR( ERR, 'write output variable  ' &
                    // EXTRA_VARIABLE_NAMES( VARIABLE ) )
     END IF
 
-    VARIABLE = VARIABLE + 1 ! Vx:
+    VARIABLE = VARIABLE + 1 ! RO2BC:
 
     IF ( WRITE_EXTRA_VARIABLE( VARIABLE ) ) THEN
-      ERR = NF_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
+    REQUEST_COUNT = REQUEST_COUNT + 1
+      ERR = ncdf_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
                                   STARTS, COUNTS, &
-                                   Vx( 1, 1, 1 ))
+                                   RO2BC( 1, 1, 1 ),REQUESTS(REQUEST_COUNT))
       CALL CHKERR( ERR, 'write output variable  ' &
                    // EXTRA_VARIABLE_NAMES( VARIABLE ) )
     END IF
 
-    VARIABLE = VARIABLE + 1 ! Wx:
+    VARIABLE = VARIABLE + 1 ! RO2R:
 
     IF ( WRITE_EXTRA_VARIABLE( VARIABLE ) ) THEN
-      ERR = NF_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
+    REQUEST_COUNT = REQUEST_COUNT + 1
+      ERR = ncdf_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
                                   STARTS, COUNTS, &
-                                   Wx( 1, 1, 1 ))
+                                   RO2R( 1, 1, 1 ),REQUESTS(REQUEST_COUNT))
       CALL CHKERR( ERR, 'write output variable  ' &
                    // EXTRA_VARIABLE_NAMES( VARIABLE ) )
     END IF
 
+write(6,*) "19 RN2_ijk",RN2(28,18,1)
+write(6,*) "19 PARdepth_ijk",irradiance(28,18,1)
+write(6,*) "PARpercent",irradiance_fraction(28,18,1)
+write(6,*) "un",uN(28,18,1,:)
+write(6,*) "Chla",Chla_mg_tot(28,18,1)
+write(6,*) "19 s_y1Z",s_y1FP(28,18,1)
 
 
     CALL FLUSH_FILE() ! Flush buffers to disk in case of crash.
@@ -861,10 +939,8 @@ CONTAINS
   SUBROUTINE FLUSH_FILE()
     IMPLICIT NONE
     ! External NetCDF routines:
-    INTEGER NF_PUT_VARA_REAL, NF_SYNC
-    EXTERNAL NF_PUT_VARA_REAL, NF_SYNC
     INTEGER ERR
-    ERR = NF_SYNC( FILE_ID )
+    ERR = ncdf_SYNC( FILE_ID )
     CALL CHKERR( ERR, 'flush buffers to disk ' )
 
     RETURN
@@ -1133,12 +1209,11 @@ Subroutine OUTPUT_NETCDF_CGEM_allocate
  endif 
     EXTRA_VARIABLE_NAMES(counter+1) = 'pH'  
     EXTRA_VARIABLE_NAMES(counter+2) = 'RN2'
-    EXTRA_VARIABLE_NAMES(counter+3) = 'RO2'
-    EXTRA_VARIABLE_NAMES(counter+4) = 'Ux'
-    EXTRA_VARIABLE_NAMES(counter+5) = 'Vx'
-    EXTRA_VARIABLE_NAMES(counter+6) = 'Wx'
+    EXTRA_VARIABLE_NAMES(counter+3) = 'RO2A'
+    EXTRA_VARIABLE_NAMES(counter+4) = 'RO2Z'
+    EXTRA_VARIABLE_NAMES(counter+5) = 'RO2BC'
+    EXTRA_VARIABLE_NAMES(counter+6) = 'RO2R'
  
-
   ALLOCATE(WRITE_EXTRA_VARIABLE(EXTRA_VARIABLES)) 
   do i=1,EXTRA_VARIABLES
    WRITE_EXTRA_VARIABLE(i) = .TRUE. !.FALSE. 
@@ -1231,10 +1306,10 @@ endif
 endif
     EXTRA_VARIABLE_DESCRIPTIONS(counter+1) = 'pH                            '  
     EXTRA_VARIABLE_DESCRIPTIONS(counter+2) = 'RN2 Denitrification Term       '
-    EXTRA_VARIABLE_DESCRIPTIONS(counter+3) = 'RO2 Decay Term       '
-    EXTRA_VARIABLE_DESCRIPTIONS(counter+4) = 'Ux                   '
-    EXTRA_VARIABLE_DESCRIPTIONS(counter+5) = 'Vx                   '
-    EXTRA_VARIABLE_DESCRIPTIONS(counter+6) = 'Wx                   '
+    EXTRA_VARIABLE_DESCRIPTIONS(counter+3) = 'RO2A Decay Term       '
+    EXTRA_VARIABLE_DESCRIPTIONS(counter+4) = 'RO2Z Decay Term       '
+    EXTRA_VARIABLE_DESCRIPTIONS(counter+5) = 'RO2BC Decay Term      '
+    EXTRA_VARIABLE_DESCRIPTIONS(counter+6) = 'RO2R Decay Term       '
 
   ALLOCATE(EXTRA_VARIABLE_UNITS(EXTRA_VARIABLES))
     EXTRA_VARIABLE_UNITS(1) = 'photons/cm2/s                   '
@@ -1274,12 +1349,12 @@ endif
     counter = counter + 1
     EXTRA_VARIABLE_UNITS(counter) = 'mg-Chla/mg-C'
   enddo
-    EXTRA_VARIABLE_UNITS(counter+1) = 's.u.                            '  
-    EXTRA_VARIABLE_UNITS(counter+2) = 'mmol-N/m3                       '
+    EXTRA_VARIABLE_UNITS(counter+1) = 's.u.                             '  
+    EXTRA_VARIABLE_UNITS(counter+2) = 'mmol-N/m3                        '
     EXTRA_VARIABLE_UNITS(counter+3) = 'mmol-O2/m3                       '
-    EXTRA_VARIABLE_UNITS(counter+4) = 'm3                               '
-    EXTRA_VARIABLE_UNITS(counter+5) = 'm3                               '
-    EXTRA_VARIABLE_UNITS(counter+6) = 'm3                               '
+    EXTRA_VARIABLE_UNITS(counter+4) = 'mmol-O2/m3                       '
+    EXTRA_VARIABLE_UNITS(counter+5) = 'mmol-O2/m3                       '
+    EXTRA_VARIABLE_UNITS(counter+6) = 'mmol-O2/m3                       '
 
   ALLOCATE(F_VAR(nf)) ! NetCDF IDs for each variable.
   F_VAR = fill(0)

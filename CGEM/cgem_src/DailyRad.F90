@@ -15,8 +15,8 @@ USE Model_dim
 
 IMPLICIT NONE
 
-    allocate (aDailyRad(im,jm,km)) ! previous day's irradiance per layer
-    allocate (aRadSum(im,jm,km))   ! Add up current day's irradiance
+    allocate (aDailyRad(myim,jm,km)) ! previous day's irradiance per layer
+    allocate (aRadSum(myim,jm,km))   ! Add up current day's irradiance
  
 return
 

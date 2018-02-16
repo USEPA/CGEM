@@ -30,10 +30,7 @@
     real, parameter :: OneD60     = 1.0/60.0  ! Convert 1/min to 1/sec
     real            :: HrTC          ! Decimal hour of day
     integer         :: iYrTC, iMonTC, iDayTC, iHrTC, iMinTC, iSecTC !Time variables
-    integer         :: JY            ! Function determines whether argument is a leap year
     integer         :: julianDay     ! Holds Julian Day
-    integer         :: mdate_julian  ! Function calculates Julian Day
-    logical         :: leapyr        ! Logical, is leap year
   integer i,j,nz,numdepths,myi
 
 
@@ -56,15 +53,8 @@
  ! Calc HrTC, the decimal hour of day
        HrTC = real(iHrTC,4) + OneD60*iMinTC + OneD60*iSecTC
 
- ! Now calculate whether or not the year iYrTC is a leap year
-      if(JY(iYrTC) == 1) then
-         leapyr = .FALSE.   ! iYrTC is not a leap year
-      else
-         leapyr = .TRUE.    ! iYrTC is     a leap year
-      endif
-
- ! Now calculate the Julian Day associated with model time TC_8
-      julianDay = mdate_julian(iMonTC,iDayTC,leapyr)
+! Now calculate the Julian Day associated with model time TC_8
+      julianDay = JDAY_IN_YEAR(iYrTC, iMonTC, iDayTC)
 
    do j = 1,jm
      myi = 1
@@ -72,7 +62,7 @@
         nz=nza(i,j)
         if(nz.gt.0) then
 
-         sun_zenith = calc_solar_zenith(lat(i,j),lon(i,j),HrTC,julianDay,leapyr)
+         sun_zenith = calc_solar_zenith(lat(i,j),lon(i,j),HrTC,julianDay)
 
          totChl(1:nz) = (f(myi,j,1:nz,JDIA) * 1.0E6 / CCHLD) + (f(myi,j,1:nz,JGRE) * 1.0E6 / CCHLG)
          OM1_A(1:nz) = 0.

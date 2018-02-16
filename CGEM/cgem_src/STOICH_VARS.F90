@@ -25,33 +25,35 @@ IMPLICIT NONE
 real fill_val
 integer i,j,k
 
-ALLOCATE(s_x1A(im,jm,km))
-ALLOCATE(s_x2A(im,jm,km))
-ALLOCATE(s_y1A(im,jm,km))
-ALLOCATE(s_y2A(im,jm,km))
-ALLOCATE(s_z1A(im,jm,km))
-ALLOCATE(s_z2A(im,jm,km))
-ALLOCATE(s_x1Z(im,jm,km))
-ALLOCATE(s_x2Z(im,jm,km))
-ALLOCATE(s_y1Z(im,jm,km))
-ALLOCATE(s_y2Z(im,jm,km))
-ALLOCATE(s_z1Z(im,jm,km))
-ALLOCATE(s_z2Z(im,jm,km))
+ALLOCATE(s_x1A(myim,jm,km))
+ALLOCATE(s_x2A(myim,jm,km))
+ALLOCATE(s_y1A(myim,jm,km))
+ALLOCATE(s_y2A(myim,jm,km))
+ALLOCATE(s_z1A(myim,jm,km))
+ALLOCATE(s_z2A(myim,jm,km))
+ALLOCATE(s_x1Z(myim,jm,km))
+ALLOCATE(s_x2Z(myim,jm,km))
+ALLOCATE(s_y1Z(myim,jm,km))
+ALLOCATE(s_y2Z(myim,jm,km))
+ALLOCATE(s_z1Z(myim,jm,km))
+ALLOCATE(s_z2Z(myim,jm,km))
 
 !initialize for netCDF, 1==-9999
 fill_val = fill(1)
+
 s_x1A=fill_val
 s_x2A=fill_val
 s_y1A=fill_val
 s_y2A=fill_val
 s_z1A=fill_val
 s_z2A=fill_val
-s_x1A=fill_val
-s_x2A=fill_val
-s_y1A=fill_val
-s_y2A=fill_val
-s_z1A=fill_val
-s_z2A=fill_val
+
+s_x1Z=fill_val
+s_x2Z=fill_val
+s_y1Z=fill_val
+s_y2Z=fill_val
+s_z1Z=fill_val
+s_z2Z=fill_val
 
 return
 

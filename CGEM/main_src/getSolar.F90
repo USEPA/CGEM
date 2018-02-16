@@ -38,13 +38,10 @@
       real, parameter :: OneD3600 =  1./3600.              
       integer  :: i,j  
       integer  :: jday
-      integer  :: JY
-      integer  :: mdate_julian
       real                :: rhr         ! decimal hr in the Julian Day 
       real                :: Z   ! solar zenith angle 
       real calc_solar_zenith
       real                :: solconst      
-      LOGICAL :: leapyr  
 
          ! Note in next line that 1200 is the average clear-sky solar constant
          ! in watts/m^2
@@ -56,19 +53,13 @@
 
          !Hours in day
          rhr = real(iHr,4) + real(iMin,4)*OneD60 + real(iSec,4)*OneD3600
-         !Is Leap year?
-         if (JY(iYr) == 1) then
-             leapyr = .FALSE.  ! iYr is not a leap-year
-         else
-             leapyr = .TRUE.   ! iYr is a leap-year
-         endif
-         !Julian day
-         jday = mdate_julian(iMon,iDay,leapyr)
+
+         !Day of the year
+         jday = JDAY_IN_YEAR(iYr, iMon, iDay)
 
          do i = 1,im
          do j = 1,jm
-           Z =  calc_solar_zenith(lat(i,j),lon(i,j),rhr,jday,leapyr) !in rad
-         !  write(6,*) "lon,lat,rhr,jday",lon(i,j),lat(i,j),rhr,jday,Z
+           Z =  calc_solar_zenith(lat(i,j),lon(i,j),rhr,jday) !in rad
            Rad(i,j) = solconst * AMAX1( COS(Z), 0.0)    ! COS(suna)<= 0 means night 
          enddo
          enddo

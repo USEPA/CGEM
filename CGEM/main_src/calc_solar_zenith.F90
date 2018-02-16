@@ -1,5 +1,5 @@
 !----------------------------------------------------------------------
-      FUNCTION calc_solar_zenith(lat, lon, rhr, julianDay, leapyr )    &      
+      FUNCTION calc_solar_zenith(lat, lon, rhr, julianDay )    &      
       &        RESULT(sunangle) 
       
 !-----------------------------------------------------------------------
@@ -14,8 +14,7 @@
 !  Calculate the solar zenith angle (radians) given the latitude 
 !  (lat, degrees) longitude (lon, degrees) of a point in the Gulf of 
 !  Mexico (GOM) as well as the Julian day of the year (julianDay),
-!  the hour in that day (ihr-integer), and whether julianDay is in
-!  a leap year (leapyr == .TRUE.) or a non leap year (leapyr == .FALSE.)
+!  the hour in that day (ihr-integer)
 !------------------------------------------------------------------------
 
   !--------------------------------------------------------------------------
@@ -27,11 +26,6 @@
   ! Compute the sun zenith angle in radians for a given Julian day (julianDay),
   ! GMT (ihr;in hours), latitude (lat), and longitude (lon).
   !
-  ! leapyr      -> a logical parameter input thru the subroutine interface.
-  !                 If true, then julianDay is in a leap year (366 days 
-  !                 long). If false, then julianDay is in a non leap year 
-  !                 (365 days long).      
-  !  
   ! Sun angle of pi/2 radians (90 deg) = sun at or below horizon i.e. dark
   ! Sun angle of 0 radians (0 deg)     = sun directly overhead.
 !------------------------------------------------------------------------------
@@ -50,10 +44,6 @@
 
   INTEGER, INTENT(IN)    :: julianDay    ! Julian Day GMT
   
-  LOGICAL, INTENT(IN)    :: leapyr       ! IF true,  julianDay is in a leap
-                                         !           year (366 days)
-					 ! IF false, julianDay is in a non
-                                         !           leap year (365 days)    
 !-------------------------------------------------
 ! Local variables
 !------------------------------------------------- 
@@ -73,13 +63,7 @@
 !  Compute solar declination angle
   rad = 180.0/ (4.0 * atan(1.0))             ! rad = radian to degrees 
                                              !       conversion factor
-  IF(leapyr .eqv..FALSE.) THEN
-      Yr_length = 365.0
-  ELSE
-      Yr_length = 366.0  
-  ENDIF        
-
-  thez = 360.0*((FLOAT(julianDay-1)) )/Yr_length ! thez = theta zero orbital 
+  thez = 360.0*((FLOAT(julianDay-1)) )/365. ! thez = theta zero orbital 
                                                  !        position (degs)
   rthez = thez/rad;  ! in radians
 

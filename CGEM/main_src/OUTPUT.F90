@@ -12,5 +12,7 @@
         CHARACTER(LEN=100),DIMENSION(:),allocatable :: EXTRA_VARIABLE_UNITS
         INTEGER,DIMENSION(:),allocatable :: EXTRA_VAR ! NetCDF IDs for extra vars.
         INTEGER,DIMENSION(:),allocatable :: F_VAR ! NetCDF IDs for each variable.
+        INTEGER,save :: EXTRA_VARIABLES
+        INTEGER,save :: STATE_VARIABLES
 
        END Module OUTPUT 

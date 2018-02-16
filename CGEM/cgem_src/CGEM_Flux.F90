@@ -14,9 +14,9 @@ Contains
 
   USE Model_dim
   
-  Allocate(Esed(im,jm))
-  Allocate(CBODW(im,jm))
-  Allocate(pH(im,jm,km))
+  Allocate(Esed(myim,jm))
+  Allocate(CBODW(myim,jm))
+  Allocate(pH(myim,jm,km))
 
   return
 

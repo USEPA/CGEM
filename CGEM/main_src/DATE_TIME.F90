@@ -21,10 +21,11 @@ MODULE DATE_TIME
   INTEGER,PARAMETER,DIMENSION( MONTHS ):: DAYS_PER_MONTH = &
     (/ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 /)
 
-PUBLIC SECONDS_PER_DAY, &
-       TOTAL_SECONDS, DATE_TIMESTAMP, IS_LEAP_YEAR, DAYS_IN_YEAR, DAYS_IN_MONTH
+PUBLIC SECONDS_PER_DAY, TOTAL_SECONDS,&
+       DATE_TIMESTAMP, IS_LEAP_YEAR, DAYS_IN_YEAR, DAYS_IN_MONTH, JDAY_IN_YEAR
 
 PRIVATE
+
 CONTAINS
 
   ! Public
@@ -211,6 +212,35 @@ CONTAINS
 
     RETURN
   END FUNCTION DAYS_IN_MONTH
+
+
+
+  ! Day of the year (1-366)
+  !
+  FUNCTION JDAY_IN_YEAR( YEAR, MONTH, DAY ) RESULT( RES )
+  !"J" is to distinguish this subroutine from DAYS_IN_YEAR
+  !and is inspired by legacy code from 'julian day' subroutines
+    IMPLICIT NONE
+    INTEGER,INTENT(IN):: YEAR, MONTH, DAY
+    INTEGER RES
+
+    INTEGER  JM0(13) ! Cumulative days in year at beginning of each
+                     ! month for non-leap year
+
+    DATA  JM0/0,31,59,90,120,151,181,212,243,273,304,334,365/
+
+    RES = JM0(MONTH) + DAY
+
+    IF ( MONTH .GE. 2 ) THEN
+
+      IF ( IS_LEAP_YEAR( YEAR ) ) THEN
+        RES = RES + 1
+      END IF
+
+    END IF
+
+    RETURN
+  END FUNCTION JDAY_IN_YEAR
 
 
 

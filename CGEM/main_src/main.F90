@@ -52,7 +52,9 @@
       integer :: numprocs=1
       real*8  mpitime1,mpitime2   !timing
       integer mpierr
+#ifndef _MPI
       real*8 :: MPI_WTIME
+#endif
 
 !------------------------------------------------
 !Initialize MPI

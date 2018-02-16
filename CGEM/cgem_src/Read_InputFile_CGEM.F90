@@ -15,7 +15,7 @@ integer, intent(in) :: myid, numprocs
 character(120),intent(in) :: filename
 
 integer i,j,k,icent_jcent_units,mpierr
-integer isp,isz
+integer isp,isz,myi
 real tot,x
 real, parameter :: SDay = 86400.0  ! # of sec in 24 hr day
 real eps
@@ -375,21 +375,23 @@ enddo
       write(6,*) "Which_VMix=",Which_VMix
 
   do j = 1,jm
-    do i = 1,im
+    myi = 1
+    do i = myi_start,myi_end
       do k=1,nza(i,j)
-       s_x1A(i,j,k)= Stoich_x1A_init
-       s_x2A(i,j,k)= Stoich_x2A_init
-       s_y1A(i,j,k)= Stoich_y1A_init
-       s_y2A(i,j,k)= Stoich_y2A_init
-       s_z1A(i,j,k)= Stoich_z1A_init
-       s_z2A(i,j,k)= Stoich_z2A_init
-       s_x1Z(i,j,k)= Stoich_x1Z_init
-       s_x2Z(i,j,k)= Stoich_x2Z_init
-       s_y1Z(i,j,k)= Stoich_y1Z_init
-       s_y2Z(i,j,k)= Stoich_y2Z_init
-       s_z1Z(i,j,k)= Stoich_z1Z_init
-       s_z2Z(i,j,k)= Stoich_z2Z_init
+       s_x1A(myi,j,k)= Stoich_x1A_init
+       s_x2A(myi,j,k)= Stoich_x2A_init
+       s_y1A(myi,j,k)= Stoich_y1A_init
+       s_y2A(myi,j,k)= Stoich_y2A_init
+       s_z1A(myi,j,k)= Stoich_z1A_init
+       s_z2A(myi,j,k)= Stoich_z2A_init
+       s_x1Z(myi,j,k)= Stoich_x1Z_init
+       s_x2Z(myi,j,k)= Stoich_x2Z_init
+       s_y1Z(myi,j,k)= Stoich_y1Z_init
+       s_y2Z(myi,j,k)= Stoich_y2Z_init
+       s_z1Z(myi,j,k)= Stoich_z1Z_init
+       s_z2Z(myi,j,k)= Stoich_z2Z_init
     enddo
+    myi = myi + 1
    enddo
   enddo
 

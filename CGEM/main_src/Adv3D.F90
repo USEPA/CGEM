@@ -33,7 +33,7 @@
        wx=0.
       endif
 
-      if(numprocs.gt.1) call AdvNeighbors(f,myim,myid,numprocs)
+      if(numprocs.gt.1) call AdvNeighbors(f,myim,jm,km,nsl,myid,numprocs)
 
 ! --------loop over each variable
      do ii = 1,nf
@@ -61,7 +61,7 @@
 
 !If wsm=0 (shelf), then set sinking velocity to zero as well...
 !     at bottom (w=0) add settling or deep ocean (wsm=1)
-      w_wsink (i,j,nz+1) = wx(i,j,nz+1) + ws(ii)*real(wsm(i,j),4)*area(i,j)
+      w_wsink (i,j,nz+1) = wx(i,j,nsl) + ws(ii)*real(wsm(i,j),4)*area(i,j)
 
 ! -------------------------------------------------------------
       do k = 1, nz       ! do layer by layer

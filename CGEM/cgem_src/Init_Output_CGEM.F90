@@ -27,9 +27,10 @@
       WRITE ( NETCDF_OUTPUT_FILE_NAME, '(A, I6.6, A)' )&
               trim(BASE_NETCDF_OUTPUT_FILE_NAME), 0, '.nc'
 
+      write(6,*) "calling create file"
       if(myid.eq.0) then
           CALL CREATE_FILE( trim(NETCDF_OUTPUT_FILE_NAME), &
-                            myi_start, myim, 1, jm, 1, km, nstep, iYr0,       & 
+                            im, jm, km, nstep, iYr0,       & 
                             IYRS, IMONS, IDAYS, IHRS, IMINS, ISECS, &
                             IYRE, IMONE, IDAYE, IHRE, IMINE, ISECE, &
                             DT_OUT, &
@@ -39,10 +40,12 @@
       endif
       CALL MPI_BARRIER( MPI_COMM_WORLD, mpierr ) ! Wait until file is created.
 
+      write(6,*) "calling open file"
+
 ! Opens the output file for writing:
        CALL OPEN_FILE( trim(NETCDF_OUTPUT_FILE_NAME), 0 )
 
-        dumf = f
+        dumf = f(1:myim,:,:,:)
 
         do j=1,jm
          myi = 1
@@ -56,11 +59,14 @@
         enddo
 
         write(6,*) "myi_start,myim",myi_start,myim
+        write(6,*) "calling write data"
         CALL WRITE_DATA( myi_start, myim, 1,jm, 1, km, 0, dumf)
+        CALL MPI_BARRIER( MPI_COMM_WORLD, mpierr ) ! Wait until file is updated.
 
 #ifdef DEBUG
 write(6,*) "---- Init_Output_CGEM ---"
 write(6,*) 
 #endif
 
+       return
        End Subroutine Init_Output_CGEM

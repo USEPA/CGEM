@@ -5,6 +5,7 @@
       USE OUTPUT_NETCDF_GD
       USE Grid
       USE states 
+      USE OUTPUT
 
       IMPLICIT NONE
 

@@ -8,6 +8,7 @@
        USE State_Vars
        USE OUTPUT_NETCDF_GD
        USE states
+       USE OUTPUT
 
        IMPLICIT NONE
 

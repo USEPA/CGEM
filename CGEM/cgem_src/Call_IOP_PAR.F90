@@ -74,6 +74,11 @@
       real cell_depth, bd_km1
       integer :: k  
 
+
+      if(numdepths.eq.0) then
+         write(6,*) "numdepths",numdepths
+         stop
+      endif
 ! First, convert CDOM(ppb) into CDOM, a490 (m-1)
 ! Once the CDOM (QSE ppb) is in the model domain, we advect and mix using the same 
 ! routine as for other dissolved constituents. However, to use the CDOM in the light 
