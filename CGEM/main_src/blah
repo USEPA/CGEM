@@ -1,0 +1,402 @@
+9c9
+<   USE pnetcdf ! For NFMPI_*
+---
+> !USE netcdf
+12d11
+<   INCLUDE 'mpif.h' ! For MPI_*
+16,17c15,16
+<        DEFVAR, DEFIAT, DEFRAT, DEFRATX, DEFTAT, &
+<        READIAT, READRAT, CHECKIAT, CHECKRAT, CONVERT_LONGITUDES
+---
+>        DEFVAR, DEFIAT, DEFRAT, DEFRAT2, DEFRAT6, DEFRAT8, DEFRATX, DEFTAT, &
+>        READIAT, CONVERT_LONGITUDES
+31a31,33
+>     ! Externals:
+>     CHARACTER*(80) NF_STRERROR
+>     EXTERNAL NF_STRERROR
+35c37
+<       PRINT *, NFMPI_STRERROR( ERR )
+---
+>       PRINT *, NF_STRERROR( ERR )
+50a53,55
+>     ! Externals:
+>     INTEGER NF_DEF_DIM
+>     EXTERNAL NF_DEF_DIM
+53d57
+<     INTEGER(MPI_OFFSET_KIND):: VALUE_COPY
+55,56c59
+<     VALUE_COPY = VALUE
+<     ERR = NFMPI_DEF_DIM( FILEID, TRIM( NAME ), VALUE_COPY, DIM_ID )
+---
+>     ERR = NF_DEF_DIM( FILEID, NAME, VALUE, DIM_ID )
+69a73,75
+>     ! Externals:
+>     INTEGER NF_DEF_VAR
+>     EXTERNAL NF_DEF_VAR
+72d77
+<     INTEGER TEMP(1) ! Must use a temp array for NetCDF call.
+74,75c79
+<     TEMP( 1 ) = DIMID
+<     ERR = NFMPI_DEF_VAR( FILEID, VARNAM, 4, 1, TEMP, VARID )
+---
+>     ERR = NF_DEF_VAR( FILEID, VARNAM, 4, 1, DIMID, VARID )
+89a94,96
+>     ! Externals:
+>     INTEGER NF_DEF_VAR
+>     EXTERNAL NF_DEF_VAR
+92d98
+<     INTEGER TEMP(1) ! Must use a temp array for NetCDF call.
+94,95c100
+<     TEMP( 1 ) = DIMID
+<     ERR = NFMPI_DEF_VAR( FILEID, VARNAM, 5, 1, TEMP, VARID )
+---
+>     ERR = NF_DEF_VAR( FILEID, VARNAM, 5, 1, DIMID, VARID )
+109a115,117
+>     ! Externals:
+>     INTEGER NF_DEF_VAR
+>     EXTERNAL NF_DEF_VAR
+112d119
+<     INTEGER TEMP(1) ! Must use a temp array for NetCDF call.
+114,115c121
+<     TEMP( 1 ) = DIMID
+<     ERR = NFMPI_DEF_VAR( FILEID, VARNAM, 6, 1, TEMP, VARID )
+---
+>     ERR = NF_DEF_VAR( FILEID, VARNAM, 6, 1, DIMID, VARID )
+129a136,138
+>     ! Externals:
+>     INTEGER NF_DEF_VAR
+>     EXTERNAL NF_DEF_VAR
+135c144
+<     ERR = NFMPI_DEF_VAR( FILEID, VARNAM, 4, 2, DIM_IDS, VARID )
+---
+>     ERR = NF_DEF_VAR( FILEID, VARNAM, 4, 2, DIM_IDS, VARID )
+149a159,161
+>     ! Externals:
+>     INTEGER NF_DEF_VAR
+>     EXTERNAL NF_DEF_VAR
+155c167
+<     ERR = NFMPI_DEF_VAR( FILEID, VARNAM, 5, 2, DIM_IDS, VARID )
+---
+>     ERR = NF_DEF_VAR( FILEID, VARNAM, 5, 2, DIM_IDS, VARID )
+169a182,184
+>     ! Externals:
+>     INTEGER NF_DEF_VAR
+>     EXTERNAL NF_DEF_VAR
+176c191
+<     ERR = NFMPI_DEF_VAR( FILEID, VARNAM, 4, 3, DIM_IDS, VARID )
+---
+>     ERR = NF_DEF_VAR( FILEID, VARNAM, 4, 3, DIM_IDS, VARID )
+191a207,209
+>     ! Externals:
+>     INTEGER NF_DEF_VAR
+>     EXTERNAL NF_DEF_VAR
+198c216
+<     ERR = NFMPI_DEF_VAR( FILEID, VARNAM, 5, 3, DIM_IDS, VARID )
+---
+>     ERR = NF_DEF_VAR( FILEID, VARNAM, 5, 3, DIM_IDS, VARID )
+210d227
+<     INTEGER :: IS_POSITIVE  !=1 if valid range is positive only
+212a230
+>     INTEGER :: IS_POSITIVE  !=1 if valid range is positive only
+214a233,240
+>     ! Externals:
+>     INTEGER NF_DEF_VAR
+>     EXTERNAL NF_DEF_VAR
+>     INTEGER NF_PUT_ATT_REAL
+>     EXTERNAL NF_PUT_ATT_REAL
+>     INTEGER NF_DOUBLE
+>     EXTERNAL NF_DOUBLE
+> 
+217a244
+>     ERR = NF_DEF_VAR( FILEID, VARNAM, 5, 4, DIMIDS, VARID )
+219c246
+<        ERR = nfmpi_put_att_real(fileid, VARID, "valid_range", 5, 2, (/ 0., 1.e38 /))
+---
+>        ERR = nf_put_att_real(fileid, VARID, "valid_range", 5, 2, (/ 0., 1.e38 /))
+221c248
+<        ERR = nfmpi_put_att_real(fileid, VARID, "valid_range", 5, 2, (/ -1.e2, 1.e38 /))
+---
+>        ERR = nf_put_att_real(fileid, VARID, "valid_range", 5, 2, (/ -1.e2, 1.e38 /))
+224d250
+<     ERR = NFMPI_DEF_VAR( FILEID, VARNAM, 5, 4, DIMIDS, VARID )
+236c262
+<     INTEGER,INTENT(IN):: FILEID, VARID
+---
+>     INTEGER ,INTENT(IN):: FILEID, VARID
+237a264,266
+>     ! Externals:
+>     INTEGER NF_PUT_ATT_TEXT
+>     EXTERNAL NF_PUT_ATT_TEXT
+240,245d268
+<     INTEGER(MPI_OFFSET_KIND):: LEN_COPY
+< 
+<     LEN_COPY = LEN( VARDES )
+<     ERR = NFMPI_PUT_ATT_TEXT( FILEID, VARID, 'description', LEN_COPY, &
+<                               VARDES )
+<     CALL CHKERR( ERR, 'create description attribute for ' // VARNAM )
+246a270,272
+>     ERR = NF_PUT_ATT_TEXT( FILEID, VARID, 'long_name', LEN( VARDES ), VARDES)
+>     CALL CHKERR( ERR, 'create long_name attribute for ' // VARNAM )
+>     
+248,249c274
+<       LEN_COPY = LEN( UNITS )
+<       ERR = NFMPI_PUT_ATT_TEXT( FILEID, VARID, 'units', LEN_COPY, UNITS )
+---
+>       ERR = NF_PUT_ATT_TEXT( FILEID, VARID, 'units', LEN( UNITS ), UNITS )
+262c287
+<     INTEGER,INTENT(IN):: FILEID
+---
+>     INTEGER ,INTENT(IN):: FILEID
+264a290,292
+>     ! Externals:
+>     INTEGER NF_PUT_ATT_INT
+>     EXTERNAL NF_PUT_ATT_INT
+266,267c294
+<     INTEGER(MPI_OFFSET_KIND) ONE
+<     INTEGER ERR, TEMP(1)
+---
+>     INTEGER ERR
+269,271c296
+<     ONE = 1
+<     TEMP(1) = VALUE ! Must copy for NetCDF call.
+<     ERR = NFMPI_PUT_ATT_INT( FILEID, 0, TRIM( NAME ), 4, ONE, TEMP )
+---
+>     ERR = NF_PUT_ATT_INT( FILEID, 0, NAME, 4, 1, VALUE )
+283c308
+<     INTEGER,INTENT(IN):: FILEID
+---
+>     INTEGER ,INTENT(IN):: FILEID
+285a311,313
+>     ! Externals:
+>     INTEGER NF_PUT_ATT_REAL
+>     EXTERNAL NF_PUT_ATT_REAL
+287d314
+<     INTEGER(MPI_OFFSET_KIND) ONE
+289d315
+<     REAL TEMP(1)
+291,294c317,318
+<     ONE = 1
+<     TEMP( 1 ) = VALUE ! Must copy for NetCDF call.
+<     ERR = NFMPI_PUT_ATT_REAL( FILEID, 0, TRIM( NAME ), 5, ONE, TEMP )
+<     CALL CHKERR( ERR, 'create real attribute ' // NAME )
+---
+>     ERR = NF_PUT_ATT_REAL( FILEID, 0, NAME, 5, 1, VALUE )
+>     CALL CHKERR( ERR, 'create integer attribute ' // NAME )
+300,301c324
+< 
+<   ! Define a real attribute of 8 values in a NetCDF file.
+---
+> ! Define a real attribute of 2 values in a NetCDF file.
+303c326
+<   SUBROUTINE DEFRATX( FILEID, NAME, VALUE, X )
+---
+>   SUBROUTINE DEFRAT2( FILEID, NAME, VALUE )
+306d328
+<     INTEGER(MPI_OFFSET_KIND),INTENT(IN):: X
+308c330,333
+<     REAL,INTENT(IN):: VALUE(X)
+---
+>     REAL,INTENT(IN):: VALUE(2)
+>     ! Externals:
+>     INTEGER NF_PUT_ATT_REAL
+>     EXTERNAL NF_PUT_ATT_REAL
+309a335
+>     INTEGER TWO
+311c337
+<     REAL TEMP(X)
+---
+>     REAL TEMP(2)
+312a339
+>     TWO = 2
+314,315c341,342
+<     ERR = NFMPI_PUT_ATT_REAL( FILEID, 0, TRIM( NAME ), 5, X, TEMP )
+<     CALL CHKERR( ERR, 'create X real attributes ' // NAME )
+---
+>     ERR = NF_PUT_ATT_REAL( FILEID, 0, TRIM( NAME ), 5, TWO, TEMP )
+>     CALL CHKERR( ERR, 'create 2 real attributes ' // NAME )
+318c345
+<   END SUBROUTINE DEFRATX
+---
+>   END SUBROUTINE DEFRAT2
+321c348
+<   ! Define a text attribute in a NetCDF file.
+---
+>   ! Define a real attribute of 6 values in a NetCDF file.
+323c350
+<   SUBROUTINE DEFTAT( FILEID,  NAME, VALUE )
+---
+>   SUBROUTINE DEFRAT6( FILEID, NAME, VALUE )
+326c353,357
+<     CHARACTER(LEN=*),INTENT(IN):: NAME, VALUE
+---
+>     CHARACTER(LEN=*),INTENT(IN):: NAME
+>     REAL,INTENT(IN):: VALUE(6)
+>     ! Externals:
+>     INTEGER NF_PUT_ATT_REAL
+>     EXTERNAL NF_PUT_ATT_REAL
+327a359
+>     INTEGER SIX
+329,330c361
+<     INTEGER(MPI_OFFSET_KIND):: LEN_VALUE
+<     LEN_VALUE = LEN( VALUE )
+---
+>     REAL TEMP(6)
+332,333c363,366
+<     ERR = NFMPI_PUT_ATT_TEXT( FILEID, 0, TRIM( NAME ), LEN_VALUE , VALUE )
+<     CALL CHKERR( ERR, 'create text attribute ' // NAME )
+---
+>     SIX = 6
+>     TEMP = VALUE ! Must copy for NetCDF call.
+>     ERR = NF_PUT_ATT_REAL( FILEID, 0, TRIM( NAME ), 5, SIX, TEMP )
+>     CALL CHKERR( ERR, 'create 6 real attributes ' // NAME )
+336,337c369
+<   END SUBROUTINE DEFTAT
+< 
+---
+>   END SUBROUTINE DEFRAT6
+340c372
+<   ! Read an integer attribute from a NetCDF file.
+---
+>  ! Define a real attribute of 8 values in a NetCDF file.
+342c374
+<   FUNCTION READIAT( FILEID, NAME ) RESULT( RES )
+---
+>   SUBROUTINE DEFRAT8( FILEID, NAME, VALUE )
+346c378,381
+<     INTEGER RES
+---
+>     REAL,INTENT(IN):: VALUE(8)
+>     ! Externals:
+>     INTEGER NF_PUT_ATT_REAL
+>     EXTERNAL NF_PUT_ATT_REAL
+348,354c383,385
+<     INTEGER ERR, TEMP(1)
+< 
+<     ERR = NFMPI_GET_ATT_INT( FILEID, 0, TRIM( NAME ), TEMP )
+<     CALL CHKERR( ERR, 'read integer attribute ' // NAME )
+<     RES = TEMP( 1 )
+<     RETURN
+<   END FUNCTION READIAT
+---
+>     INTEGER EIGHT
+>     INTEGER ERR
+>     REAL TEMP(8)
+355a387,390
+>     EIGHT = 8
+>     TEMP = VALUE ! Must copy for NetCDF call.
+>     ERR = NF_PUT_ATT_REAL( FILEID, 0, TRIM( NAME ), 5, EIGHT, TEMP )
+>     CALL CHKERR( ERR, 'create 8 real attributes ' // NAME )
+356a392,393
+>     RETURN
+>   END SUBROUTINE DEFRAT8
+358c395
+<   ! Read a real attribute from a NetCDF file.
+---
+>  ! Define a real attribute of X values in a NetCDF file.
+360c397
+<   FUNCTION READRAT( FILEID, NAME ) RESULT( RES )
+---
+>   SUBROUTINE DEFRATX( FILEID, NAME, VALUE, X )
+362c399
+<     INTEGER,INTENT(IN):: FILEID
+---
+>     INTEGER,INTENT(IN):: FILEID,X
+364c401,404
+<     REAL RES
+---
+>     REAL,INTENT(IN):: VALUE(X)
+>     ! Externals:
+>     INTEGER NF_PUT_ATT_REAL
+>     EXTERNAL NF_PUT_ATT_REAL
+367c407,411
+<     REAL TEMP(1)
+---
+>     REAL TEMP(X)
+> 
+>     TEMP = VALUE ! Must copy for NetCDF call.
+>     ERR = NF_PUT_ATT_REAL( FILEID, 0, TRIM( NAME ), 5, X, TEMP )
+>     CALL CHKERR( ERR, 'create 8 real attributes ' // NAME )
+369,371d412
+<     ERR = NFMPI_GET_ATT_REAL( FILEID, 0, TRIM( NAME ), TEMP )
+<     CALL CHKERR( ERR, 'read real attribute ' // NAME )
+<     RES = TEMP( 1 )
+373c414
+<   END FUNCTION READRAT
+---
+>   END SUBROUTINE DEFRATX
+377c418
+<   ! Read and match an integer attribute from a NetCDF file.
+---
+>   ! Define a text attribute in a NetCDF file.
+379c420
+<   SUBROUTINE CHECKIAT( FILEID, NAME, VALUE )
+---
+>   SUBROUTINE DEFTAT( FILEID,  NAME, VALUE )
+381,382c422,426
+<     INTEGER,INTENT(IN):: FILEID, VALUE
+<     CHARACTER(LEN=*),INTENT(IN):: NAME
+---
+>     INTEGER ,INTENT(IN):: FILEID
+>     CHARACTER(LEN=*),INTENT(IN):: NAME, VALUE
+>     ! Externals:
+>     INTEGER NF_PUT_ATT_TEXT
+>     EXTERNAL NF_PUT_ATT_TEXT
+384,386c428
+<     INTEGER FILE_VALUE
+< 
+<     FILE_VALUE = READIAT( FILEID, NAME )
+---
+>     INTEGER ERR
+388,392c430,431
+<     IF ( VALUE .NE. VALUE ) THEN
+<       PRINT *, 'PROBLEM: Unmatched file attribute: ', TRIM( NAME ), &
+<                ' ', VALUE, ' does not match ', VALUE
+<       STOP
+<     END IF
+---
+>     ERR = NF_PUT_ATT_TEXT( FILEID, 0, NAME, LEN( VALUE) , VALUE )
+>     CALL CHKERR( ERR, 'create text attribute ' // NAME )
+395,396c434
+<   END SUBROUTINE CHECKIAT
+< 
+---
+>   END SUBROUTINE DEFTAT
+399c437
+<   ! Read and match a real attribute from a NetCDF file.
+---
+>   ! Read an integer attribute from a NetCDF file.
+401c439
+<   SUBROUTINE CHECKRAT( FILEID, NAME, VALUE )
+---
+>   FUNCTION READIAT( FILEID, NAME ) RESULT( RES )
+405c443,445
+<     REAL,INTENT(IN):: VALUE
+---
+>     INTEGER RES
+>     INTEGER NF_GET_ATT_INT
+>     EXTERNAL NF_GET_ATT_INT
+407,415c447
+<     REAL FILE_VALUE
+< 
+<     FILE_VALUE = READRAT( FILEID, NAME )
+< 
+<     IF ( FILE_VALUE .NE. VALUE ) THEN
+<       PRINT *, 'PROBLEM: Unmatched file attribute: ', TRIM( NAME ), &
+<                ' ', VALUE, ' does not match ', VALUE
+<       STOP
+<     END IF
+---
+>     INTEGER ERR, TEMP(1)
+416a449,451
+>     ERR = NF_GET_ATT_INT( FILEID, 0, TRIM( NAME ), TEMP )
+>     CALL CHKERR( ERR, 'read integer attribute ' // NAME )
+>     RES = TEMP( 1 )
+418,419c453
+<   END SUBROUTINE CHECKRAT
+< 
+---
+>   END FUNCTION READIAT
+443c477
+< END MODULE NETCDF_UTILITIES
+---
+> END MODULE NETCDF_UTILITIES 

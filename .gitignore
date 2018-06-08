@@ -8,7 +8,6 @@
 
 # Editor (e.g., Emacs) temp files
 *~
-\#*\#
 
 # Compiled code and objects
 *.exe
