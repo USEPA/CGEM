@@ -2,7 +2,7 @@
 # source file changes.
 # Note modules must be compiled in bottom-up dependency order.
 
-Ser_OBJ  =  serial.o\
+SER_OBJ  =  serial.o\
 	MPI_dummy.o\
 	AdvNeighborsOrdered_fake.o\
 	s_netcdf.o

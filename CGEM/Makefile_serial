@@ -22,12 +22,10 @@ IRIS_INC  = -I. -I/usr/local/apps/netcdf-4.4.0/gcc-4.4.7/include/
 IRIS_LIBS = -L. -L/usr/local/apps/netcdf-4.4.0/gcc-4.4.7/lib/ -lnetcdff -lnetcdf -L/usr/local/apps/pnetcdf-1.6.1/intel-15.0/lib -lpnetcdf
 
 OTHER_INC   = -I. -I/usr/local/include -I/usr/include/x86_64-linux-gnu/ -I/usr/include
-OTHER_LIBS  = -L/usr/lib/x86_64-linux-gnu/ -lpnetcdf -L/usr/local/lib -lnetcdff -L/usr/local/bin -lnetcdf 
+OTHER_LIBS  = -L. -L/usr/local/lib -lnetcdff -L/usr/local/bin -lnetcdf 
 
 ### =============== End User Modifiable Section  =============== ####
-#include main_src/src_just_par
-#include main_src/src_just_serial
-include main_src/src_files_par
+include main_src/src_files_serial
 include moc_src/src_files
 include sdm_src/src_files
 include cgem_src/src_files
@@ -56,8 +54,8 @@ ifeq (sol,$(findstring sol,$(MY_HOST)))
 else
   INC      = $(OTHER_INC)
   LIBS     = $(OTHER_LIBS)
-  F90    = mpifort 
-  FFLAGS = -ffree-line-length-none -D_MPI
+  F90    = gfortran 
+  FFLAGS = -ffree-line-length-none 
 endif
 endif
 

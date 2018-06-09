@@ -3,8 +3,13 @@
 # Note modules must be compiled in bottom-up dependency order.
 
 MAIN_OBJ  =  fillval.o\
+	my_wtime.o\
+	fake_mpi_interface.o\
+	serial_fake.o\
+	p_netcdf.o\
 	Model_dim.o\
 	AdvNeighborsOrdered.o\
+	PNETCDF_UTILITIES.o\
 	error.o\
         netcdf_utils.o\
 	Grid.o\

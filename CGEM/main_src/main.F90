@@ -27,12 +27,10 @@
       USE State_Vars
       USE INPUT_VARS
       USE serial
+      use mpi
 
       IMPLICIT NONE
 
-#ifdef _MPI
-!      include "mpif.h"
-#endif
 
 !---------------------
 ! Declare Variables:    
@@ -50,18 +48,15 @@
 !---------------------
       integer :: myid=0
       integer :: numprocs=1
-      real*8  mpitime1,mpitime2   !timing
+      real*8  mpitime1,mpitime2,my_wtime   !timing
       integer mpierr
-#ifndef _MPI
-      real*8 :: MPI_WTIME
-#endif
 
 !------------------------------------------------
 !Initialize MPI
       call MPI_INIT(mpierr)
       call MPI_COMM_RANK(MPI_COMM_WORLD, myid, mpierr)
       call MPI_COMM_SIZE(MPI_COMM_WORLD, numprocs, mpierr)
-      mpitime1 = MPI_WTIME()
+      mpitime1 = MY_WTIME()
 
 ! --- Command Line Arguments for file names ---
       if(myid.eq.0) call Command_Line_Args(Which_code,input_filename,init_filename,BASE_NETCDF_OUTPUT_FILE_NAME)
@@ -179,7 +174,7 @@
 
       Call Model_Finalize(Which_code,Which_gridio,myid,numprocs) ! Closes the NetCDF files and whatever else
 
-      mpitime2 = MPI_WTIME()
+      mpitime2 = MY_WTIME()
       if(myid.eq.0) write(6,*) "Code took",mpitime2-mpitime1,"seconds"
 
       call MPI_FINALIZE(mpierr)
@@ -194,3 +189,5 @@
 !-----------------------------------      
       END PROGRAM main 
 !-----------------------------------  
+
+

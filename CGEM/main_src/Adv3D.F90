@@ -11,6 +11,7 @@
       USE Grid
       USE State_Vars
       USE Hydro
+      use mpi
 
       IMPLICIT NONE
 
@@ -110,7 +111,7 @@
            write(6,*) "u",ux(i-2,j,k),ux(im1,j,k),ux(i,j,k),ux(ip1,j,k),ux(i+2,j,k)
            write(6,*) "v",vx(i,j-2,k),vx(i,jm1,k),vx(i,j,k),vx(i,jp1,k),vx(i,j+2,k)
            write(6,*) "w",wx(i,j,km1),wx(i,j,k),wx(i,j,k+1)
-           call MPI_BARRIER(MPI_COMM_WORLD)
+           call MPI_BARRIER(MPI_COMM_WORLD,mpierr)
            call MPI_FINALIZE(mpierr)
            stop
        endif

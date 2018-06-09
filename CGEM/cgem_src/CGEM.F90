@@ -878,7 +878,7 @@
          &    T(i,j,k), S(i,j,k), m_alk, m_dic, m_si, m_po4, patm, d_sfc(i,j,k), lat(i,j), 1, &
          &    'mol/m3', 'Tinsitu', 'm ', 'u74', 'l  ', 'pf ', 'Pzero  ')
         pH(myi,j,k) = ph_calc(1)
-write(6,*) "s_y1Z",myi,j,k,s_y1Z(myi,j,k)
+!write(6,*) "s_y1Z",myi,j,k,s_y1Z(myi,j,k)
 !------------------------------------------------------------
 ! Particulate and Dissolved dead phytoplankton, rate of remineralization
 !--------------------------------------------------------------
@@ -902,12 +902,12 @@ write(6,*) "s_y1Z",myi,j,k,s_y1Z(myi,j,k)
 ! Particulate and Dissolved fecal pellets, rate of remineralization
 !--------------------------------------------------------------
 if(s_y1Z(myi,j,k).lt.0) then
-write(6,*) "istep=",istep
-write(6,*) "myid,myi,j,k,start,end,myim",myid,myi,j,k,myi_start,myi_end,myim
-write(6,*) "Z1,Z2,O2,NO3,KG1,KG2,KO2",OM1_Z, OM2_Z, O2, NO3, KG1, KG2, KO2 
-write(6,*) "KstarO2,KNO3,s_x1Z,sy1z",KstarO2, KNO3,s_x1Z(myi,j,k), s_y1Z(myi,j,k)
-write(6,*) "z1z,x2z,y2z,z2z",s_z1Z(myi,j,k), s_x2Z(myi,j,k), s_y2Z(myi,j,k), s_z2Z(myi,j,k)
-write(6,*) "T",T_k(k)
+write(6,*) "LT Zero at istep=",istep
+!write(6,*) "myid,myi,j,k,start,end,myim",myid,myi,j,k,myi_start,myi_end,myim
+!write(6,*) "Z1,Z2,O2,NO3,KG1,KG2,KO2",OM1_Z, OM2_Z, O2, NO3, KG1, KG2, KO2 
+!write(6,*) "KstarO2,KNO3,s_x1Z,sy1z",KstarO2, KNO3,s_x1Z(myi,j,k), s_y1Z(myi,j,k)
+!write(6,*) "z1z,x2z,y2z,z2z",s_z1Z(myi,j,k), s_x2Z(myi,j,k), s_y2Z(myi,j,k), s_z2Z(myi,j,k)
+!write(6,*) "T",T_k(k)
 !stop
 endif
         call reaction( OM1_Z, OM2_Z, O2, NO3, KG1, KG2, KO2, KstarO2, KNO3,               &
@@ -925,7 +925,7 @@ endif
         RALK_Z     = RC(9)
         RN2_Z      = RC(10)
 
-write(6,*) "2. s_y1Z",myi,j,k,s_y1Z(myi,j,k)
+!write(6,*) "2. s_y1Z",myi,j,k,s_y1Z(myi,j,k)
 
 !------------------------------------------------------------
 ! Particulate and Dissolved riverine OM, rate of remineralization 
@@ -1130,7 +1130,7 @@ enddo
     s_y2Z(myi,j,k) = stoich_y2Z
     s_z2Z(myi,j,k) = stoich_z2Z
 !------------------------------------------------------------------------
-write(6,*) "3, s_y1Z",myi,j,k,s_y1Z(myi,j,k)
+!write(6,*) "3, s_y1Z",myi,j,k,s_y1Z(myi,j,k)
  
 !-------------------------------
 !-NO3; (mmol-N/m3)
@@ -1258,12 +1258,12 @@ write(6,*) "3, s_y1Z",myi,j,k,s_y1Z(myi,j,k)
          enddo
 !-- End Main GEM Calculations ---------------------------------------------------
 !#endif
-write(6,*) "888 RN2_ijk",RN2_ijk(28,18,1)
-write(6,*) "888 PARdepth_ijk",PARdepth_ijk(28,18,1)
-write(6,*) "PARpercent",PAR_percent_ijk(28,18,1)
-write(6,*) "un",uN_ijk(28,18,1,:)
-write(6,*) "Chla",Chla_tot_ijk(28,18,1)
-write(6,*) "888 s_y1Z",myi,j,k,s_y1Z(28,18,1)
+!write(6,*) "888 RN2_ijk",RN2_ijk(28,18,1)
+!write(6,*) "888 PARdepth_ijk",PARdepth_ijk(28,18,1)
+!write(6,*) "PARpercent",PAR_percent_ijk(28,18,1)
+!write(6,*) "un",uN_ijk(28,18,1,:)
+!write(6,*) "Chla",Chla_tot_ijk(28,18,1)
+!write(6,*) "888 s_y1Z",myi,j,k,s_y1Z(28,18,1)
 
 !-- Call "Extra" variables for netCDF --------------------------------------------------------
 !--------------------------------------------------------
@@ -1293,13 +1293,13 @@ write(6,*) "888 s_y1Z",myi,j,k,s_y1Z(28,18,1)
                                          RO2_A_ijk,  &
                                          RO2_Z_ijk,RO2_BC_ijk,RO2_R_ijk   )
      endif  !end of EXTRA_DATA initialization 
-write(6,*) "999 RN2_ijk",RN2_ijk(28,18,1)
-write(6,*) "999 PARdepth_ijk",PARdepth_ijk(28,18,1)
-write(6,*) "PARpercent",PAR_percent_ijk(28,18,1)
-write(6,*) "un",uN_ijk(28,18,1,:)
-write(6,*) "Chla",Chla_tot_ijk(28,18,1)
-write(6,*) "999 s_y1Z",myi,j,k,s_y1Z(28,18,1)
-stop
+!write(6,*) "999 RN2_ijk",RN2_ijk(28,18,1)
+!write(6,*) "999 PARdepth_ijk",PARdepth_ijk(28,18,1)
+!write(6,*) "PARpercent",PAR_percent_ijk(28,18,1)
+!write(6,*) "un",uN_ijk(28,18,1,:)
+!write(6,*) "Chla",Chla_tot_ijk(28,18,1)
+!write(6,*) "999 s_y1Z",myi,j,k,s_y1Z(28,18,1)
+!stop
   ! --- dump output when istep is a multiple of iout
       if (  mod( istep, iout ) .eq. 0 ) then
                  CALL WRITE_EXTRA_DATA( myi_start,myim,1,jm, 1,km, istep_out+1, &

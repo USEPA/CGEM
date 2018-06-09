@@ -6,6 +6,7 @@
        USE Grid
        USE DATE_TIME
        USE Hydro
+       use mpi_interface
 
        IMPLICIT NONE
 

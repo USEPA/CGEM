@@ -3,6 +3,11 @@
 # Note modules must be compiled in bottom-up dependency order.
 
 MAIN_OBJ  =  fillval.o\
+	s_mpi.o\
+	mpi_interface.o\
+	serial.o\
+	s_netcdf.o\
+	MPI_dummy.o\
 	error.o\
 	Model_dim.o\
         netcdf_utils.o\
@@ -48,6 +53,7 @@ MAIN_OBJ  =  fillval.o\
 	Get_Vars.o\
 	WQ_Model.o\
 	Transport.o\
+	AdvNeighborsOrdered_fake.o\
 	Adv3D.o\
         VMixing.o\
 	Model_Output.o\

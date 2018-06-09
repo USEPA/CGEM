@@ -366,10 +366,10 @@ CONTAINS
       END IF
     END DO
 
-    write(6,*) "ev1--------",EXTRA_VAR
-    write(6,*) EXTRA_VARIABLE_NAMES
-    write(6,*) EXTRA_VARIABLE_DESCRIPTIONS
-    write(6,*) EXTRA_VARIABLE_UNITS
+    !write(6,*) "ev1--------",EXTRA_VAR
+    !write(6,*) EXTRA_VARIABLE_NAMES
+    !write(6,*) EXTRA_VARIABLE_DESCRIPTIONS
+    !write(6,*) EXTRA_VARIABLE_UNITS
     ! End of NetCDF header:
 
     ERR = ncdf_ENDDEF( FILE_ID )
@@ -532,17 +532,17 @@ CONTAINS
     INTEGER,DIMENSION(STATE_VARIABLES+1):: REQUESTS, STATUSES
 
     FILE_TIMESTEP = TIMESTEP - FILE_FIRST_TIMESTEP
-    write(6,*) "FILE_TIMESTEP",FILE_TIMESTEP
+    !write(6,*) "FILE_TIMESTEP",FILE_TIMESTEP
 
     ! Write time variable as an 8-byte real since NetCDF lacks 8-byte integer:
 
     STARTS1( 1 ) = FILE_TIMESTEP + 1
     COUNTS1( 1 ) = 1
     SECONDS( 1 ) = SECONDS0 + FILE_TIMESTEP * SECONDS_PER_TIMESTEP
-    write(6,*) "seconds",seconds
+    !write(6,*) "seconds",seconds
     ERR = ncdf_PUT_VARA_DOUBLE( FILE_ID, TIME_VAR, STARTS1, COUNTS1, SECONDS, REQUESTS(1)) 
     CALL CHKERR( ERR, 'write output variable time' )
-    write(6,*) "double",FILE_ID, TIME_VAR, STARTS1, COUNTS1, SECONDS, REQUESTS(1)    
+    !write(6,*) "double",FILE_ID, TIME_VAR, STARTS1, COUNTS1, SECONDS, REQUESTS(1)    
 
     REQUEST_COUNT = 1
 
@@ -632,17 +632,17 @@ CONTAINS
     COUNTS( 4 ) = 1
 
 
-    write(6,*) IMSTART, JMSTART, KMSTART, IM, JM, KM, TIMESTEP
-write(6,*) "9 RN2_ijk",RN2(28,18,1)
-write(6,*) "9 PARdepth_ijk",irradiance(28,18,1)
-write(6,*) "PARpercent",irradiance_fraction(28,18,1)
-write(6,*) "un",uN(28,18,1,:)
-write(6,*) "Chla",Chla_mg_tot(28,18,1)
-write(6,*) "9 s_y1Z",s_y1FP(28,18,1)
+    !write(6,*) IMSTART, JMSTART, KMSTART, IM, JM, KM, TIMESTEP
+!write(6,*) "9 RN2_ijk",RN2(28,18,1)
+!write(6,*) "9 PARdepth_ijk",irradiance(28,18,1)
+!write(6,*) "PARpercent",irradiance_fraction(28,18,1)
+!write(6,*) "un",uN(28,18,1,:)
+!write(6,*) "Chla",Chla_mg_tot(28,18,1)
+!write(6,*) "9 s_y1Z",s_y1FP(28,18,1)
 
     ! Write each extra variable (if selected to be written):
 
-    write(6,*) "ev", EXTRA_VAR
+    !write(6,*) "ev", EXTRA_VAR
     REQUEST_COUNT = 0
 
     VARIABLE = 1 ! IRRADIANCE:
@@ -670,7 +670,7 @@ write(6,*) "9 s_y1Z",s_y1FP(28,18,1)
     DO INDEX = 1, nospA ! UN(:,:,:,SPECIES):
       VARIABLE = VARIABLE + 1
 
-      write(6,*) "UN before",index,"of",nospA,variable,UN(1,1,1,index)
+      !write(6,*) "UN before",index,"of",nospA,variable,UN(1,1,1,index)
 
       IF ( WRITE_EXTRA_VARIABLE( VARIABLE ) ) THEN
     REQUEST_COUNT = REQUEST_COUNT + 1
@@ -681,8 +681,8 @@ write(6,*) "9 s_y1Z",s_y1FP(28,18,1)
                      // EXTRA_VARIABLE_NAMES( VARIABLE ) )
       END IF
     END DO
-      write(6,*) "UN after",index,variable,UN(1,1,1,index-1)
-      write(6,*) EXTRA_VAR
+      !write(6,*) "UN after",index,variable,UN(1,1,1,index-1)
+      !write(6,*) EXTRA_VAR
     DO INDEX = 1, nospA ! UP(:,:,:,SPECIES):
       VARIABLE = VARIABLE + 1
 
@@ -914,12 +914,12 @@ write(6,*) "9 s_y1Z",s_y1FP(28,18,1)
                    // EXTRA_VARIABLE_NAMES( VARIABLE ) )
     END IF
 
-write(6,*) "19 RN2_ijk",RN2(28,18,1)
-write(6,*) "19 PARdepth_ijk",irradiance(28,18,1)
-write(6,*) "PARpercent",irradiance_fraction(28,18,1)
-write(6,*) "un",uN(28,18,1,:)
-write(6,*) "Chla",Chla_mg_tot(28,18,1)
-write(6,*) "19 s_y1Z",s_y1FP(28,18,1)
+!write(6,*) "19 RN2_ijk",RN2(28,18,1)
+!write(6,*) "19 PARdepth_ijk",irradiance(28,18,1)
+!write(6,*) "PARpercent",irradiance_fraction(28,18,1)
+!write(6,*) "un",uN(28,18,1,:)
+!write(6,*) "Chla",Chla_mg_tot(28,18,1)
+!write(6,*) "19 s_y1Z",s_y1FP(28,18,1)
 
 
     CALL FLUSH_FILE() ! Flush buffers to disk in case of crash.

@@ -1,0 +1,3 @@
+module mpi
+
+end module

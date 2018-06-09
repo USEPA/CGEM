@@ -4,12 +4,11 @@
       USE State_Vars !f
       USE Fill_Value
       use INPUT_VARS, only:icent,jcent
-#ifndef _MPI
       use serial
-#endif
+      use mpi_interface
 
       implicit none
- 
+
       integer ii,i,j,k,nz
       integer ierr,isum,myi,mpierr
       integer, intent(in) :: myid, numprocs

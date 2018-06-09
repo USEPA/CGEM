@@ -15,7 +15,6 @@ MAIN_OBJ  =  fillval.o\
 	Which_Flux.o\
 	TEMP_VARS.o\
 	DATE_TIME.o\
-	PNETCDF_UTILITIES.o\
 	main.o\
 	MOD_UTILITIES.o\
 	Conversions.o\

@@ -38,7 +38,7 @@
                             DZ )
           CALL CLOSE_FILE()
       endif
-      CALL MPI_BARRIER( MPI_COMM_WORLD, mpierr ) ! Wait until file is created.
+      CALL MPI_BARRIER( MPI_COMM_WORLD,mpierr) ! Wait until file is created.
 
       write(6,*) "calling open file"
 
@@ -61,7 +61,7 @@
         write(6,*) "myi_start,myim",myi_start,myim
         write(6,*) "calling write data"
         CALL WRITE_DATA( myi_start, myim, 1,jm, 1, km, 0, dumf)
-        CALL MPI_BARRIER( MPI_COMM_WORLD, mpierr ) ! Wait until file is updated.
+        CALL MPI_BARRIER( MPI_COMM_WORLD,mpierr ) ! Wait until file is updated.
 
 #ifdef DEBUG
 write(6,*) "---- Init_Output_CGEM ---"

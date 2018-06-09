@@ -212,13 +212,16 @@ CONTAINS
     INTEGER,DIMENSION(4),INTENT(IN):: DIMIDS
     INTEGER,INTENT(OUT):: VARID
     CHARACTER(LEN=*),INTENT(IN):: VARNAM, VARDES, UNITS
+    INTEGER(MPI_OFFSET_KIND):: TWO  !Need to pass mpi_offset_kind
+ 
     ! Locals:
     INTEGER ERR
 
+    TWO = 2
     if(is_positive.eq.1) then
-       ERR = nfmpi_put_att_real(fileid, VARID, "valid_range", 5, 2, (/ 0., 1.e38 /))
+       ERR = nfmpi_put_att_real(fileid, VARID, "valid_range", 5, TWO, (/ 0., 1.e38 /))
     else
-       ERR = nfmpi_put_att_real(fileid, VARID, "valid_range", 5, 2, (/ -1.e2, 1.e38 /))
+       ERR = nfmpi_put_att_real(fileid, VARID, "valid_range", 5, TWO, (/ -1.e2, 1.e38 /))
     endif
 
     ERR = NFMPI_DEF_VAR( FILEID, VARNAM, 5, 4, DIMIDS, VARID )

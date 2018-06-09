@@ -8,6 +8,7 @@ USE CGEM_vars
 USE TEMP_VARS
 USE DATE_TIME
 USE STOICH_VARS
+use mpi_interface
 
 IMPLICIT NONE
 
@@ -16,7 +17,7 @@ character(120),intent(in) :: filename
 
 integer i,j,k,icent_jcent_units,mpierr
 integer isp,isz,myi
-real tot,x
+real tot,x,icent_in,jcent_in
 real, parameter :: SDay = 86400.0  ! # of sec in 24 hr day
 real eps
 
@@ -33,7 +34,7 @@ read(999,*) iYrS,iMonS,iDayS,iHrS,iMinS,iSecS
 read(999,*) iYrE,iMonE,iDayE,iHrE,iMinE,iSecE
 read(999,*) dT, dT_out
 read(999,*) icent_jcent_units
-read(999,*) icent, jcent
+read(999,*) icent_in, jcent_in
 read(999,*)
 !--Switches in GEM---------
 read(999,*)

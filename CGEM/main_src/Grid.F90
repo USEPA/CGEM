@@ -2,8 +2,10 @@
 
        USE Model_dim
        USE netcdf_utils
+       USE mpi_interface
 
        IMPLICIT NONE
+
 
       real,allocatable,save :: lat(:,:),lon(:,:) !Latitude and longitude of each grid cell
       real,allocatable,save :: d(:,:,:)          !Distance from surface to bottom of cell 

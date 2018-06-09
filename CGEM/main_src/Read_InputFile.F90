@@ -1,5 +1,8 @@
 Subroutine Read_InputFile(input_filename,Which_code,myid,numprocs)
 
+
+use mpi_interface
+
 IMPLICIT NONE
 
 integer, intent(in) :: myid, numprocs

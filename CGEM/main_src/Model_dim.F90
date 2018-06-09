@@ -1,8 +1,8 @@
 Module Model_dim
 
-#ifndef _MPI
 use serial
-#endif
+use mpi_interface
+use mpi
 
 IMPLICIT NONE
 
@@ -24,9 +24,6 @@ IMPLICIT NONE
       INTEGER, SAVE :: myi_start !location of first array index WRT full grid
       INTEGER, SAVE :: myi_end !location of last array index WRT full grid
       INTEGER, SAVE :: myimp2  !Number of i in f array (myim + 2 boundary cells)
-#ifdef _MPI
-include 'mpif.h'
-#endif
 
 CONTAINS
 
@@ -34,6 +31,7 @@ Subroutine Set_Model_dim(myid,numprocs)
 
 
 IMPLICIT NONE
+
 
       integer, intent(in) :: myid,numprocs
       character(200) filename
