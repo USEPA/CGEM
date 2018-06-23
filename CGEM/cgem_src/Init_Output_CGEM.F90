@@ -27,7 +27,6 @@
       WRITE ( NETCDF_OUTPUT_FILE_NAME, '(A, I6.6, A)' )&
               trim(BASE_NETCDF_OUTPUT_FILE_NAME), 0, '.nc'
 
-      write(6,*) "calling create file"
       if(myid.eq.0) then
           CALL CREATE_FILE( trim(NETCDF_OUTPUT_FILE_NAME), &
                             im, jm, km, nstep, iYr0,       & 
@@ -40,7 +39,6 @@
       endif
       CALL MPI_BARRIER( MPI_COMM_WORLD,mpierr) ! Wait until file is created.
 
-      write(6,*) "calling open file"
 
 ! Opens the output file for writing:
        CALL OPEN_FILE( trim(NETCDF_OUTPUT_FILE_NAME), 0 )
@@ -58,8 +56,6 @@
          enddo
         enddo
 
-        write(6,*) "myi_start,myim",myi_start,myim
-        write(6,*) "calling write data"
         CALL WRITE_DATA( myi_start, myim, 1,jm, 1, km, 0, dumf)
         CALL MPI_BARRIER( MPI_COMM_WORLD,mpierr ) ! Wait until file is updated.
 

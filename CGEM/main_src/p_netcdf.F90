@@ -60,7 +60,6 @@ return
 end
 
 function ncdf_close(id) result(res)
-integer,intent(in) :: id
 integer :: res
 res=nfmpi_close(id)
 return

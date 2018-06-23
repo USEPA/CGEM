@@ -39,7 +39,7 @@
        CALL OPEN_FILE( trim(NETCDF_OUTPUT_FILE_NAME), nf, EXTRA_VARIABLES, 0 )
        tinit=0
 
-        dumf = f
+        dumf = f(1:myim,:,:,:)
         do j=1,jm
         myi = 1
         do i=myi_start,myi_end

@@ -1269,7 +1269,6 @@ enddo
 !--------------------------------------------------------
   ! -- do initialization of first timestep:
       if (   istep .eq. 1 ) then
-                    write(6,*) "calling WED",myi_start,myim, 1,jm, 1,km
                  CALL WRITE_EXTRA_DATA( myi_start,myim, 1,jm, 1,km, 0, &
                                      PARdepth_ijk, &
                                   PAR_percent_ijk, &
@@ -1325,6 +1324,10 @@ enddo
                                          RO2_A_ijk,  &
                                          RO2_Z_ijk,RO2_BC_ijk,RO2_R_ijk   )
      endif  !end of "if (mod(istep,iout).eq.0)" block if
+
+#ifdef DEBUG
+   write(6,*) "A=",f(1,1,1,1),"at istep=",istep
+#endif
 
    return
    END Subroutine CGEM 

@@ -16,6 +16,7 @@ integer icent_jcent_units
 character(120), intent(in) :: filename
 integer, intent(in) :: myid, numprocs
 integer mpierr
+real icent_in, jcent_in
 
 ws = 0.
 
@@ -30,7 +31,10 @@ read(999,*) iYrS,iMonS,iDayS,iHrS,iMinS,iSecS
 read(999,*) iYrE,iMonE,iDayE,iHrE,iMinE,iSecE
 read(999,*) dT, dT_out
 read(999,*) icent_jcent_units
-read(999,*) icent, jcent
+read(999,*) icent_in, jcent_in
+icent = INT(icent_in)
+jcent = INT(jcent_in)
+
 read(999,*)
 !--Switches in GEM---------
 read(999,*)

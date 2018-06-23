@@ -6,6 +6,9 @@
 
        integer, intent(in) :: myid,numprocs
 
+#ifdef DEBUG
+       write(6,*) "myid,numprocs"
+#endif
        if(myid.eq.0) CALL CLOSE_FILE()
 
        return

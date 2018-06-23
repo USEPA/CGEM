@@ -13,7 +13,8 @@
       real :: dumf(myim,jm,km,nf)
       integer :: i,j,k,nz,myi
 
-        dumf = f
+        dumf = f(1:myim,:,:,:)
+
         do j=1,jm
         myi = 1
         do i=myi_start,myi_end
