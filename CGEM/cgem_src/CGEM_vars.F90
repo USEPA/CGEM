@@ -165,12 +165,14 @@ integer :: counter = 0
 !-O2: Molecular Oxygen (mmol-O2/m3)
 !------------------------------
       iO2 = counter+5 
+
 !-------------------------------------------------------------
 !-OM1_A: (mmol-C/m3--particulate)
 !        -- Particulate Organic Matter arising from 
 !           dead Phytoplankton
 !-------------------------------------------------------------
       iOM1_A = counter+6  
+
 !-----------------------------------------------------------------
 !-OM2_A: (mmol-C/m3--dissolved)
 !        -- Dissolved Organic Matter arising from 

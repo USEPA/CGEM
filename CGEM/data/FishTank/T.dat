@@ -1,4 +1,4 @@
 !Tmax, Tmin, MaxDay- this is for sine wave input (might want to adjust later)
-20        !Maximum temperature in Celsius
-2         !Minimum temperature in Celsius
-199     !Day of maximum temperature  
+20         !Maximum temperature in Celsius
+20         !Minimum temperature in Celsius
+199        !Day of maximum temperature  

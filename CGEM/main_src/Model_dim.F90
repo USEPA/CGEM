@@ -16,7 +16,8 @@ IMPLICIT NONE
       INTEGER, SAVE :: Which_gridio
       CHARACTER(200), SAVE :: DATADIR
       INTEGER, SAVE :: iYr0 ! Reference year all timestamps are relative to.
-
+      INTEGER, SAVE :: nRiv
+      INTEGER, SAVE :: nBC
 
 CONTAINS
 
@@ -38,6 +39,8 @@ write(6,*)
 !"
       write(filename,'(A, A)') trim(DATADIR),'/Model_dim.txt'
 
+      PRINT*, "DATADIR = ", DATADIR
+
 #ifdef DEBUG
 write(6,*) "Model_dim.txt=",filename
 #endif
@@ -52,8 +55,14 @@ write(6,*) "Model_dim.txt=",filename
       read(19,*) nospZ
       read(19,*) Which_gridio
       read(19,*) iYr0
+      read(19,*) nRiv
+      read(19,*) nBC
       close(19)
       
+      PRINT*, "Number of rivers = ", nRiv
+      PRINT*, "Number of surficial boundary cells = ", nBC
+      PRINT*, "Reference year = ", iYr0
+
       if(Which_gridio.eq.2 .or. Which_gridio.eq.3) then
          nsl = km + 1 
       else
@@ -87,7 +96,7 @@ write(6,*)
 #endif 
 
 !Initialize for netCDF
-nza=fill(0)
+nza = fill(0)
 
 Return
 

@@ -8,6 +8,8 @@ MAIN_OBJ  =  fillval.o\
 	Grid.o\
 	State_Vars.o\
 	Hydro.o\
+	RiverLoad.o\
+        BoundaryConcentration.o\
 	OUTPUT.o\
 	INPUT_VARS.o\
 	LIGHT_VARS.o\

@@ -9,6 +9,7 @@ USE STATES
 USE EUT
 USE INPUT_VARS, ONLY:Read_Solar
 USE LIGHT_VARS, ONLY:PARfac
+USE FLAGS, ONLY: KDWD
 
 IMPLICIT NONE
 
@@ -24,35 +25,41 @@ INTEGER :: i,j,k,nz
 !------------------------------------------------------------------------------
 !
 
-Rad_Watts = Rad/2.77e14*PARfac
+Rad_Watts = Rad / 2.77e14 * PARfac
 
-if(Read_Solar.ne.2) then
- Rad_Watts = Rad_Watts*0.48
+if (Read_Solar .ne. 2) then
+    Rad_Watts = Rad_Watts * 0.48
 endif
 
-if(Read_Solar.eq.2) Rad_Watts = Rad/4.57
+if (Read_Solar .eq. 2) Rad_Watts = Rad / 4.57
 
 !GoMDOM LIGHT MODEL, No Wind Speed
  do j = 1,jm
      do i = 1,im
         nz = nza(i,j)
-       if(nz.ge.0) then
-      do k = 1, nz
-         SAL_TERM = 1.084E-06 * (S(i,j,k)**4)
+        if (nz .gt. 0) then
+            if (KDWD .eq. 1) then
+              do k = 1, nz
+                 KESS(k) = KE + KECHL * (f(i,j,k,JDIA) / CCHLD + f(i,j,k,JGRE) / CCHLG)
+              enddo
+            else
+	      do k = 1, nz
+		 SAL_TERM = 1.084E-06 * (S(i,j,k)**4)
 
-          IF ((f(i,j,k,JDIA) + f(i,j,k,JGRE)) < 1.0E-07) THEN
-               CHL_TERM = 0.0
-          ELSE
-               CHL_TERM = 0.2085 * LOG( (f(i,j,k,JDIA) * 1.0E6 / CCHLD) + &
-                        & (f(i,j,k,JGRE) * 1.0E6 / CCHLG) )
-          ENDIF
+		  IF ((f(i,j,k,JDIA) + f(i,j,k,JGRE)) < 1.0E-07) THEN
+		       CHL_TERM = 0.0
+		  ELSE
+		       CHL_TERM = 0.2085 * LOG( (f(i,j,k,JDIA) * 1.0E6 / CCHLD) + &
+				& (f(i,j,k,JGRE) * 1.0E6 / CCHLG) )
+		  ENDIF
 
-          POC_TERM = 0.7640 * SQRT( (f(i,j,k,JLOC) * 1.0E3) +  &
-                   & (f(i,j,k,JROC) * 1.0E3) + (f(i,j,k,JZOO) * 1.0E3) )
+		  POC_TERM = 0.7640 * SQRT( (f(i,j,k,JLOC) * 1.0E3) +  &
+			   & (f(i,j,k,JROC) * 1.0E3) + (f(i,j,k,JZOO) * 1.0E3) )
 
-          KESS(k) = ( ( -0.10 * (-0.5606 - SAL_TERM + CHL_TERM + POC_TERM) ) &
-                  &  + 1 ) ** (1.0/(-0.10))
-      enddo
+		  KESS(k) = ( ( -0.10 * (-0.5606 - SAL_TERM + CHL_TERM + POC_TERM) ) &
+			  &  + 1 ) ** (1.0/(-0.10))
+	      enddo
+            endif
 
       DO k = 1,1
          IATTOP    =  Rad_Watts(i,j)

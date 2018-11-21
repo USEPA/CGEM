@@ -21,6 +21,7 @@
      USE LIGHT_VARS
      USE CGEM_Flux
      USE Fill_Value
+     USE RiverLoad
 
       IMPLICIT NONE
 
@@ -33,8 +34,10 @@
 !---------------------------------------------------------------------------------------
 ! Local Variables
 !-----------------------------------------------------
-    real ::  ff(im,jm,km,nf)        ! Holds the nf state vectors
+    real ::  ff(im,jm,km,nf)             ! Holds the nf state vectors
+    real :: rivLoadConvFactor            ! Conversion factor used to change units of river loads.
     integer        ::  i, j, k, isp, isz ! Loop indicies, isp/isz is for phytoplankton/zooplankton species
+    integer        ::  icell, jcell      ! Indices of river discharge locations.
     integer, save  ::  init  = 1         ! Declare some variables only at first subroutine call
     integer        ::  Is_Day            ! Switch for day/night for phytoplankton nutrient uptake only, Is_Day=0 means night
 !------------------------------------ 
@@ -442,15 +445,17 @@
                   endif
                   enddo
                 enddo
-
-                 call Call_IOP_PAR(                                    &
-                 & PARsurf    , SunZenithAtm,                          &
-                 & CDOM_k     , Chla_tot_k,                            &
-                 & OM1A_k     , OM1Z_k,                                &
-                 & OM1SPM_k   , OM1BC_k, d(i,j,:),                     &
-                 & nz         , d_sfc(i,j,:),                          &
-                 & PAR_percent_k,                                      &
-                 & PARbot     , PARdepth_k                         )
+                 ! PRINT*, "Calling IOP_PAR, i, j, PARsurf, SunZenithAtm = ", i, j, PARsurf, SunZenithAtm
+                 if (nz .gt. 0) then
+		     call Call_IOP_PAR(                                    &
+		     & PARsurf    , SunZenithAtm,                          &
+		     & CDOM_k     , Chla_tot_k,                            &
+		     & OM1A_k     , OM1Z_k,                                &
+		     & OM1SPM_k   , OM1BC_k, d(i,j,:),                     &
+		     & nz         , d_sfc(i,j,:),                          &
+		     & PAR_percent_k,                                      &
+		     & PARbot     , PARdepth_k                         )
+                 endif
 
 #ifdef DEBUG_LIGHT
                  write(6,*) "percent", PAR_percent_k(1),PAR_percent_k(6),PAR_percent_k(12),PAR_percent_k(20)
@@ -1283,6 +1288,27 @@ enddo
    enddo      ! end of do i block do loop
  enddo      ! end of do j block do loop
 ! ----------------------------------------------------------------------
+
+! ----------------------------------------------------------------------
+! Add river loads.  Loads are converted from kg/s to mmol/m3.
+! ----------------------------------------------------------------------
+do i = 1, nriv            ! Loop over the rivers
+   icell = riversIJ(i,1)  ! Extract the i index of grid cell where river discharges
+   jcell = riversIJ(i,2)  ! Extract the j index of grid cell where river discharges
+   do k = 1, nsl          ! Loop over the sigma layers
+      rivLoadConvFactor = 1.0e6 * weights(i,k) * dT / Vol(icell,jcell,k)
+      ff(icell,jcell,k,iNO3) = ff(icell,jcell,k,iNO3) +  &
+                            & Var2(i) * rivLoadConvFactor / 14.01
+      ff(icell,jcell,k,iNH4) = ff(icell,jcell,k,iNH4) +  &
+                            & Var3(i) * rivLoadConvFactor / 14.01
+      ff(icell,jcell,k,iPO4) = ff(icell,jcell,k,iPO4) +  &
+                            & Var6(i) * rivLoadConvFactor / 30.97
+      ff(icell,jcell,k,iO2) = ff(icell,jcell,k,iO2) +  &
+                            & Var9(i) * rivLoadConvFactor / 32.0
+   enddo
+enddo
+
+! PRINT*, "---------------------------------------"
 
 !update f for the current timestep
          do j = 1,jm

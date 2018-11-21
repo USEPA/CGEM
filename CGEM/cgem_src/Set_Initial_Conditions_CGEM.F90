@@ -8,12 +8,14 @@
        USE CGEM_Vars
        USE Grid 
        USE State_Vars
+       USE BoundaryConcentration
 
        IMPLICIT NONE
 
        character(200) filename
        character(120), intent(in) :: init_filename
-       integer i,j,k
+       integer i,j,k, nz
+       integer ::  ibc, jbc      ! Indices of boundary grid cells.
 
 #ifdef DEBUG
       write(6,*) "In Set Initial Conditions"
@@ -53,6 +55,20 @@
           write(6,*) "Unknown, InitializeHow=",InitializeHow," exiting"
           stop
        endif
+
+       ! Initialize concentrations of boundary cells
+       do i = 1, nBC            ! Loop over boundary cells
+          ibc = bcIJ(i,1)  ! Extract the i index of grid cell 
+          jbc = bcIJ(i,2)  ! Extract the j index of grid cell 
+          nz = nza(ibc,jbc)
+          do k = 1, nz       ! Loop over the sigma layers
+             f(ibc,jbc,k,iNO3) = BCvar2(i) * 1.0e3 / 14.01
+             f(ibc,jbc,k,iNH4) = BCvar3(i) * 1.0e3 / 14.01
+             f(ibc,jbc,k,iPO4) = BCvar6(i) * 1.0e3 / 30.97
+             f(ibc,jbc,k,iO2) =  BCvar9(i) * 1.0e3 / 32.0
+          enddo
+       enddo
+
 
        !call InitError_Check_CGEM()
 

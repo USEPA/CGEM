@@ -7,6 +7,7 @@ MODULE EUT
 !-  Purpose and Methods : Include file for eutrophication variables.
 !-
 !-  Created: 12/09/97  M. Settles
+!-  Revised: 11/12/2018 W. Melendez : Added KE and KECHL parameters.
 !------------------------------------------------------------------------------
 
 IMPLICIT NONE
@@ -364,6 +365,10 @@ REAL :: KDP                         ! Minimum dissolved organic phosphorous
 REAL :: KDPALG                      ! Dissolved phosphorous mineralization
                                               ! algal proportionality dependence [m^3-kg^-1-s^-1] 
 
+REAL :: KE                          ! Background light attenuation
+
+REAL :: KECHL                       ! Light attenuation factor for chlorophyll-a [m^2-kg^-1]
+
 
 REAL :: KHN                         ! Organic nitrogen decay
                                               ! half saturation constant [kg-m^-3]
@@ -720,6 +725,10 @@ DATA KDP/5.0E-07/                     ! Minimum dissolved organic phosphorous
 
 DATA KDPALG/2.3E-03/               ! Dissolved phosphorous mineralization
                                               ! algal proportionality dependence [m^3-kg^-1-s^-1] 
+
+DATA KE/0.15/                      ! Background light attenuation [m^-1]
+
+DATA KECHL/1.7E+04/                ! Light attenuation factor for chlorophyll-a [m^2-kg^-1]
 
 
 DATA KHN/2.5E-05/                     ! Organic nitrogen decay

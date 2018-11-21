@@ -6,3 +6,5 @@
 2    !INTEGER, PARAMETER :: nospZ, zooplankton groups
 1    !Which_gridio 0==fishtank 1==efdc
 1970 !iYear0, time in terms of seconds from this year
+0  !Number of rivers
+0  !Number of boundary cells

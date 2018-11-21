@@ -9,11 +9,13 @@
       real, dimension(im,jm) :: sdetg
       integer :: i,j
       character(200) filename
+
 #ifdef map_code
-write(6,*) "---USER_get_EFDC grid----"
-write(6,*) "  only setting dx, dy, dxdy, and area"
-write(6,*)
+      write(6,*) "---USER_get_EFDC grid----"
+      write(6,*) "  only setting dx, dy, dxdy, and area"
+      write(6,*)
 #endif
+
       write(filename,'(A, A)') trim(DATADIR),'/dxdy.dat'
       open(19,file=filename,status='old')
       read(19,*) !dx
@@ -34,11 +36,11 @@ write(6,*)
       do i=1,im
          read(19,*) sdetg(i,:)
       enddo
-
+      close(19)
 
       do j=1,jm
        do i=1,im
-          if(nza(i,j)>0) then
+          if(nza(i,j) > 0) then
           area(i,j) = dx(i,j)*dy(i,j) !*sdetg(i,j)
       !    write(6,*) "area",i,j,area(i,j),area(i,j)*sdetg(i,j)
           !write(6,*) "area*g",area(i,j)*sdetg(i,j)

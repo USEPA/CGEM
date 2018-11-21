@@ -83,8 +83,7 @@ Subroutine DailyRad_init(TC_8, lat, lon, d, d_sfc, A_k, CDOM_k, &
      rhr = REAL(iSec) / REAL(3600)
      Zenith = calc_solar_zenith(lat,lon,rhr,jul_day,leapyr)
      SfcRad = solconst * AMAX1( COS(Zenith), 0.0)    ! COS(Z)<= 0 means night
-
-     if(SfcRad .gt. 0.) then
+     if(SfcRad .gt. 0. .AND. nz .gt. 0) then
         Call Call_IOP_PAR(SfcRad, Zenith, CDOM_k, Chla_tot_k, &
              & OM1A_k, OM1Z_k, OM1R_k, OM1BC_k, bottom_depth, nz, d_sfc, aIOPpar, &
              & aRadBot, aRadMid)

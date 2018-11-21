@@ -38,6 +38,7 @@ write(6,*)
        do j = 1, jm
          do i = 1, im
              nz = nza(i,j)
+             if (nz == 0) CYCLE  
              do k = 2, nz
                  A(k-1) = -dT*Kh(i,j,k)                       &
             &                /(dz(i,j,k-1)*(d_sfc(i,j,k)-d_sfc(i,j,k-1)))           
@@ -46,7 +47,7 @@ write(6,*)
             &                /(dz(i,j,k)*(d_sfc(i,j,k)-d_sfc(i,j,k-1)))            
              end do
              E(1) = A(1)/(A(1)-1.)
-             do k=2, nz-1
+             do k = 2, nz-1
                Gk(k)= 1./((A(k)+C(k)*(1.-E(k-1)))-1.)
                E(k) = A(k)*Gk(k)
              end do
@@ -55,14 +56,14 @@ write(6,*)
        
                ! --- No flux at surface
                G(1) = -f(i,j,1,ii)/(A(1)-1.)
-               do k=2,nz-1
+               do k = 2, nz-1
                  G(k) = (C(k)*G(k-1)-f(i,j,k,ii))*Gk(k)
                end do
                ! --- No flux at bottom
                f(i,j,nz,ii) = (C(nz)*G(nz-1)-f(i,j,nz,ii)) &
               &              /(C(nz)*(1.-E(nz-1))-1.)
          
-               do k=nz-1, 1, -1
+               do k = nz-1, 1, -1
                  f(i,j,k,ii) = E(k)*f(i,j,k+1,ii)+G(k)
                end do
        

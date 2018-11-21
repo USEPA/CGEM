@@ -24,6 +24,8 @@
       USE Model_dim
       USE Grid
       USE Hydro
+      USE RiverLoad
+      USE BoundaryConcentration
       USE State_Vars
       USE INPUT_VARS
 
@@ -46,12 +48,16 @@
       call Command_Line_Args(Which_code,input_filename,init_filename,BASE_NETCDF_OUTPUT_FILE_NAME)
 
       call Set_Model_dim()
-      call Set_Grid(TC_8)
+      call Set_Grid()
       call Allocate_Input_Vars(Which_code)
-      call Allocate_Hydro
+      call Allocate_Hydro()
+      if (nRiv > 0) call Allocate_RiverLoads()
+      if (nBC  > 0) call Allocate_BoundaryConcentrations()
       !L3 Take care of ws here
 
 ! Read_InputFile must define nstep, iout, dT, START_SECONDS
+      PRINT*, "Input filename = ", input_filename
+      PRINT*, "Which_code = ", Which_code
       call Read_InputFile(input_filename,Which_code) 
 
 #ifdef DEBUG
@@ -59,17 +65,20 @@
       write(6,*) "  start,dT",START_SECONDS, dT
 #endif
 
-!L3--- This next line is from Ko, but I have no idea why this is necessary.
+! L3--- This next line is from Ko, but I have no idea why this is necessary.
 ! Check to see if we can just use START-dT or move the time increment to
 ! the bottom of the loop.
 
       T_8 = START_SECONDS 
       TC_8 = START_SECONDS - (dT / 2) ! Subtract half dT to 'center' of timestep.
+      PRINT*, "START_SECONDS = ", START_SECONDS
       if (Which_gridio .gt. 0) then
         call Init_Hydro_NetCDF()
+        if (nRiv > 0) call Init_RiverLoad_NetCDF()
+        if (nBC  > 0) call Init_BoundaryConcentration_NetCDF()
       endif
   
-      call Get_Vars(TC_8,T_8) !Hydro for initial timestep 
+      call Get_Vars(TC_8, T_8)  ! Hydro, river loads, and boundary concentrations for initial timestep 
 
 ! Initialize time an loop variables
       istep = 0
@@ -144,7 +153,7 @@
         call USER_update_POM_grid()
       endif
 
-       call Get_Vars(TC_8,T_8) !Hydro, Solar, Wind, Temp, Salinity
+       call Get_Vars(TC_8, T_8) !Hydro, Solar, Wind, Temp, Salinity, and riverloads
 
 !L3 add when necessary       call USER_update_masks()
 
@@ -168,15 +177,18 @@ write(6,*)
 #endif
 
 !write(6,*) "---Before Transport"
-!write(6,*) "f(i19)",f(20,4,1:km,1)
+!write(6,*) "f(iNO3) = ", f(25,70,1,6)
 
-!       write(6,*) "step_out",istep_out
-!       write(6,*) "istep=",istep
+      ! write(6,*) "step_out",istep_out
+      write(6,*) "istep = ", istep
        call Transport(Which_code)
+
+!write(6,*) "---After Transport"
+!write(6,*) "f(iNO3) = ", f(25,70,1,6)
 
 #ifdef DEBUG
 write(6,*) "---After Transport"
-!write(6,*) "f(i19)",f(1,1,1:km,19)
+write(6,*) "f(iNO3) = ", f(25,70,1,6)
 #endif
 
       ! -------------- BEGIN OUTPUT DATA
@@ -196,6 +208,8 @@ write(6,*) "---After Model_Output"
       Call Model_Finalize(Which_code) ! Closes the output NetCDF file and whatever else
       if (Which_gridio.eq.1) then
         Call Close_Hydro_NetCDF()
+        Call Close_RiverLoad_NetCDF()
+        call Close_BoundaryConcentration_NetCDF()
         Call Close_Grid_NetCDF()
       endif
 

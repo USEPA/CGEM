@@ -6,3 +6,6 @@
 2    !INTEGER, PARAMETER :: nospZ = 2
 0    !Which_gridio 0==fishtank 1==efdc
 2002 !iYr0
+0   !Number of rivers
+0   !Number of boundary cells
+

@@ -23,11 +23,10 @@
       real, allocatable, save :: dz_k(:) !Original (Ko) dz, sigma thickness of layer k
       real, save :: Hs  !reference depth used to calculate sigma values given depths of layer surfaces and centers
 
-!Temporary variables to debug Advection for EFDC
+      !Temporary variables to debug Advection for EFDC
       real,allocatable,save :: dx(:,:)  !dx
       real,allocatable,save :: dy(:,:)  !dy
-  
- 
+   
       integer, parameter :: numGridFiles = 2
       type(netCDF_file), save :: grid_info(numGridFiles)    ! 1-column depth, 2-cell depth
       integer, dimension(numGridFiles), save :: gridStartIndex  ! holds the last time index accessed from netcdf file for each grid variable
@@ -37,21 +36,22 @@
 
       contains
 
-      Subroutine Set_Grid(TC_8)
+      Subroutine Set_Grid()
 
       IMPLICIT NONE
 
       integer j
       character(200) filename
-      integer(kind=8) :: TC_8
+      ! integer(kind=8) :: TC_8
 
       call Grid_allocate()
+
 #ifdef map_code
-write(6,*) "---Set_Grid----"
-write(6,*) "  Allocated Grid in Grid_allocate"
-write(6,*) "  Reading nza for 0D and EFDC, setting nza=km for NCOM"
-write(6,*) "  *** nza really should be zero if land, but is set to km here in Set_Grid"
-write(6,*)
+      write(6,*) "---Set_Grid----"
+      write(6,*) "  Allocated Grid in Grid_allocate"
+      write(6,*) "  Reading nza for 0D and EFDC, setting nza=km for NCOM"
+      write(6,*) "  *** nza really should be zero if land, but is set to km here in Set_Grid"
+      write(6,*)
 #endif
 
       if (Which_gridio .eq. 0 .OR. Which_gridio .eq. 1) then   ! used for basic and EFDC grids
@@ -79,11 +79,11 @@ write(6,*)
         call USER_get_basic_grid(dz,depth,d,d_sfc,area,Vol)
       else if (Which_gridio.eq.1) then
         gridStartIndex=1
-        call USER_get_EFDC_grid(TC_8)
+        call USER_get_EFDC_grid()
       else if (Which_gridio.eq.2) then
-        call USER_get_NCOM_grid(TC_8)
+        call USER_get_NCOM_grid()
       else if (Which_gridio.eq.3) then
-        call USER_get_POM_grid(TC_8)
+        call USER_get_POM_grid()
       endif
 !--------------------------------
 ! --- get land/water and shelf masks
@@ -93,6 +93,7 @@ write(6,*)
       return
 
       End Subroutine Set_Grid
+
 
       Subroutine Grid_allocate()
 
@@ -112,7 +113,7 @@ write(6,*)
       ALLOCATE(fm(im,jm,km))
       ALLOCATE(wsm(im,jm))
 
-!Temporary variables to debug Advection for EFDC
+      !Temporary variables to debug Advection for EFDC
       ALLOCATE(dx(im,jm))  !dx
       ALLOCATE(dy(im,jm))  !dy
       dx=fill(0)  !Fill values for netCDF

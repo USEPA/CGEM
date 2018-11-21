@@ -51,17 +51,26 @@ write(6,*)
 
 !     w_wsink means 'w' with sinking terms
 !     at surface sink = 0.
-      w_wsink (i,j,1) = wx(i,j,1)
 
-       nz = nza(i,j)
+      nz = nza(i,j)
+      if (nz .gt. 0) then
+          w_wsink (i,j,1) = wx(i,j,1)
+      endif
 
-      do k = 2,nz 
+      do k = 2, nz 
         w_wsink(i,j,k) = wx(i,j,k) + ws(ii)*area(i,j)
       end do
 
+
 !If wsm=0 (shelf), then set sinking velocity to zero as well...
 !     at bottom (w=0) add settling or deep ocean (wsm=1)
-      w_wsink (i,j,nz+1) = wx(i,j,nz+1) + ws(ii)*real(wsm(i,j),4)*area(i,j)
+      if (nz .gt. 0) then
+          if (nz .eq. km) then
+              w_wsink (i,j,nz+1) = ws(ii)*real(wsm(i,j),4)*area(i,j)
+          else
+              w_wsink (i,j,nz+1) = wx(i,j,nz+1) + ws(ii)*real(wsm(i,j),4)*area(i,j)
+          endif
+      endif
 
 #ifdef DEBUG_A
 write(6,*) "nz=",nz
@@ -84,6 +93,7 @@ write(6,*)
 
         wfm = amax1(-w_wsink(i,j,k  ),0.)       ! p0/np
         wfp = amax1( w_wsink(i,j,k+1),0.)       ! pp/n0
+
 !                   p0/nn             pn/n0
         cfh = ( (ux(i,j,k)-ufm) - (ux(ip1,j,k)+ufp) )               &
      &       +( (vx(i,j,k)-vfm) - (vx(i,jp1,k)+vfp) )
@@ -97,6 +107,7 @@ write(6,*)
      &           +(wfm*f(i,j,km1,ii)+wfp*f(i,j,min(k+1,nz),ii))) ) *dT  &
      &      ) /Vol(i,j,k)
 ! -------------------------------------------------------------
+
        if(f_n(i,j,k,ii).lt.0) then
            write(6,*) "f_n(ii,i,j,k) lt zero",ii,i,j,k,f_n(i,j,k,ii)
            write(6,*) "f,Vol_prev,V/V",f(i,j,k,ii),Vol_prev(i,j,k),Vol_prev(i,j,k)/Vol(i,j,k)
@@ -109,9 +120,10 @@ write(6,*)
            write(6,*) "u,v,w:p1",ux(ip1,j,k),vx(i,jp1,k),w_wsink(i,j,k+1)
            write(6,*) "V,Vip1",Vol(i,j,k),Vol(ip1,j,k)
            write(6,*) "V,Vjp1",Vol(i,j,k),Vol(i,jp1,k)
+           write(6,*) "im1,ip1,fm1, fp1", im1, ip1, f(im1,j,k,ii), f(ip1,j,k,ii) 
            write(6,*) "ufm*fm1,ufp*fp1",ufm*f(im1,j,k,ii),ufp*f(ip1,j,k,ii)
            write(6,*) "vfm*fm1,vfp*fp1",vfm*f(i,jm1,k,ii),vfp*f(i,jp1,k,ii)
-           write(6,*) "wfm*fm1,wfp*fp1",wfm*f(i,j,km1,ii),vfp*f(i,j,min(k+1,nz),ii)
+           write(6,*) "fkm1, fkp1, wfm*fm1, wfp*fp1", f(i,j,km1,ii), f(i,j,min(k+1,nz),ii), wfm*f(i,j,km1,ii), wfp*f(i,j,min(k+1,nz),ii)
            write(6,*)
            write(6,*) "u",ux(i-2,j,k),ux(im1,j,k),ux(i,j,k),ux(ip1,j,k),ux(i+2,j,k)
            write(6,*) "u_mps",ux(im1,j,k)*dx(im1,j)/Vol(im1,j,k),ux(i,j,k)*dx(i,j)/Vol(i,j,k),ux(ip1,j,k)*dx(ip1,j)/Vol(ip1,j,k)
@@ -130,7 +142,7 @@ write(6,*)
          do j = 1,jm
          do i = 1,im
             nz = nza(i,j)
-          do k=1,nz
+          do k = 1, nz
              f(i,j,k,:) = f_n(i,j,k,:)
           enddo
          enddo

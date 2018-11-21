@@ -212,6 +212,10 @@ enddo
     ! Compute starting time of run in seconds since Model_dim::iYr0:
       START_SECONDS = &
       TOTAL_SECONDS( iYr0, iYrS, iMonS, iDayS, iHrS, iMinS, iSecS )
+
+      PRINT*, "iYr0, iYrS, iMonS, iDayS, iHrS, iMinS, iSecS = ", iYr0, iYrS, iMonS, iDayS, iHrS, iMinS, iSecS
+      PRINT*, "In ReadInput START_SECONDS = ", START_SECONDS
+
 #ifdef DEBUG
       write(6,*) "In ReadInput"
       write(6,*) "StartSeconds",START_SECONDS
