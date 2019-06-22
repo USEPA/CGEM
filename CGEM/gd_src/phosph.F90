@@ -98,9 +98,6 @@ REAL :: ALG               ! Total phytoplankton concentration (dia+gre)
    POPL = FPLD*BMD(i,j,k)*ALGP + FPLP*(1.0-GREFF)*PRD(i,j,k)*APCP
    POPR = FPRD*BMD(i,j,k)*ALGP + FPRP*(1.0-GREFF)*PRD(i,j,k)*APCP
 
-   PRINT*, "f(JRSP), f(JDOP), f(JGRE) = ", f(JSRP), f(JDOP), f(JGRE)  
-   PRINT*, "PO4D = ", PO4D
-
    DTM(JSRP) = DTM(JSRP) + PO4D 
    DTM(JDOP) = DTM(JDOP) + DOP 
    DTM(JLOP) = DTM(JLOP) + POPL 
@@ -122,9 +119,6 @@ REAL :: ALG               ! Total phytoplankton concentration (dia+gre)
    PO4G = (FPIG * BMG(i,j,k) - PG(i,j,k) * FRAC_SRP) * ALGP + & 
            FPIP * (1.0 - GREFF) * PRG(i,j,k) * APCP
 
-   PRINT*, "BMG(i,j,k), PG(i,j,k), PRG(i,j,k)  = ",  BMG(i,j,k), PG(i,j,k), PRG(i,j,k)
-   PRINT*, "FPIG, FPIP, FRAC_SRP = ", FPIG, FPIP, FRAC_SRP
-
    IF (AVFRAC*f(JDOP) > 0.0) THEN
       FRAC_DOP = AVFRAC*f(JDOP)/(f(JSRP) + AVFRAC*f(JDOP))
    ELSE
@@ -134,8 +128,6 @@ REAL :: ALG               ! Total phytoplankton concentration (dia+gre)
            FPDP*(1.0-GREFF)*PRG(i,j,k)*APCP
    POPL = FPLG*BMG(i,j,k)*ALGP + FPLP*(1.0-GREFF)*PRG(i,j,k)*APCP
    POPR = FPRG*BMG(i,j,k)*ALGP + FPRP*(1.0-GREFF)*PRG(i,j,k)*APCP
-
-   PRINT*, "PO4G = ", PO4G
 
    DTM(JSRP) = DTM(JSRP) + PO4G
    DTM(JDOP) = DTM(JDOP) + DOP 
@@ -174,7 +166,6 @@ REAL :: ALG               ! Total phytoplankton concentration (dia+gre)
 !------------------------------------------------------------------------------
    RPOPZOO = FPRZ*APCP*ZDEATH                               
 
-   PRINT*, "PO4ZOO = ", PO4ZOO
 !------------------------------------------------------------------------------
 !  PO4 time derivative
 !------------------------------------------------------------------------------
@@ -208,9 +199,6 @@ REAL :: ALG               ! Total phytoplankton concentration (dia+gre)
    MNLDOP  = KDOP*FTMNL(i,j,k)*f(JDOP)
    HDRLPOP = KPOPL*FTHDR(i,j,k)*f(JLOP)
    HDRRPOP = KPOPR*FTHDR(i,j,k)*f(JROP)
-
-   PRINT*, "MNLDOP, HDRLPOP, HDRRPOP   = ", MNLDOP, HDRLPOP, HDRRPOP 
-   PRINT*, "HDRRPOP + HDRLPOP - MNLDOP = ", HDRRPOP + HDRLPOP - MNLDOP
 
    DTM(JSRP) = DTM(JSRP) + MNLDOP 
    DTM(JDOP) = DTM(JDOP) + HDRRPOP + HDRLPOP - MNLDOP

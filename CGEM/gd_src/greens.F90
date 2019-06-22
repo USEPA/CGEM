@@ -137,8 +137,6 @@ BMG(i,j,k) = BMRG * EXP(KTBG * (TEMP - TRG))
        FN = MIN(NFG(i,j,k),PFG(i,j,k))       ! Nutrient limitation
    ENDIF
    PG(i,j,k) = PMG * FN * IFG(i,j,k) * TFG(i,j,k)      ! Production
-
-   PRINT*, "PMG, FN, PFG(i,j,k), IFG(i,j,k), TFG(i,j,k) = ", PMG, FN, PFG(i,j,k), IFG(i,j,k), TFG(i,j,k)
    
    IF (PG(i,j,k) < 0.0) PG(i,j,k) = 0.0
 

@@ -1071,6 +1071,19 @@ ALLOCATE(IFG(im,jm,km))     ! Light limitation for greens
 
 ALLOCATE(TFG(im,jm,km))     ! Temperature limitation for greens
 
+!------------------------------------------------------------------------------
+! Initialize arrays to zero.
+!------------------------------------------------------------------------------
+PFD = 0.0
+SFD = 0.0
+NFD = 0.0
+IFD = 0.0
+TFD = 0.0
+PFG = 0.0
+NFG = 0.0
+IFG = 0.0
+TFG = 0.0
+
 !Droop
 ALLOCATE(QND(im,jm,km))  
 ALLOCATE(QPD(im,jm,km))  

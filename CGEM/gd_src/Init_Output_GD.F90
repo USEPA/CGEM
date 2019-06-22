@@ -50,5 +50,7 @@
 
        CALL WRITE_DATA( im, jm, km, nf, tinit, dumf)
 
+       CALL WRITE_EXTRA_DATA( im, jm, km, EXTRA_VARIABLES, tinit)
+
        return
        End Subroutine Init_Output_GD

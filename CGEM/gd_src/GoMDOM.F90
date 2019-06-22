@@ -117,8 +117,7 @@ endif
  do j = 1,jm
      do i = 1,im 
          nz = nza(i,j)
-      do k = 1, nz
-         PRINT*, "f(i,j,k,JDOP), DTM(i,j,k,JDOP) * dTime = ", f(i,j,k,JDOP), DTM(i,j,k,JDOP) * dTime 
+      do k = 1, nz 
          f(i,j,k,:) = max(f(i,j,k,:) + DTM(i,j,k,:) * dTime, 0.0)
       enddo
    enddo      ! end of do i block do loop
