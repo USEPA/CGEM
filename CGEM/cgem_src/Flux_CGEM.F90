@@ -183,7 +183,8 @@ if(Which_fluxes(iSOC).eq.1) then
 elseif(Which_fluxes(iSOC).eq.2.or.Which_fluxes(iSOC).eq.3) then
 !Justic and Wang sediment oxygen consumption
      tau=0.
-     call JW_SOC(O2Flux,NH4Flux,PO4Flux,CBODW(myi,j),f(myi,j,nz,iA(1):iA(nospA)),Esed(myi,j),f(myi,j,nz,iO2),T(i,j,nz),tau(myi,j),myi,j)
+     call JW_SOC(O2Flux,NH4Flux,PO4Flux,CBODW(myi,j),f(myi,j,nz,iA(1):iA(nospA)),Esed(myi,j),f(myi,j,nz,iO2), &
+       T(i,j,nz),tau(myi,j),myi,j)
 !O2
                f(myi,j,nz,iO2) = AMAX1(f(myi,j,nz,iO2)    + O2Flux/  &
      & dz(i,j,nz)*dT/SDay,0.)
@@ -249,8 +250,8 @@ if(Which_Fluxes(iSDM).eq.1) then
 !        if(init.eq.1.or.mod(istep,288).eq.0) then  !Call every day, every 288 timesteps, assumes timestep = 5 min
 !           call Sediment_Diagenesis_Flux(dT*288,f(i,j,nz,:),T(i,j,nz),S(i,j,nz),pH(i,j,nz),sedflux(i,j,:),s_x1A(i,j,nz),&
            call Sediment_Diagenesis_Flux(dT,f(myi,j,nz,:),T(i,j,nz),S(i,j,nz),pH(myi,j,nz),sedflux(myi,j,:),s_x1A(myi,j,nz),&
-     & s_y1A(myi,j,nz),s_z1A(myi,j,nz),s_x2A(myi,j,nz),s_y2A(myi,j,nz),s_z2A(myi,j,nz),s_x1Z(myi,j,nz),s_y1Z(myi,j,nz),s_z1Z(myi,j,nz), &
-     & s_x2Z(myi,j,nz),s_y2Z(myi,j,nz),s_z2Z(myi,j,nz),YY_init(myi,j,:),pph_init(myi,j,:) )
+     & s_y1A(myi,j,nz),s_z1A(myi,j,nz),s_x2A(myi,j,nz),s_y2A(myi,j,nz),s_z2A(myi,j,nz),s_x1Z(myi,j,nz),s_y1Z(myi,j,nz), &
+     & s_z1Z(myi,j,nz), s_x2Z(myi,j,nz),s_y2Z(myi,j,nz),s_z2Z(myi,j,nz),YY_init(myi,j,:),pph_init(myi,j,:) )
 !        endif
 
 !DIC Exchange
@@ -280,8 +281,8 @@ if(Which_Fluxes(iSDM).eq.1) then
      &   * sedflux(myi,j,sDOC)/dz(i,j,nz)*dT/SDay
        f(myi,j,nz,iOM2_R) = AMAX1(f(myi,j,nz,iOM2_R)-sedflux_iOM2_R,0.)
 
-       sedflux_iOM2_BC = f(myi,j,nz,iOM2_bc) / (f(myi,j,nz,iOM2_A) + f(myi,j,nz,iOM2_Z) + f(myi,j,nz,iOM2_R) + f(myi,j,nz,iOM2_bc)) &
-     & * sedflux(myi,j,sDOC)/dz(i,j,nz)*dT/SDay
+       sedflux_iOM2_BC = f(myi,j,nz,iOM2_bc) / (f(myi,j,nz,iOM2_A) + f(myi,j,nz,iOM2_Z) + f(myi,j,nz,iOM2_R) + & 
+           f(myi,j,nz,iOM2_bc)) * sedflux(myi,j,sDOC)/dz(i,j,nz)*dT/SDay
        f(myi,j,nz,iOM2_bc) = AMAX1(f(myi,j,nz,iOM2_bc)-sedflux_iOM2_bc,0.)
 
 !OM1 Exchange for OM1_A and OM1_Z

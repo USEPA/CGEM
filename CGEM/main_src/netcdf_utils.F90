@@ -157,11 +157,14 @@ CONTAINS
     !populate var locations
     info%varLocs=-1
     do i=1, info%nvars
-      if(info%varNames(i) .eq. 'X' .or. info%varNames(i) .eq. 'x' .or. info%varNames(i) .eq. 'I' .or. info%varNames(i) .eq. 'i') then
+      if(info%varNames(i) .eq. 'X' .or. info%varNames(i) .eq. 'x' .or. info%varNames(i) .eq. 'I' &
+      .or. info%varNames(i) .eq. 'i') then
         info%varLocs(1) = i
-      else if (info%varNames(i) .eq. 'Y' .or. info%varNames(i) .eq. 'y' .or. info%varNames(i) .eq. 'J' .or. info%varNames(i) .eq. 'j') then
+      else if (info%varNames(i) .eq. 'Y' .or. info%varNames(i) .eq. 'y' .or. info%varNames(i) .eq. 'J' &
+      .or. info%varNames(i) .eq. 'j') then
         info%varLocs(2) = i
-      else if (info%varNames(i) .eq. 'Z' .or. info%varNames(i) .eq. 'z' .or. info%varNames(i) .eq. 'K' .or. info%varNames(i) .eq. 'k') then
+      else if (info%varNames(i) .eq. 'Z' .or. info%varNames(i) .eq. 'z' .or. info%varNames(i) .eq. 'K' &
+      .or. info%varNames(i) .eq. 'k') then
         info%varLocs(3) = i
       else if (info%varNames(i) .eq. 'TIME' .or. info%varNames(i) .eq. 'Time' .or. info%varNames(i) .eq. 'time') then
         info%varLocs(4) = i

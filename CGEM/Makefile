@@ -15,8 +15,8 @@
 
 ### Build options for specific platforms. 
 ### LIBS has path to netCDF
-SOL_INC	  = -I. -I/usr/local/apps/netcdf-4.3.3/intel-15.0/include/
-SOL_LIBS  = -L/usr/local/apps/netcdf-4.3.3/intel-15.0/lib -lnetcdff -lnetcdf
+ATMOS_INC   = -I. -I/usr/local/apps/pnetcdf-1.9.0/intel-18.0/include -I/usr/local/apps/netcdf-4.6.3/intel-18.0/include/
+ATMOS_LIBS  = -L. -L/usr/local/apps/pnetcdf-1.9.0/intel-18.0/lib -lpnetcdf -L/usr/local/apps/netcdf-4.6.3/intel-18.0/lib -lnetcdff -lnetcdf
 
 IRIS_INC  = -I. -I/usr/local/apps/netcdf-4.4.0/gcc-4.4.7/include/
 IRIS_LIBS = -L. -L/usr/local/apps/netcdf-4.4.0/gcc-4.4.7/lib/ -lnetcdff -lnetcdf -L/usr/local/apps/pnetcdf-1.6.1/intel-15.0/lib -lpnetcdf
@@ -48,16 +48,16 @@ ifeq (iris,$(findstring iris,$(MY_HOST)))
   F90      = mpiifort
   FFLAGS = -warn all -traceback -no-diag-error-limit -implicitnone -convert big_endian -ftz -D_MPI#-check -debug -g       #-g -fbacktrace -Wall 
 else 
-ifeq (sol,$(findstring sol,$(MY_HOST)))
-  INC	   = $(SOL_INC)
-  LIBS	   = $(SOL_LIBS)
-  F90     = gfortran 
-  FFLAGS =  
+ifeq (atmos,$(findstring atmos,$(MY_HOST)))
+  INC	   = $(ATMOS_INC)
+  LIBS	   = $(ATMOS_LIBS)
+  F90     = mpiifort 
+  FFLAGS = -D_MPI
 else
   INC      = $(OTHER_INC)
   LIBS     = $(OTHER_LIBS)
-  F90    = mpifort 
-  FFLAGS = -ffree-line-length-none -D_MPI
+  F90    = mpif90 
+  FFLAGS = -D_MPI
 endif
 endif
 
