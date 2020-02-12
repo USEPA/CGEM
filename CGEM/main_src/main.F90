@@ -132,6 +132,7 @@
    write(6,*) "TC_8=", TC_8
 #endif
     if(myid.eq.0) then
+      Vol_prev = Vol
       if (Which_gridio.eq.1) then
         !Vol_prev = Vol
         call USER_update_EFDC_grid(TC_8,T_8)
@@ -143,7 +144,6 @@
         call USER_update_POM_grid()
       endif
     endif
-      Vol_prev = Vol
     if(numprocs.gt.1) then
       call MPI_BCAST(depth,im*jm,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
       call MPI_BCAST(d,im*jm*km,MPI_REAL,0,MPI_COMM_WORLD,mpierr)

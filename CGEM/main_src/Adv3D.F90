@@ -38,7 +38,7 @@
 
 ! --------loop over each variable
      do ii = 1,nf
-
+     
 ! -------------------------------------------------------------------
       do j = 1,jm
       myi = 1
@@ -48,8 +48,9 @@
        ip1 = min0(i+1,im)
        jm1 = max0(j-1,1)
        jp1 = min0(j+1,jm)
-       myim1 = myi-1
-       myip1 = myi+1
+
+       myim1 = max0(myi-1,1)
+       myip1 = min0(myi+1,im)
 !     w_wsink means 'w' with sinking terms
 !     at surface sink = 0.
       w_wsink (i,j,1) = wx(i,j,1)
@@ -62,7 +63,7 @@
 
 !If wsm=0 (shelf), then set sinking velocity to zero as well...
 !     at bottom (w=0) add settling or deep ocean (wsm=1)
-      w_wsink (i,j,nz+1) = wx(i,j,nsl) + ws(ii)*real(wsm(i,j),4)*area(i,j)
+      w_wsink (i,j,nz+1) = wx(i,j,nz+1) + ws(ii)*real(wsm(i,j),4)*area(i,j)
 
 ! -------------------------------------------------------------
       do k = 1, nz       ! do layer by layer
@@ -77,6 +78,7 @@
         wfm = amax1(-w_wsink(i,j,k  ),0.)       ! p0/np
         wfp = amax1( w_wsink(i,j,k+1),0.)       ! pp/n0
 !                   p0/nn             pn/n0
+
         cfh = ( (ux(i,j,k)-ufm) - (ux(ip1,j,k)+ufp) )               &
      &       +( (vx(i,j,k)-vfm) - (vx(i,jp1,k)+vfp) )
         cf  = cfh + ((w_wsink(i,j,k+1)-wfp)-(w_wsink(i,j,k)+wfm))

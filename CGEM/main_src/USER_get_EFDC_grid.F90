@@ -93,6 +93,7 @@ write(6,*)
                  write(6,*) "where nz(i,j)=",nza(i,j)
                  write(6,*) "dz",dz(i,j,k)
                  write(6,*) "depth",depth(i,j)
+                 write(6,*) "Stopping b/c dz <= 0"
                  stop
            endif
            d_sfc(i,j,k) = sum(dz(i,j,1:(k-1))) + dz(i,j,k)/2. 
