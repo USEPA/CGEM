@@ -47,6 +47,7 @@ error
 *.out
 
 # Customized runtime files
+CGEM/data/MyFiles.inp
 CGEM/submit.sh
 CGEM/my_submit.sh
 CGEM/GEM_InputFile
