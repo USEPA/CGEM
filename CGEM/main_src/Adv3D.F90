@@ -34,7 +34,8 @@
        wx=0.
       endif
 
-      if(numprocs.gt.1) call AdvNeighbors(f,myim,jm,km,nsl,myid,numprocs)
+      !if(numprocs.gt.1) call AdvNeighbors(f,myim,jm,km,nsl,myid,numprocs)
+      if(numprocs.gt.1) call AdvNeighbors(f,myim,jm,km,nf,myid,numprocs)
 
 ! --------loop over each variable
      do ii = 1,nf
@@ -49,8 +50,30 @@
        jm1 = max0(j-1,1)
        jp1 = min0(j+1,jm)
 
-       myim1 = max0(myi-1,1)
-       myip1 = min0(myi+1,im)
+!       myim1 = max0(myi-1,1)
+!       myip1 = min0(myi+1,im)
+
+       if (i.eq.1) then
+         if (myid.eq.0)then
+            myim1 = 1
+         else
+            myim1 = max0(myi-1,1)
+         endif
+       else
+         myim1 = max0(myi-1,0)
+       endif
+
+       if (i.eq.im) then
+         if (myid.eq.(numprocs-1))then
+            myip1 = min0(myi,im)
+         else
+            myip1 = min0(myi+1,im)
+         endif
+       else
+         myip1 = min0(myi+1,im+1)
+       endif
+
+
 !     w_wsink means 'w' with sinking terms
 !     at surface sink = 0.
       w_wsink (i,j,1) = wx(i,j,1)
@@ -113,9 +136,9 @@
            write(6,*) "u",ux(i-2,j,k),ux(im1,j,k),ux(i,j,k),ux(ip1,j,k),ux(i+2,j,k)
            write(6,*) "v",vx(i,j-2,k),vx(i,jm1,k),vx(i,j,k),vx(i,jp1,k),vx(i,j+2,k)
            write(6,*) "w",wx(i,j,km1),wx(i,j,k),wx(i,j,k+1)
-           call MPI_BARRIER(MPI_COMM_WORLD,mpierr)
-           call MPI_FINALIZE(mpierr)
-           stop
+!           call MPI_BARRIER(MPI_COMM_WORLD,mpierr)
+!           call MPI_FINALIZE(mpierr)
+!           stop
        endif
       end do ! k = 1, nz
        myi=myi+1

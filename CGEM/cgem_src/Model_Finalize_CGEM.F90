@@ -9,7 +9,9 @@
 #ifdef DEBUG
        write(6,*) "myid,numprocs"
 #endif
-       if(myid.eq.0) CALL CLOSE_FILE()
+!       if(myid.eq.0) then
+         CALL CLOSE_FILE()
+!       endif
 
        return
 

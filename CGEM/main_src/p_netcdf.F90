@@ -46,7 +46,7 @@ integer(KIND=MPI_OFFSET_KIND),intent(in), dimension(*) :: starts, counts
 double precision, intent(inout) :: var(*)
 integer, intent(out) :: request
 integer :: res
-res=nfmpi_iput_var_double(id,ivar,var,request)
+res=nfmpi_iput_vara_double(id,ivar,starts,counts,var,request)
 return
 end
 
