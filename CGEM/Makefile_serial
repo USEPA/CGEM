@@ -13,39 +13,17 @@
 #DFLAGS = -Wall -Wextra -pedantic -fimplicit-none -fbacktrace -D_CGEM -DRDEBUG -DDEBUG 
 #DFLAGS = -g
 
-#Compiler can be INTEL or GNU
-COMPILER = INTEL   
-
 ### Build options for specific platforms. 
 ### LIBS has path to netCDF
+ATMOS_INC	  = -I. -I/usr/local/apps/netcdf-4.6.3/intel-18.0/include/
+ATMOS_LIBS  = -L/usr/local/apps/netcdf-4.6.3/intel-18.0/lib -lnetcdff -lnetcdf
 
-ifeq (INTEL,$(strip $(COMPILER)))
-#INTEL
-  ATMOS_INC	  = -I. -I/usr/local/apps/netcdf-4.6.3/intel-18.0/include/
-  ATMOS_LIBS  = -L/usr/local/apps/netcdf-4.6.3/intel-18.0/lib -lnetcdff -lnetcdf
+IRIS_INC  = -I. -I/usr/local/apps/netcdf-4.4.1/intel-17.0/include/
+IRIS_LIBS = -L. -L/usr/local/apps/netcdf-4.4.1/intel-17.0/lib/ -lnetcdff -lnetcdf
 
-  IRIS_INC  = -I. -I/usr/local/apps/netcdf-4.4.1/intel-17.0/include/
-  IRIS_LIBS = -L. -L/usr/local/apps/netcdf-4.4.1/intel-17.0/lib/ -lnetcdff -lnetcdf
-
-  OTHER_INC   = -I. -I/usr/local/include -I/usr/include/x86_64-linux-gnu/ -I/usr/include
-  #OTHER_LIBS  = -L. -L/usr/local/lib -lnetcdff -L/usr/local/bin -lnetcdf 
-  OTHER_LIBS  = -L. -L/usr/lib/x86_64-linux-gnu -lnetcdff -lnetcdf
-else
-ifeq (GNU,$(strip $(COMPILER)))
-#GNU
-  ATMOS_INC	  = -I. -I/usr/local/apps/netcdf-4.6.3/gcc-6.1.0/include/
-  ATMOS_LIBS  = -L/usr/local/apps/netcdf-4.6.3/gcc-6.1.0/lib -lnetcdff -lnetcdf
-
-  IRIS_INC  = -I. -I/usr/local/apps/netcdf-4.4.1/gcc-4.4.7/include/
-  IRIS_LIBS = -L. -L/usr/local/apps/netcdf-4.4.1/gcc-4.4.7/lib/ -lnetcdff -lnetcdf
-
-  OTHER_INC   = -I. -I/usr/local/include -I/usr/include/x86_64-linux-gnu/ -I/usr/include
-  #OTHER_LIBS  = -L. -L/usr/local/lib -lnetcdff -L/usr/local/bin -lnetcdf 
-  OTHER_LIBS  = -L. -L/usr/lib/x86_64-linux-gnu -lnetcdff -lnetcdf
-else
-$(error INVALID COMPILER TYPE)
-endif
-endif
+OTHER_INC   = -I. -I/usr/local/include -I/usr/include/x86_64-linux-gnu/ -I/usr/include
+#OTHER_LIBS  = -L. -L/usr/local/lib -lnetcdff -L/usr/local/bin -lnetcdf 
+OTHER_LIBS  = -L. -L/usr/lib/x86_64-linux-gnu -lnetcdff -lnetcdf
 ### =============== End User Modifiable Section  =============== ####
 include main_src/src_files_serial
 include moc_src/src_files
@@ -65,33 +43,15 @@ MY_HOST	  = $(shell hostname)
 ifeq (iris,$(findstring iris,$(MY_HOST)))
   INC	   = $(IRIS_INC)
   LIBS	   = $(IRIS_LIBS)
-  ifeq (INTEL,$(strip $(COMPILER)))
-    F90      = ifort
-    FFLAGS = 
-  else
-  ifeq (GNU,$(strip $(COMPILER)))
-    F90      = gfortran
-    FFLAGS = 
-  else
-    $(error INVALID COMPILER TYPE)
-  endif
-  endif
+  F90      = ifort
+  FFLAGS = 
 #  FFLAGS = -warn all -traceback -no-diag-error-limit -implicitnone -convert big_endian -ftz -D_MPI#-check -debug -g       #-g -fbacktrace -Wall 
 else 
 ifeq (atmos,$(findstring atmos,$(MY_HOST)))
   INC	   = $(ATMOS_INC)
   LIBS	   = $(ATMOS_LIBS)
-  ifeq (INTEL,$(strip $(COMPILER)))
-    F90     = ifort 
-    FFLAGS =  
-  else
-  ifeq (GNU,$(strip $(COMPILER)))
-    F90     = gfortran 
-    FFLAGS =  
-  else
-    $(error INVALID COMPILER TYPE)
-  endif
-  endif
+  F90     = ifort 
+  FFLAGS =  
 else
   INC      = $(OTHER_INC)
   LIBS     = $(OTHER_LIBS)

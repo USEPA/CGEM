@@ -1,4 +1,4 @@
-!======================================================================     
+!!======================================================================     
     Subroutine CGEM( TC_8, istep, istep_out, myid, numprocs )
 
 !======================================================================
@@ -433,14 +433,14 @@
                  & PAR_percent_k,                                      &
                  & PARbot     , PARdepth_k                         )
 
-#ifdef DEBUG_LIGHT
-                 write(6,*) "percent", PAR_percent_k(1),PAR_percent_k(6),PAR_percent_k(12),PAR_percent_k(20)
-                 write(6,*) "depth", PARdepth_k(1),PARdepth_k(6),PARdepth_k(12),PARdepth_k(20)
-                 write(6,*) "BC", m_OM_init,m_OM_BC,m_OM_sh
-                 write(6,*) "d_sfc,nz",d_sfc(i,j,:),nz
-                 write(6,*) "bot",PARbot
-                  write(6,*) "Chl,A,Z,SP,BC",Chla_tot_k(1),OM1A_k(1),OM1Z_k(1),OM1SPM_k(1),OM1BC_k(1)
-#endif
+!#ifdef DEBUG_LIGHT
+!                 write(6,*) "percent", PAR_percent_k(1),PAR_percent_k(6),PAR_percent_k(12),PAR_percent_k(20)
+!                 write(6,*) "depth", PARdepth_k(1),PARdepth_k(6),PARdepth_k(12),PARdepth_k(20)
+!                 write(6,*) "BC", m_OM_init,m_OM_BC,m_OM_sh
+!                 write(6,*) "d_sfc,nz",d_sfc(i,j,:),nz
+!                 write(6,*) "bot",PARbot
+!                  write(6,*) "Chl,A,Z,SP,BC",Chla_tot_k(1),OM1A_k(1),OM1Z_k(1),OM1SPM_k(1),OM1BC_k(1)
+!#endif
                  !-------------------------------------------------
          case (2)! Upgraded form of the original underwater light
                  ! model of Pete Eldridge is used. Now accounts for
@@ -481,7 +481,7 @@
                  !-------------------------------------------------
          case (3)! Light Model from GoMDOM, case with no wind speed
                  !-------------------------------------------------
-                  !GoMDOM's light model, no wind
+                 !GoMDOM's light model, no wind
                   if(nz.gt.0) call Light_GoMDOM(PARsurf, S_k, A_k, Z_k,    &
      &               OM1A_k, OM1Z_k, OM1SPM_k, OM1BC_k,        &
      &               dz(i,j,:), PAR_percent_k, PARbot, PARdepth_k, nz  )
@@ -493,13 +493,13 @@
 
         endif
 
-         ! Save array values for netCDF
-           PAR_percent_ijk(myi,j,1:nz) = PAR_percent_k(1:nz)
-           PARdepth_ijk(myi,j,1:nz) = PARdepth_k(1:nz)
-           Esed(myi,j) = Parbot !E in sediments, needed for flux
+!         ! Save array values for netCDF
+!           PAR_percent_ijk(myi,j,1:nz) = PAR_percent_k(1:nz)
+!           PARdepth_ijk(myi,j,1:nz) = PARdepth_k(1:nz)
+!           Esed(myi,j) = Parbot !E in sediments, needed for flux
 
 !---------------------End Underwater Light Model-----------------------------------
-
+!
 ! Update running total of current day's irradiance
          aRadSum_k(:) = aRadSum_k(:) + PARdepth_k(:)
          if (MOD(istep, StepsPerDay) .eq. 0) then ! If last time step of day
@@ -519,23 +519,24 @@
 ! Agrow_k(k) is the growth-rate  for
 ! vertical grid column (i,j) at cell (i,j,k).
 !-----------------------------------------------------------------------
+
        if(nz.gt.0) call calc_Agrow(  PARdepth_k,    T_k,                    &
      & Qn_k   , Qp_k, N_k, P_k, Si_k , A_k     , Agrow_k,                  &
      & uA_k, Aresp_k, uN_k, uP_k, uE_k, uSi_k, nz  )
 
 
 ! Save arrays to output to netCDF
-     do k = 1,nz
-      do isp = 1,nospA
-        uN_ijk(myi,j,k,isp) = uN_k(k,isp)
-        uP_ijk(myi,j,k,isp) = uP_k(k,isp)
-        uE_ijk(myi,j,k,isp) = uE_k(k,isp)
-        uA_ijk(myi,j,k,isp) = uA_k(k,isp)
-        uSi_ijk(myi,j,k,isp) = uSi_k(k,isp)
-        Chl_C_ijk(myi,j,k,isp) = Chl_C_k(isp,k)
-       enddo
-        Chla_tot_ijk(myi,j,k) = Chla_tot_k(k)
-      enddo
+!     do k = 1,nz
+!      do isp = 1,nospA
+!        uN_ijk(myi,j,k,isp) = uN_k(k,isp)
+!        uP_ijk(myi,j,k,isp) = uP_k(k,isp)
+!        uE_ijk(myi,j,k,isp) = uE_k(k,isp)
+!        uA_ijk(myi,j,k,isp) = uA_k(k,isp)
+!        uSi_ijk(myi,j,k,isp) = uSi_k(k,isp)
+!        Chl_C_ijk(myi,j,k,isp) = Chl_C_k(isp,k)
+!       enddo
+!        Chla_tot_ijk(myi,j,k) = Chla_tot_k(k)
+!      enddo
 !------end phytoplankton growth model-------------------------
 
 
@@ -640,7 +641,7 @@
 !-------------------------------------------------------------------------      
      Amort(isp)     = A_k(isp,k) * mA(isp)    ! dead phytoplankton (cells/m3/day)
 
-   !Monod Equations
+!   !Monod Equations
      Ntotal       = NO3 + NH4 
      monodN(isp)  = Ntotal/(Ntotal+Kn(isp))
      monodP(isp)  = PO4/(PO4+Kp(isp))
@@ -658,7 +659,11 @@
      RLN = 3
    endif
 
-!------------------------------------------------------------------------
+!   PRINT*,"RLN=",RLN
+!   PRINT*,"isp=",isp
+!   PRINT*,"vmaxN(isp)=",vmaxN(isp)
+
+!!------------------------------------------------------------------------
    if(Is_Day.eq.0) then  !Nutrient uptake only takes place during the day
         vN = 0
         vP = 0
@@ -676,7 +681,6 @@
      &      *( Ntotal/(Ntotal+aN(isp)*Kn(isp)) )
 
       elseif(RLN.eq.2) then
-
          vN = Q10_T(T_k(k),vmaxN(isp))*monodN(isp)*f_Qn(isp)&
      &      *( PO4/(PO4+aN(isp)*Kp(isp)) )
 
@@ -686,7 +690,6 @@
      &      *( PO4/(PO4+aN(isp)*Kp(isp)) )
 
       else
-
          vN = Q10_T(T_k(k),vmaxN(isp))*monodN(isp)*f_Qn(isp)&
      &      *( Si/(Si+aN(isp)*Ksi(isp)) )
 
@@ -901,15 +904,15 @@
 !------------------------------------------------------------
 ! Particulate and Dissolved fecal pellets, rate of remineralization
 !--------------------------------------------------------------
-if(s_y1Z(myi,j,k).lt.0) then
-write(6,*) "LT Zero at istep=",istep
-!write(6,*) "myid,myi,j,k,start,end,myim",myid,myi,j,k,myi_start,myi_end,myim
-!write(6,*) "Z1,Z2,O2,NO3,KG1,KG2,KO2",OM1_Z, OM2_Z, O2, NO3, KG1, KG2, KO2 
-!write(6,*) "KstarO2,KNO3,s_x1Z,sy1z",KstarO2, KNO3,s_x1Z(myi,j,k), s_y1Z(myi,j,k)
-!write(6,*) "z1z,x2z,y2z,z2z",s_z1Z(myi,j,k), s_x2Z(myi,j,k), s_y2Z(myi,j,k), s_z2Z(myi,j,k)
-!write(6,*) "T",T_k(k)
-!stop
-endif
+!if(s_y1Z(myi,j,k).lt.0) then
+!write(6,*) "LT Zero at istep=",istep
+!!write(6,*) "myid,myi,j,k,start,end,myim",myid,myi,j,k,myi_start,myi_end,myim
+!!write(6,*) "Z1,Z2,O2,NO3,KG1,KG2,KO2",OM1_Z, OM2_Z, O2, NO3, KG1, KG2, KO2 
+!!write(6,*) "KstarO2,KNO3,s_x1Z,sy1z",KstarO2, KNO3,s_x1Z(myi,j,k), s_y1Z(myi,j,k)
+!!write(6,*) "z1z,x2z,y2z,z2z",s_z1Z(myi,j,k), s_x2Z(myi,j,k), s_y2Z(myi,j,k), s_z2Z(myi,j,k)
+!!write(6,*) "T",T_k(k)
+!!stop
+!endif
         call reaction( OM1_Z, OM2_Z, O2, NO3, KG1, KG2, KO2, KstarO2, KNO3,               &
      &  s_x1Z(myi,j,k), s_y1Z(myi,j,k), s_z1Z(myi,j,k), s_x2Z(myi,j,k), s_y2Z(myi,j,k), s_z2Z(myi,j,k), T_k(k), RC )
         RC       = one_d_365 * RC   !Change units from /year to /day
@@ -925,7 +928,7 @@ endif
         RALK_Z     = RC(9)
         RN2_Z      = RC(10)
 
-!write(6,*) "2. s_y1Z",myi,j,k,s_y1Z(myi,j,k)
+!!write(6,*) "2. s_y1Z",myi,j,k,s_y1Z(myi,j,k)
 
 !------------------------------------------------------------
 ! Particulate and Dissolved riverine OM, rate of remineralization 
@@ -971,8 +974,8 @@ endif
            KG2 = KG2_save
        endif
 
-!--------------------------------------------------------------------
-! Sum remineralization terms from dead phytoplankton, fecal pellets, and riverine particulate
+!!--------------------------------------------------------------------
+!! Sum remineralization terms from dead phytoplankton, fecal pellets, and riverine particulate
   RO2   = RO2_A  + RO2_Z  + RO2_R  + RO2_BC - 2.*R_11  ! (mmol-O2/m3/d)
   RNO3  = RNO3_A + RNO3_Z + RNO3_R + RNO3_BC + R_11    ! (mmol-NO3/m3/d)
   RNH4  = RNH4_A + RNH4_Z + RNH4_R + RNH4_BC - R_11    ! (mmol-NH4/m3/d)
@@ -982,17 +985,17 @@ endif
   RALK  = RALK_A + RALK_Z + RALK_R + RALK_BC - 2.*R_11 ! (mmol-HCO3/m3/d)
   RN2   = RN2_A + RN2_Z + RN2_R + RN2_BC         ! (mmol-N2/m3/d)
        !Save for netCDF
-       RN2_ijk(myi,j,k) = RN2_ijk(myi,j,k) + (2*RN2)*dTd
-       RO2_A_ijk(myi,j,k) = RO2_A_ijk(myi,j,k) + (RO2_A)*dTd 
-       RO2_Z_ijk(myi,j,k) = RO2_Z_ijk(myi,j,k) + (RO2_Z)*dTd
-       RO2_R_ijk(myi,j,k) = RO2_R_ijk(myi,j,k) + (RO2_R)*dTd
-       RO2_BC_ijk(myi,j,k) = RO2_BC_ijk(myi,j,k) + (RO2_BC)*dTd
+!       RN2_ijk(myi,j,k) = RN2_ijk(myi,j,k) + (2*RN2)*dTd
+!       RO2_A_ijk(myi,j,k) = RO2_A_ijk(myi,j,k) + (RO2_A)*dTd 
+!       RO2_Z_ijk(myi,j,k) = RO2_Z_ijk(myi,j,k) + (RO2_Z)*dTd
+!       RO2_R_ijk(myi,j,k) = RO2_R_ijk(myi,j,k) + (RO2_R)*dTd
+!       RO2_BC_ijk(myi,j,k) = RO2_BC_ijk(myi,j,k) + (RO2_BC)*dTd
 
 
 ! Save RO2 as CBODW
   CBODW(myi,j) = RO2 !The last time this happens, k=nz, so will be the bottom
 !--------------------------------------------------------------------
-
+!
 !---------------------------------------------------------------------
 ! Stoichiometry - calculate C:N:P ratios for Remineralization equations
 !---------------------------------------------------------------------
@@ -1010,7 +1013,7 @@ do isp=1,nospA
    OM1_CA = OM1_CA + Amort(isp)*(Qn_k(isp,k)-QminN(isp))/Qn_k(isp,k)*Qc(isp)
    OM1_NA = OM1_NA + Amort(isp)*(Qn_k(isp,k)-QminN(isp))
    OM1_PA = OM1_PA + Amort(isp)*(Qn_k(isp,k)-QminN(isp))/Qn_k(isp,k)*Qp_k(isp,k)
-!Dissolved
+!!Dissolved
    OM2_CA = OM2_CA + Amort(isp)*QminN(isp)/Qn_k(isp,k)*Qc(isp)
    OM2_NA = OM2_NA + Amort(isp)*QminN(isp)
    OM2_PA = OM2_PA + Amort(isp)*QminN(isp)/Qn_k(isp,k)*Qp_k(isp,k)
@@ -1019,7 +1022,7 @@ do isp=1,nospA
    OM1_CA = OM1_CA + Amort(isp)*(Qp_k(isp,k)-QminP(isp))/Qp_k(isp,k)*Qc(isp)
    OM1_NA = OM1_NA + Amort(isp)*(Qp_k(isp,k)-QminP(isp))/Qp_k(isp,k)*Qn_k(isp,k)
    OM1_PA = OM1_PA + Amort(isp)*(Qp_k(isp,k)-QminP(isp))
-!Dissolved
+!!Dissolved
    OM2_CA = OM2_CA + Amort(isp)*QminP(isp)/Qp_k(isp,k)*Qc(isp)
    OM2_NA = OM2_NA + Amort(isp)*QminP(isp)/Qp_k(isp,k)*Qn_k(isp,k)
    OM2_PA = OM2_PA + Amort(isp)*QminP(isp)
@@ -1061,7 +1064,7 @@ enddo
     s_y2A(myi,j,k) = stoich_y2A
     s_z2A(myi,j,k) = stoich_z2A
 
-!-- Organic Matter from fecal pellets ---------------------------------
+!!-- Organic Matter from fecal pellets ---------------------------------
     OM1_Ratio = SUM( (Qn_k(:,k)-QminN)/Qn_k(:,k)*A_k(:,k))/SUM(A_k(:,k))
     OM2_Ratio = SUM( (QminN/Qn_k(:,k))*A_k(:,k))/SUM(A_k(:,k))
 
@@ -1229,10 +1232,10 @@ enddo
 !----------------------------
        ff(myi,j,k,iCDOM) =  AMAX1(f(myi,j,k,iCDOM)*(1.0 - KGcdom*dTd), 0.0)  
 
-!---------------------------------------------------------------------
-!----------------------------
-!-ALK: (mmol-HCO3/m3)
-!----------------------------
+!!---------------------------------------------------------------------
+!!----------------------------
+!!-ALK: (mmol-HCO3/m3)
+!!----------------------------
        ff(myi,j,k,iALK) =  AMAX1(f(myi,j,k,iALK) +                 &
       & (RALK + AupN*NO3/(NO3+NH4) - AupN*NH4/(NO3+NH4) + AupP + 4.8*AupP)*dTd, 0.0) 
                 
@@ -1267,67 +1270,75 @@ enddo
 
 !-- Call "Extra" variables for netCDF --------------------------------------------------------
 !--------------------------------------------------------
-  ! -- do initialization of first timestep:
-      if (   istep .eq. 1 ) then
-                 CALL WRITE_EXTRA_DATA( myi_start,myim, 1,jm, 1,km, 0, &
-                                     PARdepth_ijk, &
-                                  PAR_percent_ijk, &
-                                        uN_ijk, &
-                                        uP_ijk, &
-                                        uE_ijk, &
-                                        uA_ijk, &
-                                     Chla_tot_ijk, &
-                                            s_x1A, &
-                                            s_y1A, &
-                                            s_x2A, &
-                                            s_y2A, &
-                                            s_x1Z, &
-                                            s_y1Z, &
-                                            s_x2Z, &
-                                            s_y2Z, &
-                                       uSi_ijk,    &
-                                       Chl_C_ijk,  &
-                                              pH,  &
-                                         RN2_ijk,  &
-                                         RO2_A_ijk,  &
-                                         RO2_Z_ijk,RO2_BC_ijk,RO2_R_ijk   )
-     endif  !end of EXTRA_DATA initialization 
-!write(6,*) "999 RN2_ijk",RN2_ijk(28,18,1)
-!write(6,*) "999 PARdepth_ijk",PARdepth_ijk(28,18,1)
-!write(6,*) "PARpercent",PAR_percent_ijk(28,18,1)
-!write(6,*) "un",uN_ijk(28,18,1,:)
-!write(6,*) "Chla",Chla_tot_ijk(28,18,1)
-!write(6,*) "999 s_y1Z",myi,j,k,s_y1Z(28,18,1)
-!stop
-  ! --- dump output when istep is a multiple of iout
-      if (  mod( istep, iout ) .eq. 0 ) then
-                 CALL WRITE_EXTRA_DATA( myi_start,myim,1,jm, 1,km, istep_out+1, &
-                                     PARdepth_ijk, &
-                                  PAR_percent_ijk, &
-                                        uN_ijk, &
-                                        uP_ijk, &
-                                        uE_ijk, &
-                                        uA_ijk, &
-                                     Chla_tot_ijk, &
-                                            s_x1A, &
-                                            s_y1A, &
-                                            s_x2A, &
-                                            s_y2A, &
-                                            s_x1Z, &
-                                            s_y1Z, &
-                                            s_x2Z, &
-                                            s_y2Z, &
-                                       uSi_ijk,    &
-                                       Chl_C_ijk,  &
-                                              pH,  &
-                                          RN2_ijk, &
-                                         RO2_A_ijk,  &
-                                         RO2_Z_ijk,RO2_BC_ijk,RO2_R_ijk   )
-     endif  !end of "if (mod(istep,iout).eq.0)" block if
+!  ! -- do initialization of first timestep:
+!      if (   istep .eq. 1 ) then
+!          PRINT*,"istep = 1"
+!          if (uN_ijk(1,1,1,1) .eq. -9999) then
+!            PRINT*, "-9999 found istep = 1"
+!          end if
+!                 CALL WRITE_EXTRA_DATA( myi_start,myim, 1,jm, 1,km, 0, &
+!                                     PARdepth_ijk, &
+!                                  PAR_percent_ijk, &
+!                                        uN_ijk, &
+!                                        uP_ijk, &
+!                                        uE_ijk, &
+!                                        uA_ijk, &
+!                                     Chla_tot_ijk, &
+!                                            s_x1A, &
+!                                            s_y1A, &
+!                                            s_x2A, &
+!                                            s_y2A, &
+!                                            s_x1Z, &
+!                                            s_y1Z, &
+!                                            s_x2Z, &
+!                                            s_y2Z, &
+!                                       uSi_ijk,    &
+!                                       Chl_C_ijk,  &
+!                                              pH,  &
+!                                         RN2_ijk,  &
+!                                         RO2_A_ijk,  &
+!                                         RO2_Z_ijk,RO2_BC_ijk,RO2_R_ijk   )
+!     endif  !end of EXTRA_DATA initialization 
+!!write(6,*) "999 RN2_ijk",RN2_ijk(28,18,1)
+!!write(6,*) "999 PARdepth_ijk",PARdepth_ijk(28,18,1)
+!!write(6,*) "PARpercent",PAR_percent_ijk(28,18,1)
+!!write(6,*) "un",uN_ijk(28,18,1,:)
+!!write(6,*) "Chla",Chla_tot_ijk(28,18,1)
+!!write(6,*) "999 s_y1Z",myi,j,k,s_y1Z(28,18,1)
+!!stop
+!  ! --- dump output when istep is a multiple of iout
+!      if (  mod( istep, iout ) .eq. 0 ) then
+!                 PRINT*,"Calling WRITE_EXTRA_DATA for istep=",istep
+!                 if (uN_ijk(1,1,1,1) .eq. -9999) then
+!                    PRINT*, "-9999 found istep =",istep
+!                 end if
+!                 CALL WRITE_EXTRA_DATA( myi_start,myim,1,jm, 1,km, istep_out+1, &
+!                                     PARdepth_ijk, &
+!                                  PAR_percent_ijk, &
+!                                        uN_ijk, &
+!                                        uP_ijk, &
+!                                        uE_ijk, &
+!                                        uA_ijk, &
+!                                     Chla_tot_ijk, &
+!                                            s_x1A, &
+!                                            s_y1A, &
+!                                            s_x2A, &
+!                                            s_y2A, &
+!                                            s_x1Z, &
+!                                            s_y1Z, &
+!                                            s_x2Z, &
+!                                            s_y2Z, &
+!                                       uSi_ijk,    &
+!                                       Chl_C_ijk,  &
+!                                              pH,  &
+!                                          RN2_ijk, &
+!                                         RO2_A_ijk,  &
+!                                         RO2_Z_ijk,RO2_BC_ijk,RO2_R_ijk   )
+!     endif  !end of "if (mod(istep,iout).eq.0)" block if
 
-#ifdef DEBUG
-   write(6,*) "A=",f(1,1,1,1),"at istep=",istep
-#endif
+!#ifdef DEBUG
+!   write(6,*) "A=",f(1,1,1,1),"at istep=",istep
+!#endif
 
    return
    END Subroutine CGEM 

@@ -13,37 +13,16 @@
 #DFLAGS = -Wall -Wextra -pedantic -fimplicit-none -fbacktrace -D_CGEM -DRDEBUG -DDEBUG 
 #DFLAGS = -g
 
-#Compiler can be INTEL or GNU
-COMPILER = INTEL
-
 ### Build options for specific platforms. 
 ### LIBS has path to netCDF
+ATMOS_INC   = -I. -I/usr/local/apps/pnetcdf-1.9.0/intel-18.0/include -I/usr/local/apps/netcdf-4.6.3/intel-18.0/include/
+ATMOS_LIBS  = -L. -L/usr/local/apps/pnetcdf-1.9.0/intel-18.0/lib -lpnetcdf -L/usr/local/apps/netcdf-4.6.3/intel-18.0/lib -lnetcdff -lnetcdf
 
-ifeq (INTEL,$(strip $(COMPILER)))
-#INTEL
-  ATMOS_INC   = -I. -I/usr/local/apps/pnetcdf-1.9.0/intel-18.0/include -I/usr/local/apps/netcdf-4.6.3/intel-18.0/include/
-  ATMOS_LIBS  = -L. -L/usr/local/apps/pnetcdf-1.9.0/intel-18.0/lib -lpnetcdf -L/usr/local/apps/netcdf-4.6.3/intel-18.0/lib -lnetcdff -lnetcdf
+IRIS_INC  = -I. -I/usr/local/apps/netcdf-4.4.1/intel-17.0/include/
+IRIS_LIBS = -L. -L/usr/local/apps/netcdf-4.4.1/intel-17.0/lib/ -lnetcdff -lnetcdf -L/usr/local/apps/pnetcdf-1.6.1/intel-15.0/lib -lpnetcdf
 
-  IRIS_INC  = -I. -I/usr/local/apps/netcdf-4.4.1/intel-17.0/include/
-  IRIS_LIBS = -L. -L/usr/local/apps/netcdf-4.4.1/intel-17.0/lib/ -lnetcdff -lnetcdf -L/usr/local/apps/pnetcdf-1.6.1/intel-15.0/lib -lpnetcdf
-
-  OTHER_INC   = -I. -I/usr/local/include -I/usr/include/x86_64-linux-gnu/ -I/usr/include
-  OTHER_LIBS  = -L/usr/lib/x86_64-linux-gnu/ -lpnetcdf -L/usr/local/lib -lnetcdff -L/usr/local/bin -lnetcdf 
-else
-ifeq (GNU,$(strip $(COMPILER)))
-#GNU
-  ATMOS_INC   = -I. -I/usr/local/apps/pnetcdf-1.9.0/intel-18.0/include -I/usr/local/apps/netcdf-4.6.3/intel-18.0/include/
-  ATMOS_LIBS  = -L. -L/usr/local/apps/pnetcdf-1.9.0/intel-18.0/lib -lpnetcdf -L/usr/local/apps/netcdf-4.6.3/intel-18.0/lib -lnetcdff -lnetcdf
-
-  IRIS_INC  = -I. -I/usr/local/apps/netcdf-4.4.1/intel-17.0/include/
-  IRIS_LIBS = -L. -L/usr/local/apps/netcdf-4.4.1/intel-17.0/lib/ -lnetcdff -lnetcdf -L/usr/local/apps/pnetcdf-1.6.1/intel-15.0/lib -lpnetcdf
-
-  OTHER_INC   = -I. -I/usr/local/include -I/usr/include/x86_64-linux-gnu/ -I/usr/include
-  OTHER_LIBS  = -L/usr/lib/x86_64-linux-gnu/ -lpnetcdf -L/usr/local/lib -lnetcdff -L/usr/local/bin -lnetcdf 
-else
-  $(error INVALID COMPILER TYPE)
-endif
-endif
+OTHER_INC   = -I. -I/usr/local/include -I/usr/include/x86_64-linux-gnu/ -I/usr/include
+OTHER_LIBS  = -L/usr/lib/x86_64-linux-gnu/ -lpnetcdf -L/usr/local/lib -lnetcdff -L/usr/local/bin -lnetcdf 
 
 ### =============== End User Modifiable Section  =============== ####
 #include main_src/src_just_par
@@ -66,33 +45,15 @@ MY_HOST	  = $(shell hostname)
 ifeq (iris,$(findstring iris,$(MY_HOST)))
   INC	   = $(IRIS_INC)
   LIBS	   = $(IRIS_LIBS)
-ifeq (INTEL,$(strip $(COMPILER)))
   F90      = mpiifort
   FFLAGS = -D_MPI
-else
-ifeq (GNU,$(strip $(COMPILER)))
-  F90     = mpiifort 
-  FFLAGS = -D_MPI
-else
-$(error INVALID COMPILER TYPE)
-endif
-endif
 #  FFLAGS = -warn all -traceback -no-diag-error-limit -implicitnone -convert big_endian -ftz -D_MPI#-check -debug -g       #-g -fbacktrace -Wall 
 else 
 ifeq (atmos,$(findstring atmos,$(MY_HOST)))
   INC	   = $(ATMOS_INC)
   LIBS	   = $(ATMOS_LIBS)
-ifeq (INTEL,$(strip $(COMPILER)))
   F90     = mpiifort 
   FFLAGS = -D_MPI
-else
-ifeq (GNU,$(strip $(COMPILER)))
-  F90     = mpiifort 
-  FFLAGS = -D_MPI
-else
-$(error INVALID COMPILER TYPE)
-endif
-endif
 else
   INC      = $(OTHER_INC)
   LIBS     = $(OTHER_LIBS)

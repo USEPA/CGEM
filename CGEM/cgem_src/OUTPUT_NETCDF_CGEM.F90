@@ -616,7 +616,7 @@ CONTAINS
     ! Locals:
     INTEGER ERR, FILE_TIMESTEP, VARIABLE, INDEX
     INTEGER(KIND=MPI_OFFSET_KIND) STARTS(4),COUNTS(4)
-    INTEGER REQUEST_COUNT
+    INTEGER REQUEST_COUNT, REQUEST
 
     FILE_TIMESTEP = TIMESTEP - FILE_FIRST_TIMESTEP
 
@@ -921,6 +921,13 @@ CONTAINS
 !write(6,*) "Chla",Chla_mg_tot(28,18,1)
 !write(6,*) "19 s_y1Z",s_y1FP(28,18,1)
 
+
+    ERR = ncdf_WAIT_ALL( FILE_ID, REQUEST_COUNT, REQUESTS, STATUSES)
+    CALL CHKERR( ERR, 'implement non-blocking interface' )
+
+    DO REQUEST = 1, REQUEST_COUNT
+      CALL CHKERR( STATUSES( REQUEST ), 'nonblocking call ' )
+    END DO
 
     CALL FLUSH_FILE() ! Flush buffers to disk in case of crash.
 
