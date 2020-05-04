@@ -30,6 +30,7 @@ read(999,*)
 read(999,*) iYrS,iMonS,iDayS,iHrS,iMinS,iSecS
 read(999,*) iYrE,iMonE,iDayE,iHrE,iMinE,iSecE
 read(999,*) dT, dT_out
+PRINT*,"Just read dT=",dT
 read(999,*) icent_jcent_units
 read(999,*) icent_in, jcent_in
 icent = INT(icent_in)
@@ -479,7 +480,7 @@ call MPI_BCAST(KHDENITR,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
 call MPI_BCAST(KHDONT,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
 call MPI_BCAST(KHOCOD,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
 call MPI_BCAST(KHODOC,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-call MPI_BCAST(KRDO,im*jm*nsl,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(KRDO,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
 call MPI_BCAST(RCDO,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
 call MPI_BCAST(RNTO,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
 
@@ -546,6 +547,10 @@ endif
       write(6,*) "iYr0",iYr0, iYrS, iMonS, iDayS, iHrS, iMinS, iSecS
       write(6,*) "START_SECONDS",START_SECONDS,START_SECONDS/3600./24./365.
 #endif
+      PRINT*,"START_SECONDS = ",START_SECONDS
+      PRINT*,"END_SECONDS = ",END_SECONDS
+      PRINT*,"dT=",dT
+
       nstep = ( END_SECONDS - START_SECONDS ) / dT !number of timesteps in a run
       iout = dT_out/dT !output time-interval in timesteps
 

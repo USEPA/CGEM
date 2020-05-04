@@ -6,7 +6,7 @@
 
        integer, intent(in) :: myid,numprocs
 
-       if(myid.eq.0) CALL CLOSE_FILE()
+       CALL CLOSE_FILE()
 
        return
 
