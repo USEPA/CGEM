@@ -1,8 +1,0 @@
-# This is the list of objects to compile. Edit as necessary to reflect
-# source file changes.
-# Note modules must be compiled in bottom-up dependency order.
-
-SER_OBJ  =  serial.o\
-	MPI_dummy.o\
-	AdvNeighborsOrdered_fake.o\
-	s_netcdf.o

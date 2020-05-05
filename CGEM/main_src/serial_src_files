@@ -1,3 +1,0 @@
-SERIAL_OBJ = MPI_dummy.o\
-	serial.o\
-	AdvNeighborsOrdered_fake.o

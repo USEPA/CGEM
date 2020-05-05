@@ -1,8 +1,0 @@
-# This is the list of objects to compile. Edit as necessary to reflect
-# source file changes.
-# Note modules must be compiled in bottom-up dependency order.
-
-PAR_OBJ  =  \
-	serial_fake.o\
-	p_netcdf.o\
-	PNETCDF_UTILITIES.o

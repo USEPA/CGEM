@@ -1,2 +1,0 @@
-PAR_OBJ = serial_fake.o\
-	AdvNeighborsOrdered.o 

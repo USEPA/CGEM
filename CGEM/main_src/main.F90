@@ -18,7 +18,7 @@
 !                    D.S.Ko/NRL
 !                    Wei Tang/EMVL
 !                    Louis Olszyk/EMVL
-!     Simplified by Lisa Lowe.  This is my fish tank.  September 21, 2014
+!                    Cody Simmons/EMVL
 ! -----------------------------------------------------------------------
 
       USE Model_dim
@@ -57,9 +57,13 @@
       call MPI_COMM_RANK(MPI_COMM_WORLD, myid, mpierr)
       call MPI_COMM_SIZE(MPI_COMM_WORLD, numprocs, mpierr)
       mpitime1 = MY_WTIME()
+!      mpitime1 = MPI_Wtime()
+      PRINT*,"mpitime1=",mpitime1, " with myid=",myid
 
 ! --- Command Line Arguments for file names ---
-      if(myid.eq.0) call Command_Line_Args(Which_code,input_filename,init_filename,BASE_NETCDF_OUTPUT_FILE_NAME)
+      if(myid.eq.0) then
+        call Command_Line_Args(Which_code,input_filename,init_filename,BASE_NETCDF_OUTPUT_FILE_NAME)
+      endif
       if(numprocs.gt.1) then 
        call MPI_BCAST(Which_code,6,MPI_CHARACTER,0,MPI_COMM_WORLD,mpierr)
        call MPI_BCAST(input_filename,120,MPI_CHARACTER,0,MPI_COMM_WORLD,mpierr)
@@ -74,7 +78,6 @@
 
 ! Read_InputFile must define nstep, iout, dT, START_SECONDS
       call Read_InputFile(input_filename,Which_code,myid,numprocs) 
-
 #ifdef DEBUG
       write(6,*) "----After Read_InputFile"
       write(6,*) "  start,dT",START_SECONDS, dT
@@ -109,7 +112,6 @@
       call MPI_BCAST(Vol,im*jm*km,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
     endif
 
-
 !--------------------------------
 ! --- get land/water and shelf masks
 !--------------------------------
@@ -120,6 +122,7 @@
       call MPI_BCAST(fm,im*jm*km,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
      endif
 
+     
       call Set_Vars(Which_code,init_filename,myid,numprocs) !initialize 'f' array
 
       call Initialize_Output(Which_code,BASE_NETCDF_OUTPUT_FILE_NAME,myid,numprocs)     !Open file and write initial configuration
@@ -170,12 +173,13 @@
         if(Which_gridio.ne.0.and.myid.eq.0) write(6,*) "output=",istep_out+1
         call Model_Output(Which_Code,istep_out,myid,numprocs)
        endif
-
       enddo
 
       Call Model_Finalize(Which_code,Which_gridio,myid,numprocs) ! Closes the NetCDF files and whatever else
 
       mpitime2 = MY_WTIME()
+!      mpitime2 = MPI_Wtime()
+      PRINT*,"mpitime2=",mpitime2, " with myid=",myid
       if(myid.eq.0) write(6,*) "Code took",mpitime2-mpitime1,"seconds"
 
       call MPI_FINALIZE(mpierr)
