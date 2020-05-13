@@ -2,6 +2,8 @@
 
        use Hydro, only:close_hydro_netcdf
        use Grid, only:close_grid_netcdf
+       USE Riverload, only:Close_RiverLoad_NetCDF
+       USE BoundaryConcentration, only:Close_BoundaryConcentration_NetCDF
 
        IMPLICIT NONE
 
@@ -12,6 +14,10 @@
       if (Which_gridio.ne.0.and.myid.eq.0) then
         Call Close_Hydro_NetCDF()
         Call Close_Grid_NetCDF()
+        if (Which_gridio.eq.1) then
+          Call Close_RiverLoad_NetCDF()
+          Call Close_BoundaryConcentration_NetCDF()
+        endif
       endif
 
       !Right now these just close the output netCDF files

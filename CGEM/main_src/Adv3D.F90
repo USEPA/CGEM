@@ -76,9 +76,11 @@
 
 !     w_wsink means 'w' with sinking terms
 !     at surface sink = 0.
-      w_wsink (i,j,1) = wx(i,j,1)
+      nz = nza(i,j)
 
-       nz = nza(i,j)
+      if (nz .gt. 0) then
+        w_wsink (i,j,1) = wx(i,j,1)
+      end if
 
       do k = 2,nz 
         w_wsink(i,j,k) = wx(i,j,k) + ws(ii)*area(i,j)
@@ -86,7 +88,13 @@
 
 !If wsm=0 (shelf), then set sinking velocity to zero as well...
 !     at bottom (w=0) add settling or deep ocean (wsm=1)
-      w_wsink (i,j,nz+1) = wx(i,j,nz+1) + ws(ii)*real(wsm(i,j),4)*area(i,j)
+      if (nz .gt. 0) then
+        if (nz .eq. km) then
+          w_wsink (i,j,nz+1) = ws(ii)*real(wsm(i,j),4)*area(i,j)
+        else
+          w_wsink (i,j,nz+1) = wx(i,j,nz+1) + ws(ii)*real(wsm(i,j),4)*area(i,j)
+        endif
+      endif
 
 ! -------------------------------------------------------------
       do k = 1, nz       ! do layer by layer
@@ -136,9 +144,9 @@
            write(6,*) "u",ux(i-2,j,k),ux(im1,j,k),ux(i,j,k),ux(ip1,j,k),ux(i+2,j,k)
            write(6,*) "v",vx(i,j-2,k),vx(i,jm1,k),vx(i,j,k),vx(i,jp1,k),vx(i,j+2,k)
            write(6,*) "w",wx(i,j,km1),wx(i,j,k),wx(i,j,k+1)
-!           call MPI_BARRIER(MPI_COMM_WORLD,mpierr)
-!           call MPI_FINALIZE(mpierr)
-!           stop
+           call MPI_BARRIER(MPI_COMM_WORLD,mpierr)
+           call MPI_FINALIZE(mpierr)
+           stop
        endif
       end do ! k = 1, nz
        myi=myi+1

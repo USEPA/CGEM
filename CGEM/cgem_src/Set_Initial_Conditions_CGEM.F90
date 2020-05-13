@@ -5,13 +5,15 @@
        USE CGEM_Vars
        USE Grid 
        USE State_Vars
+       USE BoundaryConcentration
 
        IMPLICIT NONE
 
        integer, intent(in) :: myid, numprocs
        character(200) :: filename
        character(120), intent(in) :: init_filename
-       integer i,j,k,myi
+       integer i,j,k,nz,myi
+       integer :: ibc, jbc    ! Indices of boundary grid cells.
 
        if(InitializeHow.eq.0) then 
 
@@ -49,6 +51,20 @@
           stop
 
        endif
+
+       ! Initialize concentrations of boundary cells
+       do i = 1, nBC            ! Loop over boundary cells
+          ibc = bcIJ(i,1)  ! Extract the i index of grid cell 
+          jbc = bcIJ(i,2)  ! Extract the j index of grid cell 
+          nz = nza(ibc,jbc)
+          do k = 1, nz       ! Loop over the sigma layers
+             f(ibc,jbc,k,iNO3) = BCvar2(i) * 1.0e3 / 14.01
+             f(ibc,jbc,k,iNH4) = BCvar3(i) * 1.0e3 / 14.01
+             f(ibc,jbc,k,iPO4) = BCvar6(i) * 1.0e3 / 30.97
+             f(ibc,jbc,k,iO2) =  BCvar9(i) * 1.0e3 / 32.0
+          enddo
+       enddo
+
 
        !call InitError_Check_CGEM()
 #ifdef DEBUG

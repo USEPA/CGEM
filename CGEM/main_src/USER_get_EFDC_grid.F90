@@ -29,6 +29,7 @@
       do i=1,im
          read(19,*) sdetg(i,:)
       enddo
+      close(19)
 
 
       do j=1,jm

@@ -6,6 +6,8 @@
        USE Grid
        USE DATE_TIME
        USE Hydro
+       USE RiverLoad
+       USE BoundaryConcentration
        use mpi_interface
 
        IMPLICIT NONE
@@ -61,6 +63,32 @@
           call interpVar(hydro_info(eKh), TC_8, startIndex(eKh), Kh)   
 !          call interpVar(hydro_info(eE), TC_8, startIndex(eE), E)  
           call interpVar(hydro_info(eE), T_8, startIndex(eE), E)
+
+! River vars
+          if (nRiv > 0) then
+              call interpRiverVar(riverload_info(eVar1), TC_8, startRivIndex(eVar1), Var1)
+              call interpRiverVar(riverload_info(eVar2), TC_8, startRivIndex(eVar2), Var2)
+              call interpRiverVar(riverload_info(eVar3), TC_8, startRivIndex(eVar3), Var3)
+              call interpRiverVar(riverload_info(eVar4), TC_8, startRivIndex(eVar4), Var4)
+              call interpRiverVar(riverload_info(eVar5), TC_8, startRivIndex(eVar5), Var5)
+              call interpRiverVar(riverload_info(eVar6), TC_8, startRivIndex(eVar6), Var6)
+              call interpRiverVar(riverload_info(eVar7), TC_8, startRivIndex(eVar7), Var7)
+              call interpRiverVar(riverload_info(eVar8), TC_8, startRivIndex(eVar8), Var8)
+              call interpRiverVar(riverload_info(eVar9), TC_8, startRivIndex(eVar9), Var9)
+          endif
+
+          ! Boundary concentration variables
+          if (nBC > 0) then
+              call interpBcVar(boundaryconcentration_info(eBCvar1), TC_8, startBcIndex(eBCvar1), BCvar1)
+              call interpBcVar(boundaryconcentration_info(eBCvar2), TC_8, startBcIndex(eBCvar2), BCvar2)
+              call interpBcVar(boundaryconcentration_info(eBCvar3), TC_8, startBcIndex(eBCvar3), BCvar3)
+              call interpBcVar(boundaryconcentration_info(eBCvar4), TC_8, startBcIndex(eBCvar4), BCvar4)
+              call interpBcVar(boundaryconcentration_info(eBCvar5), TC_8, startBcIndex(eBCvar5), BCvar5)
+              call interpBcVar(boundaryconcentration_info(eBCvar6), TC_8, startBcIndex(eBCvar6), BCvar6)
+              call interpBcVar(boundaryconcentration_info(eBCvar7), TC_8, startBcIndex(eBCvar7), BCvar7)
+              call interpBcVar(boundaryconcentration_info(eBCvar8), TC_8, startBcIndex(eBCvar8), BCvar8)
+              call interpBcVar(boundaryconcentration_info(eBCvar9), TC_8, startBcIndex(eBCvar9), BCvar9)
+          endif
 
           if (Which_gridio.eq.3) then
             call interpVar(hydro_info(eRad), TC_8, startIndex(eRad), Rad)

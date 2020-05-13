@@ -45,6 +45,14 @@
 
       call Grid_allocate(myid)
 
+#ifdef map_code
+      write(6,*) "---Set_Grid----"
+      write(6,*) "  Allocated Grid in Grid_allocate"
+      write(6,*) "  Reading nza for 0D and EFDC, setting nza=km for NCOM"
+      write(6,*) "  *** nza really should be zero if land, but is set to km here in Set_Grid"
+      write(6,*)
+#endif
+
 if(myid.eq.0) then
       if (Which_gridio .eq. 0 .OR. Which_gridio .eq. 1) then   ! used for basic and EFDC grids
          write(filename,'(A, A)') trim(DATADIR),'/nz.dat'

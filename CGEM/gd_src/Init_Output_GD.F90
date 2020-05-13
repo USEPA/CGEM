@@ -55,6 +55,9 @@
         enddo
 
         CALL WRITE_DATA( myi_start, myim, 1,jm, 1, km, nf,0, dumf)
+
+!        CALL WRITE_EXTRA_DATA(im, jm , km, EXTRA_VARIABLES, tinit)
+
         CALL MPI_BARRIER( MPI_COMM_WORLD,mpierr ) ! Wait until file is updated.
 
        return

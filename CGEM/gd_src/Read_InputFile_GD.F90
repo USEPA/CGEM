@@ -153,6 +153,8 @@ read(999,*) KDP           ! KDP: min DOP mineral
 read(999,*) KDPALG        ! KDPALG: DOP alg dependence
 read(999,*) 
 read(999,*) KDWD          ! KDWD: Specifies light attenuation eqn, default=0
+read(999,*) KE            ! KE: Background light attenuation [m^-1]
+read(999,*) KECHL         ! KECHL: Light attenuation factor for chlorophyll-a [m^2-kg^-1]
 read(999,*) 
 read(999,*) KHDONT_SED    ! KHDONT_SED
 read(999,*) KHN           ! KHN: Organic N Decay Half Saturation Constant

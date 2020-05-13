@@ -24,6 +24,8 @@
       USE Model_dim
       USE Grid
       USE Hydro
+      USE RiverLoad
+      USE BoundaryConcentration
       USE State_Vars
       USE INPUT_VARS
       USE serial
@@ -75,6 +77,8 @@
       call Set_Grid(myid,numprocs)
       call Allocate_Input_Vars(Which_code)
       call Allocate_Hydro
+      if (nRiv > 0) call Allocate_RiverLoads()
+      if (nBC  > 0) call Allocate_BoundaryConcentrations()
 
 ! Read_InputFile must define nstep, iout, dT, START_SECONDS
       call Read_InputFile(input_filename,Which_code,myid,numprocs) 
@@ -87,6 +91,8 @@
       TC_8 = START_SECONDS - (dT / 2) ! Subtract half dT to 'center' of timestep.
       if (Which_gridio .gt. 0.and.myid.eq.0) then
         call Init_Hydro_NetCDF()
+        if (nRiv > 0) call Init_RiverLoad_NetCDF()
+        if (nBC  > 0) call Init_BoundaryConcentration_NetCDF()
       endif
   
       call Get_Vars(TC_8,T_8,myid,numprocs) !Hydro for initial timestep 
@@ -156,7 +162,7 @@
       call MPI_BCAST(Vol_prev,im*jm*km,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
     endif
 
-       call Get_Vars(TC_8,T_8,myid,numprocs) !Hydro, Solar, Wind, Temp, Salinity
+       call Get_Vars(TC_8,T_8,myid,numprocs) !Hydro, Solar, Wind, Temp, Salinity, and riverloads
 
        call USER_update_masks()
 

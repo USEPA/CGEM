@@ -9,6 +9,7 @@ USE STATES
 USE EUT
 USE INPUT_VARS, ONLY:Read_Solar
 USE LIGHT_VARS, ONLY:PARfac
+USE FLAGS, ONLY: KDWD
 
 IMPLICIT NONE
 
@@ -37,23 +38,29 @@ if(Read_Solar.eq.2) Rad_Watts = Rad/4.57
      myi = 1
      do i = myi_start,myi_end
         nz = nza(i,j)
-       if(nz.ge.0) then
-      do k = 1, nz
-         SAL_TERM = 1.084E-06 * (S(i,j,k)**4)
-
-          IF ((f(myi,j,k,JDIA) + f(myi,j,k,JGRE)) < 1.0E-07) THEN
-               CHL_TERM = 0.0
-          ELSE
-               CHL_TERM = 0.2085 * LOG( (f(myi,j,k,JDIA) * 1.0E6 / CCHLD) + &
-                        & (f(myi,j,k,JGRE) * 1.0E6 / CCHLG) )
-          ENDIF
-
-          POC_TERM = 0.7640 * SQRT( (f(myi,j,k,JLOC) * 1.0E3) +  &
-                   & (f(myi,j,k,JROC) * 1.0E3) + (f(myi,j,k,JZOO) * 1.0E3) )
-
-          KESS(k) = ( ( -0.10 * (-0.5606 - SAL_TERM + CHL_TERM + POC_TERM) ) &
-                  &  + 1 ) ** (1.0/(-0.10))
-      enddo
+       if(nz.gt.0) then
+         if (KDWD .eq. 1) then
+           do k = 1, nz
+             KESS(k) = KE + KECHL * (f(myi,j,k,JDIA) / CCHLD + f(myi,j,k,JGRE) / CCHLG)
+           enddo
+         else
+           do k = 1, nz
+             SAL_TERM = 1.084E-06 * (S(i,j,k)**4)
+    
+             IF ((f(myi,j,k,JDIA) + f(myi,j,k,JGRE)) < 1.0E-07) THEN
+                   CHL_TERM = 0.0
+             ELSE
+                   CHL_TERM = 0.2085 * LOG( (f(myi,j,k,JDIA) * 1.0E6 / CCHLD) + &
+                            & (f(myi,j,k,JGRE) * 1.0E6 / CCHLG) )
+             ENDIF
+    
+             POC_TERM = 0.7640 * SQRT( (f(myi,j,k,JLOC) * 1.0E3) +  &
+                      & (f(myi,j,k,JROC) * 1.0E3) + (f(myi,j,k,JZOO) * 1.0E3) )
+    
+             KESS(k) = ( ( -0.10 * (-0.5606 - SAL_TERM + CHL_TERM + POC_TERM) ) &
+                     &  + 1 ) ** (1.0/(-0.10))
+           enddo
+         endif
 
       DO k = 1,1
          IATTOP    =  Rad_Watts(i,j)

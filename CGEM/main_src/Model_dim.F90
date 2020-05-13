@@ -19,6 +19,8 @@ IMPLICIT NONE
       INTEGER, SAVE :: Which_gridio
       CHARACTER(200), SAVE :: DATADIR
       INTEGER, SAVE :: iYr0 ! Reference year all timestamps are relative to.
+      INTEGER, SAVE :: nRiv
+      INTEGER, SAVE :: nBC
 !For parallel runs
       INTEGER, SAVE :: myim !Number of cells in i direction on the processor
       INTEGER, SAVE :: myi_start !location of first array index WRT full grid
@@ -57,6 +59,8 @@ if(myid.eq.0) then
       read(19,*) nospZ
       read(19,*) Which_gridio
       read(19,*) iYr0
+      read(19,*) nRiv
+      read(19,*) nBC
       close(19)
       
       if(Which_gridio.eq.2 .or. Which_gridio.eq.3) then

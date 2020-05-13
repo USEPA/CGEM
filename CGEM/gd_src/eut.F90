@@ -364,6 +364,9 @@ REAL :: KDP                         ! Minimum dissolved organic phosphorous
 REAL :: KDPALG                      ! Dissolved phosphorous mineralization
                                               ! algal proportionality dependence [m^3-kg^-1-s^-1] 
 
+REAL :: KE                          ! Background light attenuation
+
+REAL :: KECHL                       ! Light attenuation factor for chlorophyll-a [m^2-kg^-1]
 
 REAL :: KHN                         ! Organic nitrogen decay
                                               ! half saturation constant [kg-m^-3]
@@ -721,6 +724,9 @@ DATA KDP/5.0E-07/                     ! Minimum dissolved organic phosphorous
 DATA KDPALG/2.3E-03/               ! Dissolved phosphorous mineralization
                                               ! algal proportionality dependence [m^3-kg^-1-s^-1] 
 
+DATA KE/0.15/                      ! Background light attenuation [m^-1]
+
+DATA KECHL/1.7E+04/                ! Light attenuation factor for chlorophyll-a [m^2-kg^-1]
 
 DATA KHN/2.5E-05/                     ! Organic nitrogen decay
                                               ! half saturation constant [kg-m^-3]
@@ -1061,6 +1067,19 @@ ALLOCATE(NFG(im,jm,km))     ! Nitrogen limitation for greens
 ALLOCATE(IFG(im,jm,km))     ! Light limitation for greens
 
 ALLOCATE(TFG(im,jm,km))     ! Temperature limitation for greens
+
+!------------------------------------------------------------------------------
+! Initialize arrays to zero.
+!------------------------------------------------------------------------------
+PFD = 0.0
+SFD = 0.0
+NFD = 0.0
+IFD = 0.0
+TFD = 0.0
+PFG = 0.0
+NFG = 0.0
+IFG = 0.0
+TFG = 0.0
 
 !Droop
 ALLOCATE(QND(im,jm,km))  
