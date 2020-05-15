@@ -53,5 +53,6 @@ MAIN_OBJ  =  fillval.o\
 	Transport.o\
 	Adv3D.o\
         VMixing.o\
+        HMixing.o\
 	Model_Output.o\
 	Model_Finalize.o

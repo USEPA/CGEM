@@ -14,6 +14,7 @@ USE Which_Flux
 USE InRemin
 USE FLAGS, ONLY : DoDroop
 USE LIGHT_VARS, ONLY: PARfac
+USE RiverLoad
 
 IMPLICIT NONE
 
@@ -21,7 +22,9 @@ INTEGER*8, INTENT(IN) :: TC_8
 REAL :: DTM(im,jm,km,nf),PAR(im,jm,km)
 REAL :: SETRATE(nf)
 INTEGER :: i,j,k,nz
-REAL dTime
+INTEGER :: icell, jcell
+REAL :: dTime
+REAL :: rivLoadConvFactor
 
 dTime = real(dT)
 
@@ -113,6 +116,21 @@ endif
 
 endif
 
+! ----------------------------------------------------------------------
+! Add river loads. 
+! ----------------------------------------------------------------------
+do i = 1, nriv            ! Loop over the rivers
+   icell = riversIJ(i,1)  ! Extract the i index of grid cell where river discharges
+   jcell = riversIJ(i,2)  ! Extract the j index of grid cell where river discharges
+!   PRINT*, 'River loads: i, icell, jcell = ', i, icell, jcell
+   do k = 1, nsl          ! Loop over the sigma layers
+      rivLoadConvFactor = weights(i,k) / Vol(icell,jcell,k)
+!      PRINT*, 'k, weights(i,k), Vol, Factor = ', k, weights(i,k), Vol(icell,jcell,k), rivLoadConvFactor
+      DTM(icell,jcell,k,JTR) = DTM(icell,jcell,k,JTR) +  &
+                            & Var1(i) * rivLoadConvFactor
+!      PRINT*, 'i, k, Var1(i), f(i,j,k,JTR) = ', i, k, Var1(i), f(icell,jcell,k,JTR)
+   enddo
+enddo
 
  do j = 1,jm
      do i = 1,im 
@@ -139,7 +157,8 @@ if(Which_Fluxes(iInRemin).eq.2) then
  do j = 1,jm
      do i = 1,im
          nz = nza(i,j)
-       if(nz.ge.0.and.wsm(i,j).eq.0) then
+!       if(nz.ge.0.and.wsm(i,j).eq.0) then
+       if(nz > 0 .and. fm(i,j,1) == 1) then
          SETRATE(:) = f(i,j,nz,:)*area(i,j)*(-ws(:))
          f(i,j,nz,:) = max(f(i,j,nz,:)  - (SETRATE(:)/Vol(i,j,nz)) * dTime,0.)
        endif !End of if(nza(i,j) statement

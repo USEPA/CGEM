@@ -1,8 +1,14 @@
+!********************************************************************
+! PURPOSE: Get_Vars.F90 - Updates time-dependent variables.
+!
+! Revised: 04/27/2020 Wilson Melendez, Added horizontal dispersion
+!                                      variables.
+!
+!******************************************************************** 
        Subroutine Get_Vars(TC_8,T_8) 
 
        USE Model_dim
-       USE INPUT_VARS, ONLY: START_SECONDS,&
-     & Read_T, Read_Sal, Read_Solar, Read_Wind
+       USE INPUT_VARS, ONLY: START_SECONDS, Read_T, Read_Sal, Read_Solar, Read_Wind
        USE Grid
        USE DATE_TIME
        USE Hydro
@@ -13,7 +19,7 @@
 
        integer(kind=8), intent(in) :: TC_8, T_8 ! Current time in seconds since Model_dim::iYr0.
        integer(kind=8) :: TC_in
-       integer, save :: init=1
+       integer, save :: init = 1
        integer i,j,k
 
         TC_in = TC_8
@@ -39,7 +45,7 @@
           endif
   
           if(Read_Wind.eq.0) then
-            Wind=5.
+            Wind = 5.
           else
             call USER_Read_Wind(TC_in,Wind)
           endif
@@ -54,21 +60,22 @@
           call interpVar(hydro_info(eUx), TC_8, startIndex(eUx), Ux)   
           call interpVar(hydro_info(eVx), TC_8, startIndex(eVx), Vx)   
           call interpVar(hydro_info(eWx), TC_8, startIndex(eWx), Wx)   
-          call interpVar(hydro_info(eKh), TC_8, startIndex(eKh), Kh)   
-!          call interpVar(hydro_info(eE), TC_8, startIndex(eE), E)  
+          call interpVar(hydro_info(eKh), TC_8, startIndex(eKh), Kh)    
           call interpVar(hydro_info(eE), T_8, startIndex(eE), E)
+          call interpVar(hydro_info(eDx), TC_8, startIndex(eDx), Dispx)
+          call interpVar(hydro_info(eDy), TC_8, startIndex(eDy), Dispy)
 
           ! River vars
           if (nRiv > 0) then
               call interpRiverVar(riverload_info(eVar1), TC_8, startRivIndex(eVar1), Var1)
-              call interpRiverVar(riverload_info(eVar2), TC_8, startRivIndex(eVar2), Var2)
-              call interpRiverVar(riverload_info(eVar3), TC_8, startRivIndex(eVar3), Var3)
-              call interpRiverVar(riverload_info(eVar4), TC_8, startRivIndex(eVar4), Var4)
-              call interpRiverVar(riverload_info(eVar5), TC_8, startRivIndex(eVar5), Var5)
-              call interpRiverVar(riverload_info(eVar6), TC_8, startRivIndex(eVar6), Var6)
-              call interpRiverVar(riverload_info(eVar7), TC_8, startRivIndex(eVar7), Var7)
-              call interpRiverVar(riverload_info(eVar8), TC_8, startRivIndex(eVar8), Var8)
-              call interpRiverVar(riverload_info(eVar9), TC_8, startRivIndex(eVar9), Var9)
+!              call interpRiverVar(riverload_info(eVar2), TC_8, startRivIndex(eVar2), Var2)
+!              call interpRiverVar(riverload_info(eVar3), TC_8, startRivIndex(eVar3), Var3)
+!              call interpRiverVar(riverload_info(eVar4), TC_8, startRivIndex(eVar4), Var4)
+!              call interpRiverVar(riverload_info(eVar5), TC_8, startRivIndex(eVar5), Var5)
+!              call interpRiverVar(riverload_info(eVar6), TC_8, startRivIndex(eVar6), Var6)
+!              call interpRiverVar(riverload_info(eVar7), TC_8, startRivIndex(eVar7), Var7)
+!              call interpRiverVar(riverload_info(eVar8), TC_8, startRivIndex(eVar8), Var8)
+!              call interpRiverVar(riverload_info(eVar9), TC_8, startRivIndex(eVar9), Var9)
           endif
 
           ! Boundary concentration variables

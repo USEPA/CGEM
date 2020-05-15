@@ -266,5 +266,6 @@ write(999,*) ws(JRON)  ! VRON
 write(999,*) ws(JLOP)  ! VLOP
 write(999,*) ws(JROP)  ! VROP
 write(999,*) ws(JSU)   ! VSU
+write(999,*) ws(JTR)   ! VTR
 
 END Subroutine Write_InputFile_GD

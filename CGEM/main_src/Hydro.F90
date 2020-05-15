@@ -1,23 +1,33 @@
+!********************************************************************
+! PURPOSE: Hydro.F90 - Declares and initializes hydrodynamic
+!                      variables.
+!
+! Revised: 04/27/2020 Wilson Melendez, Added horizontal dispersion
+!                                      variables.
+!
+!******************************************************************** 
       MODULE Hydro 
 
       USE netcdf_utils
 
       IMPLICIT NONE
 
-      real,allocatable,save :: S(:,:,:) !Salinity
-      real,allocatable,save :: T(:,:,:) !Temperature, C
+      real,allocatable,save :: S(:,:,:)  !Salinity
+      real,allocatable,save :: T(:,:,:)  !Temperature, C
       real,allocatable,save :: Ux(:,:,:) !X- Horizonal Current Flux
       real,allocatable,save :: Vx(:,:,:) !Y- Horizonal Current Flux
       real,allocatable,save :: Wx(:,:,:) !Z- Vertical Current Flux
       real,allocatable,save :: Kh(:,:,:) !Diffusion Coefficients
-      real,allocatable,save :: E(:,:) !Elevation
+      real,allocatable,save :: E(:,:)    !Elevation
       real,allocatable,save :: Wind(:,:) !Wind Speed, m/s
-      real,allocatable,save :: Rad(:,:) !Solar Radiation, watts/m2
+      real,allocatable,save :: Rad(:,:)  !Solar Radiation, watts/m2
+      real,allocatable,save :: Dispx(:,:,:) !X- horizontal dispersion
+      real,allocatable,save :: Dispy(:,:,:) !Y- horizontal dispersion
       
-      type(netCDF_file) :: hydro_info(9)  !indices refer to order declared below in enum, 
+      type(netCDF_file) :: hydro_info(11)  !indices refer to order declared below in enum, 
                                           !omitting Wind Speed and Solar Radiation
-      character(len=200) :: netcdf_fileNames(9)  !holds filenames of hydro netcdf data files
-      integer, dimension(9) :: startIndex ! holds the last time index from netcdf file used for each hydro variable
+      character(len=200) :: netcdf_fileNames(11)  !holds filenames of hydro netcdf data files
+      integer, dimension(11) :: startIndex ! holds the last time index from netcdf file used for each hydro variable
                                           ! used as starting point for next lookup
 
       integer, parameter :: eSal=1      !Salinity
@@ -27,8 +37,10 @@
       integer, parameter :: eWx = 5     !Z- Vertical Current Flux
       integer, parameter :: eKh = 6     !Diffusion Coefficients
       integer, parameter :: eE = 7      !Elevation
-      integer, parameter :: eWind = 8   !Wind
-      integer, parameter :: eRad = 9    !Rad
+      integer, parameter :: eDx = 8     ! X- horizontal dispersion
+      integer, parameter :: eDy = 9     ! Y- horizontal dispersion 
+      integer, parameter :: eWind = 10   !Wind
+      integer, parameter :: eRad = 11    !Rad
 
       integer, save :: fHv, lHv  ! looping index of FirstHydroVar and LastHydroVar (currently allows skipping of vars if they are not needed)
 
@@ -58,6 +70,8 @@ write(6,*) "Variables allocated for im,jm,nsl=",im,jm,nsl
       ALLOCATE(Wx(im,jm,nsl))
       ALLOCATE(Kh(im,jm,nsl))
       ALLOCATE(E(im,jm))
+      ALLOCATE(Dispx(im,jm,nsl))
+      ALLOCATE(Dispy(im,jm,nsl))
 
       !Fill values for netCDF
       S=fill(0)  
@@ -71,7 +85,9 @@ write(6,*) "Variables allocated for im,jm,nsl=",im,jm,nsl
       !Vx = 0.0
       !Wx = 0.0 
       Kh=fill(0)
-      E=fill(0) 
+      E=fill(0)
+      Dispx = fill(0)
+      Dispy = fill(0) 
 
       return
 
@@ -102,6 +118,8 @@ write(6,*)
          write(netcdf_fileNames(eWx), '(A, A)') trim(DATADIR), '/INPUT/WFlow.nc'
          write(netcdf_fileNames(eKh), '(A, A)') trim(DATADIR), '/INPUT/Ev.nc'
          write(netcdf_fileNames(eE), '(A, A)') trim(DATADIR), '/INPUT/SurfaceElev.nc'
+         write(netcdf_fileNames(eDx), '(A, A)') trim(DATADIR), '/INPUT/UDisp.nc'
+         write(netcdf_fileNames(eDy), '(A, A)') trim(DATADIR), '/INPUT/VDisp.nc'
       else if (Which_gridio .eq. 2) then
          write(netcdf_fileNames(eSal), '(A, A)') trim(DATADIR), '/INPUT/S.nc'
          write(netcdf_fileNames(eTemp), '(A, A)') trim(DATADIR), '/INPUT/T.nc'
@@ -125,17 +143,18 @@ write(6,*)
 
       if (Which_gridio .eq. 1 .OR. Which_gridio .eq. 2) then  !EFDC and NCOM do not use Wind or Rad from NetCDF
          fHv = 1;
-         lHv = 7;
+         lHv = 9;
       else if (Which_gridio .eq. 3) then  !POM does not use Salinity
          fHv = 2;
-         lHv = 9
+         lHv = 11
       endif
-      do i=fHv,lHv
-        call open_netcdf(netcdf_fileNames(i), 0, hydro_info(i)%ncid)
-        hydro_info(i)%fileName = netcdf_fileNames(i)
-        call init_info(hydro_info(i))
+
+      do i = fHv, lHv
+         call open_netcdf(netcdf_fileNames(i), 0, hydro_info(i)%ncid)
+         hydro_info(i)%fileName = netcdf_fileNames(i)
+         call init_info(hydro_info(i))
 #ifdef DEBUG
-        call report_info(hydro_info(i))
+         call report_info(hydro_info(i))
 #endif
       enddo
 
@@ -154,8 +173,8 @@ write(6,*) "---Close_Hydro_NetCDF----"
 write(6,*)
 #endif
 
-      do i=fHv,lHv
-        call close_netcdf(hydro_info(i)%ncid)
+      do i = fHv, lHv
+         call close_netcdf(hydro_info(i)%ncid)
       enddo
 
       End Subroutine Close_Hydro_NetCDF

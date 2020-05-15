@@ -37,9 +37,9 @@ IMPLICIT NONE
 
 
 REAL, INTENT(IN) :: f(nf),Vol
-REAL, INTENT(IN) :: TEMP,PAR
+REAL, INTENT(IN) :: TEMP,PAR, dT
 REAL, INTENT(INOUT) :: DTM(nf)
-INTEGER, INTENT(IN) :: i,j,k,dT
+INTEGER, INTENT(IN) :: i,j,k
 
 REAL :: FN  ! Nutrient limitation factor
 

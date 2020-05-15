@@ -24,13 +24,13 @@
         write(filename,'(A,A,A)') trim(DATADIR),"/",trim(init_filename)
 
         call USER_Set_Initial_Conditions(filename) 
-        do j=1,jm
-        do i=1,im
-        do k=1,nza(i,j)
-         f(i,j,k,JTR) = 1./Vol(i,j,k)
-        enddo
-        enddo
-        enddo
+!        do j=1,jm
+!        do i=1,im
+!        do k=1,nza(i,j)
+!         f(i,j,k,JTR) = 1./Vol(i,j,k)
+!        enddo
+!        enddo
+!        enddo
 
        elseif(InitializeHow.eq.1) then !Salinity Regression Equations
 

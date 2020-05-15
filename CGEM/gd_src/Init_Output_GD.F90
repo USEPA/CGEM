@@ -1,5 +1,8 @@
        Subroutine Init_Output_GD(BASE_NETCDF_OUTPUT_FILE_NAME)
-
+       !
+       ! 02/21/2020  Wilson Melendez, Commented out loop that was
+       !             recalcualting dumf for the tracer case for
+       !             unknown reason.
        USE Model_dim
        USE INPUT_VARS, ONLY : nstep,dT_out, IYRS, IMONS,&
      & IDAYS, IHRS, IMINS, ISECS, IYRE, IMONE, IDAYE, IHRE,&
@@ -39,14 +42,14 @@
        tinit=0
 
         dumf = f
-        do j=1,jm
-        do i=1,im
-          nz=nza(i,j)
-          do k=1,nz
-            dumf(i,j,k,JTR) = f(i,j,k,JTR) * Vol(i,j,k)
-          enddo
-         enddo
-        enddo
+!        do j=1,jm
+!        do i=1,im
+!          nz=nza(i,j)
+!          do k=1,nz
+!            dumf(i,j,k,JTR) = f(i,j,k,JTR) * Vol(i,j,k)
+!          enddo
+!         enddo
+!        enddo
 
        CALL WRITE_DATA( im, jm, km, nf, tinit, dumf)
 

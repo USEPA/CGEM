@@ -2,6 +2,8 @@
 ! PURPOSE: NETCDF_UTILITIES.F90 - Helper routines for writing to a NetCDF file.
 ! NOTES:   Non-ADT module.
 ! HISTORY: 2010/04/26, Todd Plessel, plessel.todd@epa.gov, Created.
+! HISTORY: 2020/05/14, Wilson Melendez, Added new attributes such as 
+!                                      coordinates and area.
 !******************************************************************************
 
 MODULE NETCDF_UTILITIES
@@ -159,6 +161,8 @@ CONTAINS
     ! Externals:
     INTEGER NF_DEF_VAR
     EXTERNAL NF_DEF_VAR
+    INTEGER NF_PUT_ATT_TEXT
+    EXTERNAL NF_PUT_ATT_TEXT
     ! Locals:
     INTEGER ERR, DIM_IDS( 2 )
 
@@ -166,6 +170,15 @@ CONTAINS
     DIM_IDS( 2 ) = DIMID2
     ERR = NF_DEF_VAR( FILEID, VARNAM, 5, 2, DIM_IDS, VARID )
     CALL CHKERR( ERR, 'create variable ' // VARNAM )
+
+    IF (VARNAM == 'latitude') THEN
+        ERR = NF_PUT_ATT_TEXT(FILEID, VARID, 'axis', 1, 'Y')
+        CALL CHKERR( ERR, 'create coordinates attribute ' // VARNAM )   
+    ELSEIF (VARNAM == 'longitude') THEN
+        ERR = NF_PUT_ATT_TEXT(FILEID, VARID, 'axis', 1, 'X')
+        CALL CHKERR( ERR, 'create coordinates attribute ' // VARNAM )  
+    ENDIF
+
     CALL DEFVAR( FILEID, VARID, VARNAM, VARDES, UNITS )
     RETURN
   END SUBROUTINE DEFVR2
@@ -207,6 +220,10 @@ CONTAINS
     ! Externals:
     INTEGER NF_DEF_VAR
     EXTERNAL NF_DEF_VAR
+    INTEGER NF_PUT_ATT_REAL
+    EXTERNAL NF_PUT_ATT_REAL
+    INTEGER NF_PUT_ATT_TEXT
+    EXTERNAL NF_PUT_ATT_TEXT
     ! Locals:
     INTEGER ERR, DIM_IDS( 3 )
 
@@ -215,6 +232,13 @@ CONTAINS
     DIM_IDS( 3 ) = DIMID3
     ERR = NF_DEF_VAR( FILEID, VARNAM, 5, 3, DIM_IDS, VARID )
     CALL CHKERR( ERR, 'create variable ' // VARNAM )
+
+    ERR = NF_PUT_ATT_TEXT(FILEID, VARID, 'coordinates', 18, 'latitude longitude')
+    CALL CHKERR( ERR, 'create coordinates attribute ' // VARNAM )
+
+    ERR = NF_PUT_ATT_TEXT(FILEID, VARID, 'cell_measures', 10, 'area: Area')
+    CALL CHKERR( ERR, 'create cell measures attribute ' // VARNAM )
+
     CALL DEFVAR( FILEID, VARID, VARNAM, VARDES, UNITS )
     RETURN
   END SUBROUTINE DEFVR3
@@ -223,7 +247,7 @@ CONTAINS
 
   ! Define a real 4D variable in a NetCDF file.
   !
-  SUBROUTINE DEFVR4( FILEID, DIMIDS, VARID, VARNAM, VARDES, UNITS, IS_POSITIVE )
+  SUBROUTINE DEFVR4( FILEID, DIMIDS, VARID, VARNAM, VARDES, UNITS, IS_POSITIVE)
     IMPLICIT NONE
     INTEGER,INTENT(IN):: FILEID
     INTEGER,DIMENSION(4),INTENT(IN):: DIMIDS
@@ -235,6 +259,8 @@ CONTAINS
     EXTERNAL NF_DEF_VAR
     INTEGER NF_PUT_ATT_REAL
     EXTERNAL NF_PUT_ATT_REAL
+    INTEGER NF_PUT_ATT_TEXT
+    EXTERNAL NF_PUT_ATT_TEXT
     INTEGER NF_DOUBLE
     EXTERNAL NF_DOUBLE
 
@@ -247,8 +273,14 @@ CONTAINS
     else
        ERR = nf_put_att_real(fileid, VARID, "valid_range", 5, 2, (/ -1.e2, 1.e38 /))
     endif
-
     CALL CHKERR( ERR, 'create variable ' // VARNAM )
+
+    ERR = NF_PUT_ATT_TEXT(FILEID, VARID, 'coordinates', 18, 'latitude longitude')
+    CALL CHKERR( ERR, 'create coordinates attribute ' // VARNAM )
+
+    ERR = NF_PUT_ATT_TEXT(FILEID, VARID, 'cell_measures', 10, 'area: Area')
+    CALL CHKERR( ERR, 'create cell measures attribute ' // VARNAM )
+
     CALL DEFVAR( FILEID, VARID, VARNAM, VARDES, UNITS )
     RETURN
   END SUBROUTINE DEFVR4

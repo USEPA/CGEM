@@ -83,15 +83,16 @@
 
       !Set filenames for netCDF
       if (Which_gridio .eq. 1) then 
-         write(netcdf_riverload_fileNames(eVar1), '(A, A)') trim(DATADIR), '/INPUT/TN_RiverLoads.nc'
-         write(netcdf_riverload_fileNames(eVar2), '(A, A)') trim(DATADIR), '/INPUT/NO3_RiverLoads.nc'
-         write(netcdf_riverload_fileNames(eVar3), '(A, A)') trim(DATADIR), '/INPUT/NH3_RiverLoads.nc'
-         write(netcdf_riverload_fileNames(eVar4), '(A, A)') trim(DATADIR), '/INPUT/DON_RiverLoads.nc'
-         write(netcdf_riverload_fileNames(eVar5), '(A, A)') trim(DATADIR), '/INPUT/TP_RiverLoads.nc'
-         write(netcdf_riverload_fileNames(eVar6), '(A, A)') trim(DATADIR), '/INPUT/DIP_RiverLoads.nc'
-         write(netcdf_riverload_fileNames(eVar7), '(A, A)') trim(DATADIR), '/INPUT/DOP_RiverLoads.nc'
-         write(netcdf_riverload_fileNames(eVar8), '(A, A)') trim(DATADIR), '/INPUT/BOD1_RiverLoads.nc'
-         write(netcdf_riverload_fileNames(eVar9), '(A, A)') trim(DATADIR), '/INPUT/DO_RiverLoads.nc'
+         write(netcdf_riverload_fileNames(eVar1), '(A, A)') trim(DATADIR), '/INPUT/TP_RiverLoads.nc'
+!         write(netcdf_riverload_fileNames(eVar1), '(A, A)') trim(DATADIR), '/INPUT/TN_RiverLoads.nc'
+!         write(netcdf_riverload_fileNames(eVar2), '(A, A)') trim(DATADIR), '/INPUT/NO3_RiverLoads.nc'
+!         write(netcdf_riverload_fileNames(eVar3), '(A, A)') trim(DATADIR), '/INPUT/NH3_RiverLoads.nc'
+!         write(netcdf_riverload_fileNames(eVar4), '(A, A)') trim(DATADIR), '/INPUT/DON_RiverLoads.nc'
+!         write(netcdf_riverload_fileNames(eVar5), '(A, A)') trim(DATADIR), '/INPUT/TP_RiverLoads.nc'
+!         write(netcdf_riverload_fileNames(eVar6), '(A, A)') trim(DATADIR), '/INPUT/DIP_RiverLoads.nc'
+!         write(netcdf_riverload_fileNames(eVar7), '(A, A)') trim(DATADIR), '/INPUT/DOP_RiverLoads.nc'
+!         write(netcdf_riverload_fileNames(eVar8), '(A, A)') trim(DATADIR), '/INPUT/BOD1_RiverLoads.nc'
+!         write(netcdf_riverload_fileNames(eVar9), '(A, A)') trim(DATADIR), '/INPUT/DO_RiverLoads.nc'
       else if (Which_gridio .eq. 2) then
 !         write(netcdf_fileNames(eSal), '(A, A)') trim(DATADIR), '/INPUT/S.nc'
 !         write(netcdf_fileNames(eTemp), '(A, A)') trim(DATADIR), '/INPUT/T.nc'
@@ -115,7 +116,8 @@
 
       if (Which_gridio .eq. 1 .OR. Which_gridio .eq. 2) then  !EFDC and NCOM do not use Wind or Rad from NetCDF
          fRv = 1;
-         lRv = 9;
+         lRv = 1;
+!         lRv = 9;
       else if (Which_gridio .eq. 3) then  !POM does not use Salinity
 !         fHv = 2;
 !         lHv = 9

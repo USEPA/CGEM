@@ -29,7 +29,8 @@
          if(Which_code.eq."GOMDOM".or.Which_code.eq."GoMDOM".or.Which_code.eq."gomdom") then
            Which_code = "GOMDOM"
            input_filename = "GOMDOM_InputFile"
-           init_filename = "InitialConditions_GD.txt"
+           ! init_filename = "InitialConditions_GD.txt"
+           init_filename = "Initial_Conditions.nc"
            BASE_NETCDF_OUTPUT_FILE_NAME = './NETCDF/gomdom.'
          endif
        endif

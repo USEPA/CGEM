@@ -290,6 +290,10 @@ CONTAINS
 
     ! check if requested timeVal is inside dataset
     if (t_current .lt. timeVals(1) .OR. (t_current .gt. timeVals(timeLength))) then
+       write(6,*) "ncid = ", ncid
+       write(6,*) "start_index = ", start_index
+       write(6,*) "tDim_index = ", tDim_index
+       write(6,*) "timeLength = ", timeLength
        write(6,*) "Requested time value (",t_current,") is not in dataset!"
        write(6,*) " dataset has time range of ", timeVals(1), " to ", timeVals(timeLength)
        write(6,*) "   ...Stopping simulation"
@@ -375,7 +379,7 @@ CONTAINS
     var_index = info%varLocs(5)
     tvar_index = info%varLocs(4)
     tdim_index = info%dimLocs(4)
-
+    
     call getTimeIndex(info%ncid, t_current, tdim_index, tvar_index, tstep, t1, t2)
 
     allocate(var1(nRiv))
@@ -490,10 +494,11 @@ CONTAINS
     tvar_index = info%varLocs(4)
     tdim_index = info%dimLocs(4)
 
-    !write(6,*) " file: ", info%filename 
-    !write(6,*) " var_index = ", var_index
-    !write(6,*) " tvar_index = ", tvar_index
-    !write(6,*) " tdim_index = ", tdim_index
+    ! write(6,*) "Inside SUBROUTINE interpVar3d"
+    ! write(6,*) " file: ", info%filename 
+    ! write(6,*) " var_index = ", var_index
+    ! write(6,*) " tvar_index = ", tvar_index
+    ! write(6,*) " tdim_index = ", tdim_index
    
 #ifdef DEBUG_CWS
     write(6,*)"Inside interpVar3d"

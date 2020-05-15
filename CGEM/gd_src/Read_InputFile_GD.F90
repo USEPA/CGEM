@@ -290,6 +290,7 @@ read(999,*) ws(JRON)  ! VRON
 read(999,*) ws(JLOP)  ! VLOP
 read(999,*) ws(JROP)  ! VROP
 read(999,*) ws(JSU)   ! VSU
+read(999,*) ws(JTR)   ! VTR
 
     ! Compute starting time of run in seconds since Model_dim::iYr0:
       START_SECONDS = &

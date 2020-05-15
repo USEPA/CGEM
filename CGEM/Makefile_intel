@@ -18,8 +18,8 @@
 SOL_INC	  = -I. -I/usr/local/apps/netcdf-4.3.3/intel-15.0/include/
 SOL_LIBS  = -L/usr/local/apps/netcdf-4.3.3/intel-15.0/lib -lnetcdff -lnetcdf
 
-IRIS_INC  = -I. -I/usr/local/apps/netcdf-4.4.0/gcc-4.4.7/include/
-IRIS_LIBS = -L. -L/usr/local/apps/netcdf-4.4.0/gcc-4.4.7/lib/ -lnetcdff -lnetcdf
+ATMOS_INC  = -I. -I/usr/local/apps/netcdf-4.6.0/gcc-4.8.5/lib/include/
+ATMOS_LIBS = -L. -L/usr/local/apps/netcdf-4.6.0/gcc-4.8.5/lib -lnetcdff -lnetcdf
 
 OTHER_INC   = -I. -I/usr/local/include
 OTHER_LIBS  = -L/usr/local/lib -lnetcdff -L/usr/local/bin -lnetcdf 
@@ -40,11 +40,11 @@ gddir=gd_src
 ### These lines should seldom change! ###
 EXE	= CGEM 
 MY_HOST	  = $(shell hostname)
-ifeq (iris,$(findstring iris,$(MY_HOST)))
-  INC	   = $(IRIS_INC)
-  LIBS	   = $(IRIS_LIBS)
+ifeq (atmos,$(findstring atmos,$(MY_HOST)))
+  INC	   = $(ATMOS_INC)
+  LIBS	   = $(ATMOS_LIBS)
   F90      = ifort
-  FFLAGS = -warn all -traceback -no-diag-error-limit -implicitnone -convert big_endian -ftz #-check -debug -g       #-g -fbacktrace -Wall 
+  FFLAGS = -warn all -traceback -no-diag-error-limit -implicitnone -convert big_endian -ftz
 else 
 ifeq (sol,$(findstring sol,$(MY_HOST)))
   INC	   = $(SOL_INC)
