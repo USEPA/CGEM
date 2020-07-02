@@ -180,7 +180,7 @@ write(6,*)
 !write(6,*) "f(iNO3) = ", f(25,70,1,6)
 
       ! write(6,*) "step_out",istep_out
-      write(6,*) "istep = ", istep
+      ! write(6,*) "istep = ", istep
        call Transport(Which_code)
 
 !write(6,*) "---After Transport"
