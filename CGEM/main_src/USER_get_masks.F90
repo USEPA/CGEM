@@ -1,3 +1,9 @@
+!**************************************************************************
+! Purpose: USER_get_masks.F90  This subroutine initializes land/water
+!                              mask arrays.
+!
+! Revised: 05/21/2020, Wilson Melendez, Commented out setting of fm_save.  
+!**************************************************************************
       subroutine USER_get_masks()
 
       USE Model_dim
@@ -29,15 +35,15 @@ write(6,*)
       fm_save = 0.
       fm = 0.
 
-      if(Which_gridio.eq.0) then !FishTank
+      if(Which_gridio .eq. 0) then !FishTank
          fm  = 1.  !Everything is water
          wsm = 0  !Everything is on the shelf
-      else if(Which_gridio.eq.1) then !EFDC
+      else if(Which_gridio .eq. 1) then !EFDC
 
-         do j=1,jm
-          do i=1,im
+         do j = 1, jm
+          do i = 1, im
             nz = nza(i,j)
-            do k=1,nz
+            do k = 1, nz
                fm_save(i,j,k) = 1. 
                fm(i,j,k) = 1.
             enddo
@@ -45,22 +51,22 @@ write(6,*)
           enddo
          enddo
 
-         do j=2,(jm-1)
-         do i=1,im
-            nz = nza(i,j)
-            if(fm_save(i,j-1,1).eq.0) fm(i,j,:) = 0
+!         do j=2,(jm-1)
+!         do i=1,im
+!            nz = nza(i,j)
+!            if(fm_save(i,j-1,1).eq.0) fm(i,j,:) = 0
 !            do k=1,nz
 !               if(fm_save(i,j,k).gt.0) then
 !                  if(int(fm_save(i,j-1,k)).eq.0) fm(i,j,k) = 0
 !                  if(int(fm_save(i,j+1,k)).eq.0) fm(i,j,k) = 0
-                  !if(int(fm_save(i,j-1,k)).eq.0.and.int(fm_save(i,j+1,k)).eq.0) fm(i,j,k) = 0
+!                  if(int(fm_save(i,j-1,k)).eq.0.and.int(fm_save(i,j+1,k)).eq.0) fm(i,j,k) = 0
 !               endif
-         ! write(6,*) i,j,k,fm(i,j,k)
+!          write(6,*) i,j,k,fm(i,j,k)
 !         enddo
-         enddo
-         enddo
-        !stop
-      else if(Which_gridio.eq.2) then !NCOM 
+!         enddo
+!         enddo
+!        stop
+      else if(Which_gridio .eq. 2) then !NCOM 
          do j=1,jm
          do i=1,im
               if (depth(i,j).gt.0.) then  !Mask to determine if cell is land or ocean  (contains number of layers, with 0 layers = land)
@@ -76,7 +82,7 @@ write(6,*)
               endif
          enddo
          enddo
-      else if (Which_gridio.eq.3) then !POM
+      else if (Which_gridio .eq. 3) then !POM
          ! Read in mask data
          write(filename, '(A,A)') trim(DATADIR), '/mask.dat'
          open(19, file=filename, status='old')
