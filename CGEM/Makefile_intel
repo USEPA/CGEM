@@ -18,8 +18,8 @@
 SOL_INC	  = -I. -I/usr/local/apps/netcdf-4.3.3/intel-15.0/include/
 SOL_LIBS  = -L/usr/local/apps/netcdf-4.3.3/intel-15.0/lib -lnetcdff -lnetcdf
 
-ATMOS_INC  = -I. -I/usr/local/apps/netcdf-4.6.0/gcc-4.8.5/lib/include/
-ATMOS_LIBS = -L. -L/usr/local/apps/netcdf-4.6.0/gcc-4.8.5/lib -lnetcdff -lnetcdf
+ATMOS_INC  = -I. -I/usr/local/apps/netcdf-4.6.3/gcc-4.8.5/include/
+ATMOS_LIBS = -L. -L/usr/local/apps/netcdf-4.6.3/gcc-4.8.5/lib -lnetcdff -lnetcdf
 
 OTHER_INC   = -I. -I/usr/local/include
 OTHER_LIBS  = -L/usr/local/lib -lnetcdff -L/usr/local/bin -lnetcdf 
