@@ -47,13 +47,16 @@ ifeq (iris,$(findstring iris,$(MY_HOST)))
   LIBS	   = $(IRIS_LIBS)
   F90      = mpiifort
   FFLAGS = -D_MPI
+  FFLAGS = -O -D_MPI -qopenmp -mcmodel=medium -pg -save-temps
 #  FFLAGS = -warn all -traceback -no-diag-error-limit -implicitnone -convert big_endian -ftz -D_MPI#-check -debug -g       #-g -fbacktrace -Wall 
 else 
 ifeq (atmos,$(findstring atmos,$(MY_HOST)))
   INC	   = $(ATMOS_INC)
   LIBS	   = $(ATMOS_LIBS)
   F90     = mpiifort 
-  FFLAGS = -D_MPI
+##FFLAGS = -D_MPI
+  FFLAGS = -D_MPI -pg -save-temps
+  FFLAGS = -O -D_MPI -qopenmp -mcmodel=medium -pg -save-temps
 else
   INC      = $(OTHER_INC)
   LIBS     = $(OTHER_LIBS)
@@ -91,7 +94,7 @@ $(CGEM_OBJ):%.o: $(cgemdir)/%.F90
 	$(F90) $(INC) -c $(FFLAGS) $(DFLAGS)   $<
 
 $(GD_OBJ):%.o: $(gddir)/%.F90
-	$(F90) -c $(FFLAGS) $(DFLAGS)  $<
+	$(F90) $(INC) -c $(FFLAGS) $(DFLAGS)  $<
 
 $(PAR_OBJ):%.o: $(maindir)/%.F90
 	$(F90) $(INC) -c  $<

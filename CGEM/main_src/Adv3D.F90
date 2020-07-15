@@ -38,6 +38,7 @@
       if(numprocs.gt.1) call AdvNeighbors(f,myim,jm,km,nf,myid,numprocs)
 
 ! --------loop over each variable
+!$omp parallel do private( i,j,k,ii,nz,myi,mpierr,w_wsink,im1,ip1,jm1,jp1,km1,myim1,myip1,ufm,ufp,vfm,vfp,wfm,wfp,cfh,cf)
      do ii = 1,nf
      
 ! -------------------------------------------------------------------
@@ -153,6 +154,7 @@
       end do !i
       end do !j
       end do   ! ii = 1,nf
+!$omp end parallel do
 
 ! update f for the current timestep
          do j = 1,jm
