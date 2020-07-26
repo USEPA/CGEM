@@ -18,7 +18,7 @@ IMPLICIT NONE
 
 
 
-PUBLIC netCDF_file, open_netcdf, close_netcdf, interpVar, getTimeIndex, report_info, init_info
+PUBLIC netCDF_file, open_netcdf, close_netcdf, interpVar, getTimeIndex, report_info, init_info, retrieveBookendVar
 
 type netCDF_file
    integer :: ncid
@@ -39,7 +39,7 @@ end type netCDF_file
 
 
 PRIVATE report_info_from_id, report_info_from_filename, report_info_from_type, init_info_from_id, init_info_from_filename, & 
-        init_info_from_type, interpVar3d, interpVar2d, getVarAtTime2d, getVarAtTime3d
+        init_info_from_type, interpVar3d, interpVar2d, getVarAtTime2d, getVarAtTime3d, retrieveBookendVar3d, retrieveBookendVar2d
 
   INTERFACE report_info
     MODULE PROCEDURE report_info_from_id, report_info_from_filename, report_info_from_type
@@ -59,6 +59,10 @@ PRIVATE report_info_from_id, report_info_from_filename, report_info_from_type, i
 
   INTERFACE interpBcVar
     MODULE PROCEDURE interpBcVar2D
+  END INTERFACE
+
+  INTERFACE retrieveBookendVar
+    MODULE PROCEDURE retrieveBookendVar3d, retrieveBookendVar2d
   END INTERFACE
 
 CONTAINS
@@ -581,5 +585,157 @@ CONTAINS
     var = var1 + (var2-var1) *fac
     
   END SUBROUTINE interpVar2d
+
+
+  SUBROUTINE retrieveBookendVar3d(info, t_current, tstep, var1, var2, t1, t2)
+    IMPLICIT NONE
+
+    type (netCDF_file), INTENT(IN) :: info             !info for netcdf file
+    integer, INTENT(INOUT) :: tstep                    !tstep to start looking for current time bookend
+    integer(kind=8), INTENT(IN) :: t_current           !current time value to bookend
+    real, dimension(:,:,:), INTENT(OUT) :: var1, var2  !bookend variable values
+    integer :: var_index, tdim_index, tvar_index       !index in netcdf of interp variable and time variable
+    integer(kind=8), INTENT(OUT) :: t1, t2                          !bookend time values
+
+    var_index = info%varLocs(5)
+    tvar_index = info%varLocs(4)
+    tdim_index = info%dimLocs(4)
+
+    !write(6,*) " file: ", info%filename
+    !write(6,*) " var_index = ", var_index
+    !write(6,*) " tvar_index = ", tvar_index
+    !write(6,*) " tdim_index = ", tdim_index
+
+#ifdef DEBUG_CWS
+    write(6,*)"Inside retrieveBookendVar3d"
+    write(6,*)"Calling getTimeIndex for ", info%filename
+    write(6,*)"tdim_index = ", tdim_index
+    write(6,*)"tvar_index = ", tvar_index
+#endif
+    call getTimeIndex(info%ncid, t_current, tdim_index, tvar_index, tstep, t1, t2)
+
+    call getVarAtTime3d(info%ncid, var_index, tstep, var1)
+    if (tstep .LE. info%dimLengths(tdim_index)) then
+      call getVarAtTime3d(info%ncid, var_index, tstep+1, var2)
+    else
+      write(6,*)"timestep is outside of supplied data range!"
+      write(6,*)"Stopping execution (netcdf_utils.F90)"
+      STOP
+      !var2 = 0.0
+    endif
+
+  END SUBROUTINE retrieveBookendVar3d
+
+
+  SUBROUTINE retrieveBookendVar2d(info, t_current, tstep, var1, var2, t1, t2)
+    IMPLICIT NONE
+
+    type (netCDF_file), INTENT(IN) :: info           !info for netcdf file
+    integer, INTENT(INOUT) :: tstep                  !tstep to start looking for current time bookend
+    integer(kind=8), INTENT(IN) :: t_current         !current time value to bookend
+    real, dimension(:,:), INTENT(OUT) :: var1, var2  !bookend variable values
+    integer :: var_index, tdim_index, tvar_index     !index in netcdf of interp variable and time variable
+    integer(kind=8), INTENT(OUT) :: t1, t2                        !bookend time values
+
+    var_index = info%varLocs(5)
+    tvar_index = info%varLocs(4)
+    tdim_index = info%dimLocs(4)
+
+
+    !write(6,*) " file: ", info%filename
+    !write(6,*) " var_index = ", var_index
+    !write(6,*) " tvar_index = ", tvar_index
+    !write(6,*) " tdim_index = ", tdim_index
+
+
+#ifdef DEBUG_CWS
+    write(6,*)"Inside retrieveBookendVar2d"
+    write(6,*)"Calling getTimeIndex for ", info%filename
+    write(6,*)"tdim_index = ", tdim_index
+    write(6,*)"tvar_index = ", tvar_index
+#endif
+    call getTimeIndex(info%ncid, t_current, tdim_index, tvar_index, tstep, t1, t2)
+
+    call getVarAtTime2d(info%ncid, var_index, tstep, var1)
+    if (tstep .LE. info%dimLengths(tdim_index)) then
+      call getVarAtTime2d(info%ncid, var_index, tstep+1, var2)
+    else
+      write(6,*)"timestep is outside of supplied data range!"
+      write(6,*)"Stopping execution (netcdf_utils.F90)"
+      STOP
+      !var2 = 0.0
+    endif
+
+  END SUBROUTINE retrieveBookendVar2d
+
+
+  SUBROUTINE retrieveBookendRiverVar(info, t_current, tstep, var1, var2, t1, t2)
+
+    IMPLICIT NONE
+
+    type (netCDF_file), INTENT(IN) :: info            !info for netcdf file
+    integer, INTENT(INOUT) :: tstep                   !tstep to start looking for current time bookend
+    integer(kind=8), INTENT(IN) :: t_current          !current time value to bookend
+    real, dimension(:), allocatable, INTENT(OUT) :: var1, var2     !bookend variable values
+    integer :: var_index, tdim_index, tvar_index      !index in netcdf of interp variable and time variable
+    integer(kind=8), INTENT(OUT) :: t1, t2                         !bookend time values
+
+    var_index = info%varLocs(5)
+    tvar_index = info%varLocs(4)
+    tdim_index = info%dimLocs(4)
+
+    call getTimeIndex(info%ncid, t_current, tdim_index, tvar_index, tstep, t1, t2)
+
+!    allocate(var1(nRiv))
+!    allocate(var2(nRiv))
+
+    call getRiverLoadVarAtTime(info%ncid, var_index, tstep, var1)
+
+    if (tstep .LE. info%dimLengths(tdim_index)) then
+        call getRiverLoadVarAtTime(info%ncid, var_index, tstep + 1, var2)
+    else
+        write(6,*)"timestep is outside of supplied data range!"
+        write(6,*)"Stopping execution (netcdf_utils.F90)"
+        STOP
+        !var2 = 0.0
+    endif
+
+  END SUBROUTINE retrieveBookendRiverVar
+
+
+  SUBROUTINE retrieveBookendBCVar(info, t_current, tstep, var1, var2, t1, t2)  
+
+    IMPLICIT NONE
+
+    type (netCDF_file), INTENT(IN) :: info            !info for netcdf file
+    integer, INTENT(INOUT) :: tstep                   !tstep to start looking for current time bookend
+    integer(kind=8), INTENT(IN) :: t_current          !current time value to bookend
+    real, dimension(:), allocatable, INTENT(OUT) :: var1, var2     !bookend variable values
+    integer :: var_index, tdim_index, tvar_index      !index in netcdf of interp variable and time variable
+    integer(kind=8), INTENT(OUT) :: t1, t2                         !bookend time values
+
+    var_index = info%varLocs(5)
+    tvar_index = info%varLocs(4)
+    tdim_index = info%dimLocs(4)
+
+    call getTimeIndex(info%ncid, t_current, tdim_index, tvar_index, tstep, t1, t2)
+
+!    allocate(var1(nBC))
+!    allocate(var2(nBC))
+
+    call getBoundaryConcentrationVarAtTime(info%ncid, var_index, tstep, var1)
+
+    if (tstep .LE. info%dimLengths(tdim_index)) then                    
+        call getBoundaryConcentrationVarAtTime(info%ncid, var_index, tstep + 1, var2)
+    else 
+        write(6,*)"timestep is outside of supplied data range!"
+        write(6,*)"Stopping execution (netcdf_utils.F90)"
+        STOP
+        !var2 = 0.0
+    endif
+
+    
+  END SUBROUTINE retrieveBookendBCVar
+
 
 END MODULE netcdf_utils

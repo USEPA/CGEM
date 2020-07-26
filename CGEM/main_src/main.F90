@@ -89,6 +89,10 @@
 
       T_8 = START_SECONDS 
       TC_8 = START_SECONDS - (dT / 2) ! Subtract half dT to 'center' of timestep.
+
+      print*,"start T_8=",T_8
+      print*,"start_TC_8=",TC_8
+
       if (Which_gridio .gt. 0.and.myid.eq.0) then
         call Init_Hydro_NetCDF()
         if (nRiv > 0) call Init_RiverLoad_NetCDF()
@@ -97,9 +101,26 @@
   
       call Get_Vars(TC_8,T_8,myid,numprocs) !Hydro for initial timestep 
 
+!      print*,"Initial T(49,48,1)=",T(49,48,1)," with myid:",myid
+!      print*,"Initial T(205,38,1)=",T(205,38,1)," with myid:",myid
+!      print*,"Initial S(47,94,1)=",S(47,94,1)," with myid:",myid
+!      print*,"Initial S(222,108,1)=",S(222,108,1)," with myid:",myid
+!      print*,"Initial Ux(47,94,1)=",Ux(47,94,1)," with myid:",myid
+!      print*,"Initial Ux(222,108,1)=",Ux(222,108,1)," with myid:",myid
+!      print*,"Initial Vx(47,94,1)=",Vx(47,94,1)," with myid:",myid
+!      print*,"Initial Vx(222,108,1)=",Vx(222,108,1)," with myid:",myid
+!      print*,"Initial Wx(47,94,1)=",Wx(47,94,1)," with myid:",myid
+!      print*,"Initial Wx(222,108,1)=",Wx(222,108,1)," with myid:",myid
+!      print*,"Initial Wind(47,94)=",Wind(47,94)," with myid:",myid
+!      print*,"Initial Wind(222,108)=",Wind(222,108)," with myid:",myid
+!      print*,"Initial Rad(47,94)=",Rad(47,94)," with myid:",myid
+!      print*,"Initial Rad(222,108)=",Rad(222,108)," with myid:",myid
+
 ! Initialize time an loop variables
       istep = 0
       istep_out = 0
+
+    print*,"istep = 0"
 
     if(myid.eq.0) then  !Sets depth,d,dz,d_sfc,Vol
       if (Which_gridio.eq.1) then
@@ -134,12 +155,14 @@
       call Initialize_Output(Which_code,BASE_NETCDF_OUTPUT_FILE_NAME,myid,numprocs)     !Open file and write initial configuration
 
 !-------------- START TIME LOOP -----------------------------------
+      print*,"iout = ", iout
       do istep = 1, nstep
        TC_8 = TC_8 + dT
        T_8 = T_8 + dT
 #ifdef DEBUG
    write(6,*) "TC_8=", TC_8
 #endif
+   write(6,*) "istep=",istep, " on processor: ",myid
     if(myid.eq.0) then
       Vol_prev = Vol
       if (Which_gridio.eq.1) then
@@ -153,6 +176,7 @@
         call USER_update_POM_grid()
       endif
     endif
+!    write(6,*) "after update grid on processor: ", myid
     if(numprocs.gt.1) then
       call MPI_BCAST(depth,im*jm,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
       call MPI_BCAST(d,im*jm*km,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
@@ -162,7 +186,26 @@
       call MPI_BCAST(Vol_prev,im*jm*km,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
     endif
 
-       call Get_Vars(TC_8,T_8,myid,numprocs) !Hydro, Solar, Wind, Temp, Salinity, and riverloads
+!       print*,"b4 Get_Vars on processor: ",myid
+
+      call Get_Vars(TC_8,T_8,myid,numprocs) !Hydro, Solar, Wind, Temp, Salinity, and riverloads
+
+!      print*,"Main T(49,48,1)=",T(49,48,1)," with myid:",myid
+!      print*,"Main T(205,38,1)=",T(205,38,1)," with myid:",myid
+!      print*,"Main S(47,94,1)=",S(47,94,1)," with myid:",myid
+!      print*,"Main S(222,108,1)=",S(222,108,1)," with myid:",myid
+!      print*,"Main Ux(47,94,1)=",Ux(47,94,1)," with myid:",myid
+!      print*,"Main Ux(222,108,1)=",Ux(222,108,1)," with myid:",myid
+!      print*,"Main Vx(47,94,1)=",Vx(47,94,1)," with myid:",myid
+!      print*,"Main Vx(222,108,1)=",Vx(222,108,1)," with myid:",myid
+!      print*,"Main Wx(47,94,1)=",Wx(47,94,1)," with myid:",myid
+!      print*,"Main Wx(222,108,1)=",Wx(222,108,1)," with myid:",myid
+!      print*,"Main Kh(47,94,1)=",Kh(47,94,1)," with myid:",myid
+!      print*,"Main Kh(222,108,1)=",Kh(222,108,1)," with myid:",myid
+!      print*,"Main Wind(47,94)=",Wind(47,94)," with myid:",myid
+!      print*,"Main Wind(222,108)=",Wind(222,108)," with myid:",myid
+!      print*,"Main Rad(47,94)=",Rad(47,94)," with myid:",myid
+!      print*,"Main Rad(222,108)=",Rad(222,108)," with myid:",myid
 
        call USER_update_masks()
 

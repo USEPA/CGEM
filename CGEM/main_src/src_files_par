@@ -12,6 +12,7 @@ MAIN_OBJ  =  fillval.o\
 	PNETCDF_UTILITIES.o\
 	error.o\
         netcdf_utils.o\
+        Interp_utils.o\
 	Grid.o\
 	State_Vars.o\
 	Hydro.o\

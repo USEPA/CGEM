@@ -12,6 +12,17 @@
       real,allocatable,save :: d_sfc(:,:,:)      !Distance from surface to center of cell
       real,allocatable,save :: depth(:,:)        !Depth of water column    
       real,allocatable,save :: dz(:,:,:)         !Thickness of cell
+      real,allocatable,save :: depth1(:,:)        !Depth of water column bookend vars    
+      real,allocatable,save :: depth2(:,:)       
+      real,allocatable,save :: dz1(:,:,:)         !Thickness of cell bookend vars
+      real,allocatable,save :: dz2(:,:,:)         
+
+      integer(kind=8),save :: grid_t1,grid_t2   ! bookend time values for grid variables
+                                                ! may be same or different from
+                                                ! hydro bookend time values
+                                                ! depending on whether T_8 or
+                                                ! TC_8 is used
+
       real,allocatable,save :: Vol(:,:,:), Vol_prev(:,:,:)        !Volume of each cell
       real,allocatable,save :: area(:,:)       !Area of each cell
       real,allocatable,save :: fm(:,:,:)        ! land(0)/sea(1) mask
@@ -44,6 +55,9 @@
       integer mpierr
 
       call Grid_allocate(myid)
+
+      grid_t1 = 0
+      grid_t2 = 0
 
 #ifdef map_code
       write(6,*) "---Set_Grid----"
@@ -132,11 +146,15 @@ write(6,*)
       ALLOCATE(lat(im,jm))
       ALLOCATE(lon(im,jm))
       ALLOCATE(depth(im,jm))
+      ALLOCATE(depth1(im,jm))
+      ALLOCATE(depth2(im,jm))
       ALLOCATE(d(im,jm,km))
       ALLOCATE(Vol(im,jm,km))
       ALLOCATE(Vol_prev(im,jm,km))
       ALLOCATE(area(im,jm))
       ALLOCATE(dz(im,jm,km))
+      ALLOCATE(dz1(im,jm,km))
+      ALLOCATE(dz2(im,jm,km))
       ALLOCATE(d_sfc(im,jm,km))
       ALLOCATE(fm(im,jm,km))
       ALLOCATE(wsm(im,jm))
@@ -156,10 +174,14 @@ write(6,*)
       lat=fill(0)  !Fill values for netCDF
       lon=fill(0)  
       depth=fill(0) 
+      depth1=fill(0)
+      depth2=fill(0)
       d=fill(0)  
       Vol=fill(0)  
       area=fill(0)
       dz=fill(0) 
+      dz1=fill(0)
+      dz2=fill(0)
       d_sfc=fill(0)  
       fm=0. !Default land, real zero
       wsm=0 !Default shelf, integer zero

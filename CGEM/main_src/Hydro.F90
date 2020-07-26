@@ -13,6 +13,31 @@
       real,allocatable,save :: E(:,:) !Elevation
       real,allocatable,save :: Wind(:,:) !Wind Speed, m/s
       real,allocatable,save :: Rad(:,:) !Solar Radiation, watts/m2
+
+      real,allocatable,save :: S1(:,:,:)  !Bookend hydro variables 
+      real,allocatable,save :: T1(:,:,:) 
+      real,allocatable,save :: Ux1(:,:,:)
+      real,allocatable,save :: Vx1(:,:,:)
+      real,allocatable,save :: Wx1(:,:,:)
+      real,allocatable,save :: Kh1(:,:,:)
+      real,allocatable,save :: E1(:,:) 
+      real,allocatable,save :: Wind1(:,:)
+      real,allocatable,save :: Rad1(:,:) 
+      real,allocatable,save :: S2(:,:,:) 
+      real,allocatable,save :: T2(:,:,:) 
+      real,allocatable,save :: Ux2(:,:,:)
+      real,allocatable,save :: Vx2(:,:,:)
+      real,allocatable,save :: Wx2(:,:,:)
+      real,allocatable,save :: Kh2(:,:,:)
+      real,allocatable,save :: E2(:,:) 
+      real,allocatable,save :: Wind2(:,:)
+      real,allocatable,save :: Rad2(:,:) 
+
+      integer(kind=8),save :: hydro_t1, hydro_t2  ! bookend time values for hydro variables
+                                                  ! may be same or different
+                                                  ! depending on whether
+                                                  ! T_8 or TC_8 is used
+      integer(kind=8),save :: hydro_tc1, hydro_tc2
       
       type(netCDF_file) :: hydro_info(9)  !indices refer to order declared below in enum, 
                                           !omitting Wind Speed and Solar Radiation
@@ -51,6 +76,25 @@
       ALLOCATE(Kh(im,jm,nsl))
       ALLOCATE(E(im,jm))
 
+      ALLOCATE(S1(im,jm,nsl))
+      ALLOCATE(T1(im,jm,nsl))
+      ALLOCATE(Wind1(im,jm))
+      ALLOCATE(Rad1(im,jm))
+      ALLOCATE(Ux1(im,jm,nsl))
+      ALLOCATE(Vx1(im,jm,nsl))
+      ALLOCATE(Wx1(im,jm,nsl))
+      ALLOCATE(Kh1(im,jm,nsl))
+      ALLOCATE(E1(im,jm))
+      ALLOCATE(S2(im,jm,nsl))
+      ALLOCATE(T2(im,jm,nsl))
+      ALLOCATE(Wind2(im,jm))
+      ALLOCATE(Rad2(im,jm))
+      ALLOCATE(Ux2(im,jm,nsl))
+      ALLOCATE(Vx2(im,jm,nsl))
+      ALLOCATE(Wx2(im,jm,nsl))
+      ALLOCATE(Kh2(im,jm,nsl))
+      ALLOCATE(E2(im,jm))
+      
       !Fill values for netCDF
       S=fill(0)  
       T=fill(0) 
@@ -64,6 +108,25 @@
       !Wx = 0.0 
       Kh=fill(0)
       E=fill(0) 
+
+      S1=fill(0)  
+      T1=fill(0) 
+      Wind1=fill(0)  
+      Rad1=fill(0) 
+      Ux1=fill(0)
+      Vx1=fill(0)  
+      Wx1=fill(0)
+      Kh1=fill(0)
+      E1=fill(0) 
+      S2=fill(0)  
+      T2=fill(0) 
+      Wind2=fill(0)  
+      Rad2=fill(0) 
+      Ux2=fill(0)
+      Vx2=fill(0)  
+      Wx2=fill(0)
+      Kh2=fill(0)
+      E2=fill(0) 
 
 #ifdef DEBUG
         write(6,*) "Allocate_Hydro"
@@ -130,6 +193,10 @@
       enddo
 
       startIndex = 1
+      hydro_t1 = 0
+      hydro_t2 = 0
+      hydro_tc1 = 0
+      hydro_tc2 = 0
 
 #ifdef DEBUG 
 write(6,*) "---Init_Hydro_NetCDF----"

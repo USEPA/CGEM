@@ -11,6 +11,7 @@ MAIN_OBJ  =  fillval.o\
 	error.o\
 	Model_dim.o\
         netcdf_utils.o\
+        Interp_utils.o\
 	Grid.o\
 	State_Vars.o\
 	Hydro.o\

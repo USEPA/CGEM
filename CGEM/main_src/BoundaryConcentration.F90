@@ -4,15 +4,35 @@
 
       IMPLICIT NONE
 
-      real,allocatable,save :: BCvar1(:) !BCvar1
-      real,allocatable,save :: BCvar2(:) !BCvar2
-      real,allocatable,save :: BCvar3(:) !BCvar3
-      real,allocatable,save :: BCvar4(:) !BCvar4
-      real,allocatable,save :: BCvar5(:) !BCvar5
-      real,allocatable,save :: BCvar6(:) !BCvar6
-      real,allocatable,save :: BCvar7(:) !BCvar7
-      real,allocatable,save :: BCvar8(:) !BCvar8
-      real,allocatable,save :: BCvar9(:) !BCvar9
+      real,allocatable,save :: BC1(:) !BCvar1
+      real,allocatable,save :: BC2(:) !BCvar2
+      real,allocatable,save :: BC3(:) !BCvar3
+      real,allocatable,save :: BC4(:) !BCvar4
+      real,allocatable,save :: BC5(:) !BCvar5
+      real,allocatable,save :: BC6(:) !BCvar6
+      real,allocatable,save :: BC7(:) !BCvar7
+      real,allocatable,save :: BC8(:) !BCvar8
+      real,allocatable,save :: BC9(:) !BCvar9
+
+
+      real,allocatable,save :: BC1A(:) !BCvar1
+      real,allocatable,save :: BC2A(:) !BCvar2
+      real,allocatable,save :: BC3A(:) !BCvar3
+      real,allocatable,save :: BC4A(:) !BCvar4
+      real,allocatable,save :: BC5A(:) !BCvar5
+      real,allocatable,save :: BC6A(:) !BCvar6
+      real,allocatable,save :: BC7A(:) !BCvar7
+      real,allocatable,save :: BC8A(:) !BCvar8
+      real,allocatable,save :: BC9A(:) !BCvar9
+      real,allocatable,save :: BC1B(:) !BCvar1
+      real,allocatable,save :: BC2B(:) !BCvar2
+      real,allocatable,save :: BC3B(:) !BCvar3
+      real,allocatable,save :: BC4B(:) !BCvar4
+      real,allocatable,save :: BC5B(:) !BCvar5
+      real,allocatable,save :: BC6B(:) !BCvar6
+      real,allocatable,save :: BC7B(:) !BCvar7
+      real,allocatable,save :: BC8B(:) !BCvar8
+      real,allocatable,save :: BC9B(:) !BCvar9
       
       integer, allocatable, save :: bcIJ(:,:)  ! Grid cell indices of boundary concentration locations
 
@@ -21,17 +41,19 @@
       integer, dimension(9) :: startBcIndex ! holds the last time index from netcdf file used for each boundaryconcentration variable
                                             ! used as starting point for next lookup
 
-      integer, parameter :: eBCvar1 = 1    !BCvar1
-      integer, parameter :: eBCvar2 = 2    !BCvar2
-      integer, parameter :: eBCvar3 = 3    !BCvar3
-      integer, parameter :: eBCvar4 = 4    !BCvar4
-      integer, parameter :: eBCvar5 = 5    !BCvar5
-      integer, parameter :: eBCvar6 = 6    !BCvar6
-      integer, parameter :: eBCvar7 = 7    !BCvar7
-      integer, parameter :: eBCvar8 = 8    !BCvar8
-      integer, parameter :: eBCvar9 = 9    !BCvar9
+      integer, parameter :: eBC1 = 1    !BCvar1
+      integer, parameter :: eBC2 = 2    !BCvar2
+      integer, parameter :: eBC3 = 3    !BCvar3
+      integer, parameter :: eBC4 = 4    !BCvar4
+      integer, parameter :: eBC5 = 5    !BCvar5
+      integer, parameter :: eBC6 = 6    !BCvar6
+      integer, parameter :: eBC7 = 7    !BCvar7
+      integer, parameter :: eBC8 = 8    !BCvar8
+      integer, parameter :: eBC9 = 9    !BCvar9
 
-      integer, save :: fBCv, lBCv  ! looping index of FirstBoundaryConcentrationVar and LastBoundaryConcentrationVar 
+      integer, save :: fBCv, lBCv  ! looping index of FirstBoundaryConcentrationVar and LastBoundaryConcentrationVar
+
+      integer(kind=8), save :: bc_tc1, bc_tc2 
 
       contains
 
@@ -42,28 +64,28 @@
 
       IMPLICIT NONE
 
-      ALLOCATE(BCvar1(nBC))
-      ALLOCATE(BCvar2(nBC))
-      ALLOCATE(BCvar3(nBC))
-      ALLOCATE(BCvar4(nBC))
-      ALLOCATE(BCvar5(nBC))
-      ALLOCATE(BCvar6(nBC))
-      ALLOCATE(BCvar7(nBC))
-      ALLOCATE(BCvar8(nBC))
-      ALLOCATE(BCvar9(nBC))
+      ALLOCATE(BC1(nBC))
+      ALLOCATE(BC2(nBC))
+      ALLOCATE(BC3(nBC))
+      ALLOCATE(BC4(nBC))
+      ALLOCATE(BC5(nBC))
+      ALLOCATE(BC6(nBC))
+      ALLOCATE(BC7(nBC))
+      ALLOCATE(BC8(nBC))
+      ALLOCATE(BC9(nBC))
 
       ALLOCATE(bcIJ(nBC,2))
 
       !Fill values for netCDF
-      BCvar1 = fill(0)  
-      BCvar2 = fill(0)
-      BCvar3 = fill(0)
-      BCvar4 = fill(0)
-      BCvar5 = fill(0)
-      BCvar6 = fill(0)
-      BCvar7 = fill(0)
-      BCvar8 = fill(0)
-      BCvar9 = fill(0)
+      BC1 = fill(0)  
+      BC2 = fill(0)
+      BC3 = fill(0)
+      BC4 = fill(0)
+      BC5 = fill(0)
+      BC6 = fill(0)
+      BC7 = fill(0)
+      BC8 = fill(0)
+      BC9 = fill(0)
 
       return
 
@@ -81,15 +103,15 @@
 
       !Set filenames for netCDF
       if (Which_gridio .eq. 1) then 
-         write(netcdf_boundaryconcentration_fileNames(eBCvar1), '(A, A)') trim(DATADIR), '/INPUT/TN_BoundaryConcentrations.nc'
-         write(netcdf_boundaryconcentration_fileNames(eBCvar2), '(A, A)') trim(DATADIR), '/INPUT/NO3_BoundaryConcentrations.nc'
-         write(netcdf_boundaryconcentration_fileNames(eBCvar3), '(A, A)') trim(DATADIR), '/INPUT/NH4_BoundaryConcentrations.nc'
-         write(netcdf_boundaryconcentration_fileNames(eBCvar4), '(A, A)') trim(DATADIR), '/INPUT/DON_BoundaryConcentrations.nc'
-         write(netcdf_boundaryconcentration_fileNames(eBCvar5), '(A, A)') trim(DATADIR), '/INPUT/TP_BoundaryConcentrations.nc'
-         write(netcdf_boundaryconcentration_fileNames(eBCvar6), '(A, A)') trim(DATADIR), '/INPUT/DIP_BoundaryConcentrations.nc'
-         write(netcdf_boundaryconcentration_fileNames(eBCvar7), '(A, A)') trim(DATADIR), '/INPUT/DOP_BoundaryConcentrations.nc'
-         write(netcdf_boundaryconcentration_fileNames(eBCvar8), '(A, A)') trim(DATADIR), '/INPUT/BOD_BoundaryConcentrations.nc'
-         write(netcdf_boundaryconcentration_fileNames(eBCvar9), '(A, A)') trim(DATADIR), '/INPUT/DO_BoundaryConcentrations.nc'
+         write(netcdf_boundaryconcentration_fileNames(eBC1), '(A, A)') trim(DATADIR), '/INPUT/TN_BoundaryConcentrations.nc'
+         write(netcdf_boundaryconcentration_fileNames(eBC2), '(A, A)') trim(DATADIR), '/INPUT/NO3_BoundaryConcentrations.nc'
+         write(netcdf_boundaryconcentration_fileNames(eBC3), '(A, A)') trim(DATADIR), '/INPUT/NH4_BoundaryConcentrations.nc'
+         write(netcdf_boundaryconcentration_fileNames(eBC4), '(A, A)') trim(DATADIR), '/INPUT/DON_BoundaryConcentrations.nc'
+         write(netcdf_boundaryconcentration_fileNames(eBC5), '(A, A)') trim(DATADIR), '/INPUT/TP_BoundaryConcentrations.nc'
+         write(netcdf_boundaryconcentration_fileNames(eBC6), '(A, A)') trim(DATADIR), '/INPUT/DIP_BoundaryConcentrations.nc'
+         write(netcdf_boundaryconcentration_fileNames(eBC7), '(A, A)') trim(DATADIR), '/INPUT/DOP_BoundaryConcentrations.nc'
+         write(netcdf_boundaryconcentration_fileNames(eBC8), '(A, A)') trim(DATADIR), '/INPUT/BOD_BoundaryConcentrations.nc'
+         write(netcdf_boundaryconcentration_fileNames(eBC9), '(A, A)') trim(DATADIR), '/INPUT/DO_BoundaryConcentrations.nc'
       else if (Which_gridio .eq. 2) then
 !         write(netcdf_fileNames(eSal), '(A, A)') trim(DATADIR), '/INPUT/S.nc'
 !         write(netcdf_fileNames(eTemp), '(A, A)') trim(DATADIR), '/INPUT/T.nc'
@@ -136,6 +158,9 @@ call report_info(boundaryconcentration_info(i))
          read(19,*) bcIJ(i,1:2)
       enddo
       close(19)
+
+      bc_tc1=0
+      bc_tc2=0
       
       
       End Subroutine Init_BoundaryConcentration_NetCDF

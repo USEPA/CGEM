@@ -1261,13 +1261,13 @@ do i = 1, nriv            ! Loop over the rivers
    do k = 1, nsl          ! Loop over the sigma layers
       rivLoadConvFactor = 1.0e6 * weights(i,k) * dT / Vol(icell,jcell,k)
       ff(icell,jcell,k,iNO3) = ff(icell,jcell,k,iNO3) +  &
-                            & Var2(i) * rivLoadConvFactor / 14.01
+                            & Riv2(i) * rivLoadConvFactor / 14.01
       ff(icell,jcell,k,iNH4) = ff(icell,jcell,k,iNH4) +  &
-                            & Var3(i) * rivLoadConvFactor / 14.01
+                            & Riv3(i) * rivLoadConvFactor / 14.01
       ff(icell,jcell,k,iPO4) = ff(icell,jcell,k,iPO4) +  &
-                            & Var6(i) * rivLoadConvFactor / 30.97
+                            & Riv6(i) * rivLoadConvFactor / 30.97
       ff(icell,jcell,k,iO2) = ff(icell,jcell,k,iO2) +  &
-                            & Var9(i) * rivLoadConvFactor / 32.0
+                            & Riv9(i) * rivLoadConvFactor / 32.0
    enddo
 enddo
 
