@@ -83,6 +83,17 @@ integer b,c,d,e,f
 real :: a(b,1,1)
 end subroutine
 
+subroutine BCAST_INT8(a,b,c,d,e,f)
+integer(kind=8) :: a
+integer b,c,d,e,f
+end subroutine
+
+subroutine BCAST_LOGICAL(a,b,c,d,e,f)
+logical :: a
+integer b,c,d,e,f
+end subroutine
+
+
 
 subroutine MPI_FINALIZE(mierr)
 integer mierr

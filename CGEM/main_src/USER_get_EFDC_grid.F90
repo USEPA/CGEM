@@ -69,22 +69,22 @@ write(6,*)
       integer(kind=8) :: T_1,T_2, TC_1,TC_2  !bookend time values
       real x
 
-      call interpVar(grid_info(eColDepth), TC_8, gridStartIndex(eColDepth), depth)
-      call interpVar(grid_info(eCellDepth), TC_8, gridStartIndex(eCellDepth), dz)
-      call interpVar(grid_info(eColDepth), T_8, gridStartIndex(eColDepth), depth)
-      call interpVar(grid_info(eCellDepth), T_8, gridStartIndex(eCellDepth), dz)
+!      call interpVar(grid_info(eColDepth), TC_8, gridStartIndex(eColDepth), depth)
+!      call interpVar(grid_info(eCellDepth), TC_8, gridStartIndex(eCellDepth), dz)
+!      call interpVar(grid_info(eColDepth), T_8, gridStartIndex(eColDepth), depth)
+!      call interpVar(grid_info(eCellDepth), T_8, gridStartIndex(eCellDepth), dz)
 
-!       t_current = T_8
-!       if(t_current .gt. grid_t2) then
-!!         print*,"reading grid vars for time: ", t_current
-!         call retrieveBookendVar(grid_info(eColDepth), t_current, gridStartIndex(eColDepth), depth1, depth2, grid_t1, grid_t2)
-!         call retrieveBookendVar(grid_info(eCellDepth), t_current, gridStartIndex(eCellDepth), dz1, dz2, grid_t1, grid_t2)
-!!       else 
-!!         print*,"skipping read of grid vars for time: ", t_current
-!       end if
-!
-!       call interp(depth1, depth2, grid_t1, grid_t2, t_current, depth, .TRUE.)
-!       call interp(dz1, dz2, grid_t1, grid_t2, t_current, dz, .TRUE.)
+       t_current = T_8
+       if(t_current .gt. grid_t2) then
+!         print*,"reading grid vars for time: ", t_current
+         call retrieveBookendVar(grid_info(eColDepth), t_current, gridStartIndex(eColDepth), depth1, depth2, grid_t1, grid_t2)
+         call retrieveBookendVar(grid_info(eCellDepth), t_current, gridStartIndex(eCellDepth), dz1, dz2, grid_t1, grid_t2)
+!       else 
+!         print*,"skipping read of grid vars for time: ", t_current
+       end if
+
+       call interp(depth1, depth2, grid_t1, grid_t2, t_current, depth, .TRUE.)
+       call interp(dz1, dz2, grid_t1, grid_t2, t_current, dz, .TRUE.)
 
 
       d = fill(0) 

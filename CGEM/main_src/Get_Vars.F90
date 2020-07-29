@@ -10,6 +10,7 @@
        USE BoundaryConcentration
        USE interp_utils
        use mpi_interface
+       use serial
 
        IMPLICIT NONE
 
@@ -60,9 +61,6 @@
          if (nBC.gt.0 .AND. Which_gridio.eq.1 .AND. TC_in .gt. bc_tc2) then
            broadcast_bc = .TRUE.
          endif
-!       else 
-!         broadcast_TC = .FALSE.
-!         broadcast_T = .FALSE.
        endif
 
 
@@ -195,117 +193,117 @@
 
 !      print*,"before Get_Vars bcast for processor: ",myid
 
+      if(numprocs.gt.1) then
+        call MPI_BCAST(broadcast_tc,1,MPI_LOGICAL,0,MPI_COMM_WORLD,mpierr)
+        call MPI_BCAST(broadcast_t,1,MPI_LOGICAL,0,MPI_COMM_WORLD,mpierr)
 
-      call MPI_BCAST(broadcast_tc,1,MPI_LOGICAL,0,MPI_COMM_WORLD,mpierr)
-      call MPI_BCAST(broadcast_t,1,MPI_LOGICAL,0,MPI_COMM_WORLD,mpierr)
+!        print*,"late broadcast_TC: ", broadcast_TC, " on processor: ",myid
+!        print*,"late broadcast_T: ", broadcast_T, " on processor: ",myid
 
-!      print*,"late broadcast_TC: ", broadcast_TC, " on processor: ",myid
-!      print*,"late broadcast_T: ", broadcast_T, " on processor: ",myid
+!        print*,"b4 bcast on processor:",myid," T1(30,87,10)=",T1(30,87,10)
+!        print*,"b4 bcast on processor:",myid," T1(210,87,10)=",T1(210,87,10)
+!        print*,"b4 bcast on processor:",myid," T2(30,87,10)=",T2(30,87,10)
+!        print*,"b4 bcast on processor:",myid," T2(210,87,10)=",T2(210,87,10)
 
-!      print*,"b4 bcast on processor:",myid," T1(30,87,10)=",T1(30,87,10)
-!      print*,"b4 bcast on processor:",myid," T1(210,87,10)=",T1(210,87,10)
-!      print*,"b4 bcast on processor:",myid," T2(30,87,10)=",T2(30,87,10)
-!      print*,"b4 bcast on processor:",myid," T2(210,87,10)=",T2(210,87,10)
+!        print*,"b4 bcast on processor:",myid," S1(30,87,10)=",S1(30,87,10)
+!        print*,"b4 bcast on processor:",myid," S1(210,87,10)=",S1(210,87,10)
+!        print*,"b4 bcast on processor:",myid," S2(30,87,10)=",S2(30,87,10)
+!        print*,"b4 bcast on processor:",myid," S2(210,87,10)=",S2(210,87,10)
 
-!      print*,"b4 bcast on processor:",myid," S1(30,87,10)=",S1(30,87,10)
-!      print*,"b4 bcast on processor:",myid," S1(210,87,10)=",S1(210,87,10)
-!      print*,"b4 bcast on processor:",myid," S2(30,87,10)=",S2(30,87,10)
-!      print*,"b4 bcast on processor:",myid," S2(210,87,10)=",S2(210,87,10)
+        if (broadcast_TC) then
+          if(numprocs.gt.1) then
+            call MPI_BCAST(hydro_tc1,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
+            call MPI_BCAST(hydro_tc2,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
 
-      if (broadcast_TC) then
-        if(numprocs.gt.1) then
-          call MPI_BCAST(hydro_tc1,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
-          call MPI_BCAST(hydro_tc2,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
-
-          if (Which_gridio.eq.0)then
-            call MPI_BCAST(S,im*jm*nsl,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-            call MPI_BCAST(T,im*jm*nsl,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-            call MPI_BCAST(Wind,im*jm,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-            call MPI_BCAST(Rad,im*jm,MPI_REAL,0,MPI_COMM_WORLD,mpierr)       
-          else 
-
-            if (Which_gridio.eq.3) then
+            if (Which_gridio.eq.0)then
               call MPI_BCAST(S,im*jm*nsl,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-              call MPI_BCAST(Wind1,im*jm,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-              call MPI_BCAST(Wind2,im*jm,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-              call MPI_BCAST(Rad1,im*jm,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-              call MPI_BCAST(Rad2,im*jm,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-            else
-              call MPI_BCAST(S1,im*jm*nsl,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-              call MPI_BCAST(S2,im*jm*nsl,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+              call MPI_BCAST(T,im*jm*nsl,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
               call MPI_BCAST(Wind,im*jm,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-              call MPI_BCAST(Rad,im*jm,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-            endif
+              call MPI_BCAST(Rad,im*jm,MPI_REAL,0,MPI_COMM_WORLD,mpierr)       
+            else 
+
+              if (Which_gridio.eq.3) then
+                call MPI_BCAST(S,im*jm*nsl,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+                call MPI_BCAST(Wind1,im*jm,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+                call MPI_BCAST(Wind2,im*jm,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+                call MPI_BCAST(Rad1,im*jm,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+                call MPI_BCAST(Rad2,im*jm,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+              else
+                call MPI_BCAST(S1,im*jm*nsl,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+                call MPI_BCAST(S2,im*jm*nsl,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+                call MPI_BCAST(Wind,im*jm,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+                call MPI_BCAST(Rad,im*jm,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+              endif
   
-!            print*,"calling MPI_BCAST for T1 & T2" 
-!            call MPI_BCAST(S1,im*jm*nsl,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-            call MPI_BCAST(T1,im*jm*nsl,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-            call MPI_BCAST(Ux1,im*jm*nsl,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-            call MPI_BCAST(Vx1,im*jm*nsl,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-            call MPI_BCAST(Wx1,im*jm*nsl,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-            call MPI_BCAST(Kh1,im*jm*nsl,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-!            call MPI_BCAST(S2,im*jm*nsl,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-            call MPI_BCAST(T2,im*jm*nsl,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-            call MPI_BCAST(Ux2,im*jm*nsl,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-            call MPI_BCAST(Vx2,im*jm*nsl,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-            call MPI_BCAST(Wx2,im*jm*nsl,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-            call MPI_BCAST(Kh2,im*jm*nsl,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+!              print*,"calling MPI_BCAST for T1 & T2" 
+!              call MPI_BCAST(S1,im*jm*nsl,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+              call MPI_BCAST(T1,im*jm*nsl,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+              call MPI_BCAST(Ux1,im*jm*nsl,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+              call MPI_BCAST(Vx1,im*jm*nsl,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+              call MPI_BCAST(Wx1,im*jm*nsl,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+              call MPI_BCAST(Kh1,im*jm*nsl,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+!              call MPI_BCAST(S2,im*jm*nsl,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+              call MPI_BCAST(T2,im*jm*nsl,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+              call MPI_BCAST(Ux2,im*jm*nsl,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+              call MPI_BCAST(Vx2,im*jm*nsl,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+              call MPI_BCAST(Wx2,im*jm*nsl,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+              call MPI_BCAST(Kh2,im*jm*nsl,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+            endif
+          endif 
+        endif
+
+
+        if (broadcast_T) then
+          if(numprocs.gt.1) then
+            call MPI_BCAST(hydro_t1,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
+            call MPI_BCAST(hydro_t2,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
+
+            call MPI_BCAST(E1,im*jm,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+            call MPI_BCAST(E2,im*jm,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
           endif
-        endif 
-      endif
+        endif
 
+        if (broadcast_river) then
+            call MPI_BCAST(river_tc1,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
+            call MPI_BCAST(river_tc2,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
 
-      if (broadcast_T) then
-        if(numprocs.gt.1) then
-          call MPI_BCAST(hydro_t1,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
-          call MPI_BCAST(hydro_t2,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
+            
+            call MPI_BCAST(Riv1A,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+            call MPI_BCAST(Riv1B,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+            call MPI_BCAST(Riv2A,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+            call MPI_BCAST(Riv2B,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+            call MPI_BCAST(Riv3A,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+            call MPI_BCAST(Riv3B,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+            call MPI_BCAST(Riv4A,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+            call MPI_BCAST(Riv4B,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+            call MPI_BCAST(Riv5A,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+            call MPI_BCAST(Riv5B,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+            call MPI_BCAST(Riv6A,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+            call MPI_BCAST(Riv6B,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+            call MPI_BCAST(Riv7A,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+            call MPI_BCAST(Riv7B,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+            call MPI_BCAST(Riv8A,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+            call MPI_BCAST(Riv8B,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+            call MPI_BCAST(Riv9A,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+            call MPI_BCAST(Riv9B,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+        endif
+        
 
-          call MPI_BCAST(E1,im*jm,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-          call MPI_BCAST(E2,im*jm,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+        if (broadcast_bc) then
+            call MPI_BCAST(bc_tc1,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
+            call MPI_BCAST(bc_tc2,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
+
+            call MPI_BCAST(BC1A,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+            call MPI_BCAST(BC2A,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+            call MPI_BCAST(BC3A,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+            call MPI_BCAST(BC4A,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+            call MPI_BCAST(BC5A,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+            call MPI_BCAST(BC6A,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+            call MPI_BCAST(BC7A,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+            call MPI_BCAST(BC8A,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+            call MPI_BCAST(BC9A,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
         endif
       endif
-
-      if (broadcast_river) then
-          call MPI_BCAST(river_tc1,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
-          call MPI_BCAST(river_tc2,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
-
-          
-          call MPI_BCAST(Riv1A,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-          call MPI_BCAST(Riv1B,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-          call MPI_BCAST(Riv2A,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-          call MPI_BCAST(Riv2B,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-          call MPI_BCAST(Riv3A,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-          call MPI_BCAST(Riv3B,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-          call MPI_BCAST(Riv4A,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-          call MPI_BCAST(Riv4B,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-          call MPI_BCAST(Riv5A,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-          call MPI_BCAST(Riv5B,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-          call MPI_BCAST(Riv6A,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-          call MPI_BCAST(Riv6B,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-          call MPI_BCAST(Riv7A,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-          call MPI_BCAST(Riv7B,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-          call MPI_BCAST(Riv8A,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-          call MPI_BCAST(Riv8B,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-          call MPI_BCAST(Riv9A,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-          call MPI_BCAST(Riv9B,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-      endif
-      
-
-      if (broadcast_bc) then
-          call MPI_BCAST(bc_tc1,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
-          call MPI_BCAST(bc_tc2,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
-
-          call MPI_BCAST(BC1A,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-          call MPI_BCAST(BC2A,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-          call MPI_BCAST(BC3A,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-          call MPI_BCAST(BC4A,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-          call MPI_BCAST(BC5A,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-          call MPI_BCAST(BC6A,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-          call MPI_BCAST(BC7A,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-          call MPI_BCAST(BC8A,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-          call MPI_BCAST(BC9A,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-      endif
-
 !      print*,"after bcast myid:",myid," T1(47,94,1)=",T1(47,94,1)
 !      print*,"after bcast myid:",myid," T1(222,108,1)=",T1(222,108,1)
 !      print*,"after bcast myid:",myid," T2(47,94,1)=",T2(47,94,1)

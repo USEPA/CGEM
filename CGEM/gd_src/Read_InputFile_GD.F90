@@ -299,6 +299,7 @@ read(999,*) ws(JRON)  ! VRON
 read(999,*) ws(JLOP)  ! VLOP
 read(999,*) ws(JROP)  ! VROP
 read(999,*) ws(JSU)   ! VSU
+read(999,*) ws(JTR)   ! VTR
 endif
 if(numprocs.gt.1) then
 call MPI_BCAST(code_ID,50,MPI_CHARACTER,0,MPI_COMM_WORLD,mpierr)

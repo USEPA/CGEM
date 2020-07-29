@@ -13,7 +13,7 @@ MODULE NETCDF_UTILITIES
 PUBLIC CHKERR, DEFDIM, &
        DEFVI1, DEFVR1, DEFVD1, DEFVI2, DEFVR2, DEFVI3, DEFVR3, DEFVR4, &
        DEFVAR, DEFIAT, DEFRAT, DEFRAT2, DEFRAT6, DEFRAT8, DEFRATX, DEFTAT, &
-       READIAT, CONVERT_LONGITUDES
+       READIAT, CONVERT_LONGITUDES, DEFVRTATT
 
 PRIVATE
 CONTAINS
@@ -215,6 +215,13 @@ CONTAINS
     DIM_IDS( 3 ) = DIMID3
     ERR = NF_DEF_VAR( FILEID, VARNAM, 5, 3, DIM_IDS, VARID )
     CALL CHKERR( ERR, 'create variable ' // VARNAM )
+
+    ERR = NF_PUT_ATT_TEXT(FILEID, VARID, 'coordinates', 18, 'latitude longitude')
+    CALL CHKERR( ERR, 'create coordinates attribute ' // VARNAM )
+
+    ERR = NF_PUT_ATT_TEXT(FILEID, VARID, 'cell_measures', 10, 'area: Area')
+    CALL CHKERR( ERR, 'create cell measures attribute ' // VARNAM )
+
     CALL DEFVAR( FILEID, VARID, VARNAM, VARDES, UNITS )
     RETURN
   END SUBROUTINE DEFVR3
@@ -249,6 +256,13 @@ CONTAINS
     endif
 
     CALL CHKERR( ERR, 'create variable ' // VARNAM )
+
+    ERR = NF_PUT_ATT_TEXT(FILEID, VARID, 'coordinates', 18, 'latitude longitude')
+    CALL CHKERR( ERR, 'create coordinates attribute ' // VARNAM )
+
+    ERR = NF_PUT_ATT_TEXT(FILEID, VARID, 'cell_measures', 10, 'area: Area')
+    CALL CHKERR( ERR, 'create cell measures attribute ' // VARNAM )
+
     CALL DEFVAR( FILEID, VARID, VARNAM, VARDES, UNITS )
     RETURN
   END SUBROUTINE DEFVR4
@@ -277,6 +291,24 @@ CONTAINS
 
     RETURN
   END SUBROUTINE DEFVAR
+
+  
+  ! Define text attribute for variable in a NetCDF file.
+  !
+  SUBROUTINE DEFVRTATT( FILEID, VARID, ATTNAME, ATT)
+    IMPLICIT NONE
+    INTEGER , INTENT(IN):: FILEID, VARID
+    CHARACTER(LEN=*),INTENT(IN):: ATTNAME, ATT
+    ! Externals:
+    INTEGER NF_PUT_ATT_TEXT
+    EXTERNAL NF_PUT_ATT_TEXT
+    ! Locals:
+    INTEGER ERR
+
+    ERR = NF_PUT_ATT_TEXT(FILEID, VARID, ATTNAME, LEN(ATT), ATT)
+    CALL CHKERR(ERR, 'create variable attribute ' // ATTNAME )
+
+  END SUBROUTINE DEFVRTATT
 
 
 

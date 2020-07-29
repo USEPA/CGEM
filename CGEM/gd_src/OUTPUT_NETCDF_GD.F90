@@ -76,16 +76,25 @@ CONTAINS
     REAL,DIMENSION(IM, JM, KM):: DZ
     REAL,DIMENSION(IM,JM):: AREA
     REAL,DIMENSION(IM,JM,KM):: FM
+    REAL,DIMENSION(IM):: XLON
+    REAL,DIMENSION(JM):: YLAT
    ! External NetCDF routines:
 !    INTEGER NF_CREATE, NF_ENDDEF, NF_PUT_VAR_INT, NF_PUT_VAR_REAL, NF_SYNC
 !    EXTERNAL NF_CREATE, NF_ENDDEF, NF_PUT_VAR_INT, NF_PUT_VAR_REAL, NF_SYNC
    ! Locals:
     INTEGER IM_DIM, JM_DIM, KM_DIM, NSTEPP1_DIM
     INTEGER RLON_VAR, RLAT_VAR, H_VAR, FM_VAR
+    INTEGER XLON_VAR, YLAT_VAR
     INTEGER DZ_VAR,AREA_VAR
-    INTEGER K,J, INFO
+    INTEGER K,J,I, INFO
     INTEGER ERR, VARIABLE, DIM_IDS( 4 )
     REAL,DIMENSION(IM,JM):: RLON_COPY
+    REAL,PARAMETER :: LAT_MIN = 43.1
+    REAL,PARAMETER :: LAT_MAX = 44.4
+    REAL,PARAMETER :: LON_MIN = -80.0
+    REAL,PARAMETER :: LON_MAX = -76.00
+    REAL :: LAT_INCR
+    REAL :: LON_INCR
     CHARACTER(LEN=40):: TIME_UNITS
     FILE_ID = -1
 
@@ -102,8 +111,8 @@ CONTAINS
 
 
     ! Create dimensions:
-    CALL DEFDIM( FILE_ID, IM_DIM, 'longitude', IM )
-    CALL DEFDIM( FILE_ID, JM_DIM, 'latitude', JM )
+    CALL DEFDIM( FILE_ID, IM_DIM, 'xlon', IM )
+    CALL DEFDIM( FILE_ID, JM_DIM, 'ylat', JM )
     CALL DEFDIM( FILE_ID, KM_DIM, 'k', KM )
 !!  CALL DEFDIM( FILE_ID, NSTEPP1_DIM, 'time', NSTEP )
     CALL DEFDIM( FILE_ID, NSTEPP1_DIM, 'time', 0 ) ! 0 Means UNLIMITED size.
@@ -382,20 +391,31 @@ CONTAINS
     CALL DEFRAT( FILE_ID, 'VLOP', ws(JLOP)   )
     CALL DEFRAT( FILE_ID, 'VROP', ws(JROP)  )
     CALL DEFRAT( FILE_ID, 'VSU', ws(JSU)   )
-
+    CALL DEFRAT( FILE_ID, 'VTR', ws(JTR)   )
 
 
     ! Define non-time-varying array variables:
 
-    CALL DEFVR2( FILE_ID, IM_DIM, JM_DIM, RLON_VAR, 'LONGXY', &
-                 'Cell center longitude [-180, 180].', 'deg' )
+    CALL DEFVR1( FILE_ID, IM_DIM, XLON_VAR, 'xlon', &
+                 'x-coordinate in Cartesian system', 'm' )
+
+    CALL DEFVR1( FILE_ID, JM_DIM, YLAT_VAR, 'ylat', &
+                 'y-coordinate in Cartesian system', 'm' )
+
+    CALL DEFVR2( FILE_ID, IM_DIM, JM_DIM, RLON_VAR, 'longitude', &
+                 'longitude', 'degrees_east' )
+
+!CWS
+    CALL DEFVRTATT( FILE_ID, RLON_VAR, 'axis','X')
 #ifdef DEBUG
 write(6,*) "After long"
 #endif
 
 
-    CALL DEFVR2( FILE_ID, IM_DIM, JM_DIM, RLAT_VAR, 'LATIXY', &
-                 'Cell center latitude [-90, 90].', 'deg' )
+    CALL DEFVR2( FILE_ID, IM_DIM, JM_DIM, RLAT_VAR, 'latitude', &
+                 'latitude', 'degrees_north' )
+!CWS
+!    CALL DEFVRTATT( FILE_ID, RLAT_VAR, 'axis','Y')
 #ifdef DEBUG
 write(6,*) "After lat"
 #endif
@@ -497,6 +517,20 @@ write(6,*) "After Extra_Vars"
     CALL CHKERR( ERR, 'begin independent data access mode' )
 
     ! Write non-time-varying array variables:
+
+    DO I = 1, IM
+      XLON(I) = I
+    ENDDO
+
+    DO J = 1, JM
+      YLAT(J) = J
+    ENDDO
+
+    ERR = ncdf_PUT_VAR_REAL( FILE_ID, XLON_VAR, XLON )
+    CALL CHKERR( ERR, 'write output variable xlon' )
+
+    ERR = ncdf_PUT_VAR_REAL( FILE_ID, YLAT_VAR, YLAT )
+    CALL CHKERR( ERR, 'write output variable ylat' )
 
     RLON_COPY = RLON
 
