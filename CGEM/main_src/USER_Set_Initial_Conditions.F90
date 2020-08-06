@@ -6,7 +6,8 @@
       use INPUT_VARS, only:icent,jcent
       use serial
       use mpi_interface
-      USE NETCDF_UTILITIES
+!      USE NETCDF_UTILITIES
+      use netcdf_utils
 
       implicit none
 
@@ -21,17 +22,19 @@
 
       !eventually put this in NETCDF_UTILITIES?
       integer ERR
-      INTEGER NF_INQ_VARID
-      EXTERNAL NF_INQ_VARID
 
    if (index(filename,file_extension) == 0 ) then !NetCDF file
 
      if(myid.eq.0) then
 
-       call nf_open(filename, 0, init_id)
-       ERR = NF_INQ_VARID( init_id, 'TP', tp_id)
-       CALL CHKERR( ERR, 'inquire TP id in initial conditions NetCDF file')
-       call nf_get_vara_real(init_id, tp_id, (/1,1,1/), (/im,jm,km/), varInitCond)
+        call nf_open(filename, 0, init_id)
+
+        call nf_inq_varid(init_id, "TP", tp_id)
+
+        call nf_get_vara_real(init_id, tp_id, (/1,1,1/), (/im,jm,km/), varInitCond)
+
+        call close_netcdf(init_id)      
+
      
      endif
 
@@ -50,7 +53,6 @@
        enddo
      enddo
 
-     call nf_close(init_id)
      
    else
 

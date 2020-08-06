@@ -45,6 +45,9 @@
 
       contains
 
+
+
+
       Subroutine Set_Grid(myid,numprocs)
 
       IMPLICIT NONE
@@ -112,8 +115,8 @@ if(myid.eq.0) then
       endif
 endif
 if(numprocs.gt.1) then
-     call MPI_BCAST(dz,im*jm*km,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-     call MPI_BCAST(depth,im*jm,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+!     call MPI_BCAST(dz,im*jm*km,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+!     call MPI_BCAST(depth,im*jm,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
      call MPI_BCAST(d,im*jm*km,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
      call MPI_BCAST(d_sfc,im*jm*km,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
      call MPI_BCAST(area,im*jm,MPI_REAL,0,MPI_COMM_WORLD,mpierr)

@@ -16,23 +16,23 @@
 
 
       real,allocatable,save :: Riv1A(:) !Var1
-      real,allocatable,save :: Riv2A(:) !Var2
-      real,allocatable,save :: Riv3A(:) !Var3
-      real,allocatable,save :: Riv4A(:) !Var4
-      real,allocatable,save :: Riv5A(:) !Var5
-      real,allocatable,save :: Riv6A(:) !Var6
-      real,allocatable,save :: Riv7A(:) !Var7
-      real,allocatable,save :: Riv8A(:) !Var8
-      real,allocatable,save :: Riv9A(:) !Var9
+!      real,allocatable,save :: Riv2A(:) !Var2
+!      real,allocatable,save :: Riv3A(:) !Var3
+!      real,allocatable,save :: Riv4A(:) !Var4
+!      real,allocatable,save :: Riv5A(:) !Var5
+!      real,allocatable,save :: Riv6A(:) !Var6
+!      real,allocatable,save :: Riv7A(:) !Var7
+!      real,allocatable,save :: Riv8A(:) !Var8
+!      real,allocatable,save :: Riv9A(:) !Var9
       real,allocatable,save :: Riv1B(:) !Var1
-      real,allocatable,save :: Riv2B(:) !Var2
-      real,allocatable,save :: Riv3B(:) !Var3
-      real,allocatable,save :: Riv4B(:) !Var4
-      real,allocatable,save :: Riv5B(:) !Var5
-      real,allocatable,save :: Riv6B(:) !Var6
-      real,allocatable,save :: Riv7B(:) !Var7
-      real,allocatable,save :: Riv8B(:) !Var8
-      real,allocatable,save :: Riv9B(:) !Var9
+!      real,allocatable,save :: Riv2B(:) !Var2
+!      real,allocatable,save :: Riv3B(:) !Var3
+!      real,allocatable,save :: Riv4B(:) !Var4
+!      real,allocatable,save :: Riv5B(:) !Var5
+!      real,allocatable,save :: Riv6B(:) !Var6
+!      real,allocatable,save :: Riv7B(:) !Var7
+!      real,allocatable,save :: Riv8B(:) !Var8
+!      real,allocatable,save :: Riv9B(:) !Var9
       
       real, allocatable, save :: weights(:,:)      ! River loads fractions/weights
       integer, allocatable, save :: riversIJ(:,:)  ! Grid cell indices of river loads discharge locations
@@ -43,14 +43,14 @@
                                           ! used as starting point for next lookup
 
       integer, parameter :: eRiv1 = 1    !Var1
-      integer, parameter :: eRiv2 = 2    !Var2
-      integer, parameter :: eRiv3 = 3    !Var3
-      integer, parameter :: eRiv4 = 4    !Var4
-      integer, parameter :: eRiv5 = 5    !Var5
-      integer, parameter :: eRiv6 = 6    !Var6
-      integer, parameter :: eRiv7 = 7    !Var7
-      integer, parameter :: eRiv8 = 8    !Var8
-      integer, parameter :: eRiv9 = 9    !Var9
+!      integer, parameter :: eRiv2 = 2    !Var2
+!      integer, parameter :: eRiv3 = 3    !Var3
+!      integer, parameter :: eRiv4 = 4    !Var4
+!      integer, parameter :: eRiv5 = 5    !Var5
+!      integer, parameter :: eRiv6 = 6    !Var6
+!      integer, parameter :: eRiv7 = 7    !Var7
+!      integer, parameter :: eRiv8 = 8    !Var8
+!      integer, parameter :: eRiv9 = 9    !Var9
 
       integer, save :: fRv, lRv  ! looping index of FirstRiverVar and LastRiverVar
 
@@ -65,29 +65,35 @@
 
       IMPLICIT NONE
 
+      print*,"Allocating riverloads"
+
       ALLOCATE(Riv1(nRiv))
-      ALLOCATE(Riv2(nRiv))
-      ALLOCATE(Riv3(nRiv))
-      ALLOCATE(Riv4(nRiv))
-      ALLOCATE(Riv5(nRiv))
-      ALLOCATE(Riv6(nRiv))
-      ALLOCATE(Riv7(nRiv))
-      ALLOCATE(Riv8(nRiv))
-      ALLOCATE(Riv9(nRiv))
+!      ALLOCATE(Riv2(nRiv))
+!      ALLOCATE(Riv3(nRiv))
+!      ALLOCATE(Riv4(nRiv))
+!      ALLOCATE(Riv5(nRiv))
+!      ALLOCATE(Riv6(nRiv))
+!      ALLOCATE(Riv7(nRiv))
+!      ALLOCATE(Riv8(nRiv))
+!      ALLOCATE(Riv9(nRiv))
+      ALLOCATE(Riv1A(nRiv))
+      ALLOCATE(Riv1B(nRiv))
 
       ALLOCATE(weights(nRiv,NSL))
       ALLOCATE(riversIJ(nRiv,2))
 
       !Fill values for netCDF
       Riv1 = fill(0)  
-      Riv2 = fill(0)
-      Riv3 = fill(0)
-      Riv4 = fill(0)
-      Riv5 = fill(0)
-      Riv6 = fill(0)
-      Riv7 = fill(0)
-      Riv8 = fill(0)
-      Riv9 = fill(0)
+!      Riv2 = fill(0)
+!      Riv3 = fill(0)
+!      Riv4 = fill(0)
+!      Riv5 = fill(0)
+!      Riv6 = fill(0)
+!      Riv7 = fill(0)
+!      Riv8 = fill(0)
+!      Riv9 = fill(0)
+      Riv1A = fill(0)  
+      Riv1B = fill(0)  
 
       return
 
@@ -105,15 +111,16 @@
 
       !Set filenames for netCDF
       if (Which_gridio .eq. 1) then 
-         write(netcdf_riverload_fileNames(eRiv1), '(A, A)') trim(DATADIR), '/INPUT/TN_RiverLoads.nc'
-         write(netcdf_riverload_fileNames(eRiv2), '(A, A)') trim(DATADIR), '/INPUT/NO3_RiverLoads.nc'
-         write(netcdf_riverload_fileNames(eRiv3), '(A, A)') trim(DATADIR), '/INPUT/NH3_RiverLoads.nc'
-         write(netcdf_riverload_fileNames(eRiv4), '(A, A)') trim(DATADIR), '/INPUT/DON_RiverLoads.nc'
-         write(netcdf_riverload_fileNames(eRiv5), '(A, A)') trim(DATADIR), '/INPUT/TP_RiverLoads.nc'
-         write(netcdf_riverload_fileNames(eRiv6), '(A, A)') trim(DATADIR), '/INPUT/DIP_RiverLoads.nc'
-         write(netcdf_riverload_fileNames(eRiv7), '(A, A)') trim(DATADIR), '/INPUT/DOP_RiverLoads.nc'
-         write(netcdf_riverload_fileNames(eRiv8), '(A, A)') trim(DATADIR), '/INPUT/BOD1_RiverLoads.nc'
-         write(netcdf_riverload_fileNames(eRiv9), '(A, A)') trim(DATADIR), '/INPUT/DO_RiverLoads.nc'
+         write(netcdf_riverload_fileNames(eRiv1), '(A, A)') trim(DATADIR), '/INPUT/TP_RiverLoads.nc'
+!         write(netcdf_riverload_fileNames(eRiv1), '(A, A)') trim(DATADIR), '/INPUT/TN_RiverLoads.nc'
+!         write(netcdf_riverload_fileNames(eRiv2), '(A, A)') trim(DATADIR), '/INPUT/NO3_RiverLoads.nc'
+!         write(netcdf_riverload_fileNames(eRiv3), '(A, A)') trim(DATADIR), '/INPUT/NH3_RiverLoads.nc'
+!         write(netcdf_riverload_fileNames(eRiv4), '(A, A)') trim(DATADIR), '/INPUT/DON_RiverLoads.nc'
+!         write(netcdf_riverload_fileNames(eRiv5), '(A, A)') trim(DATADIR), '/INPUT/TP_RiverLoads.nc'
+!         write(netcdf_riverload_fileNames(eRiv6), '(A, A)') trim(DATADIR), '/INPUT/DIP_RiverLoads.nc'
+!         write(netcdf_riverload_fileNames(eRiv7), '(A, A)') trim(DATADIR), '/INPUT/DOP_RiverLoads.nc'
+!         write(netcdf_riverload_fileNames(eRiv8), '(A, A)') trim(DATADIR), '/INPUT/BOD1_RiverLoads.nc'
+!         write(netcdf_riverload_fileNames(eRiv9), '(A, A)') trim(DATADIR), '/INPUT/DO_RiverLoads.nc'
       else if (Which_gridio .eq. 2) then
 !         write(netcdf_fileNames(eSal), '(A, A)') trim(DATADIR), '/INPUT/S.nc'
 !         write(netcdf_fileNames(eTemp), '(A, A)') trim(DATADIR), '/INPUT/T.nc'
@@ -136,7 +143,8 @@
 
 
       if (Which_gridio .eq. 1 .OR. Which_gridio .eq. 2) then  !EFDC and NCOM do not use Wind or Rad from NetCDF
-         fRv = 1;
+         fRv = 1
+         lRv = 1
 !         lRv = 9;
       else if (Which_gridio .eq. 3) then  !POM does not use Salinity
 !         fHv = 2;

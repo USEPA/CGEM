@@ -676,7 +676,7 @@ CONTAINS
     type (netCDF_file), INTENT(IN) :: info            !info for netcdf file
     integer, INTENT(INOUT) :: tstep                   !tstep to start looking for current time bookend
     integer(kind=8), INTENT(IN) :: t_current          !current time value to bookend
-    real, dimension(:), allocatable, INTENT(OUT) :: var1, var2     !bookend variable values
+    real, dimension(:), INTENT(OUT) :: var1, var2     !bookend variable values
     integer :: var_index, tdim_index, tvar_index      !index in netcdf of interp variable and time variable
     integer(kind=8), INTENT(OUT) :: t1, t2                         !bookend time values
 
@@ -710,7 +710,7 @@ CONTAINS
     type (netCDF_file), INTENT(IN) :: info            !info for netcdf file
     integer, INTENT(INOUT) :: tstep                   !tstep to start looking for current time bookend
     integer(kind=8), INTENT(IN) :: t_current          !current time value to bookend
-    real, dimension(:), allocatable, INTENT(OUT) :: var1, var2     !bookend variable values
+    real, dimension(:), INTENT(OUT) :: var1, var2     !bookend variable values
     integer :: var_index, tdim_index, tvar_index      !index in netcdf of interp variable and time variable
     integer(kind=8), INTENT(OUT) :: t1, t2                         !bookend time values
 

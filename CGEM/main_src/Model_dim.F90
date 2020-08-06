@@ -81,6 +81,8 @@ if(numprocs.gt.1) then
       call MPI_BCAST(iYr0,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
       call MPI_BCAST(DATADIR,200,MPI_CHARACTER,0,MPI_COMM_WORLD,mpierr)
       call MPI_BCAST(nsl,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
+      call MPI_BCAST(nRiv,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
+      call MPI_BCAST(nBC,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
 endif
 
 !Divide grid among processors
