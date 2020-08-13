@@ -98,6 +98,11 @@
         if (nRiv > 0) call Init_RiverLoad_NetCDF()
         if (nBC  > 0) call Init_BoundaryConcentration_NetCDF()
       endif
+
+      if(numprocs .gt. 1) then
+       call MPI_BCAST(riversIJ,nRiv*2,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
+       call MPI_BCAST(weights,nRiv*NSL,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+      endif
   
       call Get_Vars(TC_8,T_8,myid,numprocs) !Hydro for initial timestep 
 
