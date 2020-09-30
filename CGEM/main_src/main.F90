@@ -90,8 +90,10 @@
       T_8 = START_SECONDS 
       TC_8 = START_SECONDS - (dT / 2) ! Subtract half dT to 'center' of timestep.
 
-      print*,"start T_8=",T_8
-      print*,"start_TC_8=",TC_8
+      if(myid.eq.0)then
+        print*,"start T_8=",T_8
+        print*,"start_TC_8=",TC_8
+      endif
 
       if (Which_gridio .gt. 0.and.myid.eq.0) then
         call Init_Hydro_NetCDF()
@@ -113,9 +115,9 @@
       if (Which_gridio.eq.1) then
         call USER_update_EFDC_grid(TC_8,T_8,myid,numprocs)
       else if (Which_gridio.eq.2) then
-        call USER_update_NCOM_grid()
+        call USER_update_NCOM_grid(T_8,myid,numprocs)
       else if (Which_gridio.eq.3) then
-        call USER_update_POM_grid()
+        call USER_update_POM_grid(T_8,myid,numprocs)
       endif
 
 !--------------------------------
@@ -134,7 +136,6 @@
       call Initialize_Output(Which_code,BASE_NETCDF_OUTPUT_FILE_NAME,myid,numprocs)     !Open file and write initial configuration
 
 !-------------- START TIME LOOP -----------------------------------
-      print*,"iout = ", iout
       do istep = 1, nstep
        TC_8 = TC_8 + dT
        T_8 = T_8 + dT
@@ -142,18 +143,19 @@
      write(6,*) "TC_8=", TC_8
 #endif
       if(myid.eq.0)then
-        write(6,*) "istep=",istep
+        write(6,*) "istep=",istep, " of ",nstep
       endif
+
+      call Get_Vars(TC_8,T_8,myid,numprocs) !Hydro, Solar, Wind, Temp, Salinity, and riverloads
 
       if (Which_gridio.eq.1) then
         call USER_update_EFDC_grid(TC_8,T_8,myid,numprocs)
       elseif (Which_gridio.eq.2) then
-        call USER_update_NCOM_grid()
+        call USER_update_NCOM_grid(T_8,myid,numprocs)
       elseif (Which_gridio.eq.3) then
         call USER_update_POM_grid()
       endif
 
-      call Get_Vars(TC_8,T_8,myid,numprocs) !Hydro, Solar, Wind, Temp, Salinity, and riverloads
 
 !!      print*,"Main T(49,48,1)=",T(49,48,1)," with myid:",myid
 !!      print*,"Main T(205,38,1)=",T(205,38,1)," with myid:",myid

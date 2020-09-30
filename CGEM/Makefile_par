@@ -47,7 +47,7 @@ ifeq (iris,$(findstring iris,$(MY_HOST)))
   LIBS	   = $(IRIS_LIBS)
   F90      = mpiifort
   FFLAGS = -D_MPI
-  FFLAGS = -O -D_MPI -qopenmp -mcmodel=medium -pg -save-temps
+  FFLAGS = -O -D_MPI -mcmodel=medium -pg -save-temps
 #  FFLAGS = -warn all -traceback -no-diag-error-limit -implicitnone -convert big_endian -ftz -D_MPI#-check -debug -g       #-g -fbacktrace -Wall 
 else 
 ifeq (atmos,$(findstring atmos,$(MY_HOST)))

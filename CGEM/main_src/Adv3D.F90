@@ -132,7 +132,7 @@
            write(6,*) "ufm,ufp,vfm,vfp,wfm,wfp",ufm,ufp,vfm,vfp,wfm,wfp
            write(6,*) "cf,cfh",cf,cfh
            write(6,*) (ux(i,j,k)-ufm),(ux(ip1,j,k)+ufp),(ux(i,j,k)-ufm) - (ux(ip1,j,k)+ufp)
-           write(6,*) (vx(i,j,k)-vfm),(ux(i,jp1,k)+vfp),(vx(i,j,k)-vfm) - (vx(i,jp1,k)+vfp)
+           write(6,*) (vx(i,j,k)-vfm),(vx(i,jp1,k)+vfp),(vx(i,j,k)-vfm) - (vx(i,jp1,k)+vfp)
            write(6,*) "cf_wterms",w_wsink(i,j,k+1),w_wsink(i,j,k),(w_wsink(i,j,k+1)-wfp)-(w_wsink(i,j,k)+wfm)
            write(6,*) "u,v,w",ux(i,j,k),vx(i,j,k),w_wsink(i,j,k)
            write(6,*) "u,v,w:p1",ux(ip1,j,k),vx(i,jp1,k),w_wsink(i,j,k+1)

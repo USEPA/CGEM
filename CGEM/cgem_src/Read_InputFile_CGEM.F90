@@ -372,8 +372,6 @@ enddo
 ! --- sinking speed: converted from m/d downward positive to m/s negative
       ws = -ws/SDay
       if(Which_Adv.eq.2.or.Which_adv.eq.3) ws = 0.
-      write(6,*) "Which_Adv=",Which_Adv
-      write(6,*) "Which_VMix=",Which_VMix
 
   do j = 1,jm
     myi = 1

@@ -59,7 +59,7 @@
       end subroutine USER_get_POM_grid
 
 
-      subroutine USER_update_POM_grid()
+      subroutine USER_update_POM_grid(T_8,myid,numprocs)
 
       USE Fill_Value
       USE Model_dim
@@ -70,8 +70,25 @@
       IMPLICIT NONE
 
       real :: dp !d previous
-      integer :: i,j,k,nz
+      integer :: i,j,k,nz,mpierr
+      integer, intent(in) :: myid, numprocs
+      integer(kind=8) :: T_8, t_current
       integer :: init=1
+      logical :: broadcast_grid
+
+      t_current = T_8
+      broadcast_grid = .FALSE.
+
+      if (myid.eq.0)then
+        if (t_current.gt.grid_t2) then
+          broadcast_grid = .TRUE.
+        endif
+      endif
+
+      if (myid.eq.0)then
+        Vol_prev = Vol
+      endif
+
 
        do j=1,jm
         do i=1,im
@@ -96,6 +113,14 @@
         enddo
        enddo
       enddo  
+
+      if(numprocs.gt.1) then
+         call MPI_BCAST(dz,im*jm*km,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+         call MPI_BCAST(d,im*jm*km,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+         call MPI_BCAST(d_sfc,im*jm*km,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+         call MPI_BCAST(Vol,im*jm*km,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+         call MPI_BCAST(Vol_prev,im*jm*km,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+      endif
 
 
 #ifdef DEBUG
