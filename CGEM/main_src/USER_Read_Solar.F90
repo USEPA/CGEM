@@ -8,7 +8,7 @@
       integer*8, intent (in) :: TC_8
       real, intent (out) :: Var(im,jm)
       integer*8,save :: t1,t2
-      real,save :: Var1,Var2
+      real,save :: Var1,Var2, VarTemp
       real :: fac
       character(100) :: filename
       integer :: ifile
@@ -89,9 +89,11 @@
 
       fac = real(TC_8 - t1)
       fac = real(fac,4) / real(( t2 - t1 ),4)
-      Var(1,1) = Var1 + ( Var2 - Var1 ) * fac
+      !Var(1,1) = Var1 + ( Var2 - Var1 ) * fac
+      VarTemp = Var1 + ( Var2 - Var1 ) * fac
 
-      Var(1,1) = cv*Var(1,1)
+      !Var(1,1) = cv*Var(1,1)
+      Var = cv*VarTemp
 
       return 
       end subroutine USER_Read_Solar
