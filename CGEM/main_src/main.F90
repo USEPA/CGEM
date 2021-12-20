@@ -77,7 +77,7 @@
       call Set_Grid(myid,numprocs)
       call Allocate_Input_Vars(Which_code)
       call Allocate_Hydro
-      if (nRiv > 0) call Allocate_RiverLoads()
+      if (nRiv > 0) call Allocate_RiverLoads(Which_code)
       if (nBC  > 0) call Allocate_BoundaryConcentrations()
 
 ! Read_InputFile must define nstep, iout, dT, START_SECONDS
@@ -97,7 +97,7 @@
 
       if (Which_gridio .gt. 0.and.myid.eq.0) then
         call Init_Hydro_NetCDF()
-        if (nRiv > 0) call Init_RiverLoad_NetCDF()
+        if (nRiv > 0) call Init_RiverLoad_NetCDF(Which_code)
         if (nBC  > 0) call Init_BoundaryConcentration_NetCDF()
       endif
 
@@ -106,7 +106,7 @@
        call MPI_BCAST(weights,nRiv*NSL,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
       endif
   
-      call Get_Vars(TC_8,T_8,myid,numprocs) !Hydro for initial timestep 
+      call Get_Vars(TC_8,T_8,myid,numprocs, Which_code) !Hydro for initial timestep 
 
 ! Initialize time an loop variables
       istep = 0
@@ -146,7 +146,7 @@
         write(6,*) "istep=",istep, " of ",nstep
       endif
 
-      call Get_Vars(TC_8,T_8,myid,numprocs) !Hydro, Solar, Wind, Temp, Salinity, and riverloads
+      call Get_Vars(TC_8,T_8,myid,numprocs, Which_code) !Hydro, Solar, Wind, Temp, Salinity, and riverloads
 
       if (Which_gridio.eq.1) then
         call USER_update_EFDC_grid(TC_8,T_8,myid,numprocs)
