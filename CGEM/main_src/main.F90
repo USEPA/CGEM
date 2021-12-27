@@ -44,6 +44,7 @@
       character(120) init_filename         !Initial conditions file
       character(6) Which_code
       character(100) :: BASE_NETCDF_OUTPUT_FILE_NAME
+      character(100) :: comt_filename  ! COMT file
 !------------------------------------------------ 
 !---------------------
 ! MPI variables
@@ -71,6 +72,7 @@
        call MPI_BCAST(input_filename,120,MPI_CHARACTER,0,MPI_COMM_WORLD,mpierr)
        call MPI_BCAST(init_filename,120,MPI_CHARACTER,0,MPI_COMM_WORLD,mpierr)
        call MPI_BCAST(BASE_NETCDF_OUTPUT_FILE_NAME,100,MPI_CHARACTER,0,MPI_COMM_WORLD,mpierr)
+       call MPI_BCAST(comt_filename,100,MPI_CHARACTER,0,MPI_COMM_WORLD,mpierr)
       endif
 
       call Set_Model_dim(myid,numprocs)
@@ -86,6 +88,9 @@
       write(6,*) "----After Read_InputFile"
       write(6,*) "  start,dT",START_SECONDS, dT
 #endif
+
+      ! Define when and how often to print intermediate values
+      call Ave_istep_offset()
 
       T_8 = START_SECONDS 
       TC_8 = START_SECONDS - (dT / 2) ! Subtract half dT to 'center' of timestep.
@@ -133,7 +138,7 @@
      
       call Set_Vars(Which_code,init_filename,myid,numprocs) !initialize 'f' array
 
-      call Initialize_Output(Which_code,BASE_NETCDF_OUTPUT_FILE_NAME,myid,numprocs)     !Open file and write initial configuration
+      call Initialize_Output(Which_code,BASE_NETCDF_OUTPUT_FILE_NAME,comt_filename,myid,numprocs)     !Open file and write initial configuration
 
 !-------------- START TIME LOOP -----------------------------------
       do istep = 1, nstep

@@ -61,4 +61,5 @@ MAIN_OBJ  =  fillval.o\
         VMixing.o\
 	Model_Output.o\
 	Model_Finalize.o\
-	Decomp1D.o
+	Decomp1D.o\
+	Ave_istep_Offset.o

@@ -1,9 +1,10 @@
-      Subroutine Command_Line_Args(Which_code,input_filename,init_filename,BASE_NETCDF_OUTPUT_FILE_NAME)
+      Subroutine Command_Line_Args(Which_code,input_filename,init_filename,BASE_NETCDF_OUTPUT_FILE_NAME, comt_filename)
 
       character(120),intent(out) :: input_filename !Input file
       character(120),intent(out) :: init_filename !Initial conditions file
       character(6), intent(out) ::  Which_code     
       character(100), intent(out) :: BASE_NETCDF_OUTPUT_FILE_NAME
+      character(100), intent(out) :: comt_filename
 
       integer c_count
 
@@ -17,7 +18,7 @@
          input_filename = "GEM_InputFile"
          init_filename = "InitialConditions.txt"
          BASE_NETCDF_OUTPUT_FILE_NAME = './NETCDF/cgem.'
-
+         comt_filename = './NETCDF/CGEM_for_COMT.nc'
 
        if (c_count.gt.0) then
          call get_command_argument(1,Which_code)  !User selects which code
@@ -69,6 +70,10 @@
 
        if (c_count.gt.3) then
          call get_command_argument(4,BASE_NETCDF_OUTPUT_FILE_NAME) !User selects output file name
+       endif
+
+       if (c_count.gt.4) then
+         call get_command_argument(5,comt_filename) !User selects comt file name
        endif
 
        write(6,*) "Biogeochem equations are: ",Which_code

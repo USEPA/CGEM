@@ -22,6 +22,7 @@
      USE CGEM_Flux
      USE Fill_Value
      USE RiverLoad
+     USE Model_Compare
 
       IMPLICIT NONE
 
@@ -205,6 +206,20 @@
     real, dimension(nospA+nospZ) :: Tadj ! Temperature adjustment factor
     real :: Q10_T                        ! Temperature adjustment Q10 relation
 !------------------------------------------------------------------    
+! COMT
+    integer, save  ::  i_out, print_file ! Counters for netCDF file
+    integer istart, iend, jstart, jend, my_im, my_istart
+    real, dimension(myim,jm,km) :: SUM_PrimProd
+    real, dimension(myim,jm,km) :: SUM_RESP
+    real, dimension(myim,jm) :: INT_PrimProd_MC, INT_RESP_MC !Only sums first nz-1 layers for inter-model comparison
+    real, dimension(myim,jm) :: FO2  !for inter-model comparison
+    real, dimension(myim,jm) :: FNO3
+    real, dimension(myim,jm) :: FNH4
+    real, dimension(myim,jm) :: FPO4
+    real, dimension(myim,jm) :: FPOM
+    real :: ws_d(nf)
+!-----------------------------------------------------------------
+
 ! SAVE KGs for instant remineralization
     real, save :: KG1_save, KG2_save
 !------------------------------------------------------------------
@@ -220,6 +235,13 @@
     integer fill_val
 !For calibration
     real O2_total
+
+   istart = 1
+   iend = myi_end - myi_start + 1
+   jstart = 1
+   jend = jm
+   my_im = iend
+   my_istart = myi_start
 
 
    if(init.eq.1) then  
@@ -242,6 +264,14 @@
   uE_ijk =  fill_val
   uA_ijk =  fill_val
   uSi_ijk =  fill_val
+
+  SUM_PrimProd = 0.
+  SUM_RESP = 0.
+  FO2 = 0.
+  FNO3 = 0.
+  FNH4 = 0.
+  FPO4 = 0.
+  FPOM = 0
 
        dTd = dT/SDay         ! Timestep length in units of days
 
@@ -272,7 +302,10 @@
           enddo 
        enddo     
 
-    init=0
+     init=0
+
+     i_out = 0
+     print_file = istep_wait + print_ave
 
      KG1_save = KG1
      KG2_save = KG2
@@ -1141,12 +1174,21 @@ enddo
 !-------------------------------
 !-NO3; (mmol-N/m3)
 !-------------------------------     
+       if(k .eq. nz) then
+          FNO3(myi-1,j) = FNO3(myi-1,j) +    &
+          &  ( RNO3 - AupN*NO3/(NO3+NH4) )*dz(myi,j,k)/real(print_ave)
+       endif
+
        ff(myi,j,k,iNO3) = AMAX1(f(myi,j,k,iNO3)                            &
        &  + ( RNO3 - AupN*NO3/(NO3+NH4) )*dTd, 0.0 )              
 
 !--------------------------------
 !-NH4; Ammonium (mmol-N/m3)
 !--------------------------------
+       if(k .eq. nz) then
+          FNH4(myi-1,j) = FNH4(myi-1,j) +    &
+          &  ( RNH4 - AupN*NH4/(NO3+NH4) + AexudN + SUM(ZexN))*dz(myi,j,k)/real(print_ave)
+       endif
        ff(myi,j,k,iNH4) = AMAX1(f(myi,j,k,iNH4)                            &
        & + ( RNH4 - AupN*NH4/(NO3+NH4) + AexudN + SUM(ZexN)  )*dTd, 0.0)          
 
@@ -1159,6 +1201,10 @@ enddo
 !---------------------------------------------
 !-PO4: Phosphate (mmol-P/m3)
 !--------------------------------------
+      if(k .eq. nz) then
+         FPO4(myi-1,j) = FPO4(myi-1,j) +    &
+         &  ( RPO4 - AupP + AexudP + SUM(ZexP) )*dz(myi,j,k)/real(print_ave)
+      endif
       ff(myi,j,k,iPO4) = AMAX1(f(myi,j,k,iPO4)                             &
       & + ( RPO4 - AupP + AexudP + SUM(ZexP)  )*dTd, 0.0)
 
@@ -1171,6 +1217,11 @@ enddo
 !-----------------------------------------------------------------------      
 !-O2: Oxygen (mmol O2 m-3) 
 !-------------------------------------------------------------------      
+       SUM_RESP(myi-1,j,k) = SUM_RESP(myi-1,j,k) +  (ArespC + ZrespC -RO2)/real(print_ave)
+       if(k .eq. nz) then
+          FO2(myi-1,j) = FO2(myi-1,j) +  &
+          & ( PrimProd - ArespC + RO2 - ZrespC)*dz(myi,j,k)/real(print_ave)
+       endif
        ff(myi,j,k,iO2)  = AMAX1(f(myi,j,k,iO2)                             &  
        &  + ( PrimProd - ArespC + RO2 - ZrespC)*dTd, 0.0)
 
@@ -1252,6 +1303,31 @@ enddo
  enddo      ! end of do j block do loop
 ! ----------------------------------------------------------------------
 
+!------------------------------------------------------------------------
+!  COMT
+!-----------------------------------------------------------------------
+if (MC .eq. 1) then
+
+!Convert -ws back to positive per day:
+    ws_d = -ws * 86400.
+
+    do j = 1,jm
+     myi = 2
+     do i = myi_start, myi_end
+       if(fm(i,j,1) .eq. 1) then
+          FPOM(myi-1,j) = FPOM(myi-1,j)             &
+         & + (f(myi,j,nz-1,iOM1_A)*s_y1A(myi,j,nz-1)/s_x1A(myi,j,nz-1)*ws_d(iOM1_A) &
+         & + f(myi,j,nz-1,iOM1_Z)*s_y1Z(myi,j,nz-1)/s_x1Z(myi,j,nz-1)*ws_d(iOM1_Z) &
+         & + f(myi,j,nz-1,iOM1_R) *stoich_y1R     /stoich_x1R     *ws_d(iOM1_R) &
+         & + f(myi,j,nz-1,iOM1_BC)*stoich_y1BC    /stoich_x1BC*ws_d(iOM1_BC))/real(print_ave)
+       endif
+       myi = myi + 1
+     enddo
+    enddo
+
+endif
+
+
 ! ----------------------------------------------------------------------
 ! Add river loads.  Loads are converted from kg/s to mmol/m3.
 ! ----------------------------------------------------------------------
@@ -1285,6 +1361,46 @@ enddo
          enddo
          enddo
 !-- End Main GEM Calculations ---------------------------------------------------
+
+!-- For inter-model comparison (COMT)
+!-------------------------------------------
+      if ( istep .eq. print_file ) then
+         INT_PrimProd_MC = 0.
+         INT_RESP_MC = 0.
+
+         do k = 1, nz
+             do j = 1, jm
+                 myi = 1
+                 do i = myi_start, myi_end
+                     if(fm(i,j,1) .eq. 1) then
+                       if(k.ne.nz) INT_RESP_MC(myi,j) = INT_RESP_MC(myi,j) +SUM_RESP(myi,j,k)*dz(myi,j,k)
+                       if(k.ne.nz) INT_PrimProd_MC(myi,j) =INT_PrimProd_MC(myi,j) + SUM_PrimProd(myi,j,k)*dz(myi,j,k)
+                     endif
+                     myi = myi + 1
+                 enddo
+             enddo
+         enddo
+
+         if (MC .eq. 1) then
+            CALL MC_GEM(f, fm, INT_PrimProd_MC(istart:iend,jstart:jend),INT_RESP_MC(istart:iend,jstart:jend), &
+            &   FPOM(istart:iend,jstart:jend), FO2(istart:iend,jstart:jend),FNO3(istart:iend,jstart:jend),    &
+            &   FNH4(istart:iend,jstart:jend), FPO4(istart:iend,jstart:jend), &
+            &   i_out, istep, my_im ) !for inter-model comparison (COMT)
+         endif
+
+          FPOM = 0.0
+          FO2 = 0.0
+          FNO3 = 0.0
+          FNH4 = 0.0
+          FPO4 = 0.0
+
+          i_out = i_out + 1
+          print_file = print_file + print_ave
+
+      endif
+
+!-----------------------------------------------------------------------------------------------
+
 !#endif
 !write(6,*) "888 RN2_ijk",RN2_ijk(28,18,1)
 !write(6,*) "888 PARdepth_ijk",PARdepth_ijk(28,18,1)

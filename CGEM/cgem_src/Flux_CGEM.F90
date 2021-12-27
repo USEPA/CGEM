@@ -44,7 +44,11 @@
 !temp.
       real sedflux_iOM1_bc,sedflux_iOM2_bc,sedflux_iOM1_R,sedflux_iOM2_R
       real sedflux_iOM1_A,sedflux_iOM2_A,sedflux_iOM1_Z,sedflux_iOM2_Z
+!For COMT
+      real :: O2_Flux(myim,jm)
 
+!--- Initialize oxygen flux array ----------------------------
+      O2_Flux = 0.
 
 ! -- Read in "A" for SDM --------------------------------------
       if(Which_fluxes(iSDM).eq.1.and.init.eq.1) then
@@ -118,6 +122,12 @@ if(Which_fluxes(iO2surf).eq.1) then
                                                        ! ((mmol-O2/m2/sec)
                                                        ! negative means into
                f(myi,j,1,iO2) = AMAX1(f(myi,j,1,iO2) - O2_atF/dz(i,j,1)*dT,0.)
+
+               !For model comparison (COMT)
+               if (MC .eq. 1) then
+                   O2_Flux(myi-1,j) = -O2_atF * SDay  !Convert to per day
+               endif
+
 endif 
 
 
@@ -164,6 +174,9 @@ endif
    END DO      ! end of do i block do loop
    END DO      ! end of do j block do loop
 
+   !---------------- For COMT
+   !------------------------------------------------------------
+   if (MC .eq. 1) call MC_Flux(fm, O2_Flux(1:myim,1:jm), istep, istep_wait, print_ave)
 
 !-- BOTTOM FLUXES -------------------------------------------------------------------------
          do j = 1,jm

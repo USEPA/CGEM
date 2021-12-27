@@ -7,6 +7,7 @@ CGEM_OBJ  =  CGEM_Flux.o\
 	STOICH_VARS.o\
 	INPUT_VARS_CGEM.o\
 	OUTPUT_NETCDF_CGEM.o\
+        Model_Compare.o\
 	SDM.o\
 	T_GoMDOM.o\
 	Light_GoMDOM.o\
@@ -39,4 +40,6 @@ CGEM_OBJ  =  CGEM_Flux.o\
 	Salinity_Regression_Init_CGEM.o\
 	InitError_Check_CGEM.o\
 	Transport_CGEM.o\
-	Init_Output_CGEM.o
+	Init_Output_CGEM.o\
+        MC_Flux.o\
+        MC_GEM.o

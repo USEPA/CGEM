@@ -1,18 +1,20 @@
-       Subroutine Init_Output_CGEM(BASE_NETCDF_OUTPUT_FILE_NAME,myid,numprocs)
+       Subroutine Init_Output_CGEM(BASE_NETCDF_OUTPUT_FILE_NAME,comt_filename,myid,numprocs)
 
        USE Model_dim
        USE INPUT_VARS, ONLY: nstep,dT_out,IYRS,IMONS,&
      & IDAYS, IHRS, IMINS, ISECS, IYRE, IMONE, IDAYE, IHRE,&
-     & IMINE, ISECE,Which_Output
-       USE INPUT_VARS_CGEM, ONLY : Which_chlaC
+     & IMINE, ISECE,Which_Output, code_ID
+       USE INPUT_VARS_CGEM, ONLY : Which_chlaC, MC
        USE Grid
        USE OUTPUT_NETCDF_CGEM
+       USE Model_Compare
        USE State_Vars
        USE CGEM_vars
 
        IMPLICIT NONE
 
        character(100),intent(in) :: BASE_NETCDF_OUTPUT_FILE_NAME
+       character(100),intent(in) :: comt_filename
        character(256) :: NETCDF_OUTPUT_FILE_NAME
        real :: dumf(myim,jm,km,nf)
        integer :: i,j,k,nz,myi,myid,numprocs,mpierr
@@ -38,6 +40,16 @@
           CALL CLOSE_FILE()
       endif
       CALL MPI_BARRIER( MPI_COMM_WORLD,mpierr) ! Wait until file is created.
+
+!For a model inter-comparison study through the Coastal Ocean Modeling Testbed
+      if (MC .eq. 1) then
+          if(myid .eq. 0) then
+             CALL CREATE_FILE_MC(trim(comt_filename), im, jm, km, iYr0, LON, LAT, FM, code_id)
+             CALL CLOSE_FILE_MC()
+          endif
+          CALL MPI_BARRIER( MPI_COMM_WORLD, mpierr ) ! Wait until file is created.
+          CALL OPEN_FILE_MC(trim(comt_filename))
+      endif
 
 
 ! Opens the output file for writing:
