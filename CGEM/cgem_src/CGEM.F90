@@ -208,10 +208,11 @@
 !------------------------------------------------------------------    
 ! COMT
     integer, save  ::  i_out, print_file ! Counters for netCDF file
-    integer istart, iend, jstart, jend, my_im, my_istart
+    integer :: istart, iend, jstart, jend, my_im, my_istart
     real, dimension(myim,jm,km) :: SUM_PrimProd
     real, dimension(myim,jm,km) :: SUM_RESP
-    real, dimension(myim,jm) :: INT_PrimProd_MC, INT_RESP_MC !Only sums first nz-1 layers for inter-model comparison
+    real, dimension(myim,jm) :: INT_PrimProd_MC
+    real, dimension(myim,jm) :: INT_RESP_MC 
     real, dimension(myim,jm) :: FO2  !for inter-model comparison
     real, dimension(myim,jm) :: FNO3
     real, dimension(myim,jm) :: FNH4
@@ -267,11 +268,11 @@
 
   SUM_PrimProd = 0.
   SUM_RESP = 0.
-  FO2 = 0.
-  FNO3 = 0.
-  FNH4 = 0.
-  FPO4 = 0.
-  FPOM = 0
+  FO2 = 0.0
+  FNO3 = 0.0
+  FNH4 = 0.0
+  FPO4 = 0.0
+  FPOM = 0.0
 
        dTd = dT/SDay         ! Timestep length in units of days
 
@@ -279,9 +280,9 @@
 
        ! Initialize previous day's irradiance for Chl:C calculation
        ! These duplicated lines execute only once for init
-       do j = 1,jm
-          myi=1
-          do i = myi_start,myi_end
+       do j = 1, jm
+          myi = 1
+          do i = myi_start, myi_end
                 nz = nza(i,j)
                 do k = 1, nz
                    do isp = 1, nospA          
@@ -298,7 +299,7 @@
                 if(nz.gt.0) call DailyRad_init(TC_8, lat(i,j), lon(i,j), d(i,j,:), d_sfc(i,j,:), A_k, &
                      & CDOM_k, OM1A_k, OM1Z_k, OM1SPM_k, OM1BC_k, aDailyRad_k,nz)
                 aDailyRad(i,j,:) = aDailyRad_k(:)
-          myi=myi+1
+           myi = myi + 1
           enddo 
        enddo     
 
@@ -320,9 +321,9 @@
 !   Begin main ij loop for the biogeochemistry 
 !   calculations at time-level istep
 !-----------------------------------------------------------------
- do j = 1,jm
-         myi=1
-         do i = myi_start,myi_end
+ do j = 1, jm
+         myi = 1  ! Wilson: Double check this.
+         do i = myi_start, myi_end
          nz = nza(i,j)
  !---------------------------------------------------------
  ! Calculate and convert variables needed for light routine
@@ -661,7 +662,9 @@
 !--------------------------------------------------------------------
       PrimProd       = PrimProd + Agrow*Qc(isp)    ! Phytoplankton 
                                                    ! primary production
-                                                   ! (mmol-C/m3/d)	
+                                                   ! (mmol-C/m3/d)
+
+      SUM_PrimProd(myi,j,k) = SUM_PrimProd(myi,j,k) + PrimProd/real(print_ave)	
 
       ArespC  = ArespC + Aresp*Qc(isp)             ! Phytoplankton respiration 
 						   ! equivalent carbon loss
@@ -1217,7 +1220,7 @@ enddo
 !-----------------------------------------------------------------------      
 !-O2: Oxygen (mmol O2 m-3) 
 !-------------------------------------------------------------------      
-       SUM_RESP(myi-1,j,k) = SUM_RESP(myi-1,j,k) +  (ArespC + ZrespC -RO2)/real(print_ave)
+       SUM_RESP(myi,j,k) = SUM_RESP(myi,j,k) +  (ArespC + ZrespC -RO2)/real(print_ave)
        if(k .eq. nz) then
           FO2(myi-1,j) = FO2(myi-1,j) +  &
           & ( PrimProd - ArespC + RO2 - ZrespC)*dz(myi,j,k)/real(print_ave)
@@ -1298,8 +1301,11 @@ enddo
       
 !--------------------------------------------------------------------
         enddo   ! end of  "do k = 1, nz" 
+
        myi = myi + 1
+
    enddo      ! end of do i block do loop
+
  enddo      ! end of do j block do loop
 ! ----------------------------------------------------------------------
 
@@ -1308,21 +1314,22 @@ enddo
 !-----------------------------------------------------------------------
 if (MC .eq. 1) then
 
-!Convert -ws back to positive per day:
+    ! Convert -ws back to positive per day.
     ws_d = -ws * 86400.
 
-    do j = 1,jm
-     myi = 2
-     do i = myi_start, myi_end
-       if(fm(i,j,1) .eq. 1) then
-          FPOM(myi-1,j) = FPOM(myi-1,j)             &
-         & + (f(myi,j,nz-1,iOM1_A)*s_y1A(myi,j,nz-1)/s_x1A(myi,j,nz-1)*ws_d(iOM1_A) &
-         & + f(myi,j,nz-1,iOM1_Z)*s_y1Z(myi,j,nz-1)/s_x1Z(myi,j,nz-1)*ws_d(iOM1_Z) &
-         & + f(myi,j,nz-1,iOM1_R) *stoich_y1R     /stoich_x1R     *ws_d(iOM1_R) &
-         & + f(myi,j,nz-1,iOM1_BC)*stoich_y1BC    /stoich_x1BC*ws_d(iOM1_BC))/real(print_ave)
-       endif
-       myi = myi + 1
-     enddo
+    do j = 1, jm
+       myi = 2
+       do i = myi_start, myi_end
+          nz = nza(i,j)
+          if(fm(i,j,1) > 1.0E-06) then
+             FPOM(myi-1,j) = FPOM(myi-1,j)             &
+             & + (f(myi,j,nz-1,iOM1_A) * s_y1A(myi,j,nz-1) / s_x1A(myi,j,nz-1) * ws_d(iOM1_A) &
+             & + f(myi,j,nz-1,iOM1_Z) * s_y1Z(myi,j,nz-1) / s_x1Z(myi,j,nz-1) * ws_d(iOM1_Z) &
+             & + f(myi,j,nz-1,iOM1_R) * stoich_y1R / stoich_x1R * ws_d(iOM1_R) &
+             & + f(myi,j,nz-1,iOM1_BC) * stoich_y1BC / stoich_x1BC * ws_d(iOM1_BC)) / real(print_ave)
+          endif
+          myi = myi + 1
+       enddo
     enddo
 
 endif
@@ -1351,43 +1358,47 @@ enddo
 
 
 !update f for the current timestep
-         do j = 1,jm
-         myi = 1
-         do i = myi_start,myi_end
-                do k = 1,nza(i,j)
-                 f(myi,j,k,:) = ff(myi,j,k,:)
+         do j = 1, jm
+            myi = 1
+            do i = myi_start, myi_end
+                do k = 1, nza(i,j)
+                   f(myi,j,k,:) = ff(myi,j,k,:)
                 enddo
-         myi = myi + 1
-         enddo
+                myi = myi + 1
+            enddo
          enddo
 !-- End Main GEM Calculations ---------------------------------------------------
 
+!--------------------------------------------------------------------------------
 !-- For inter-model comparison (COMT)
-!-------------------------------------------
+!--------------------------------------------------------------------------------
       if ( istep .eq. print_file ) then
          INT_PrimProd_MC = 0.
          INT_RESP_MC = 0.
-
-         do k = 1, nz
-             do j = 1, jm
-                 myi = 1
-                 do i = myi_start, myi_end
-                     if(fm(i,j,1) .eq. 1) then
-                       if(k.ne.nz) INT_RESP_MC(myi,j) = INT_RESP_MC(myi,j) +SUM_RESP(myi,j,k)*dz(myi,j,k)
-                       if(k.ne.nz) INT_PrimProd_MC(myi,j) =INT_PrimProd_MC(myi,j) + SUM_PrimProd(myi,j,k)*dz(myi,j,k)
-                     endif
-                     myi = myi + 1
-                 enddo
+       
+         do j = 1, jm
+             myi = 1
+             do i = myi_start, myi_end
+                if(fm(i,j,1) > 1.0E-06) then
+                   nz = nza(i,j)
+                   do k = 1, nz    
+                      if (k .ne. nz) INT_RESP_MC(myi,j) = INT_RESP_MC(myi,j) + SUM_RESP(myi,j,k) * dz(myi,j,k)
+                      if (k .ne. nz) INT_PrimProd_MC(myi,j) = INT_PrimProd_MC(myi,j) + SUM_PrimProd(myi,j,k) * dz(myi,j,k)
+                   enddo
+                endif 
+                myi = myi + 1
              enddo
          enddo
 
-         if (MC .eq. 1) then
+         if (MC .eq. 1) then  
             CALL MC_GEM(f, fm, INT_PrimProd_MC(istart:iend,jstart:jend),INT_RESP_MC(istart:iend,jstart:jend), &
             &   FPOM(istart:iend,jstart:jend), FO2(istart:iend,jstart:jend),FNO3(istart:iend,jstart:jend),    &
             &   FNH4(istart:iend,jstart:jend), FPO4(istart:iend,jstart:jend), &
-            &   i_out, istep, my_im ) !for inter-model comparison (COMT)
+            &   i_out, istep, my_im ) 
          endif
-
+ 
+          SUM_RESP = 0.0
+          SUM_PrimProd = 0.0
           FPOM = 0.0
           FO2 = 0.0
           FNO3 = 0.0

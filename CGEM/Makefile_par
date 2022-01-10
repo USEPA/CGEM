@@ -54,9 +54,10 @@ ifeq (atmos,$(findstring atmos,$(MY_HOST)))
   INC	   = $(ATMOS_INC)
   LIBS	   = $(ATMOS_LIBS)
   F90     = mpiifort 
+  FFLAGS =  -warn all -traceback -no-diag-error-limit -implicitnone -ftz -D_3D -Dcgem
 ##FFLAGS = -D_MPI
-  FFLAGS = -D_MPI -pg -save-temps
-  FFLAGS = -O -D_MPI -qopenmp -mcmodel=medium -pg -save-temps
+#  FFLAGS = -D_MPI -pg -save-temps
+#  FFLAGS = -O -D_MPI -qopenmp -mcmodel=medium -pg -save-temps
 else
   INC      = $(OTHER_INC)
   LIBS     = $(OTHER_LIBS)

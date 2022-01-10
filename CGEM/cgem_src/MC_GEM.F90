@@ -1,15 +1,10 @@
 !---------------------------------------------------------------------------
-!  SUBROUTINE MC_GEM(f, fm, PrimProd, WC_O2, FPOM, FO2,  &
-!     &     FNO3, FNH4, FPO4, outstep, istep, my_imstart, my_imend, my_im  ) 
   SUBROUTINE MC_GEM(f, fm, PrimProd, WC_O2, FPOM, FO2,  &
      &     FNO3, FNH4, FPO4, outstep, istep, my_im  )   
 !---------------------------------------------------------------------------
 !Assume this is only called in 3D
 
   USE Model_dim
-!  USE Grid
-!  USE MPI_dim
-!  USE STATES
   USE INPUT_VARS, ONLY:dT  
   USE  CGEM_vars  
   USE Model_Compare
@@ -21,25 +16,22 @@
     IMPLICIT NONE
 
     real, intent(in) :: f(myimp2,jm,nsl,nf)
+    integer, intent(in) :: outstep, istep, my_im
     real, dimension (my_im,jm), intent(in) :: PrimProd, WC_O2, FO2
     real, dimension (my_im,jm), intent(in) :: FNO3, FNH4, FPO4, FPOM 
-    integer, intent(in) :: fm(im,jm,km)
-!    integer, intent(in) :: outstep, istep, my_imstart, my_imend, my_im
-    integer, intent(in) :: outstep, istep
+    real, intent(in) :: fm(im,jm,km)
     real :: A_N(my_im,jm,km)
-    integer :: i, j, k, myi, isp, my_im
+    integer :: i, j, k, myi, isp
 
-    my_im = myi_end - myi_start + 1 
     A_N = 0.
- 
-    do j = 1,jm
+
+    do j = 1, jm
      myi = 2 
-!     do i = my_imstart,my_imend
      do i = myi_start, myi_end
-       if(fm(i,j,1).eq.1) then
-        do k = 1, km
+       if (fm(i,j,1) > 1.0E-06) then
+         do k = 1, km
          do isp = 1, nospA
-            A_N(myi-1,j,k) = A_N(myi-1,j,k) + f(myi,j,k,iA(isp))*f(myi,j,k,iQn(isp))
+             A_N(myi-1,j,k) = A_N(myi-1,j,k) + f(myi,j,k,iA(isp))*f(myi,j,k,iQn(isp))
          enddo
         enddo
        endif
@@ -47,7 +39,6 @@
       enddo 
     enddo
 
-!    call WRITE_GEM_MC( my_imstart, my_im, 1, jm, 1, nz, outstep, istep, real(dT), &
     call WRITE_GEM_MC( myi_start, my_im, 1, jm, 1, km, outstep, istep, real(dT), &
      &             f(2:my_im+1,1:jm,1:km,iO2),     &
      &             f(2:my_im+1,1:jm,1:km,iNO3),    &

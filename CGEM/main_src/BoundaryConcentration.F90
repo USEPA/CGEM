@@ -74,6 +74,25 @@
       ALLOCATE(BC8(nBC))
       ALLOCATE(BC9(nBC))
 
+      ALLOCATE(BC1A(nBC))
+      ALLOCATE(BC1B(nBC))
+      ALLOCATE(BC2A(nBC))
+      ALLOCATE(BC2B(nBC))
+      ALLOCATE(BC3A(nBC))
+      ALLOCATE(BC3B(nBC))
+      ALLOCATE(BC4A(nBC))
+      ALLOCATE(BC4B(nBC))
+      ALLOCATE(BC5A(nBC))
+      ALLOCATE(BC5B(nBC))
+      ALLOCATE(BC6A(nBC))
+      ALLOCATE(BC6B(nBC))
+      ALLOCATE(BC7A(nBC))
+      ALLOCATE(BC7B(nBC))
+      ALLOCATE(BC8A(nBC))
+      ALLOCATE(BC8B(nBC))
+      ALLOCATE(BC9A(nBC))
+      ALLOCATE(BC9B(nBC))
+
       ALLOCATE(bcIJ(nBC,2))
 
       !Fill values for netCDF
@@ -86,6 +105,25 @@
       BC7 = fill(0)
       BC8 = fill(0)
       BC9 = fill(0)
+
+      BC1A = fill(0)
+      BC1B = fill(0)
+      BC2A = fill(0)
+      BC2B = fill(0)
+      BC3A = fill(0)
+      BC3B = fill(0)
+      BC4A = fill(0)
+      BC4B = fill(0)
+      BC5A = fill(0)
+      BC5B = fill(0)
+      BC6A = fill(0)
+      BC6B = fill(0)
+      BC7A = fill(0)
+      BC7B = fill(0)
+      BC8A = fill(0)
+      BC8B = fill(0)
+      BC9A = fill(0)
+      BC9B = fill(0)
 
       return
 

@@ -19,6 +19,9 @@
 !                    Wei Tang/EMVL
 !                    Louis Olszyk/EMVL
 !                    Cody Simmons/EMVL
+!
+! Revised: 01/04/2022 by Wilson Melendez, Added comt_filename to argument
+!                                         list of Command_Line_Args.
 ! -----------------------------------------------------------------------
 
       USE Model_dim
@@ -65,7 +68,7 @@
 
 ! --- Command Line Arguments for file names ---
       if(myid.eq.0) then
-        call Command_Line_Args(Which_code,input_filename,init_filename,BASE_NETCDF_OUTPUT_FILE_NAME)
+        call Command_Line_Args(Which_code,input_filename,init_filename,BASE_NETCDF_OUTPUT_FILE_NAME, comt_filename)
       endif
       if(numprocs.gt.1) then 
        call MPI_BCAST(Which_code,6,MPI_CHARACTER,0,MPI_COMM_WORLD,mpierr)

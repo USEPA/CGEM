@@ -71,7 +71,7 @@ MODULE Model_Compare
     'mmol-P/m2/d                    '  &
   /)
 
-  INTEGER,DIMENSION(VARS):: VAR ! NetCDF IDs for each variable.
+  INTEGER, DIMENSION(VARS):: VAR ! NetCDF IDs for each variable.
   INTEGER TIME_MC_VAR ! NetCDF ID for time array variable.
   INTEGER FILE_MC_ID ! NetCDF ID for file.
 
@@ -90,20 +90,20 @@ CONTAINS
   ! then call CLOSE_FILE_MC then
   ! worker processes should call OPEN_FILE_MC, WRITE_DATA_MC, CLOSE_FILE_MC.
   !
-  SUBROUTINE CREATE_FILE_MC( NAME, IM, JM, NZ, IYR0,   &
+  SUBROUTINE CREATE_FILE_MC( NAME, IM, JM, KM, IYR0,   &
                              RLON, RLAT, FM, CODE_ID )
 
     IMPLICIT NONE
     include 'netcdf.inc'
     CHARACTER(LEN=*),INTENT(IN):: NAME
-    INTEGER,INTENT(IN):: IM, JM, NZ
+    INTEGER,INTENT(IN):: IM, JM, KM
     INTEGER,INTENT(IN):: IYR0 ! Reference year (before start of model run).
     REAL,DIMENSION(IM):: RLON
     REAL,DIMENSION(JM):: RLAT
-    REAL, DIMENSION(IM, JM, NZ),INTENT(IN):: FM
+    REAL, DIMENSION(IM, JM, KM),INTENT(IN):: FM
     ! Locals:
-    REAL, DIMENSION(IM, JM, NZ):: TEMP_IM_JM ! VLA
-    INTEGER IM_DIM, JM_DIM, NZ_DIM, NSTEPP_MC_DIM
+    REAL, DIMENSION(IM, JM, KM):: TEMP_IM_JM ! VLA
+    INTEGER IM_DIM, JM_DIM, KM_DIM, NSTEPP_MC_DIM
     INTEGER RLON_VAR, RLAT_VAR, FM_VAR
     INTEGER ERR, VARIABLE, DIM_IDS( 4 ), INFO
     REAL,DIMENSION(IM):: RLON_COPY
@@ -124,7 +124,7 @@ CONTAINS
 
     CALL DEFDIM( FILE_MC_ID, IM_DIM, 'longitude', IM )
     CALL DEFDIM( FILE_MC_ID, JM_DIM, 'latitude', JM )
-    CALL DEFDIM( FILE_MC_ID, NZ_DIM, 'nz', NZ )
+    CALL DEFDIM( FILE_MC_ID, KM_DIM, 'nz', KM )
 !!  CALL DEFDIM( FILE_MC_ID, NSTEPP_MC_DIM, 'time', NSTEP )
     CALL DEFDIM( FILE_MC_ID, NSTEPP_MC_DIM, 'time', 0 ) ! 0 Means UNLIMITED size.
 
@@ -154,7 +154,7 @@ CONTAINS
                  'Cell center longitude [-180, 180].', 'deg' )
     CALL DEFVR1( FILE_MC_ID, JM_DIM, RLAT_VAR, 'latitude', &
                  'Cell center latitude [-90, 90].', 'deg' )
-    CALL DEFVR3( FILE_MC_ID, IM_DIM, JM_DIM, NZ_DIM, FM_VAR, 'fm', &
+    CALL DEFVR3( FILE_MC_ID, IM_DIM, JM_DIM, KM_DIM, FM_VAR, 'fm', &
                  'Mask: 0 = land, 1 = water.', 'none' )
 
     ! Define time array variable as each output data's seconds since IYR0:
@@ -169,7 +169,7 @@ CONTAINS
 
     DIM_IDS( 1 ) = IM_DIM
     DIM_IDS( 2 ) = JM_DIM
-    DIM_IDS( 3 ) = NZ_DIM
+    DIM_IDS( 3 ) = KM_DIM
     DIM_IDS( 4 ) = NSTEPP_MC_DIM
 
     DO VARIABLE = 1, VAR_3D
@@ -272,17 +272,17 @@ CONTAINS
   ! Called by concurrent programs to write all data per timestep
   ! though only one process (PROCESS_ID 0) will write the extra data.
   !
-  SUBROUTINE WRITE_GEM_MC( ISTART, IM, JSTART, JM, ZSTART, NZ, OUTSTEP, ISTEP, &
+  SUBROUTINE WRITE_GEM_MC( ISTART, IM, JSTART, JM, ZSTART, KM, OUTSTEP, ISTEP, &
                   SECONDS_PER_TIMESTEP, O2, NO3, NH4, PO4, A_N, PrimProd, WC_O2, &
                   FPOM, FO2, FNO3, FNH4, FPO4) 
     USE INPUT_VARS , ONLY:START_SECONDS
     IMPLICIT NONE
     INTEGER,INTENT(IN):: ISTART, JSTART, ZSTART
-    INTEGER,INTENT(IN):: IM, JM, NZ, OUTSTEP, ISTEP
+    INTEGER,INTENT(IN):: IM, JM, KM, OUTSTEP, ISTEP
     REAL, INTENT(IN) :: SECONDS_PER_TIMESTEP
-    REAL,DIMENSION(IM, JM, NZ):: O2, NO3, NH4, PO4, A_N 
-    REAL,DIMENSION(IM, JM):: PrimProd, WC_O2
-    REAL,DIMENSION(IM, JM):: FPOM, FO2, FNO3, FNH4, FPO4 
+    REAL, DIMENSION(IM, JM, KM) :: O2, NO3, NH4, PO4, A_N 
+    REAL, DIMENSION(IM, JM) :: PrimProd, WC_O2
+    REAL, DIMENSION(IM, JM) :: FPOM, FO2, FNO3, FNH4, FPO4 
     ! Locals:
     REAL(8):: SECONDS(1)
     INTEGER(MPI_OFFSET_KIND):: STARTS( 4 ), COUNTS( 4 )
@@ -312,7 +312,7 @@ CONTAINS
     STARTS( 4 ) = FILE_TIMESTEP + 1 ! NetCDF follows FORTRAN 1-based convention.
     COUNTS( 1 ) = IM
     COUNTS( 2 ) = JM
-    COUNTS( 3 ) = NZ
+    COUNTS( 3 ) = KM
     COUNTS( 4 ) = 1
 
 ! O2 
