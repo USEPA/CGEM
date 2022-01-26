@@ -21,18 +21,19 @@
     real, dimension (my_im,jm), intent(in) :: FNO3, FNH4, FPO4, FPOM 
     real, intent(in) :: fm(im,jm,km)
     real :: A_N(my_im,jm,km)
-    integer :: i, j, k, myi, isp
+    integer :: i, j, k, myi, isp, nz
 
     A_N = 0.
 
     do j = 1, jm
-     myi = 2 
+     myi = 1
      do i = myi_start, myi_end
        if (fm(i,j,1) > 1.0E-06) then
-         do k = 1, km
-         do isp = 1, nospA
-             A_N(myi-1,j,k) = A_N(myi-1,j,k) + f(myi,j,k,iA(isp))*f(myi,j,k,iQn(isp))
-         enddo
+         nz = nza(i,j)
+         do k = 1, nz
+            do isp = 1, nospA
+               A_N(myi,j,k) = A_N(myi,j,k) + f(myi,j,k,iA(isp))*f(myi,j,k,iQn(isp))
+            enddo
         enddo
        endif
        myi = myi + 1
@@ -40,10 +41,10 @@
     enddo
 
     call WRITE_GEM_MC( myi_start, my_im, 1, jm, 1, km, outstep, istep, real(dT), &
-     &             f(2:my_im+1,1:jm,1:km,iO2),     &
-     &             f(2:my_im+1,1:jm,1:km,iNO3),    &
-     &             f(2:my_im+1,1:jm,1:km,iNH4),    &
-     &             f(2:my_im+1,1:jm,1:km,iPO4),    &
+     &             f(1:my_im,1:jm,1:km,iO2),     &
+     &             f(1:my_im,1:jm,1:km,iNO3),    &
+     &             f(1:my_im,1:jm,1:km,iNH4),    &
+     &             f(1:my_im,1:jm,1:km,iPO4),    &
      &                  A_N(1:my_im,1:jm,1:km),    &
      &             PrimProd(1:my_im,1:jm),         &
      &                WC_O2(1:my_im,1:jm),         &

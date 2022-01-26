@@ -1318,11 +1318,11 @@ if (MC .eq. 1) then
     ws_d = -ws * 86400.
 
     do j = 1, jm
-       myi = 2
+       myi = 1
        do i = myi_start, myi_end
           nz = nza(i,j)
           if(fm(i,j,1) > 1.0E-06) then
-             FPOM(myi-1,j) = FPOM(myi-1,j)             &
+             FPOM(myi,j) = FPOM(myi,j)             &
              & + (f(myi,j,nz-1,iOM1_A) * s_y1A(myi,j,nz-1) / s_x1A(myi,j,nz-1) * ws_d(iOM1_A) &
              & + f(myi,j,nz-1,iOM1_Z) * s_y1Z(myi,j,nz-1) / s_x1Z(myi,j,nz-1) * ws_d(iOM1_Z) &
              & + f(myi,j,nz-1,iOM1_R) * stoich_y1R / stoich_x1R * ws_d(iOM1_R) &
@@ -1381,9 +1381,9 @@ enddo
              do i = myi_start, myi_end
                 if(fm(i,j,1) > 1.0E-06) then
                    nz = nza(i,j)
-                   do k = 1, nz    
-                      if (k .ne. nz) INT_RESP_MC(myi,j) = INT_RESP_MC(myi,j) + SUM_RESP(myi,j,k) * dz(myi,j,k)
-                      if (k .ne. nz) INT_PrimProd_MC(myi,j) = INT_PrimProd_MC(myi,j) + SUM_PrimProd(myi,j,k) * dz(myi,j,k)
+                   do k = 1, nz-1    
+                      INT_RESP_MC(myi,j) = INT_RESP_MC(myi,j) + SUM_RESP(myi,j,k) * dz(myi,j,k)
+                      INT_PrimProd_MC(myi,j) = INT_PrimProd_MC(myi,j) + SUM_PrimProd(myi,j,k) * dz(myi,j,k)
                    enddo
                 endif 
                 myi = myi + 1
