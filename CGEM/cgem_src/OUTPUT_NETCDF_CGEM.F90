@@ -11,7 +11,7 @@ MODULE OUTPUT_NETCDF_CGEM
   USE xnetcdf
   USE NETCDF_UTILITIES ! For CHKERR, DEFDIM, DEFVI1, CONVERT_LONGITUDES, etc.
   USE DATE_TIME ! For TOTAL_SECONDS
-  USE OUTPUT, ONLY:EXTRA_VARIABLES,STATE_VARIABLES
+  USE OUTPUT
   USE INPUT_VARS
   USE Model_dim, ONLY:nospA,nospZ
 
@@ -1368,6 +1368,27 @@ endif
 
   ALLOCATE(EXTRA_VAR(EXTRA_VARIABLES))  ! NetCDF IDs for extra vars.
   EXTRA_VAR = fill(0)
+
+  ALLOCATE(SUM_PrimProd(myim,jm,km))
+  SUM_PrimProd = 0.0
+
+  ALLOCATE(SUM_RESP(myim,jm,km))
+  SUM_RESP = 0.0
+
+  ALLOCATE(FO2(myim,jm))
+  FO2 = 0.0
+ 
+  ALLOCATE(FNO3(myim,jm))
+  FNO3 = 0.0
+  
+  ALLOCATE(FNH4(myim,jm))
+  FNH4 = 0.0
+
+  ALLOCATE(FPO4(myim,jm))
+  FPO4 = 0.0
+
+  ALLOCATE(FPOM(myim,jm))
+  FPOM = 0.0
 
   return
 

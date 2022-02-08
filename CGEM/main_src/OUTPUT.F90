@@ -15,4 +15,12 @@
         INTEGER,save :: EXTRA_VARIABLES
         INTEGER,save :: STATE_VARIABLES
 
+        REAL, DIMENSION(:,:,:), allocatable :: SUM_PrimProd
+        REAL, DIMENSION(:,:,:), allocatable :: SUM_RESP
+        REAL, DIMENSION(:,:), allocatable :: FO2
+        REAL, DIMENSION(:,:), allocatable :: FNO3
+        REAL, DIMENSION(:,:), allocatable :: FNH4
+        REAL, DIMENSION(:,:), allocatable :: FPO4
+        REAL, DIMENSION(:,:), allocatable :: FPOM
+
        END Module OUTPUT 

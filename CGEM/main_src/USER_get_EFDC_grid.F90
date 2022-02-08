@@ -31,10 +31,9 @@
       enddo
       close(19)
 
-
-      do j=1,jm
-       do i=1,im
-          if(nza(i,j)>0) then
+      do j = 1, jm
+       do i = 1, im
+          if(nza(i,j) > 0) then
           area(i,j) = dx(i,j)*dy(i,j) !*sdetg(i,j)
       !    write(6,*) "area",i,j,area(i,j),area(i,j)*sdetg(i,j)
           !write(6,*) "area*g",area(i,j)*sdetg(i,j)
@@ -46,7 +45,7 @@
 
 #ifdef DEBUG
 write(6,*) "---USER_get_EFDC grid----"
-write(6,*) "  only setting dx, dy, dxdy, and area"
+write(6,*) "  only setting dx, dy, dxdy, area, and depth"
 write(6,*)
 #endif
 
@@ -121,7 +120,7 @@ write(6,*)
                 
 !       print*,"depth(175,2)=",depth(175,2), " for myid:",myid
 
-      if (myid.eq.0)then
+      if (myid .eq. 0)then
         Vol_prev = Vol
       endif
 

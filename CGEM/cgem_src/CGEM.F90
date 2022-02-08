@@ -11,6 +11,7 @@
      USE Which_Flux
      USE DATE_TIME
      USE OUTPUT_NETCDF_CGEM
+     USE OUTPUT
      USE CGEM_vars 
      USE Calc_Chla
      USE MOD_UTILITIES
@@ -46,15 +47,20 @@
     integer        ::  Is_Day            ! Switch for day/night for phytoplankton nutrient uptake only, Is_Day=0 means night
 !------------------------------------ 
 ! Variables to hold netCDF output
-    real    :: PAR_percent_ijk(myim,jm,km) ! Percent Irradiance at mid cell (quanta/cm2/sec)
-    real    :: PARdepth_ijk(myim,jm,km)    ! Percent Irradiance at mid cell (quanta/cm2/sec) 
-    real    :: uN_ijk(myim,jm,km,nospA)    ! Nitrogen Limited growth rate (1/d)
-    real    :: uP_ijk(myim,jm,km,nospA)    ! Phosphorus limited growth rate (1/d)
-    real    :: uE_ijk(myim,jm,km,nospA)    ! Light limited growth rate (1/d)
-    real    :: uSi_ijk(myim,jm,km,nospA)   ! Silica limited growth rate (1/d)
-    real    :: uA_ijk(myim,jm,km,nospA)    ! Specific growth rate (1/d)
-    real    :: Chla_tot_ijk(myim,jm,km)    ! Total Chl-a concentration from all phytoplankton (mg/m3)
-    real    :: Chl_C_ijk(myim,jm,km,nospA)    ! Chl:C from each phytoplankton species
+    real    :: PAR_percent_ijk(myim,jm,km)     ! Percent Irradiance at mid cell (quanta/cm2/sec)
+    real    :: PARdepth_ijk(myim,jm,km)        ! Percent Irradiance at mid cell (quanta/cm2/sec) 
+    real    :: uN_ijk(myim,jm,km,nospA)        ! Nitrogen Limited growth rate (1/d)
+    real    :: uP_ijk(myim,jm,km,nospA)        ! Phosphorus limited growth rate (1/d)
+    real    :: uE_ijk(myim,jm,km,nospA)        ! Light limited growth rate (1/d)
+    real    :: uSi_ijk(myim,jm,km,nospA)       ! Silica limited growth rate (1/d)
+    real    :: uA_ijk(myim,jm,km,nospA)        ! Specific growth rate (1/d)
+    real    :: Chla_tot_ijk(myim,jm,km)        ! Total Chl-a concentration from all phytoplankton (mg/m3)
+    real    :: Chl_C_ijk(myim,jm,km,nospA)     ! Chl:C from each phytoplankton species
+    real    :: RN2_ijk_out(myim,jm,km)         ! Remineralization terms for N2 
+    real    :: RO2_A_ijk_out(myim,jm,km)       ! Remineralization terms for O2
+    real    :: RO2_Z_ijk_out(myim,jm,km)       ! Remineralization terms for O2 
+    real    :: RO2_R_ijk_out(myim,jm,km)       ! Remineralization terms for O2
+    real    :: RO2_BC_ijk_out(myim,jm,km)      ! Remineralization terms for O2
 !-------------------------------------------------------------------------
 ! Phytoplankton parameters
  !Phytoplankton uptake and growth
@@ -208,16 +214,16 @@
 !------------------------------------------------------------------    
 ! COMT
     integer, save  ::  i_out, print_file ! Counters for netCDF file
-    integer :: istart, iend, jstart, jend, my_im, my_istart
-    real, dimension(myim,jm,km) :: SUM_PrimProd
-    real, dimension(myim,jm,km) :: SUM_RESP
+    integer :: istart, iend, jstart, jend, my_im, my_istart, fstart, fend
+    real, dimension(myim,jm) :: FPOM_out
+    real, dimension(myim,jm) :: FO2_out
+    real, dimension(myim,jm) :: FNO3_out
+    real, dimension(myim,jm) :: FNH4_out
+    real, dimension(myim,jm) :: FPO4_out
     real, dimension(myim,jm) :: INT_PrimProd_MC
     real, dimension(myim,jm) :: INT_RESP_MC 
-    real, dimension(myim,jm) :: FO2  !for inter-model comparison
-    real, dimension(myim,jm) :: FNO3
-    real, dimension(myim,jm) :: FNH4
-    real, dimension(myim,jm) :: FPO4
-    real, dimension(myim,jm) :: FPOM
+    real, dimension(myim,jm) :: INT_PrimProd_out_MC
+    real, dimension(myim,jm) :: INT_RESP_out_MC 
     real :: ws_d(nf)
 !-----------------------------------------------------------------
 
@@ -230,7 +236,7 @@
     real :: patm(1) = 1.
     real :: m_alk(1), m_dic(1), m_si(1), m_po4(1)
 !Layers
-    integer nz
+    integer nz, nzm1
 !For tiny
     real x
     integer fill_val
@@ -243,37 +249,48 @@
    jend = jm
    my_im = iend
    my_istart = myi_start
+   fstart = 1
+   fend = iend
 
+   ! fill(1) is for -9999
+   fill_val = fill(1)
 
-   if(init.eq.1) then  
+   !Initialize netCDF output variables 
+   RN2_ijk_out = fill_val
+   RO2_A_ijk_out = fill_val
+   RO2_Z_ijk_out = fill_val
+   RO2_BC_ijk_out = fill_val 
+   RO2_R_ijk_out = fill_val
 
-  !fill(1) is for -9999
-  fill_val=fill(1)
+   Chl_C_ijk = fill_val 
+   Chla_tot_ijk =  fill_val
+   Esed =  fill_val
 
-!Initialize netCDF output variables
-  RN2_ijk = 0.
-  RO2_A_ijk = 0. 
-  RO2_Z_ijk = 0.
-  RO2_BC_ijk = 0.
-  RO2_R_ijk = 0.
-  Chl_C_ijk = fill_val 
-  Chla_tot_ijk =  fill_val
-  Esed =  fill_val
-  PAR_percent_ijk =  fill_val
-  uN_ijk =  fill_val
-  up_ijk =  fill_val
-  uE_ijk =  fill_val
-  uA_ijk =  fill_val
-  uSi_ijk =  fill_val
+   PARdepth_ijk = fill_val
+   PAR_percent_ijk =  fill_val
 
-  SUM_PrimProd = 0.
-  SUM_RESP = 0.
-  FO2 = 0.0
-  FNO3 = 0.0
-  FNH4 = 0.0
-  FPO4 = 0.0
-  FPOM = 0.0
+   uN_ijk =  fill_val
+   uP_ijk =  fill_val
+   uE_ijk =  fill_val
+   uA_ijk =  fill_val
+   uSi_ijk =  fill_val
+ 
+   FPOM_out = fill_val
+   FO2_out = fill_val
+   FNO3_out = fill_val
+   FNH4_out = fill_val
+   FPO4_out = fill_val
+   pH = fill_val
 
+   if (init .eq. 1) then  
+
+       !Initialize netCDF output variables
+       RN2_ijk = 0.0
+       RO2_A_ijk = 0.0 
+       RO2_Z_ijk = 0.0
+       RO2_BC_ijk = 0.0
+       RO2_R_ijk = 0.0
+  
        dTd = dT/SDay         ! Timestep length in units of days
 
        StepsPerDay = SDay / dT ! Time steps in a day
@@ -530,10 +547,10 @@
 
         endif
 
-!         ! Save array values for netCDF
-!           PAR_percent_ijk(myi,j,1:nz) = PAR_percent_k(1:nz)
-!           PARdepth_ijk(myi,j,1:nz) = PARdepth_k(1:nz)
-!           Esed(myi,j) = Parbot !E in sediments, needed for flux
+! Save array values for netCDF
+        PAR_percent_ijk(myi,j,1:nz) = PAR_percent_k(1:nz)
+        PARdepth_ijk(myi,j,1:nz) = PARdepth_k(1:nz)
+        Esed(myi,j) = Parbot !E in sediments, needed for flux
 
 !---------------------End Underwater Light Model-----------------------------------
 !
@@ -563,17 +580,17 @@
 
 
 ! Save arrays to output to netCDF
-!     do k = 1,nz
-!      do isp = 1,nospA
-!        uN_ijk(myi,j,k,isp) = uN_k(k,isp)
-!        uP_ijk(myi,j,k,isp) = uP_k(k,isp)
-!        uE_ijk(myi,j,k,isp) = uE_k(k,isp)
-!        uA_ijk(myi,j,k,isp) = uA_k(k,isp)
-!        uSi_ijk(myi,j,k,isp) = uSi_k(k,isp)
-!        Chl_C_ijk(myi,j,k,isp) = Chl_C_k(isp,k)
-!       enddo
-!        Chla_tot_ijk(myi,j,k) = Chla_tot_k(k)
-!      enddo
+     do k = 1,nz
+        do isp = 1,nospA
+           uN_ijk(myi,j,k,isp) = uN_k(k,isp)
+           uP_ijk(myi,j,k,isp) = uP_k(k,isp)
+           uE_ijk(myi,j,k,isp) = uE_k(k,isp)
+           uA_ijk(myi,j,k,isp) = uA_k(k,isp)
+           uSi_ijk(myi,j,k,isp) = uSi_k(k,isp)
+           Chl_C_ijk(myi,j,k,isp) = Chl_C_k(isp,k)
+        enddo
+        Chla_tot_ijk(myi,j,k) = Chla_tot_k(k)
+     enddo
 !------end phytoplankton growth model-------------------------
 
 
@@ -664,7 +681,7 @@
                                                    ! primary production
                                                    ! (mmol-C/m3/d)
 
-      SUM_PrimProd(myi,j,k) = SUM_PrimProd(myi,j,k) + PrimProd/real(print_ave)	
+      SUM_PrimProd(myi,j,k) = SUM_PrimProd(myi,j,k) + PrimProd/real(print_ave)
 
       ArespC  = ArespC + Aresp*Qc(isp)             ! Phytoplankton respiration 
 						   ! equivalent carbon loss
@@ -1023,14 +1040,20 @@
   RSi   = RSi_A  + RSi_Z  + RSi_R  + RSi_BC            ! (mmol-Si/m3/d)
   RALK  = RALK_A + RALK_Z + RALK_R + RALK_BC - 2.*R_11 ! (mmol-HCO3/m3/d)
   RN2   = RN2_A + RN2_Z + RN2_R + RN2_BC         ! (mmol-N2/m3/d)
-       !Save for netCDF
-!       RN2_ijk(myi,j,k) = RN2_ijk(myi,j,k) + (2*RN2)*dTd
-!       RO2_A_ijk(myi,j,k) = RO2_A_ijk(myi,j,k) + (RO2_A)*dTd 
-!       RO2_Z_ijk(myi,j,k) = RO2_Z_ijk(myi,j,k) + (RO2_Z)*dTd
-!       RO2_R_ijk(myi,j,k) = RO2_R_ijk(myi,j,k) + (RO2_R)*dTd
-!       RO2_BC_ijk(myi,j,k) = RO2_BC_ijk(myi,j,k) + (RO2_BC)*dTd
 
-
+!Save for netCDF
+  RN2_ijk(myi,j,k)    = RN2_ijk(myi,j,k) + (2 * RN2) * dTd
+  RO2_A_ijk(myi,j,k)  = RO2_A_ijk(myi,j,k) + (RO2_A * dTd)
+  RO2_Z_ijk(myi,j,k)  = RO2_Z_ijk(myi,j,k) + (RO2_Z * dTd)
+  RO2_R_ijk(myi,j,k)  = RO2_R_ijk(myi,j,k) + (RO2_R * dTd)
+  RO2_BC_ijk(myi,j,k) = RO2_BC_ijk(myi,j,k) + (RO2_BC * dTd)
+  
+  RN2_ijk_out(myi,j,k)    = RN2_ijk(myi,j,k)
+  RO2_A_ijk_out(myi,j,k)  = RO2_A_ijk(myi,j,k)
+  RO2_Z_ijk_out(myi,j,k)  = RO2_Z_ijk(myi,j,k)
+  RO2_R_ijk_out(myi,j,k)  = RO2_R_ijk(myi,j,k)
+  RO2_BC_ijk_out(myi,j,k) = RO2_BC_ijk(myi,j,k)
+  
 ! Save RO2 as CBODW
   CBODW(myi,j) = RO2 !The last time this happens, k=nz, so will be the bottom
 !--------------------------------------------------------------------
@@ -1178,8 +1201,9 @@ enddo
 !-NO3; (mmol-N/m3)
 !-------------------------------     
        if(k .eq. nz) then
-          FNO3(myi-1,j) = FNO3(myi-1,j) +    &
-          &  ( RNO3 - AupN*NO3/(NO3+NH4) )*dz(myi,j,k)/real(print_ave)
+          FNO3(myi,j) = FNO3(myi,j) +    &
+          &  ( RNO3 - AupN*NO3/(NO3+NH4) )*dz(i,j,k)/real(print_ave)
+          FNO3_out(myi,j) = FNO3(myi,j)
        endif
 
        ff(myi,j,k,iNO3) = AMAX1(f(myi,j,k,iNO3)                            &
@@ -1189,8 +1213,9 @@ enddo
 !-NH4; Ammonium (mmol-N/m3)
 !--------------------------------
        if(k .eq. nz) then
-          FNH4(myi-1,j) = FNH4(myi-1,j) +    &
-          &  ( RNH4 - AupN*NH4/(NO3+NH4) + AexudN + SUM(ZexN))*dz(myi,j,k)/real(print_ave)
+          FNH4(myi,j) = FNH4(myi,j) +    &
+          &  ( RNH4 - AupN*NH4/(NO3+NH4) + AexudN + SUM(ZexN))*dz(i,j,k)/real(print_ave)
+          FNH4_out(myi,j) = FNH4(myi,j)
        endif
        ff(myi,j,k,iNH4) = AMAX1(f(myi,j,k,iNH4)                            &
        & + ( RNH4 - AupN*NH4/(NO3+NH4) + AexudN + SUM(ZexN)  )*dTd, 0.0)          
@@ -1205,8 +1230,9 @@ enddo
 !-PO4: Phosphate (mmol-P/m3)
 !--------------------------------------
       if(k .eq. nz) then
-         FPO4(myi-1,j) = FPO4(myi-1,j) +    &
-         &  ( RPO4 - AupP + AexudP + SUM(ZexP) )*dz(myi,j,k)/real(print_ave)
+         FPO4(myi,j) = FPO4(myi,j) +    &
+         &  ( RPO4 - AupP + AexudP + SUM(ZexP) )*dz(i,j,k)/real(print_ave)
+         FPO4_out(myi,j) = FPO4(myi,j)
       endif
       ff(myi,j,k,iPO4) = AMAX1(f(myi,j,k,iPO4)                             &
       & + ( RPO4 - AupP + AexudP + SUM(ZexP)  )*dTd, 0.0)
@@ -1219,11 +1245,13 @@ enddo
  
 !-----------------------------------------------------------------------      
 !-O2: Oxygen (mmol O2 m-3) 
-!-------------------------------------------------------------------      
-       SUM_RESP(myi,j,k) = SUM_RESP(myi,j,k) +  (ArespC + ZrespC -RO2)/real(print_ave)
+!-----------------------------------------------------------------------
+       SUM_RESP(myi,j,k) = SUM_RESP(myi,j,k) + (ArespC + ZrespC - RO2)/real(print_ave)
+
        if(k .eq. nz) then
-          FO2(myi-1,j) = FO2(myi-1,j) +  &
-          & ( PrimProd - ArespC + RO2 - ZrespC)*dz(myi,j,k)/real(print_ave)
+          FO2(myi,j) = FO2(myi,j) +  &
+          & ( PrimProd - ArespC + RO2 - ZrespC)*dz(i,j,k)/real(print_ave)
+          FO2_out(myi,j) = FO2(myi,j)
        endif
        ff(myi,j,k,iO2)  = AMAX1(f(myi,j,k,iO2)                             &  
        &  + ( PrimProd - ArespC + RO2 - ZrespC)*dTd, 0.0)
@@ -1322,11 +1350,13 @@ if (MC .eq. 1) then
        do i = myi_start, myi_end
           nz = nza(i,j)
           if(fm(i,j,1) > 1.0E-06) then
+             nzm1 = max(nz-1,1)
              FPOM(myi,j) = FPOM(myi,j)             &
-             & + (f(myi,j,nz-1,iOM1_A) * s_y1A(myi,j,nz-1) / s_x1A(myi,j,nz-1) * ws_d(iOM1_A) &
-             & + f(myi,j,nz-1,iOM1_Z) * s_y1Z(myi,j,nz-1) / s_x1Z(myi,j,nz-1) * ws_d(iOM1_Z) &
-             & + f(myi,j,nz-1,iOM1_R) * stoich_y1R / stoich_x1R * ws_d(iOM1_R) &
-             & + f(myi,j,nz-1,iOM1_BC) * stoich_y1BC / stoich_x1BC * ws_d(iOM1_BC)) / real(print_ave)
+             & + (f(myi,j,nzm1,iOM1_A) * s_y1A(myi,j,nzm1) / s_x1A(myi,j,nzm1) * ws_d(iOM1_A) &
+             & + f(myi,j,nzm1,iOM1_Z) * s_y1Z(myi,j,nzm1) / s_x1Z(myi,j,nzm1) * ws_d(iOM1_Z) &
+             & + f(myi,j,nzm1,iOM1_R) * stoich_y1R / stoich_x1R * ws_d(iOM1_R) &
+             & + f(myi,j,nzm1,iOM1_BC) * stoich_y1BC / stoich_x1BC * ws_d(iOM1_BC)) / real(print_ave)
+             FPOM_out(myi,j) = FPOM(myi,j)
           endif
           myi = myi + 1
        enddo
@@ -1373,27 +1403,32 @@ enddo
 !-- For inter-model comparison (COMT)
 !--------------------------------------------------------------------------------
       if ( istep .eq. print_file ) then
-         INT_PrimProd_MC = 0.
-         INT_RESP_MC = 0.
-       
+         INT_PrimProd_MC = 0.0
+         INT_RESP_MC = 0.0
+         INT_RESP_out_MC = fill(1)
+         INT_PrimProd_out_MC = fill(1)
+
          do j = 1, jm
              myi = 1
              do i = myi_start, myi_end
                 if(fm(i,j,1) > 1.0E-06) then
                    nz = nza(i,j)
-                   do k = 1, nz-1    
-                      INT_RESP_MC(myi,j) = INT_RESP_MC(myi,j) + SUM_RESP(myi,j,k) * dz(myi,j,k)
-                      INT_PrimProd_MC(myi,j) = INT_PrimProd_MC(myi,j) + SUM_PrimProd(myi,j,k) * dz(myi,j,k)
-                   enddo
+                   nzm1 = max(nz-1,0)
+                   do k = 1, nzm1
+                      INT_RESP_MC(myi,j) = INT_RESP_MC(myi,j) + SUM_RESP(myi,j,k) * dz(i,j,k)
+                      INT_PrimProd_MC(myi,j) = INT_PrimProd_MC(myi,j) + SUM_PrimProd(myi,j,k) * dz(i,j,k)
+                    enddo 
+                   INT_RESP_out_MC(myi,j) = INT_RESP_MC(myi,j)
+                   INT_PrimProd_out_MC(myi,j) = INT_PrimProd_MC(myi,j)  
                 endif 
                 myi = myi + 1
              enddo
          enddo
 
-         if (MC .eq. 1) then  
-            CALL MC_GEM(f, fm, INT_PrimProd_MC(istart:iend,jstart:jend),INT_RESP_MC(istart:iend,jstart:jend), &
-            &   FPOM(istart:iend,jstart:jend), FO2(istart:iend,jstart:jend),FNO3(istart:iend,jstart:jend),    &
-            &   FNH4(istart:iend,jstart:jend), FPO4(istart:iend,jstart:jend), &
+         if (MC .eq. 1) then 
+            CALL MC_GEM(f, fm, INT_PrimProd_out_MC(istart:iend,jstart:jend),INT_RESP_out_MC(istart:iend,jstart:jend), &
+            &   FPOM_out(istart:iend,jstart:jend), FO2_out(istart:iend,jstart:jend),FNO3_out(istart:iend,jstart:jend),    &
+            &   FNH4_out(istart:iend,jstart:jend), FPO4_out(istart:iend,jstart:jend), &
             &   i_out, istep, my_im ) 
          endif
  
@@ -1412,7 +1447,6 @@ enddo
 
 !-----------------------------------------------------------------------------------------------
 
-!#endif
 !write(6,*) "888 RN2_ijk",RN2_ijk(28,18,1)
 !write(6,*) "888 PARdepth_ijk",PARdepth_ijk(28,18,1)
 !write(6,*) "PARpercent",PAR_percent_ijk(28,18,1)
@@ -1420,37 +1454,42 @@ enddo
 !write(6,*) "Chla",Chla_tot_ijk(28,18,1)
 !write(6,*) "888 s_y1Z",myi,j,k,s_y1Z(28,18,1)
 
-!-- Call "Extra" variables for netCDF --------------------------------------------------------
-!--------------------------------------------------------
-!  ! -- do initialization of first timestep:
-!      if (   istep .eq. 1 ) then
-!          PRINT*,"istep = 1"
+!-----------------------------------------------------------------------------------------------
+!-- Call "Extra" variables for netCDF 
+!-----------------------------------------------------------------------------------------------
+! -- do initialization of first timestep:
+      if ( istep .eq. 1 ) then
+          PRINT*, "istep = 1"
 !          if (uN_ijk(1,1,1,1) .eq. -9999) then
 !            PRINT*, "-9999 found istep = 1"
 !          end if
-!                 CALL WRITE_EXTRA_DATA( myi_start,myim, 1,jm, 1,km, 0, &
-!                                     PARdepth_ijk, &
-!                                  PAR_percent_ijk, &
-!                                        uN_ijk, &
-!                                        uP_ijk, &
-!                                        uE_ijk, &
-!                                        uA_ijk, &
-!                                     Chla_tot_ijk, &
-!                                            s_x1A, &
-!                                            s_y1A, &
-!                                            s_x2A, &
-!                                            s_y2A, &
-!                                            s_x1Z, &
-!                                            s_y1Z, &
-!                                            s_x2Z, &
-!                                            s_y2Z, &
-!                                       uSi_ijk,    &
-!                                       Chl_C_ijk,  &
-!                                              pH,  &
-!                                         RN2_ijk,  &
-!                                         RO2_A_ijk,  &
-!                                         RO2_Z_ijk,RO2_BC_ijk,RO2_R_ijk   )
-!     endif  !end of EXTRA_DATA initialization 
+!          PRINT*, "ISTEP, ISTEP_OUT = ", istep, istep_out
+          CALL WRITE_EXTRA_DATA( myi_start, my_im, 1, jm, 1, km, istep_out, &
+                                 PARdepth_ijk(fstart:fend, jstart:jend, :), &
+                                 PAR_percent_ijk(fstart:fend, jstart:jend, :), &
+                                 uN_ijk(fstart:fend, jstart:jend, :, :), &
+                                 uP_ijk(fstart:fend, jstart:jend, :, :), &
+                                 uE_ijk(fstart:fend, jstart:jend, :, :), &
+                                 uA_ijk(fstart:fend, jstart:jend, :, :), &
+                                 Chla_tot_ijk(fstart:fend, jstart:jend, :), &
+                                 s_x1A(fstart:fend, jstart:jend, :), &
+                                 s_y1A(fstart:fend, jstart:jend, :), &
+                                 s_x2A(fstart:fend, jstart:jend, :), &
+                                 s_y2A(fstart:fend, jstart:jend, :), &
+                                 s_x1Z(fstart:fend, jstart:jend, :), &
+                                 s_y1Z(fstart:fend, jstart:jend, :), &
+                                 s_x2Z(fstart:fend, jstart:jend, :), &
+                                 s_y2Z(fstart:fend, jstart:jend, :), &
+                                 uSi_ijk(fstart:fend, jstart:jend, :, :),    &
+                                 Chl_C_ijk(fstart:fend, jstart:jend, :, :),  &
+                                 pH(fstart:fend, jstart:jend, :),  &
+                                 RN2_ijk_out(fstart:fend, jstart:jend, :),    &
+                                 RO2_A_ijk_out(fstart:fend, jstart:jend, :),  &
+                                 RO2_Z_ijk_out(fstart:fend, jstart:jend, :),  &
+                                 RO2_BC_ijk_out(fstart:fend, jstart:jend, :), &
+                                 RO2_R_ijk_out(fstart:fend, jstart:jend, :) )
+      endif  !end of EXTRA_DATA initialization 
+
 !!write(6,*) "999 RN2_ijk",RN2_ijk(28,18,1)
 !!write(6,*) "999 PARdepth_ijk",PARdepth_ijk(28,18,1)
 !!write(6,*) "PARpercent",PAR_percent_ijk(28,18,1)
@@ -1458,35 +1497,38 @@ enddo
 !!write(6,*) "Chla",Chla_tot_ijk(28,18,1)
 !!write(6,*) "999 s_y1Z",myi,j,k,s_y1Z(28,18,1)
 !!stop
-!  ! --- dump output when istep is a multiple of iout
-!      if (  mod( istep, iout ) .eq. 0 ) then
-!                 PRINT*,"Calling WRITE_EXTRA_DATA for istep=",istep
-!                 if (uN_ijk(1,1,1,1) .eq. -9999) then
-!                    PRINT*, "-9999 found istep =",istep
-!                 end if
-!                 CALL WRITE_EXTRA_DATA( myi_start,myim,1,jm, 1,km, istep_out+1, &
-!                                     PARdepth_ijk, &
-!                                  PAR_percent_ijk, &
-!                                        uN_ijk, &
-!                                        uP_ijk, &
-!                                        uE_ijk, &
-!                                        uA_ijk, &
-!                                     Chla_tot_ijk, &
-!                                            s_x1A, &
-!                                            s_y1A, &
-!                                            s_x2A, &
-!                                            s_y2A, &
-!                                            s_x1Z, &
-!                                            s_y1Z, &
-!                                            s_x2Z, &
-!                                            s_y2Z, &
-!                                       uSi_ijk,    &
-!                                       Chl_C_ijk,  &
-!                                              pH,  &
-!                                          RN2_ijk, &
-!                                         RO2_A_ijk,  &
-!                                         RO2_Z_ijk,RO2_BC_ijk,RO2_R_ijk   )
-!     endif  !end of "if (mod(istep,iout).eq.0)" block if
+
+! --- dump output when istep is a multiple of iout
+      if ( mod( istep, iout ) .eq. 0 ) then
+           PRINT*,"Calling WRITE_EXTRA_DATA for istep, istep_out = ", istep, istep_out 
+!           if (uN_ijk(1,1,1,1) .eq. -9999) then
+!               PRINT*, "-9999 found istep =",istep
+!           end if
+           CALL WRITE_EXTRA_DATA( myi_start, my_im, 1, jm, 1, km, istep_out+1, &
+                                  PARdepth_ijk(fstart:fend, jstart:jend, :), &
+                                  PAR_percent_ijk(fstart:fend, jstart:jend, :), &
+                                  uN_ijk(fstart:fend, jstart:jend, :, :), &
+                                  uP_ijk(fstart:fend, jstart:jend, :, :), &
+                                  uE_ijk(fstart:fend, jstart:jend, :, :), &
+                                  uA_ijk(fstart:fend, jstart:jend, :, :), &
+                                  Chla_tot_ijk(fstart:fend, jstart:jend, :), &
+                                  s_x1A(fstart:fend, jstart:jend, :), &
+                                  s_y1A(fstart:fend, jstart:jend, :), &
+                                  s_x2A(fstart:fend, jstart:jend, :), &
+                                  s_y2A(fstart:fend, jstart:jend, :), &
+                                  s_x1Z(fstart:fend, jstart:jend, :), &
+                                  s_y1Z(fstart:fend, jstart:jend, :), &
+                                  s_x2Z(fstart:fend, jstart:jend, :), &
+                                  s_y2Z(fstart:fend, jstart:jend, :), &
+                                  uSi_ijk(fstart:fend, jstart:jend, :, :),    &
+                                  Chl_C_ijk(fstart:fend, jstart:jend, :, :),  &
+                                  pH(fstart:fend, jstart:jend, :),  &
+                                  RN2_ijk_out(fstart:fend, jstart:jend, :), &
+                                  RO2_A_ijk_out(fstart:fend, jstart:jend, :),  &
+                                  RO2_Z_ijk_out(fstart:fend, jstart:jend, :), &
+                                  RO2_BC_ijk_out(fstart:fend, jstart:jend, :), &
+                                  RO2_R_ijk_out(fstart:fend, jstart:jend, :) )
+      endif  !end of "if (mod(istep,iout).eq.0)" block if
 
 !#ifdef DEBUG
 !   write(6,*) "A=",f(1,1,1,1),"at istep=",istep
