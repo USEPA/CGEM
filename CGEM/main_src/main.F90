@@ -75,7 +75,9 @@
        call MPI_BCAST(input_filename,120,MPI_CHARACTER,0,MPI_COMM_WORLD,mpierr)
        call MPI_BCAST(init_filename,120,MPI_CHARACTER,0,MPI_COMM_WORLD,mpierr)
        call MPI_BCAST(BASE_NETCDF_OUTPUT_FILE_NAME,100,MPI_CHARACTER,0,MPI_COMM_WORLD,mpierr)
-       call MPI_BCAST(comt_filename,100,MPI_CHARACTER,0,MPI_COMM_WORLD,mpierr)
+       if(Which_code.eq."CGEM")then
+         call MPI_BCAST(comt_filename,100,MPI_CHARACTER,0,MPI_COMM_WORLD,mpierr)
+       endif
       endif
 
       call Set_Model_dim(myid,numprocs)
