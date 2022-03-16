@@ -9,6 +9,9 @@ CGEM_OBJ  =  CGEM_Flux.o\
 	OUTPUT_NETCDF_CGEM.o\
         Model_Compare.o\
 	SDM.o\
+	Sediment_Diagenesis_Routines.o\
+	Model_Diagenesis.o\
+	MATLAB.o\
 	T_GoMDOM.o\
 	Light_GoMDOM.o\
 	MASS_BALANCE_CGEM.o\

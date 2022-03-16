@@ -29,13 +29,13 @@ OTHER_LIBS  = -L/usr/lib/x86_64-linux-gnu/ -lpnetcdf -L/usr/local/lib -lnetcdff 
 #include main_src/src_just_serial
 include main_src/src_files_par
 include moc_src/src_files
-include sdm_src/src_files
+# include sdm_src/src_files
 include cgem_src/src_files
 include gd_src/src_files
 
 maindir=main_src
 mocdir=moc_src
-sdmdir=sdm_src
+# sdmdir=sdm_src
 cgemdir=cgem_src
 gddir=gd_src
 
@@ -54,7 +54,7 @@ ifeq (atmos,$(findstring atmos,$(MY_HOST)))
   INC	   = $(ATMOS_INC)
   LIBS	   = $(ATMOS_LIBS)
   F90     = mpiifort 
-  FFLAGS =  -warn all -traceback -no-diag-error-limit -implicitnone -ftz -D_3D -Dcgem
+  FFLAGS =  -warn all -O0 -g -check bounds -check all -traceback -no-diag-error-limit -implicitnone -ftz -D_3D -Dcgem
 ##FFLAGS = -D_MPI
 #  FFLAGS = -D_MPI -pg -save-temps
 #  FFLAGS = -O -D_MPI -qopenmp -mcmodel=medium -pg -save-temps
@@ -79,8 +79,8 @@ $(NO_OPT_OBJS): %.o: %.F90
 	$(F90) -c -O0 $(FFLAGS) $(DFLAGS) $<
 
 # No Implicit None flag
-$(SDM_OBJ): %.o: $(sdmdir)/%.f
-	$(F90) -c $(FFLAGS_SDM) $<
+# $(SDM_OBJ): %.o: $(sdmdir)/%.f
+#	$(F90) -c $(FFLAGS_SDM) $<
 
 $(MAIN_OBJ):%.o: $(maindir)/%.F90
 	$(F90) $(INC) -c $(FFLAGS) $(DFLAGS)  $<

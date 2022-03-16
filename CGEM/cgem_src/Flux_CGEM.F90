@@ -13,6 +13,7 @@
       USE STOICH_VARS
       USE SDM  !, ONLY: sedflux
       USE MOD_UTILITIES
+      USE Sediment_Diagenesis_Routines, ONLY: datain
 
       IMPLICIT NONE
 
@@ -68,9 +69,9 @@ endif
 
 ! -- SURFACE FLUXES -------------------------------------------------------------
 ! -- Loop over i,j; k will be 1 (surface)
-         do j = 1,jm
-         myi=1
-         do i= myi_start,myi_end
+         do j = 1, jm
+         myi = 1
+         do i = myi_start, myi_end
              if(nza(i,j).gt.0) then 
 
 if(Which_fluxes(iO2surf).eq.1) then
@@ -125,7 +126,7 @@ if(Which_fluxes(iO2surf).eq.1) then
 
                !For model comparison (COMT)
                if (MC .eq. 1) then
-                   O2_Flux(myi-1,j) = -O2_atF * SDay  !Convert to per day
+                   O2_Flux(myi,j) = -O2_atF * SDay  !Convert to per day
                endif
 
 endif 
@@ -176,7 +177,7 @@ endif
 
    !---------------- For COMT
    !------------------------------------------------------------
-   if (MC .eq. 1) call MC_Flux(fm, O2_Flux(1:myim,1:jm), istep, istep_wait, print_ave)
+   if (MC .eq. 1) call MC_Flux(fm(1:myim,1:jm,1:km), O2_Flux(1:myim,1:jm), istep, istep_wait, print_ave)
 
 !-- BOTTOM FLUXES -------------------------------------------------------------------------
          do j = 1,jm
@@ -262,6 +263,15 @@ if(Which_Fluxes(iSDM).eq.1) then
 !Sediment Diagenesis Model
 !        if(init.eq.1.or.mod(istep,288).eq.0) then  !Call every day, every 288 timesteps, assumes timestep = 5 min
 !           call Sediment_Diagenesis_Flux(dT*288,f(i,j,nz,:),T(i,j,nz),S(i,j,nz),pH(i,j,nz),sedflux(i,j,:),s_x1A(i,j,nz),&
+
+           PRINT*, "myi, j, nz = ", myi, j, nz
+           PRINT*, "dT,f(myi,j,nz,1),T(i,j,nz),S(i,j,nz) = ", dT,f(myi,j,nz,1), T(i,j,nz), S(i,j,nz)
+           PRINT*, "pH(myi,j,nz),sedflux(myi,j,:),s_x1A(myi,j,nz) = ", pH(myi,j,nz), sedflux(myi,j,1), s_x1A(myi,j,nz)
+           PRINT*, "s_y1A(myi,j,nz),s_z1A(myi,j,nz),s_x2A(myi,j,nz),s_y2A(myi,j,nz) = ", s_y1A(myi,j,nz), s_z1A(myi,j,nz), s_x2A(myi,j,nz), s_y2A(myi,j,nz)
+           PRINT*, "s_z2A(myi,j,nz),s_x1Z(myi,j,nz),s_y1Z(myi,j,nz) = ", s_z2A(myi,j,nz), s_x1Z(myi,j,nz), s_y1Z(myi,j,nz)
+           PRINT*, "s_z1Z(myi,j,nz), s_x2Z(myi,j,nz),s_y2Z(myi,j,nz),s_z2Z(myi,j,nz) = ", s_z1Z(myi,j,nz), s_x2Z(myi,j,nz), s_y2Z(myi,j,nz), s_z2Z(myi,j,nz)
+           PRINT*, "YY_init(myi,j,1),pph_init(myi,j,1) = ", YY_init(myi,j,1),pph_init(myi,j,1)
+
            call Sediment_Diagenesis_Flux(dT,f(myi,j,nz,:),T(i,j,nz),S(i,j,nz),pH(myi,j,nz),sedflux(myi,j,:),s_x1A(myi,j,nz),&
      & s_y1A(myi,j,nz),s_z1A(myi,j,nz),s_x2A(myi,j,nz),s_y2A(myi,j,nz),s_z2A(myi,j,nz),s_x1Z(myi,j,nz),s_y1Z(myi,j,nz), &
      & s_z1Z(myi,j,nz), s_x2Z(myi,j,nz),s_y2Z(myi,j,nz),s_z2Z(myi,j,nz),YY_init(myi,j,:),pph_init(myi,j,:) )

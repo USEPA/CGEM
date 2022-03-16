@@ -13,9 +13,9 @@ SUBROUTINE MC_Flux(fm, O2_Flux, istep, istep_wait, print_ave  )
   !------------------------------------------------------------------------
     IMPLICIT NONE
 
-    real, intent(in) :: O2_Flux(myim,jm)
+    real, intent(in) :: fm(im,jm,km), O2_Flux(myim,jm)
     integer, intent(in) :: istep
-    integer, intent(in) :: istep_wait, print_ave, fm(im,jm,km)
+    integer, intent(in) :: istep_wait, print_ave
     real :: SUM_O2F(myim,jm)
     integer :: my_im, myi, i, j
     integer, save :: i_out, print_file

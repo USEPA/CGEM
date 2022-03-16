@@ -4,12 +4,13 @@
 
       USE Model_dim
       !USE CGEM_vars 
-      USE SDM, only:A,NPOINTS,NEQ,nsed
+      USE SDM, only: A, NPOINTS, NEQ, nsed
+      USE Model_Diagenesis, ONLY: model
 
       IMPLICIT NONE
 
       real, intent(in) :: f_nf(nf),T,S,pH ! State variables, Temp, Salinity
-      real, intent(out) :: sedflux_ij(nsed) 
+      REAL(kind=8), intent(out) :: sedflux_ij(nsed) 
       real, intent(in) :: s_x1A,s_y1A,s_z1A,s_x2A,s_y2A,s_z2A
       real, intent(in) :: s_x1Z,s_y1Z,s_z1Z,s_x2Z,s_y2Z,s_z2Z 
       integer, intent(in) :: dT

@@ -56,13 +56,17 @@
        do i = 1, nBC            ! Loop over boundary cells
           ibc = bcIJ(i,1)  ! Extract the i index of grid cell 
           jbc = bcIJ(i,2)  ! Extract the j index of grid cell 
-          nz = nza(ibc,jbc)
-          do k = 1, nz       ! Loop over the sigma layers
-             f(ibc,jbc,k,iNO3) = BC2(i) * 1.0e3 / 14.01
-             f(ibc,jbc,k,iNH4) = BC3(i) * 1.0e3 / 14.01
-             f(ibc,jbc,k,iPO4) = BC6(i) * 1.0e3 / 30.97
-             f(ibc,jbc,k,iO2) =  BC9(i) * 1.0e3 / 32.0
-          enddo
+          if ((ibc .ge. myi_start) .and. (ibc .le. myi_end)) then
+             myi = ibc - myi_start + 1
+             nz = nza(myi,jbc)
+             PRINT*, "myi_start, myi_end, ibc, jbc, nz, nBC = ", myi_start, myi_end, ibc, jbc, nz, nBC
+             do k = 1, nz       ! Loop over the sigma layers
+                f(myi,jbc,k,iNO3) = BC2(i) * 1.0e3 / 14.01
+                f(myi,jbc,k,iNH4) = BC3(i) * 1.0e3 / 14.01
+                f(myi,jbc,k,iPO4) = BC6(i) * 1.0e3 / 30.97
+                f(myi,jbc,k,iO2) =  BC9(i) * 1.0e3 / 32.0
+             enddo
+          endif
        enddo
 
 

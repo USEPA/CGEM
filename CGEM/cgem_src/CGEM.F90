@@ -315,7 +315,7 @@
                 enddo
                 if(nz.gt.0) call DailyRad_init(TC_8, lat(i,j), lon(i,j), d(i,j,:), d_sfc(i,j,:), A_k, &
                      & CDOM_k, OM1A_k, OM1Z_k, OM1SPM_k, OM1BC_k, aDailyRad_k,nz)
-                aDailyRad(i,j,:) = aDailyRad_k(:)
+                aDailyRad(myi,j,:) = aDailyRad_k(:)
            myi = myi + 1
           enddo 
        enddo     
@@ -376,7 +376,7 @@
            OM1A_k(k)  = f(myi,j,k,iOM1_A) * C_cf 
          ! Below is mmol/m3 Organic Matter from initial and boundary conditions converted to equivalent g carbon/m3
            OM1BC_k(k)  = f(myi,j,k,iOM1_BC) * C_cf 
-           aDailyRad_k(k) = aDailyRad(i,j,k)
+           aDailyRad_k(k) = aDailyRad(myi,j,k)
       enddo ! End of the "DO k = 1, nz" block DO loop
 
 
@@ -563,8 +563,8 @@
             aRadSum_k(:) = 0.0
          endif ! if (MOD(istep, StepsPerDay) .eq. 0)
 
-         aDailyRad(i,j,:) = aDailyRad_k(:)
-         aRadSum(i,j,:) = aRadSum_k(:)
+         aDailyRad(myi,j,:) = aDailyRad_k(:)
+         aRadSum(myi,j,:) = aRadSum_k(:)
 
 !-------------------------------------------------------------------------
 ! call subroutine calc_Agrow to execute the desired phytoplankton 
@@ -1371,17 +1371,20 @@ endif
 do i = 1, nriv            ! Loop over the rivers
    icell = riversIJ(i,1)  ! Extract the i index of grid cell where river discharges
    jcell = riversIJ(i,2)  ! Extract the j index of grid cell where river discharges
-   do k = 1, nsl          ! Loop over the sigma layers
-      rivLoadConvFactor = 1.0e6 * weights(i,k) * dT / Vol(icell,jcell,k)
-      ff(icell,jcell,k,iNO3) = ff(icell,jcell,k,iNO3) +  &
-                            & Riv2(i) * rivLoadConvFactor / 14.01
-      ff(icell,jcell,k,iNH4) = ff(icell,jcell,k,iNH4) +  &
-                            & Riv3(i) * rivLoadConvFactor / 14.01
-      ff(icell,jcell,k,iPO4) = ff(icell,jcell,k,iPO4) +  &
-                            & Riv6(i) * rivLoadConvFactor / 30.97
-      ff(icell,jcell,k,iO2) = ff(icell,jcell,k,iO2) +  &
-                            & Riv9(i) * rivLoadConvFactor / 32.0
-   enddo
+   if ((icell .ge. myi_start) .and. (icell .le. myi_end)) then
+       myi = icell - myi_start + 1
+       do k = 1, nsl          ! Loop over the sigma layers
+          rivLoadConvFactor = 1.0e6 * weights(i,k) * dT / Vol(icell,jcell,k)
+          ff(myi,jcell,k,iNO3) = ff(myi,jcell,k,iNO3) +  &
+                                & Riv2(i) * rivLoadConvFactor / 14.01
+          ff(myi,jcell,k,iNH4) = ff(myi,jcell,k,iNH4) +  &
+                                & Riv3(i) * rivLoadConvFactor / 14.01
+          ff(myi,jcell,k,iPO4) = ff(myi,jcell,k,iPO4) +  &
+                                & Riv6(i) * rivLoadConvFactor / 30.97
+          ff(myi,jcell,k,iO2) = ff(myi,jcell,k,iO2) +  &
+                                & Riv9(i) * rivLoadConvFactor / 32.0
+       enddo
+   endif
 enddo
 
 ! PRINT*, "---------------------------------------"

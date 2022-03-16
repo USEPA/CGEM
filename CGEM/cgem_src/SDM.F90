@@ -4,8 +4,9 @@ IMPLICIT NONE
 
 SAVE
 
-INTEGER NPOINTS   !This is read in from A 
-INTEGER NEQ       !Calculated from A
+INTEGER :: NPOINTS   !This is read in from A 
+INTEGER :: NEQ       !Calculated from A
+INTEGER :: NS
 real, allocatable :: sedflux(:,:,:) 
 double precision, dimension(100) :: A
 double precision, allocatable :: YY_init(:,:,:)
