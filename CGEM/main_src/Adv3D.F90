@@ -15,8 +15,8 @@
 
       IMPLICIT NONE
 
-      integer, intent(in) :: myid,numprocs
-      integer :: i,j,k,ii,nz,myi,mpierr
+      integer, intent(in) :: myid, numprocs
+      integer :: i, j, k, ii, nz, myi, mpierr
       real :: f_n(0:(myim+1),jm,km,nf) 
 
 ! --- transports
@@ -115,6 +115,7 @@
      &       +( (vx(i,j,k)-vfm) - (vx(i,jp1,k)+vfp) )
         cf  = cfh + ((w_wsink(i,j,k+1)-wfp)-(w_wsink(i,j,k)+wfm))
 ! -------------------------------------------------------------
+
           f_n(myi,j,k,ii) =                                        &
      &      ( f(myi,j,k,ii)*Vol_prev(i,j,k)                            &
      &       +( cf*f(myi,j,k,ii)                                  &
@@ -123,49 +124,50 @@
      &           +(wfm*f(myi,j,km1,ii)+wfp*f(myi,j,min(k+1,nz),ii))) ) *dT  &
      &      ) /Vol(i,j,k)
 ! -------------------------------------------------------------
-       if(f_n(myi,j,k,ii).lt.0) then
-           write(6,*) "myid,numprocs,myid,start,end=",myid,numprocs,myid,myi_start,myi_end
-           write(6,*) "f_n(ii,i,j,k) lt zero,myi",ii,i,j,k,f_n(myi,j,k,ii),myi
-           write(6,*) "fim1,f,fip1",f(myim1,j,k,ii),f(myi,j,k,ii),f(myip1,j,k,ii)
-           write(6,*) "ufm,ufp,vfm,vfp,wfm,wfp,cf",ufm,ufp,vfm,vfp,wfm,wfp,cf
-           write(6,*) "f,Vol_prev,V/V",f(myi,j,k,ii),Vol_prev(i,j,k),Vol_prev(i,j,k)/Vol(i,j,k)
-           write(6,*) "ufm,ufp,vfm,vfp,wfm,wfp",ufm,ufp,vfm,vfp,wfm,wfp
-           write(6,*) "cf,cfh",cf,cfh
+       if(f_n(myi,j,k,ii) .lt. 0) then
+           write(6,*) "myid,numprocs,myid,start,end = ", myid, numprocs, myid, myi_start, myi_end
+           write(6,*) "ii, i, j, k, f_n(myi,j,k,ii) lt zero, myi = ", ii, i, j, k, f_n(myi,j,k,ii), myi
+           write(6,*) "fim1, f, fip1 = ",f(myim1,j,k,ii),f(myi,j,k,ii),f(myip1,j,k,ii)
+           write(6,*) "ufm, ufp, vfm, vfp, wfm, wfp, cf = ",ufm,ufp,vfm,vfp,wfm,wfp,cf
+           write(6,*) "f,Vol_prev, V/V = ",f(myi,j,k,ii),Vol_prev(i,j,k),Vol_prev(i,j,k)/Vol(i,j,k)
+           write(6,*) "ufm, ufp, vfm, vfp, wfm, wfp = ",ufm,ufp,vfm,vfp,wfm,wfp
+           write(6,*) "cf, cfh = ",cf,cfh
            write(6,*) (ux(i,j,k)-ufm),(ux(ip1,j,k)+ufp),(ux(i,j,k)-ufm) - (ux(ip1,j,k)+ufp)
            write(6,*) (vx(i,j,k)-vfm),(vx(i,jp1,k)+vfp),(vx(i,j,k)-vfm) - (vx(i,jp1,k)+vfp)
-           write(6,*) "cf_wterms",w_wsink(i,j,k+1),w_wsink(i,j,k),(w_wsink(i,j,k+1)-wfp)-(w_wsink(i,j,k)+wfm)
-           write(6,*) "u,v,w",ux(i,j,k),vx(i,j,k),w_wsink(i,j,k)
-           write(6,*) "u,v,w:p1",ux(ip1,j,k),vx(i,jp1,k),w_wsink(i,j,k+1)
-           write(6,*) "V,Vip1",Vol(i,j,k),Vol(ip1,j,k)
-           write(6,*) "V,Vjp1",Vol(i,j,k),Vol(i,jp1,k)
-           write(6,*) "ufm*fm1,ufp*fp1",ufm*f(myim1,j,k,ii),ufp*f(myip1,j,k,ii)
-           write(6,*) "vfm*fm1,vfp*fp1",vfm*f(myi,jm1,k,ii),vfp*f(myi,jp1,k,ii)
-           write(6,*) "wfm*fm1,wfp*fp1",wfm*f(myi,j,km1,ii),vfp*f(myi,j,min(k+1,nz),ii)
+           write(6,*) "cf_wterms = ",w_wsink(i,j,k+1),w_wsink(i,j,k),(w_wsink(i,j,k+1)-wfp)-(w_wsink(i,j,k)+wfm)
+           write(6,*) "u, v, w = ",ux(i,j,k),vx(i,j,k),w_wsink(i,j,k)
+           write(6,*) "u, v, w:p1 = ",ux(ip1,j,k),vx(i,jp1,k),w_wsink(i,j,k+1)
+           write(6,*) "V, Vip1 = ",Vol(i,j,k),Vol(ip1,j,k)
+           write(6,*) "V, Vjp1 = ",Vol(i,j,k),Vol(i,jp1,k)
+           write(6,*) "ufm*fm1, ufp*fp1 = ",ufm*f(myim1,j,k,ii),ufp*f(myip1,j,k,ii)
+           write(6,*) "vfm*fm1, vfp*fp1 = ",vfm*f(myi,jm1,k,ii),vfp*f(myi,jp1,k,ii)
+           write(6,*) "wfm*fm1, wfp*fp1 = ",wfm*f(myi,j,km1,ii),vfp*f(myi,j,min(k+1,nz),ii)
            write(6,*)
-           write(6,*) "u",ux(i-2,j,k),ux(im1,j,k),ux(i,j,k),ux(ip1,j,k),ux(i+2,j,k)
-           write(6,*) "v",vx(i,j-2,k),vx(i,jm1,k),vx(i,j,k),vx(i,jp1,k),vx(i,j+2,k)
-           write(6,*) "w",wx(i,j,km1),wx(i,j,k),wx(i,j,k+1)
-           call MPI_BARRIER(MPI_COMM_WORLD,mpierr)
+           write(6,*) "u = ",ux(i-2,j,k),ux(im1,j,k),ux(i,j,k),ux(ip1,j,k),ux(i+2,j,k)
+           write(6,*) "v = ",vx(i,j-2,k),vx(i,jm1,k),vx(i,j,k),vx(i,jp1,k),vx(i,j+2,k)
+           write(6,*) "w = ",wx(i,j,km1),wx(i,j,k),wx(i,j,k+1)
+           call MPI_BARRIER(MPI_COMM_WORLD, mpierr)
            call MPI_FINALIZE(mpierr)
-           stop
+           call MPI_ABORT(MPI_COMM_WORLD, 1, mpierr)
+           STOP
        endif
       end do ! k = 1, nz
-       myi=myi+1
+       myi = myi + 1
       end do !i
       end do !j
       end do   ! ii = 1,nf
 !$omp end parallel do
 
 ! update f for the current timestep
-         do j = 1,jm
-          myi = 1
-         do i = myi_start,myi_end
-            nz = nza(i,j)
-          do k=1,nz
-             f(myi,j,k,:) = f_n(myi,j,k,:)
-          enddo
-          myi = myi + 1
-         enddo
+         do j = 1, jm
+            myi = 1
+            do i = myi_start, myi_end
+               nz = nza(i,j)
+               do k = 1, nz
+                  f(myi,j,k,:) = f_n(myi,j,k,:)
+               enddo
+               myi = myi + 1
+            enddo
          enddo
 
 #ifdef DEBUG

@@ -8,7 +8,7 @@
 
       IMPLICIT NONE
 
-      real*8, dimension(100), intent(INOUT) :: A
+      REAL(kind=8), dimension(100), intent(INOUT) :: A
       real, intent(IN) :: f(nf),T,S,pH ! State variables, Temp, Salinity
       real :: R_11
       real :: s_x1A,s_y1A,s_z1A,s_x2A,s_y2A,s_z2A,s_x1Z,s_y1Z

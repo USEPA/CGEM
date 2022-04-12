@@ -304,7 +304,7 @@ SUBROUTINE flxco2(co2flux, co2ex, dpco2,                                        
   RETURN
 END SUBROUTINE flxco2
 
-!>    Compute xCO2 from arrays of pCO2atm, in situ T, S, & atm pressure
+!    Compute xCO2 from arrays of pCO2atm, in situ T, S, & atm pressure
 SUBROUTINE pCO2atm2xCO2(pCO2atm, temp, salt, Patm, N, xCO2)
   !    Purpose:
   !    Compute xCO2 from arrays of pCO2atm, in situ T, S, & atm pressure
@@ -318,14 +318,14 @@ SUBROUTINE pCO2atm2xCO2(pCO2atm, temp, salt, Patm, N, xCO2)
 
 ! INPUT variables
   !> atmospheric partial pressure of CO2 [uatm] 
-  REAL(kind=r4), INTENT(out), DIMENSION(N) :: pCO2atm
+  REAL(kind=r4), INTENT(in), DIMENSION(N) :: pCO2atm
   !> in situ temperature [C]
   REAL(kind=r4), INTENT(in), DIMENSION(N) :: temp
   !> salinity [psu]
   REAL(kind=r4), INTENT(in), DIMENSION(N) :: salt
   !> atmospheric pressure [atm]
   REAL(kind=r4), INTENT(in), DIMENSION(N) :: Patm
-!f2py optional , depend(temp) :: n=len(temp)
+! f2py optional , depend(temp) :: n=len(temp)
 
 ! OUTPUT variables:
   !> mole fraction of CO2 [ppm]

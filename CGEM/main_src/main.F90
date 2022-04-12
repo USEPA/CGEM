@@ -52,10 +52,10 @@
 !---------------------
 ! MPI variables
 !---------------------
-      integer :: myid=0
-      integer :: numprocs=1
-      real*8  mpitime1,mpitime2,my_wtime   !timing
-      integer mpierr
+      integer :: myid = 0
+      integer :: numprocs = 1
+      real(kind=8) :: mpitime1, mpitime2, my_wtime   !timing
+      integer :: mpierr
 
 !------------------------------------------------
 !Initialize MPI
@@ -186,11 +186,11 @@
 
        call USER_update_masks()
 
-       call WQ_Model(Which_code,TC_8,istep,istep_out,myid,numprocs)
+       call WQ_Model(Which_code, TC_8, istep, istep_out, myid, numprocs)
 
-       call Flux(Which_code,istep)
+       call Flux(Which_code, istep, myid, numprocs)
 
-       call Transport(Which_code,myid,numprocs)
+       call Transport(Which_code, myid, numprocs)
 
       ! -------------- BEGIN OUTPUT DATA
       ! --- dump output when istep is a multiple of iout

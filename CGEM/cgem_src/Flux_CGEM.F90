@@ -1,4 +1,4 @@
-      Subroutine Flux_CGEM(istep)
+Subroutine Flux_CGEM(istep, myid, numprocs)
 
       USE Model_dim
       USE Grid
@@ -14,16 +14,17 @@
       USE SDM  !, ONLY: sedflux
       USE MOD_UTILITIES
       USE Sediment_Diagenesis_Routines, ONLY: datain
+      USE mpi_interface
 
       IMPLICIT NONE
 
 
-      integer, intent(in) :: istep
+      integer, intent(in) :: istep, myid, numprocs
       real :: T_sfc, Sal_sfc, O2_sfc, Sc, Op_umole, rhow, Op, OsDOp
       real :: Vtrans, alpha_O2, O2_atF, zs, DIC_sfc, CO2_atF
       real :: SOC, O2Flux, NO3Flux, NH4Flux, PO4Flux, SiFlux, DICFlux, ALKFlux
-      integer :: i, j, myi
-      integer, save :: init=1
+      integer :: i, j, myi, mpierr
+      integer, save :: init = 1
       real, parameter :: SDay = 86400.0  ! # of sec in 24 hr day
       !Esed is quanta/cm2/s
       !Need mol photons/m2/d, N_Av=6.0221413E+23
@@ -52,13 +53,20 @@
       O2_Flux = 0.
 
 ! -- Read in "A" for SDM --------------------------------------
-      if(Which_fluxes(iSDM).eq.1.and.init.eq.1) then
-        ! Reads in SDM/hypox_input.csv
-         call datain(A,mrow)
-         NPOINTS = A(44)
-         NEQ = NPOINTS*17 + 2
-        ! Alloocates YY_init and ppH_init
-         call SDM_allocate()
+      if((Which_fluxes(iSDM) .eq. 1) .and. (init .eq. 1)) then
+         ! Reads in SDM/hypox_input.csv
+         if (myid .eq. 0) then
+             call datain(A,mrow)
+             NPOINTS = A(44)
+             NEQ = NPOINTS*17 + 2
+         endif
+         if (numprocs .gt. 0) then
+             call MPI_BCAST(A, 100, MPI_DOUBLE_PRECISION, 0, MPI_COMM_WORLD, mpierr)
+             call MPI_BCAST(NPOINTS, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, mpierr)
+             call MPI_BCAST(NEQ, 1, MPI_INTEGER,0, MPI_COMM_WORLD, mpierr)
+         endif
+         ! Allocates YY_init and ppH_init
+         call SDM_allocate(myid, numprocs)
       endif
 
 ! -- Read in CMAQ -------------------------------------------------------------
@@ -177,12 +185,12 @@ endif
 
    !---------------- For COMT
    !------------------------------------------------------------
-   if (MC .eq. 1) call MC_Flux(fm(1:myim,1:jm,1:km), O2_Flux(1:myim,1:jm), istep, istep_wait, print_ave)
+   if (MC .eq. 1) call MC_Flux(fm, O2_Flux(1:myim,1:jm), istep, istep_wait, print_ave)
 
 !-- BOTTOM FLUXES -------------------------------------------------------------------------
-         do j = 1,jm
+         do j = 1, jm
          myi = 1
-         do i = myi_start,myi_end
+         do i = myi_start, myi_end
               if(nza(i,j).gt.0) then
               if(wsm(i,j).eq.0) then !If we are on the shelf
                nz = nza(i,j)
@@ -258,73 +266,63 @@ elseif(Which_fluxes(iMPB).eq.3) then
 endif
 
 
-if(Which_Fluxes(iSDM).eq.1) then
+if (Which_Fluxes(iSDM).eq.1) then
 
-!Sediment Diagenesis Model
+! Sediment Diagenesis Model
 !        if(init.eq.1.or.mod(istep,288).eq.0) then  !Call every day, every 288 timesteps, assumes timestep = 5 min
 !           call Sediment_Diagenesis_Flux(dT*288,f(i,j,nz,:),T(i,j,nz),S(i,j,nz),pH(i,j,nz),sedflux(i,j,:),s_x1A(i,j,nz),&
 
-           PRINT*, "myi, j, nz = ", myi, j, nz
-           PRINT*, "dT,f(myi,j,nz,1),T(i,j,nz),S(i,j,nz) = ", dT,f(myi,j,nz,1), T(i,j,nz), S(i,j,nz)
-           PRINT*, "pH(myi,j,nz),sedflux(myi,j,:),s_x1A(myi,j,nz) = ", pH(myi,j,nz), sedflux(myi,j,1), s_x1A(myi,j,nz)
-           PRINT*, "s_y1A(myi,j,nz),s_z1A(myi,j,nz),s_x2A(myi,j,nz),s_y2A(myi,j,nz) = ", s_y1A(myi,j,nz), s_z1A(myi,j,nz), s_x2A(myi,j,nz), s_y2A(myi,j,nz)
-           PRINT*, "s_z2A(myi,j,nz),s_x1Z(myi,j,nz),s_y1Z(myi,j,nz) = ", s_z2A(myi,j,nz), s_x1Z(myi,j,nz), s_y1Z(myi,j,nz)
-           PRINT*, "s_z1Z(myi,j,nz), s_x2Z(myi,j,nz),s_y2Z(myi,j,nz),s_z2Z(myi,j,nz) = ", s_z1Z(myi,j,nz), s_x2Z(myi,j,nz), s_y2Z(myi,j,nz), s_z2Z(myi,j,nz)
-           PRINT*, "YY_init(myi,j,1),pph_init(myi,j,1) = ", YY_init(myi,j,1),pph_init(myi,j,1)
-
-           call Sediment_Diagenesis_Flux(dT,f(myi,j,nz,:),T(i,j,nz),S(i,j,nz),pH(myi,j,nz),sedflux(myi,j,:),s_x1A(myi,j,nz),&
-     & s_y1A(myi,j,nz),s_z1A(myi,j,nz),s_x2A(myi,j,nz),s_y2A(myi,j,nz),s_z2A(myi,j,nz),s_x1Z(myi,j,nz),s_y1Z(myi,j,nz), &
-     & s_z1Z(myi,j,nz), s_x2Z(myi,j,nz),s_y2Z(myi,j,nz),s_z2Z(myi,j,nz),YY_init(myi,j,:),pph_init(myi,j,:) )
+           call Sediment_Diagenesis_Flux(dT, f(myi,j,nz,:), T(i,j,nz), S(i,j,nz), pH(myi,j,nz), sedflux(myi,j,:), &
+                                       & s_x1A(myi,j,nz), s_y1A(myi,j,nz), s_z1A(myi,j,nz), & 
+                                       & s_x2A(myi,j,nz), s_y2A(myi,j,nz), s_z2A(myi,j,nz), & 
+                                       & s_x1Z(myi,j,nz), s_y1Z(myi,j,nz), s_z1Z(myi,j,nz), & 
+                                       & s_x2Z(myi,j,nz), s_y2Z(myi,j,nz), s_z2Z(myi,j,nz), & 
+                                       & YY_init(myi,j,:), pph_init(myi,j,:) )
 !        endif
 
 !DIC Exchange
-               f(myi,j,nz,iDIC) = AMAX1(f(myi,j,nz,iDIC) - sedflux(myi,j,sDIC)/ &
-     & dz(i,j,nz)*dT/SDay,0.)
+               f(myi,j,nz,iDIC) = AMAX1(f(myi,j,nz,iDIC) - sedflux(myi,j,sDIC)/dz(i,j,nz)*dT/SDay, 0.)
 
 !NH4 Exchange
-               f(myi,j,nz,iNH4) = AMAX1(f(myi,j,nz,iNH4) - sedflux(myi,j,sNH4)/ &
-     & dz(i,j,nz)*dT/SDay,0.)
+               f(myi,j,nz,iNH4) = AMAX1(f(myi,j,nz,iNH4) - sedflux(myi,j,sNH4)/dz(i,j,nz)*dT/SDay, 0.)
 !NO3 Exchange
-               f(myi,j,nz,iNO3) = AMAX1(f(myi,j,nz,iNO3) - sedflux(myi,j,sNO3)/ &
-     & dz(i,j,nz)*dT/SDay,0.)
+               f(myi,j,nz,iNO3) = AMAX1(f(myi,j,nz,iNO3) - sedflux(myi,j,sNO3)/dz(i,j,nz)*dT/SDay, 0.)
 !O2 Exchange
-               f(myi,j,nz,iO2) = AMAX1(f(myi,j,nz,iO2) - sedflux(myi,j,sO2)/ &
-     & dz(i,j,nz)*dT/SDay,0.)
+               f(myi,j,nz,iO2)  = AMAX1(f(myi,j,nz,iO2)  - sedflux(myi,j,sO2)/dz(i,j,nz)*dT/SDay, 0.)
 
 !DOC Exchange
        sedflux_iOM2_A = f(myi,j,nz,iOM2_A) / (f(myi,j,nz,iOM2_A) + f(myi,j,nz,iOM2_Z) + f(myi,j,nz,iOM2_R) + f(myi,j,nz,iOM2_bc)) &
      &   * sedflux(myi,j,sDOC)/dz(i,j,nz)*dT/SDay
-       f(myi,j,nz,iOM2_A) = AMAX1(f(myi,j,nz,iOM2_A)-sedflux_iOM2_A,0.)
+       f(myi,j,nz,iOM2_A) = AMAX1(f(myi,j,nz,iOM2_A)-sedflux_iOM2_A, 0.)
 
        sedflux_iOM2_Z = f(myi,j,nz,iOM2_Z) / (f(myi,j,nz,iOM2_A) + f(myi,j,nz,iOM2_Z) + f(myi,j,nz,iOM2_R) + f(myi,j,nz,iOM2_bc)) &
      &   * sedflux(myi,j,sDOC)/dz(i,j,nz)*dT/SDay
-       f(myi,j,nz,iOM2_Z) = AMAX1(f(myi,j,nz,iOM2_Z)-sedflux_iOM2_Z,0.)
+       f(myi,j,nz,iOM2_Z) = AMAX1(f(myi,j,nz,iOM2_Z)-sedflux_iOM2_Z, 0.)
 
        sedflux_iOM2_R = f(myi,j,nz,iOM2_R) / (f(myi,j,nz,iOM2_A) + f(myi,j,nz,iOM2_Z) + f(myi,j,nz,iOM2_R) + f(myi,j,nz,iOM2_bc)) &
      &   * sedflux(myi,j,sDOC)/dz(i,j,nz)*dT/SDay
-       f(myi,j,nz,iOM2_R) = AMAX1(f(myi,j,nz,iOM2_R)-sedflux_iOM2_R,0.)
+       f(myi,j,nz,iOM2_R) = AMAX1(f(myi,j,nz,iOM2_R)-sedflux_iOM2_R, 0.)
 
        sedflux_iOM2_BC = f(myi,j,nz,iOM2_bc) / (f(myi,j,nz,iOM2_A) + f(myi,j,nz,iOM2_Z) + f(myi,j,nz,iOM2_R) + & 
            f(myi,j,nz,iOM2_bc)) * sedflux(myi,j,sDOC)/dz(i,j,nz)*dT/SDay
-       f(myi,j,nz,iOM2_bc) = AMAX1(f(myi,j,nz,iOM2_bc)-sedflux_iOM2_bc,0.)
+       f(myi,j,nz,iOM2_bc) = AMAX1(f(myi,j,nz,iOM2_bc)-sedflux_iOM2_bc, 0.)
 
 !OM1 Exchange for OM1_A and OM1_Z
        sedflux_iOM1_A = f(myi,j,nz,iOM1_A) / (f(myi,j,nz,iOM1_A) + f(myi,j,nz,iOM1_Z)) * sedflux(myi,j,sOM1)/dz(i,j,nz)*dT/SDay
-       f(myi,j,nz,iOM1_A) = AMAX1(f(myi,j,nz,iOM1_A)-sedflux_iOM1_A,0.)
+       f(myi,j,nz,iOM1_A) = AMAX1(f(myi,j,nz,iOM1_A)-sedflux_iOM1_A, 0.)
 
        sedflux_iOM1_Z = f(myi,j,nz,iOM1_Z) / (f(myi,j,nz,iOM1_A) + f(myi,j,nz,iOM1_Z)) * sedflux(myi,j,sOM1)/dz(i,j,nz)*dT/SDay
-       f(myi,j,nz,iOM1_Z) = AMAX1(f(myi,j,nz,iOM1_Z)-sedflux_iOM1_Z,0.)
+       f(myi,j,nz,iOM1_Z) = AMAX1(f(myi,j,nz,iOM1_Z)-sedflux_iOM1_Z, 0.)
 
 !OM2 Exchange for OM1_R and OM1_bc 
        sedflux_iOM1_R = f(myi,j,nz,iOM1_R) / (f(myi,j,nz,iOM1_R) + f(myi,j,nz,iOM1_bc)) * sedflux(myi,j,sOM2)/dz(i,j,nz)*dT/SDay
-       f(myi,j,nz,iOM1_R) = AMAX1(f(myi,j,nz,iOM1_R)-sedflux_iOM1_R,0.)
+       f(myi,j,nz,iOM1_R) = AMAX1(f(myi,j,nz,iOM1_R)-sedflux_iOM1_R, 0.)
 
        sedflux_iOM1_bc = f(myi,j,nz,iOM1_bc) / (f(myi,j,nz,iOM1_R) + f(myi,j,nz,iOM1_bc)) * sedflux(myi,j,sOM2)/dz(i,j,nz)*dT/SDay
-       f(myi,j,nz,iOM1_bc) = AMAX1(f(myi,j,nz,iOM1_bc)-sedflux_iOM1_bc,0.)
+       f(myi,j,nz,iOM1_bc) = AMAX1(f(myi,j,nz,iOM1_bc)-sedflux_iOM1_bc, 0.)
 
 !ALK Exchange
-               f(myi,j,nz,iALK) = AMAX1(f(myi,j,nz,iALK) - sedflux(myi,j,sALK)/ &
-     & dz(i,j,nz)*dT/SDay,0.)
+               f(myi,j,nz,iALK) = AMAX1(f(myi,j,nz,iALK) - sedflux(myi,j,sALK)/dz(i,j,nz)*dT/SDay, 0.)
 
 endif
 
@@ -334,8 +332,8 @@ endif
    END DO      ! end of do i block do loop
    END DO      ! end of do j block do loop
 
-   init=0
+   init = 0
 
-       RETURN
+RETURN
 
-       END Subroutine Flux_CGEM
+END Subroutine Flux_CGEM

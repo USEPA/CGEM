@@ -57,7 +57,6 @@
   REAL   :: tc  
   REAL   :: thez
   REAL   :: xha
-  REAL   :: Yr_length
 
 !---------------------------------------------------
 !  Compute solar declination angle

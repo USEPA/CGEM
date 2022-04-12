@@ -36,7 +36,7 @@ CONTAINS
     real, dimension(:,:,:), INTENT(IN)  :: var1, var2
     real, dimension(:,:,:), INTENT(OUT) :: var
     integer :: i
-    logical :: full
+    logical, INTENT(IN) :: full
 
     
     ! linear interpolation
@@ -63,7 +63,7 @@ CONTAINS
     real, dimension(:,:), INTENT(IN)  :: var1, var2
     real, dimension(:,:), INTENT(OUT) :: var
     integer :: i
-    logical :: full
+    logical, INTENT(IN) :: full
 
 
     ! linear interpolation
@@ -90,7 +90,7 @@ CONTAINS
     real, dimension(:), INTENT(IN)  :: var1, var2
     real, dimension(:), INTENT(OUT) :: var
     integer :: i
-    logical :: full
+    logical, INTENT(IN) :: full
 
 
     ! linear interpolation

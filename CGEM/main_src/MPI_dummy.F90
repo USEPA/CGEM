@@ -94,15 +94,20 @@ integer b,c,d,e,f
 end subroutine
 
 
-
 subroutine MPI_FINALIZE(mierr)
 integer mierr
 !Dummy subroutine
 return
 end subroutine
 
-subroutine MPI_BARRIER(comm)
-integer comm
+subroutine MPI_BARRIER(comm1, comm2)
+integer comm1, comm2
+!Dummy subroutine
+return
+end subroutine
+
+subroutine MPI_ABORT(comm, ierror, mierr)
+integer comm, ierror, mierr
 !Dummy subroutine
 return
 end subroutine
@@ -114,7 +119,8 @@ return
 end subroutine
 
 subroutine MPI_INFO_SET(info,bsize,num,err)
-integer info, bsize, num, err 
+integer info, err 
+character(len=*) :: bsize, num
 !Dummy subroutine
 return
 end subroutine

@@ -6,20 +6,20 @@ Module Model_Diagenesis
 
       REAL(kind=8) ::  tir_O2, tir_NO, tir_HN, tir_SO, tir_TC, tir_ALK, tir_DOM
 
-contains
+      contains
       
       SUBROUTINE model(Ainp, dT, YY_ij, ppH_ij, sedflux_ij)
 
-      USE SDM, ONLY:nsed,sO2,sNO3,sNH4,sDIC,sOM1,sOM2,sALK,sALK,sDOC
+      USE SDM, ONLY: NPOINTS, NEQ, nsed,sO2,sNO3,sNH4,sDIC,sOM1,sOM2,sALK,sALK,sDOC
 
       IMPLICIT NONE
       
       INTEGER, PARAMETER :: MAXNEQ = 27000
       INTEGER, INTENT(IN) :: dT
-      REAL(kind=8), INTENT(OUT) :: sedflux_ij(nsed)
+      REAL(kind=4), INTENT(OUT) :: sedflux_ij(nsed)
       REAL(kind=8) :: MN2(1550), NH4(1500), NO3(1550)
-      REAL(kind=8), INTENT(INOUT) :: YY_ij(MAXNEQ)
-      REAL(kind=8), INTENT(INOUT) :: ppH_ij(2000)
+      REAL(kind=8), INTENT(INOUT) :: YY_ij(NEQ)
+      REAL(kind=8), INTENT(INOUT) :: ppH_ij(NPOINTS)
       REAL(kind=8) :: val1(400), val2(400)
       REAL(kind=8) :: G1(1550), G2(1550), O2(1550), Os(1500), Ob(1500)
       REAL(kind=8) :: FE2(1550), FE3(1550), SO4(1550), HS(1550)

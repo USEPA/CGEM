@@ -35,6 +35,7 @@
     integer, intent(in)  :: istep_out      ! Current output step 
     integer, intent(in)  :: myid
     integer, intent(in)  :: numprocs
+    integer :: mpierr
 !---------------------------------------------------------------------------------------
 ! Local Variables
 !-----------------------------------------------------
@@ -63,7 +64,7 @@
     real    :: RO2_BC_ijk_out(myim,jm,km)      ! Remineralization terms for O2
 !-------------------------------------------------------------------------
 ! Phytoplankton parameters
- !Phytoplankton uptake and growth
+! Phytoplankton uptake and growth
     real, dimension(nospA,km) :: A_k      ! Phytoplankton number density (cells/m3)
     real    :: Agrow                       ! Phytoplankton growth (cells/m3/d)
     real, dimension(nospA,km) :: Agrow_k  ! Phytoplankton growth (cells/m3/d)
@@ -84,12 +85,12 @@
     real    :: AupP  ! Total Phytoplankton uptake of Phosphorus (mmol-P/m3/d)
     real    :: AupSi ! Total Phytoplankton uptake of Silica (mmol-Si/m3/d)
     integer :: RLN   ! Rate Limiting Nutrient of N, P, and Si
- !Monod equations for phytoplankton
+ ! Monod equations for phytoplankton
     real, dimension(nospA)    :: monodN  !Monod term in nitrogen uptake
     real, dimension(nospA)    :: monodP  !Monod term in phosphorus uptake
     real, dimension(nospA)    :: monodSi !Monod term in Si uptake
     real    :: Ntotal   ! Total N (mmol/m3)
- !Phytoplankton nutrient loss
+ ! Phytoplankton nutrient loss
     real, dimension(nospA)    :: Amort ! Dead phytoplankton (cells/m3/day)
     real, dimension(nospA)    :: AexudN_A    ! Phytoplankton group exudation (mmol-N/cell/d)
     real, dimension(nospA)    :: AexudP_A    ! Phytoplankton group exudation (mmol-P/cell/d) 
@@ -487,14 +488,6 @@
                  & PAR_percent_k,                                      &
                  & PARbot     , PARdepth_k                         )
 
-!#ifdef DEBUG_LIGHT
-!                 write(6,*) "percent", PAR_percent_k(1),PAR_percent_k(6),PAR_percent_k(12),PAR_percent_k(20)
-!                 write(6,*) "depth", PARdepth_k(1),PARdepth_k(6),PARdepth_k(12),PARdepth_k(20)
-!                 write(6,*) "BC", m_OM_init,m_OM_BC,m_OM_sh
-!                 write(6,*) "d_sfc,nz",d_sfc(i,j,:),nz
-!                 write(6,*) "bot",PARbot
-!                  write(6,*) "Chl,A,Z,SP,BC",Chla_tot_k(1),OM1A_k(1),OM1Z_k(1),OM1SPM_k(1),OM1BC_k(1)
-!#endif
                  !-------------------------------------------------
          case (2)! Upgraded form of the original underwater light
                  ! model of Pete Eldridge is used. Now accounts for
@@ -574,9 +567,9 @@
 ! vertical grid column (i,j) at cell (i,j,k).
 !-----------------------------------------------------------------------
 
-       if(nz.gt.0) call calc_Agrow(  PARdepth_k,    T_k,                    &
-     & Qn_k   , Qp_k, N_k, P_k, Si_k , A_k     , Agrow_k,                  &
-     & uA_k, Aresp_k, uN_k, uP_k, uE_k, uSi_k, nz  )
+       if(nz .gt. 0) call calc_Agrow( PARdepth_k, T_k,              &
+                     & Qn_k, Qp_k, N_k, P_k, Si_k , A_k, Agrow_k,   &
+                     & uA_k, Aresp_k, uN_k, uP_k, uE_k, uSi_k, nz  )
 
 
 ! Save arrays to output to netCDF
@@ -697,7 +690,7 @@
 !-------------------------------------------------------------------------      
      Amort(isp)     = A_k(isp,k) * mA(isp)    ! dead phytoplankton (cells/m3/day)
 
-!   !Monod Equations
+!    Monod Equations
      Ntotal       = NO3 + NH4 
      monodN(isp)  = Ntotal/(Ntotal+Kn(isp))
      monodP(isp)  = PO4/(PO4+Kp(isp))
@@ -715,11 +708,7 @@
      RLN = 3
    endif
 
-!   PRINT*,"RLN=",RLN
-!   PRINT*,"isp=",isp
-!   PRINT*,"vmaxN(isp)=",vmaxN(isp)
-
-!!------------------------------------------------------------------------
+!------------------------------------------------------------------------
    if(Is_Day.eq.0) then  !Nutrient uptake only takes place during the day
         vN = 0
         vP = 0
@@ -791,29 +780,26 @@
 !---------------------------------------------------------
 !-A; Phytoplankton number density (cells/m3);
 !---------------------------------------------------------
-      ff(myi,j,k,iA(isp)) = AMAX1(f(myi,j,k,iA(isp))                              &
-      & + ( Agrow - Aresp - ZgrazA_tot(isp) - Amort(isp) )*dTd,1.)
+      ff(myi,j,k,iA(isp)) = AMAX1(f(myi,j,k,iA(isp))        &
+      & + ( Agrow - Aresp - ZgrazA_tot(isp) - Amort(isp) )*dTd, 1.)
 
 !----------------------------------------------------------------------
 !-Qn: Phytoplankton Nitrogen Quota (mmol-N/cell)
 !----------------------------------------------------------------------
-      Qn = f(myi,j,k,iQn(isp))                              &
-    &               + (vN - Qn*uA)*dTd
-
+      Qn = f(myi,j,k,iQn(isp)) + (vN - Qn*uA)*dTd
+      
 ! Enforce minima, also enforce maxima if not equal Droop (Which_quota=1)
       if(Which_quota.eq.1) then
            Qn = AMAX1(Qn,QminN(isp))
       else
            Qn = AMIN1(AMAX1(Qn,QminN(isp)),QmaxN(isp))
       endif
-
       ff(myi,j,k,iQn(1)-1+isp) = Qn
  
 !----------------------------------------------------------------------
 !-Qp: Phytoplankton Phosphorus Quota (mmol-P/cell)
 !----------------------------------------------------------------------
-      Qp = f(myi,j,k,iQp(isp))                              &
-       &               + (vP - Qp*uA)*dTd
+      Qp = f(myi,j,k,iQp(isp)) + (vP - Qp*uA)*dTd
 
 ! Enforce minima, also enforce maxima if not equal Droop (Which_quota=1)
       if(Which_quota.eq.1) then
@@ -960,15 +946,6 @@
 !------------------------------------------------------------
 ! Particulate and Dissolved fecal pellets, rate of remineralization
 !--------------------------------------------------------------
-!if(s_y1Z(myi,j,k).lt.0) then
-!write(6,*) "LT Zero at istep=",istep
-!!write(6,*) "myid,myi,j,k,start,end,myim",myid,myi,j,k,myi_start,myi_end,myim
-!!write(6,*) "Z1,Z2,O2,NO3,KG1,KG2,KO2",OM1_Z, OM2_Z, O2, NO3, KG1, KG2, KO2 
-!!write(6,*) "KstarO2,KNO3,s_x1Z,sy1z",KstarO2, KNO3,s_x1Z(myi,j,k), s_y1Z(myi,j,k)
-!!write(6,*) "z1z,x2z,y2z,z2z",s_z1Z(myi,j,k), s_x2Z(myi,j,k), s_y2Z(myi,j,k), s_z2Z(myi,j,k)
-!!write(6,*) "T",T_k(k)
-!!stop
-!endif
         call reaction( OM1_Z, OM2_Z, O2, NO3, KG1, KG2, KO2, KstarO2, KNO3,               &
      &  s_x1Z(myi,j,k), s_y1Z(myi,j,k), s_z1Z(myi,j,k), s_x2Z(myi,j,k), s_y2Z(myi,j,k), s_z2Z(myi,j,k), T_k(k), RC )
         RC       = one_d_365 * RC   !Change units from /year to /day
@@ -1030,8 +1007,8 @@
            KG2 = KG2_save
        endif
 
-!!--------------------------------------------------------------------
-!! Sum remineralization terms from dead phytoplankton, fecal pellets, and riverine particulate
+!--------------------------------------------------------------------
+! Sum remineralization terms from dead phytoplankton, fecal pellets, and riverine particulate
   RO2   = RO2_A  + RO2_Z  + RO2_R  + RO2_BC - 2.*R_11  ! (mmol-O2/m3/d)
   RNO3  = RNO3_A + RNO3_Z + RNO3_R + RNO3_BC + R_11    ! (mmol-NO3/m3/d)
   RNH4  = RNH4_A + RNH4_Z + RNH4_R + RNH4_BC - R_11    ! (mmol-NH4/m3/d)
@@ -1041,7 +1018,7 @@
   RALK  = RALK_A + RALK_Z + RALK_R + RALK_BC - 2.*R_11 ! (mmol-HCO3/m3/d)
   RN2   = RN2_A + RN2_Z + RN2_R + RN2_BC         ! (mmol-N2/m3/d)
 
-!Save for netCDF
+! Save for netCDF
   RN2_ijk(myi,j,k)    = RN2_ijk(myi,j,k) + (2 * RN2) * dTd
   RO2_A_ijk(myi,j,k)  = RO2_A_ijk(myi,j,k) + (RO2_A * dTd)
   RO2_Z_ijk(myi,j,k)  = RO2_Z_ijk(myi,j,k) + (RO2_Z * dTd)
@@ -1195,7 +1172,6 @@ enddo
     s_y2Z(myi,j,k) = stoich_y2Z
     s_z2Z(myi,j,k) = stoich_z2Z
 !------------------------------------------------------------------------
-!write(6,*) "3, s_y1Z",myi,j,k,s_y1Z(myi,j,k)
  
 !-------------------------------
 !-NO3; (mmol-N/m3)
@@ -1387,8 +1363,6 @@ do i = 1, nriv            ! Loop over the rivers
    endif
 enddo
 
-! PRINT*, "---------------------------------------"
-
 
 !update f for the current timestep
          do j = 1, jm
@@ -1448,14 +1422,6 @@ enddo
 
       endif
 
-!-----------------------------------------------------------------------------------------------
-
-!write(6,*) "888 RN2_ijk",RN2_ijk(28,18,1)
-!write(6,*) "888 PARdepth_ijk",PARdepth_ijk(28,18,1)
-!write(6,*) "PARpercent",PAR_percent_ijk(28,18,1)
-!write(6,*) "un",uN_ijk(28,18,1,:)
-!write(6,*) "Chla",Chla_tot_ijk(28,18,1)
-!write(6,*) "888 s_y1Z",myi,j,k,s_y1Z(28,18,1)
 
 !-----------------------------------------------------------------------------------------------
 !-- Call "Extra" variables for netCDF 
@@ -1463,10 +1429,6 @@ enddo
 ! -- do initialization of first timestep:
       if ( istep .eq. 1 ) then
           PRINT*, "istep = 1"
-!          if (uN_ijk(1,1,1,1) .eq. -9999) then
-!            PRINT*, "-9999 found istep = 1"
-!          end if
-!          PRINT*, "ISTEP, ISTEP_OUT = ", istep, istep_out
           CALL WRITE_EXTRA_DATA( myi_start, my_im, 1, jm, 1, km, istep_out, &
                                  PARdepth_ijk(fstart:fend, jstart:jend, :), &
                                  PAR_percent_ijk(fstart:fend, jstart:jend, :), &
@@ -1491,22 +1453,14 @@ enddo
                                  RO2_Z_ijk_out(fstart:fend, jstart:jend, :),  &
                                  RO2_BC_ijk_out(fstart:fend, jstart:jend, :), &
                                  RO2_R_ijk_out(fstart:fend, jstart:jend, :) )
+
+          CALL MPI_BARRIER( MPI_COMM_WORLD, mpierr ) ! Wait until file is updated
       endif  !end of EXTRA_DATA initialization 
 
-!!write(6,*) "999 RN2_ijk",RN2_ijk(28,18,1)
-!!write(6,*) "999 PARdepth_ijk",PARdepth_ijk(28,18,1)
-!!write(6,*) "PARpercent",PAR_percent_ijk(28,18,1)
-!!write(6,*) "un",uN_ijk(28,18,1,:)
-!!write(6,*) "Chla",Chla_tot_ijk(28,18,1)
-!!write(6,*) "999 s_y1Z",myi,j,k,s_y1Z(28,18,1)
-!!stop
 
 ! --- dump output when istep is a multiple of iout
       if ( mod( istep, iout ) .eq. 0 ) then
            PRINT*,"Calling WRITE_EXTRA_DATA for istep, istep_out = ", istep, istep_out 
-!           if (uN_ijk(1,1,1,1) .eq. -9999) then
-!               PRINT*, "-9999 found istep =",istep
-!           end if
            CALL WRITE_EXTRA_DATA( myi_start, my_im, 1, jm, 1, km, istep_out+1, &
                                   PARdepth_ijk(fstart:fend, jstart:jend, :), &
                                   PAR_percent_ijk(fstart:fend, jstart:jend, :), &
@@ -1531,11 +1485,10 @@ enddo
                                   RO2_Z_ijk_out(fstart:fend, jstart:jend, :), &
                                   RO2_BC_ijk_out(fstart:fend, jstart:jend, :), &
                                   RO2_R_ijk_out(fstart:fend, jstart:jend, :) )
+
+          CALL MPI_BARRIER( MPI_COMM_WORLD, mpierr ) ! Wait until file is updated
       endif  !end of "if (mod(istep,iout).eq.0)" block if
 
-!#ifdef DEBUG
-!   write(6,*) "A=",f(1,1,1,1),"at istep=",istep
-!#endif
 
    return
    END Subroutine CGEM 

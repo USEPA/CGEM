@@ -59,7 +59,6 @@
           if ((ibc .ge. myi_start) .and. (ibc .le. myi_end)) then
              myi = ibc - myi_start + 1
              nz = nza(myi,jbc)
-             PRINT*, "myi_start, myi_end, ibc, jbc, nz, nBC = ", myi_start, myi_end, ibc, jbc, nz, nBC
              do k = 1, nz       ! Loop over the sigma layers
                 f(myi,jbc,k,iNO3) = BC2(i) * 1.0e3 / 14.01
                 f(myi,jbc,k,iNH4) = BC3(i) * 1.0e3 / 14.01

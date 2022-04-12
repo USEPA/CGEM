@@ -6,7 +6,6 @@ Module Sediment_Diagenesis_Routines
 
     REAL(kind=8) :: ZROOT, WROOT
     REAL(kind=8) :: TEMP, SAL, PRESS, pH0
-    REAL(kind=8), DIMENSION(27000) :: YY
     REAL(kind=8), DIMENSION(27000) :: RATE
     REAL(kind=8), DIMENSION(2000) :: pH
     REAL(kind=8), DIMENSION(1100) :: gulfdo, day
@@ -51,7 +50,7 @@ Module Sediment_Diagenesis_Routines
     REAL(kind=8), PARAMETER, PRIVATE :: HUN = 1.0D+02, FIVEHUN = 5.0D+02
     REAL(kind=8), PARAMETER, PRIVATE :: THOU = 1000.0D0
     REAL(kind=8), PARAMETER, PRIVATE  :: PT1 = 0.1D0, PT2 = 0.2D0
-    REAL(kind=8) :: HU
+    REAL(kind=8), PRIVATE :: HU
 
     REAL(kind=8) :: ACNRM, CCMXJ, CONP, CRATE, DRC, EL(13)
     REAL(kind=8) :: ETA, ETAMAX, H, HMIN, HMXI, HNEW, HSCAL, PRL1
@@ -82,9 +81,9 @@ contains
       INTEGER, PARAMETER :: LRW = 22 + 11*MAXNEQ + (3*ML + 2*MU)*MAXNEQ
       INTEGER, PARAMETER :: LIW = 30 + MAXNEQ
       INTEGER, DIMENSION(LIW) :: IWORK
-      REAL(kind=8) :: Y(MAXNEQ), RWORK(LRW), RPAR(MAXNEQ)
+      REAL(kind=8) :: Y(NEQ), RWORK(LRW), RPAR(MAXNEQ)
       REAL(kind=8) :: RTOL(MAXNEQ), ATOL(MAXNEQ)
-      REAL(kind=8) :: ppH(2000)
+      REAL(kind=8) :: ppH(NPOINTS)
       REAL(kind=8) :: Ainp(100)
       REAL(kind=8) :: value1, value2, T, TOUT
 
@@ -169,13 +168,13 @@ contains
       INTEGER :: NEQ1, ITOL, ITASK, ISTATE, IOPT, IWORK(LIW)
       INTEGER :: MF, IPAR
       REAL(kind=8) :: T, TOUT
-      REAL(kind=8) :: Y(MAXNEQ), RTOL(MAXNEQ), ATOL(MAXNEQ), RWORK(LRW), RPAR(MAXNEQ)
+      REAL(kind=8) :: Y(NEQ1), RTOL(MAXNEQ), ATOL(MAXNEQ), RWORK(LRW), RPAR(MAXNEQ)
 
 !
 ! Type declarations for local variables --------------------------------
 !
       LOGICAL :: IHIT
-      REAL(kind=8) :: ATOLI, BIG, EWTI, FOUR, H0, HMAX, HMX
+      REAL(kind=8) :: ATOLI, BIG, EWTI, H0, HMAX, HMX
       REAL(kind=8) :: RH, RTOLI, SIZE, TCRIT, TNEXT, TOLSF, TP
       INTEGER :: I, IER, IFLAG, IMXER, JCO, KGO, LENIW, LENJ, LENP, LENRW
       INTEGER :: LENWM, LF0, MBAND, ML, MU, MXHNL0, MXSTP0, NITER, NSLAST
@@ -3513,7 +3512,7 @@ contains
        CALL SED(X,P,DPDX,U,W)
        CALL TORT2(T2,DT2DX,P,DPDX,X)
        PS = ONE - P
-       F=   PS/P         ! conversion dissolved to solids
+       F =   PS/P         ! conversion dissolved to solids
        SW = SIG(X,U)
        SS = SIG(X,W)
        AGST = ONE/PS*(-DPDX*DB0+PS*DDB(X)-PS*W)
@@ -3592,7 +3591,7 @@ contains
        CALL SED(X,P,DPDX,U,W)
        CALL TORT2(T2,DT2DX,P,DPDX,X)
        PS = ONE - P
-       F=   PS/P          ! conversion dissolved to solids
+       F =   PS/P          ! conversion dissolved to solids
        SW = SIG(X,U)
        SS = SIG(X,W)
 ! 
@@ -3895,7 +3894,7 @@ contains
        SS = SIG(X,W)
        SW = SIG(X,U)
        PS = ONE - P
-       F=   PS/P          ! conversion dissolved to solids
+       F =   PS/P          ! conversion dissolved to solids
 ! 
 !   Provides advective coefficents for solid and porewater species that 
 !   is general for all species at grid-point X.
@@ -4238,7 +4237,7 @@ contains
        CALL SED(X,P,DPDX,U,W) 
        CALL TORT2(T2,DT2DX,P,DPDX,X)
        PS = ONE - P
-       F=   PS/P          ! conversion dissolved to solids
+       F =   PS/P          ! conversion dissolved to solids
        AGTG = DPDX*DB(X) + P*DDB(X) - P*U
        AGST = -DPDX*DB(X)+PS*DDB(X)-PS*W
        ADVC = ONE/(T2**2)*(T2*DPDX-P*DT2DX)  ! Expansion of diffusion terms (PWater)
@@ -4553,7 +4552,7 @@ contains
        CALL SED(X,P,DPDX,U,W) 
        CALL TORT2(T2,DT2DX,P,DPDX,X)
        PS = ONE - P
-       F=   PS/P          ! conversion dissolved to solids
+       F =   PS/P          ! conversion dissolved to solids
        AGTG = DPDX*DB(X) + P*DDB(X) - P*U
        AGST = -DPDX*DB(X)+PS*DDB(X)-PS*W
        ADVC = ONE/(T2**2)*(T2*DPDX-P*DT2DX)  ! Expansion of diffusion terms (PWater)
@@ -5051,9 +5050,9 @@ contains
       GAM14 =(FOUR*x1+THREE*y1)/FIVE/x1 ! DENITRIFICATION NO3-/ CH20
       GAM24 =(FOUR*x2+THREE*y2)/FIVE/x2 ! DENITRIFICATION NO3-/ CH20
       GAM34 =(FOUR*x3+THREE*y3)/FIVE/x3 ! DENITRIFICATION NO3-/ CH20
-      TMP1= -(GAM13*R1(1)+GAM23*R2(1)+ONE/F*GAM33*R3(1))-(TWO*R15)
+      TMP1 = -(GAM13*R1(1)+GAM23*R2(1)+ONE/F*GAM33*R3(1))-(TWO*R15)
       RO2    = F*(TMP1)-(R8/FOUR+TWO*R11+TWO*R12)
-      TMP1= F*((y1/x1*R1(1)+y2/x2*R2(1)+ONE/F*y3/x3*R3(1)) &
+      TMP1 = F*((y1/x1*R1(1)+y2/x2*R2(1)+ONE/F*y3/x3*R3(1)) &
             -(GAM14*R1(2)+GAM24*R2(2)+ONE/F*GAM34*R3(2)))
       RNO3  = TMP1+R11
       RMN2  = F*(TWO*(R1(3)+R2(3)+R10))+TWO*R3(3)
@@ -5234,7 +5233,7 @@ contains
 !   NO3- as an electron acceptor.
 
 
-      DOUBLE PRECISION FUNCTION RNITRATE_SDM(O20)
+      REAL(KIND=8) FUNCTION RNITRATE_SDM(O20)
       IMPLICIT NONE
       REAL(kind=8), INTENT(IN) :: O20
       REAL(kind=8) :: KPO2, PO2
@@ -5252,7 +5251,7 @@ contains
 !  
 ! 
 ! 
-      DOUBLE PRECISION FUNCTION RMANGANESE(O20, NO30)
+      REAL(KIND=8) FUNCTION RMANGANESE(O20, NO30)
       IMPLICIT NONE
       REAL(kind=8), INTENT(IN) :: O20, NO30
       REAL(kind=8) :: KPO2, KPNO3, PO2, PNO3 
@@ -5275,7 +5274,7 @@ contains
 ! 
 !
 !
-      DOUBLE PRECISION FUNCTION RFERRIC(O20,NO30,MNO)
+      REAL(KIND=8) FUNCTION RFERRIC(O20,NO30,MNO)
       IMPLICIT NONE
       REAL(kind=8), INTENT(IN) :: O20, NO30, MNO
       REAL(kind=8) :: KPO2, KPNO3, KPMNO, PO2, PNO3, PMNO   
@@ -5302,7 +5301,7 @@ contains
 !
 !
 !
-      DOUBLE PRECISION FUNCTION RSULFATE(O20,NO30,MNO,FE30)
+      REAL(KIND=8) FUNCTION RSULFATE(O20,NO30,MNO,FE30)
       IMPLICIT NONE
       REAL(kind=8), INTENT(IN) :: O20, NO30, MNO, FE30 
       REAL(kind=8) :: KPO2, KPNO3, KPMNO, KPFE3
@@ -5337,11 +5336,10 @@ contains
 !    feedback function.
 ! 
 ! 
-      DOUBLE PRECISION FUNCTION rMandy(HS)
+      REAL(KIND=8) FUNCTION rMandy(HS)
       IMPLICIT NONE
       REAL(kind=8), INTENT(IN) :: HS
       REAL(kind=8) :: KPSO4, PHS
-      REAL(kind=8) :: ZERO = 0.0D+00, HUN = 1.0D+02
 ! JCL, note that KS04 is modified here, removed /HUN
       KPSO4 = KSO4
       PHS = HS
@@ -5415,7 +5413,7 @@ contains
 !		mixing coefficient
 
 
-      DOUBLE PRECISION FUNCTION DB(X)
+      REAL(KIND=8) FUNCTION DB(X)
       IMPLICIT NONE
       REAL(kind=8), INTENT(IN) :: X
 ! 
@@ -5432,7 +5430,7 @@ contains
 !    DDB	Contains the depth derivatives of DB(X)
 ! 
 ! 
-      DOUBLE PRECISION FUNCTION DDB(X)
+      REAL(KIND=8) FUNCTION DDB(X)
       IMPLICIT NONE
       REAL(kind=8), INTENT(IN) :: X
 ! 
@@ -5450,14 +5448,14 @@ contains
 !		approximation for the advective term (see Boudreau,
 !		1986, Amer. J. Sci., v. 286, p.192)
 
-      DOUBLE PRECISION FUNCTION SIG(X,W)
+      REAL(KIND=8) FUNCTION SIG(X,W)
       IMPLICIT NONE
       REAL(kind=8), INTENT(IN) :: X, W
       REAL(kind=8) :: D, E
 
       D = DB(X)
       IF (D.NE.ZERO) THEN
-          E = W*DH/D/TWO
+          E = W * DH / D / TWO
           IF(E.NE.ZERO) SIG = ONE/DTANH(E) - ONE/E
           IF(E.EQ.ZERO) SIG = ZERO
           RETURN
@@ -5477,7 +5475,7 @@ contains
       IMPLICIT NONE
       INTEGER, INTENT(IN) :: NEQ1, np, nss
       INTEGER, PARAMETER :: MAXNEQ = 27000
-      REAL(kind=8) :: Y(NEQ1+2)
+      REAL(kind=8), INTENT(IN) :: Y(NEQ1)
       REAL(kind=8), INTENT(OUT) :: G1(:),G2(:),O2(:),rNO3(:),rNH4(:),rMN2(:)
       REAL(kind=8), INTENT(OUT) :: SO4(:),HS(:),FE2(:),FES(:),TC(:),ALK(:)
       REAL(kind=8), INTENT(OUT) :: DOM(:), Os(:), Ob(:)
@@ -5780,7 +5778,7 @@ contains
       REAL(kind=8), DIMENSION(9) :: rk
       REAL(kind=8), DIMENSION(2000) :: ppH
 
-      REAL(kind=8) :: YEAR = 3.156D+07, THOU = 1.0D+03
+      REAL(kind=8) :: YEAR = 3.156D+07
       REAL(kind=8) :: yr_sec, rho, V
       REAL(kind=8) :: T0, TL, rK1, rK2, phl 
       REAL(kind=8) :: alphe0, alphe1, alphe2

@@ -217,18 +217,18 @@ CONTAINS
   !
   SUBROUTINE DEFVR4( FILEID, DIMIDS, VARID, VARNAM, VARDES, UNITS, IS_POSITIVE )
     IMPLICIT NONE
-    INTEGER :: IS_POSITIVE  !=1 if valid range is positive only
-    INTEGER,INTENT(IN):: FILEID
-    INTEGER,DIMENSION(4),INTENT(IN):: DIMIDS
-    INTEGER,INTENT(OUT):: VARID
-    CHARACTER(LEN=*),INTENT(IN):: VARNAM, VARDES, UNITS
+    INTEGER :: IS_POSITIVE  ! = 1 if valid range is positive only
+    INTEGER, INTENT(IN):: FILEID
+    INTEGER, DIMENSION(4), INTENT(IN):: DIMIDS
+    INTEGER, INTENT(OUT):: VARID
+    CHARACTER(LEN=*), INTENT(IN):: VARNAM, VARDES, UNITS
     INTEGER(MPI_OFFSET_KIND):: TWO  !Need to pass mpi_offset_kind
  
     ! Locals:
-    INTEGER ERR
+    INTEGER :: ERR
 
     TWO = 2
-    if(is_positive.eq.1) then
+    if (is_positive .eq. 1) then
        ERR = nfmpi_put_att_real(fileid, VARID, "valid_range", 5, TWO, (/ 0., 1.e38 /))
     else
        ERR = nfmpi_put_att_real(fileid, VARID, "valid_range", 5, TWO, (/ -1.e2, 1.e38 /))
@@ -286,8 +286,10 @@ CONTAINS
     EXTERNAL NF_PUT_ATT_TEXT
     ! Locals:
     INTEGER ERR
+    INTEGER(MPI_OFFSET_KIND):: LEN_COPY
 
-    ERR = NFMPI_PUT_ATT_TEXT(FILEID, VARID, ATTNAME, LEN(ATT), ATT)
+    LEN_COPY = LEN(ATT)
+    ERR = NFMPI_PUT_ATT_TEXT(FILEID, VARID, ATTNAME, LEN_COPY, ATT)
     CALL CHKERR(ERR, 'create variable attribute ' // ATTNAME )
 
   END SUBROUTINE DEFVRTATT

@@ -1,5 +1,10 @@
 module xnetcdf
 !Parallel netCDF routines
+
+USE pnetcdf
+
+IMPLICIT NONE
+
 include 'mpif.h'
 
 contains
@@ -52,14 +57,16 @@ end
 
 
 function ncdf_inq_varid(id,cname,ivar) result(res)
-integer,intent(in) :: id,ivar
+integer, intent(in) :: id
 character(LEN=*), intent(in) :: cname
+integer, intent(out) :: ivar
 integer :: res
 res=nfmpi_inq_varid(id,cname,ivar)
 return
 end
 
 function ncdf_close(id) result(res)
+integer,intent(in) :: id
 integer :: res
 res=nfmpi_close(id)
 return
@@ -82,7 +89,8 @@ return
 end
 
 function ncdf_wait_all(id,request_count,requests,statuses) result(res)
-integer,intent(in) :: id,request_count,requests(request_count)
+integer,intent(in) :: id, request_count
+integer,intent(inout) :: requests(request_count)
 integer,intent(out) :: statuses(request_count)
 integer :: res
 res=nfmpi_wait_all(id,request_count,requests,statuses)
