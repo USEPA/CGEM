@@ -334,8 +334,8 @@ SUBROUTINE vars(ph, pco2, fco2, co2, hco3, co3, OmegaA, OmegaC, BetaD, rhoSW, p,
              .OR.  sil(i) < 0.   &
              .OR. phos(i) < 0.   &
              .OR.  sal(i) > 1e+3 &
-             .OR.  alk(i) > 1e+3 &
-             .OR.  dic(i) > 1e+3 &
+             .OR.  alk(i) > 5e+3 &
+             .OR.  dic(i) > 5e+3 &
              .OR.  sil(i) > 1e+3 &
              .OR. phos(i) > 1e+3) THEN
            PRINT *, 'Unacceptable value in one or more of the following:'

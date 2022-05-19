@@ -34,8 +34,7 @@ USE mpi_interface
 
 IMPLICIT NONE
 
-
-REAL(kind=8), allocatable :: dummy1(:), dummy2(:)
+DOUBLE PRECISION, allocatable :: dummy1(:), dummy2(:)
 integer, intent(in) :: myid, numprocs
 integer :: i, mpierr
  

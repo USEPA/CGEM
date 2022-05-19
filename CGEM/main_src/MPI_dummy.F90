@@ -83,6 +83,26 @@ integer b,c,d,e,f
 real :: a(b,1,1)
 end subroutine
 
+subroutine BCAST_DOUBLE(a,b,c,d,e,f)
+DOUBLE PRECISION :: a
+integer :: b,c,d,e,f
+end subroutine
+
+subroutine BCAST_vDOUBLE(a,b,c,d,e,f)
+integer :: b,c,d,e,f
+DOUBLE PRECISION :: a(b)
+end subroutine
+
+subroutine BCAST_v2DOUBLE(a,b,c,d,e,f)
+integer :: b,c,d,e,f
+DOUBLE PRECISION :: a(b,1)
+end subroutine
+
+subroutine BCAST_v3DOUBLE(a,b,c,d,e,f)
+integer :: b,c,d,e,f
+DOUBLE PRECISION :: a(b,1,1)
+end subroutine
+
 subroutine BCAST_INT8(a,b,c,d,e,f)
 integer(kind=8) :: a
 integer b,c,d,e,f
