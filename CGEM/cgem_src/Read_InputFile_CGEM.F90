@@ -32,7 +32,7 @@ read(999,*)
 read(999,*)
 read(999,*) iYrS,iMonS,iDayS,iHrS,iMinS,iSecS
 read(999,*) iYrE,iMonE,iDayE,iHrE,iMinE,iSecE
-read(999,*) dT, dT_out
+read(999,*) dT, dT_out, dT_sed
 read(999,*) icent_jcent_units
 read(999,*) icent_in, jcent_in
 read(999,*)
@@ -192,6 +192,7 @@ call MPI_BCAST(iYrE,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
 call MPI_BCAST(iYrS,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
 call MPI_BCAST(dT,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
 call MPI_BCAST(dT_out,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(dT_sed,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
 call MPI_BCAST(icent,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
 call MPI_BCAST(jcent,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
 
@@ -368,6 +369,7 @@ enddo
 
       nstep = ( END_SECONDS - START_SECONDS ) / dT !number of timesteps in a run
       iout = dT_out/dT !output time-interval in timesteps
+      nstep_sed = dT_sed / dT   ! number of steps in-between calls to sediment diagenesis
 
 ! --- sinking speed: converted from m/d downward positive to m/s negative
       ws = -ws/SDay

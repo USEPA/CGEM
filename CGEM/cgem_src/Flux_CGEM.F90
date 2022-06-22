@@ -266,19 +266,19 @@ elseif(Which_fluxes(iMPB).eq.3) then
 endif
 
 
-if (Which_Fluxes(iSDM).eq.1) then
+if (Which_Fluxes(iSDM) .eq. 1) then
 
 ! Sediment Diagenesis Model
 !        if(init.eq.1.or.mod(istep,288).eq.0) then  !Call every day, every 288 timesteps, assumes timestep = 5 min
 !           call Sediment_Diagenesis_Flux(dT*288,f(i,j,nz,:),T(i,j,nz),S(i,j,nz),pH(i,j,nz),sedflux(i,j,:),s_x1A(i,j,nz),&
-
-           call Sediment_Diagenesis_Flux(dT, f(myi,j,nz,:), T(i,j,nz), S(i,j,nz), pH(myi,j,nz), sedflux(myi,j,:), &
-                                       & s_x1A(myi,j,nz), s_y1A(myi,j,nz), s_z1A(myi,j,nz), & 
-                                       & s_x2A(myi,j,nz), s_y2A(myi,j,nz), s_z2A(myi,j,nz), & 
-                                       & s_x1Z(myi,j,nz), s_y1Z(myi,j,nz), s_z1Z(myi,j,nz), & 
-                                       & s_x2Z(myi,j,nz), s_y2Z(myi,j,nz), s_z2Z(myi,j,nz), & 
-                                       & YY_init(myi,j,:), pph_init(myi,j,:) )
-!        endif
+    if (init == 1 .OR. mod(istep,nstep_sed) == 0) then
+        call Sediment_Diagenesis_Flux(dT_sed, f(myi,j,nz,:), T(i,j,nz), S(i,j,nz), pH(myi,j,nz), sedflux(myi,j,:), &
+                                    & s_x1A(myi,j,nz), s_y1A(myi,j,nz), s_z1A(myi,j,nz), & 
+                                    & s_x2A(myi,j,nz), s_y2A(myi,j,nz), s_z2A(myi,j,nz), & 
+                                    & s_x1Z(myi,j,nz), s_y1Z(myi,j,nz), s_z1Z(myi,j,nz), & 
+                                    & s_x2Z(myi,j,nz), s_y2Z(myi,j,nz), s_z2Z(myi,j,nz), & 
+                                    & YY_init(myi,j,:), pph_init(myi,j,:) )
+    endif
 
 !DIC Exchange
                f(myi,j,nz,iDIC) = AMAX1(f(myi,j,nz,iDIC) - sedflux(myi,j,sDIC)/dz(i,j,nz)*dT/SDay, 0.)
