@@ -1460,7 +1460,6 @@ enddo
 
 ! --- dump output when istep is a multiple of iout
       if ( mod( istep, iout ) .eq. 0 ) then
-           PRINT*,"Calling WRITE_EXTRA_DATA for istep, istep_out = ", istep, istep_out 
            CALL WRITE_EXTRA_DATA( myi_start, my_im, 1, jm, 1, km, istep_out+1, &
                                   PARdepth_ijk(fstart:fend, jstart:jend, :), &
                                   PAR_percent_ijk(fstart:fend, jstart:jend, :), &

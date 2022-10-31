@@ -1,4 +1,4 @@
-Subroutine Flux_CGEM(istep, myid, numprocs)
+Subroutine Flux_CGEM(TC_8, istep, myid, numprocs)
 
       USE Model_dim
       USE Grid
@@ -18,11 +18,12 @@ Subroutine Flux_CGEM(istep, myid, numprocs)
 
       IMPLICIT NONE
 
-
+      integer(kind=8), intent(in) :: TC_8 ! Current time in seconds since Model_dim::iYr0.
       integer, intent(in) :: istep, myid, numprocs
       real :: T_sfc, Sal_sfc, O2_sfc, Sc, Op_umole, rhow, Op, OsDOp
       real :: Vtrans, alpha_O2, O2_atF, zs, DIC_sfc, CO2_atF
       real :: SOC, O2Flux, NO3Flux, NH4Flux, PO4Flux, SiFlux, DICFlux, ALKFlux
+      real :: NO3_CMAQ(im,jm), NH4_CMAQ(im,jm)
       integer :: i, j, myi, mpierr
       integer, save :: init = 1
       real, parameter :: SDay = 86400.0  ! # of sec in 24 hr day
@@ -70,8 +71,12 @@ Subroutine Flux_CGEM(istep, myid, numprocs)
       endif
 
 ! -- Read in CMAQ -------------------------------------------------------------
-if(Which_fluxes(iCMAQ).eq.1) then !CMAQ
-   write(6,*) "CMAQ option not supported, will run without CMAQ flux"
+if (Which_fluxes(iCMAQ) .eq. 1) then !CMAQ
+    if(myid .eq. 0) call Read_CMAQ_NH4_SVflux_bin(TC_8, NH4_CMAQ)
+    if(myid .eq. 0) call Read_CMAQ_NO3_SVflux_bin(TC_8, NO3_CMAQ)
+    if(numprocs .gt. 1) call MPI_BCAST(NO3_CMAQ, im*jm, MPI_real, 0, MPI_COMM_WORLD, mpierr)
+    if(numprocs .gt. 1) call MPI_BCAST(NH4_CMAQ, im*jm, MPI_real, 0, MPI_COMM_WORLD, mpierr)
+!   write(6,*) "CMAQ option not supported, will run without CMAQ flux"
 endif
 
 
@@ -177,6 +182,13 @@ elseif(Which_fluxes(iDICsurf).eq.2) then
 
 endif
 
+        if (Which_fluxes(iCMAQ) .eq. 1) then !CMAQ
+            !NO3 Exchange
+            f(myi,j,1,iNO3) = AMAX1(f(myi,j,1,iNO3) + NO3_CMAQ(i,j)/dz(i,j,1)*dT, 0.)
+        
+            !NH4 Exchange
+            f(myi,j,1,iNH4) = AMAX1(f(myi,j,1,iNH4) + NH4_CMAQ(i,j)/dz(i,j,1)*dT, 0.)
+        endif
 
    endif !End of if(nza(i,j) statement
    myi = myi + 1

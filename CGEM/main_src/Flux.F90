@@ -1,14 +1,15 @@
-       Subroutine Flux(Which_code, istep, myid, numprocs)
+       Subroutine Flux(Which_code, TC_8, istep, myid, numprocs)
 
        IMPLICIT NONE
 
+       integer(kind=8), intent(in) :: TC_8 ! Current time in seconds since Model_dim::iYr0.
        integer, intent(in)  :: istep, myid, numprocs
        character(6), intent(in) :: Which_code
 
        if(Which_code.eq."CGEM") then !CGEM
-         call Flux_CGEM(istep, myid, numprocs)
+         call Flux_CGEM(TC_8, istep, myid, numprocs)
        else if(Which_code.eq."GOMDOM") then !GOMDOM
-         call Flux_GD()
+         call Flux_GD(TC_8, istep, myid, numprocs)
        else
          write(6,*) "Model ",Which_code," not found, Exiting."
          stop

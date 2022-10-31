@@ -188,7 +188,7 @@
 
        call WQ_Model(Which_code, TC_8, istep, istep_out, myid, numprocs)
 
-       call Flux(Which_code, istep, myid, numprocs)
+       call Flux(Which_code, TC_8, istep, myid, numprocs)
 
        call Transport(Which_code, myid, numprocs)
 

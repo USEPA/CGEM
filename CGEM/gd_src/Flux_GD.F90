@@ -1,4 +1,4 @@
-       Subroutine Flux_GD()
+       Subroutine Flux_GD(TC_8, istep, myid, numprocs)
 
        USE Model_dim
        USE Grid
@@ -13,12 +13,14 @@
 
        IMPLICIT NONE
 
+       integer(kind=8), intent(in) :: TC_8 ! Current time in seconds since Model_dim::iYr0.
+       integer, intent(in) :: istep, myid, numprocs
        REAL :: T_sfc, Sal_sfc, O2_sfc, Sc, Op_umole, rhow, Op, OsDOp
        REAL :: Vtrans, alpha_O2, O2_atF, zs, DIC_sfc, CO2_atF
        REAL :: NO3_Ex, NH4_Ex, PO4_Ex
-       !REAL :: NO3_CMAQ(im,jm),NH4_CMAQ(im,jm)
+       REAL :: NO3_CMAQ(im,jm),NH4_CMAQ(im,jm)
        REAL :: Si_Ex(im,jm,2) !1==SA 2==SRP
-       INTEGER :: i, j
+       INTEGER :: i, j, mpierr
        INTEGER, SAVE :: init=1
        REAL, PARAMETER :: SDay = 86400.0  ! # of sec in 24 hr day
        !Esed is quanta/cm2/s
@@ -40,10 +42,12 @@
 if(init.eq.1) then
 
   if(Which_Fluxes(iCMAQ).eq.1) then !CMAQ
-      !call Read_CMAQ_NH4_SVflux_bin(TC_8,NO3_CMAQ)
-      !call Read_CMAQ_NO3_SVflux_bin(TC_8,NH4_CMAQ)
-       write(6,*) "Which_Fluxes(iCMAQ) not supported, exiting"
-       stop
+      call Read_CMAQ_NH4_SVflux_bin(TC_8,NH4_CMAQ)
+      call Read_CMAQ_NO3_SVflux_bin(TC_8,NO3_CMAQ)
+      if(numprocs .gt. 1) call MPI_BCAST(NO3_CMAQ, im*jm, MPI_real, 0, MPI_COMM_WORLD, mpierr)
+      if(numprocs .gt. 1) call MPI_BCAST(NH4_CMAQ, im*jm, MPI_real, 0, MPI_COMM_WORLD, mpierr)
+      ! write(6,*) "Which_Fluxes(iCMAQ) not supported, exiting"
+      ! stop
   endif
 
   if(Which_Fluxes(i_Si).eq.1) then !Fluxes for SA and SRP in kg/s
@@ -122,18 +126,16 @@ if(Which_Fluxes(iDICsurf).eq.1) then
   stop
 endif
 
-!if(Which_Fluxes(iCMAQ).eq.1) then !CMAQ
+if (Which_Fluxes(iCMAQ) .eq. 1) then !CMAQ
 !!NO3 Exchange
-!      NO3_CMAQ(i,j) = NO3_CMAQ(i,j) * 14.e-6
-!      f(i,j,1,JNO3) = AMAX1(f(i,j,1,JNO3) - NO3_CMAQ(i,j)/ &
-!     & dz(i,j,1)*dT,0.)
+      NO3_CMAQ(i,j) = NO3_CMAQ(i,j) * 14.e-6
+      f(myi,j,1,JNO3) = AMAX1(f(myi,j,1,JNO3) - NO3_CMAQ(i,j)/ dz(i,j,1)*dT, 0.)
 !!NH4 Exchange
-!      NH4_CMAQ(i,j) = NH4_CMAQ(i,j) * 14.e-6
-!      f(i,j,1,JNH4) = AMAX1(f(i,j,1,JNH4) - NH4_CMAQ(i,j)/ &
-!     & dz(i,j,1)*dT,0.)
+      NH4_CMAQ(i,j) = NH4_CMAQ(i,j) * 14.e-6
+      f(myi,j,1,JNH4) = AMAX1(f(myi,j,1,JNH4) - NH4_CMAQ(i,j)/ dz(i,j,1)*dT, 0.)
 !!           write(6,*) "Which_Fluxes(iCMAQ) is not implemented yet, stopping."
 !!           stop
-!endif
+endif
 
    endif !End of if(nza(i,j) statement
    myi = myi + 1

@@ -47,7 +47,9 @@ MAIN_OBJ  =  fillval.o\
 	USER_Read_Temp.o\
 	USER_Read_Wind.o\
 	USER_Read_Sal.o\
-	Calc_Sal.o\
+        Read_CMAQ_NH4_SVflux_bin.o\
+        Read_CMAQ_NO3_SVflux_bin.o\
+  	Calc_Sal.o\
 	Calc_Temp.o\
 	OUTPUT_ALL_FALSE.o\
 	Command_Line_Args.o\
