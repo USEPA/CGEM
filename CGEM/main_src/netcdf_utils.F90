@@ -155,7 +155,8 @@ CONTAINS
     !populate dim locations
     info%dimLocs=-1
     do i=1, info%ndims
-      if(info%dimNames(i).eq.'X' .or. info%dimNames(i).eq.'x' .or. info%dimNames(i).eq.'I' .or. info%dimNames(i).eq.'i' .or. & info%dimNames(i).eq.'Number_Rivers' .or. info%dimNames(i).eq.'Number_BoundaryCells') then
+      !if(info%dimNames(i).eq.'X' .or. info%dimNames(i).eq.'x' .or. info%dimNames(i).eq.'I' .or. info%dimNames(i).eq.'i' .or. & info%dimNames(i).eq.'Number_Rivers' .or. info%dimNames(i).eq.'Number_BoundaryCells') then  
+      if(info%dimNames(i).eq.'X' .or. info%dimNames(i).eq.'x' .or. info%dimNames(i).eq.'I' .or. info%dimNames(i).eq.'i' .or. info%dimNames(i).eq.'Number_Rivers' .or. info%dimNames(i).eq.'Number_BoundaryCells') then  
         info%dimLocs(1) = i
       else if (info%dimNames(i).eq.'Y' .or. info%dimNames(i).eq.'y' .or. info%dimNames(i).eq.'J' .or. info%dimNames(i).eq.'j') then
         info%dimLocs(2) = i

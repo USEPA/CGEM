@@ -1,6 +1,7 @@
 module xnetcdf
 !Serial netCDF routines
 use serial
+include 'netcdf.inc'
 
 contains
 

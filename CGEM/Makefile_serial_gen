@@ -1,0 +1,80 @@
+#
+# Makefile to build the CGEM model
+#
+# Note:
+# - Ensure you load the appropriates modules before building (if applicable).
+
+### =============== User Modifiable Section =============== ###
+EXE = CGEM
+### Build options for specific platforms. 
+
+###INTEL COMPILER
+F90 = ifort
+INC   = -I. -I/usr/local/apps/netcdf-4.6.3/intel-18.0/include/
+LIBS  = -L/usr/local/apps/netcdf-4.6.3/intel-18.0/lib -lnetcdff -lnetcdf
+FFLAGS = -warn all -traceback -no-diag-error-limit -implicitnone -convert big_endian -ftz
+DFLAGS = 
+
+###GNU COMPILER
+#F90 = gfortran
+#INC   = -I. -I/usr/local/apps/netcdf-4.6.3/gcc-6.1.0/include/
+#LIBS  = -L. -L/usr/local/apps/netcdf-4.6.3/gcc-6.1.0/lib  -lnetcdff -lnetcdf
+#FFLAGS = -Wall -Wextra -pedantic -fimplicit-none -fbacktrace -ffree-line-length-none
+#DFLAGS = 
+
+### =============== End User Modifiable Section  =============== ####
+include main_src/src_files_serial
+include moc_src/src_files
+include cgem_src/src_files
+include gd_src/src_files
+
+maindir=main_src
+mocdir=moc_src
+cgemdir=cgem_src
+gddir=gd_src
+
+CGEM: ${PAR_OBJ} ${SER_OBJ} ${MAIN_OBJ} ${MOC_OBJ} ${CGEM_OBJ} ${GD_OBJ}
+	$(F90) -o $(EXE) $(FFLAGS) $(DFLAGS) $(INC) $(PAR_OBJ) $(SER_OBJ) $(MAIN_OBJ) ${MOC_OBJ} ${CGEM_OBJ} ${GD_OBJ} $(LIBS)
+
+
+#
+# Pattern rules
+#
+
+# These items must have compiler optimization disabled
+$(NO_OPT_OBJS): %.o: %.F90
+	$(F90) -c -O0 $(FFLAGS) $(DFLAGS) $<
+
+$(MAIN_OBJ):%.o: $(maindir)/%.F90
+	$(F90) $(INC) -c $(FFLAGS) $(DFLAGS)  $<
+
+$(MOC_OBJ):%.o: $(mocdir)/%.F90
+	$(F90) -c $(FFLAGS) $(DFLAGS)  $<
+
+$(OBJ):%.o: %.F90
+	$(F90) -c $(FFLAGS) $(DFLAGS) $<
+
+$(CGEM_OBJ):%.o: $(cgemdir)/%.F90
+	$(F90) $(INC) -c $(FFLAGS) $(DFLAGS)   $<
+
+$(GD_OBJ):%.o: $(gddir)/%.F90
+	$(F90) $(INC) -c $(FFLAGS) $(DFLAGS)  $<
+
+$(PAR_OBJ):%.o: $(maindir)/%.F90
+	$(F90) $(INC) -c  $<
+
+$(SER_OBJ):%.o: $(maindir)/%.F90
+	$(F90) $(INC) -c  $<
+
+#
+# Miscellaneous targets
+#
+
+clean:
+	rm -f *.o ${EXE} *.mod *genmod*
+
+tags:
+	ctags --language-force=Fortran *.F90
+
+etags:
+	etags -l fortran *.F90
