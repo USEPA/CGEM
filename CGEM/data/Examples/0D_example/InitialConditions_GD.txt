@@ -1,0 +1,23 @@
+0.00 !DOC  Default - original spreadsheet (Oct 2016)
+0.00 !DIA
+6.0E-05 !GRE
+0.00 !ZOO
+0.00 !LOC
+0.00 !ROC
+2.0E-06 !SRP
+0.00 !DOP
+6.0E-06 !LOP
+0.00 !ROP
+0.00 !NH4
+0.00 !NO3
+0.00 !DON
+0.00 !LON
+0.00 !RON
+0.00 !SA
+0.00 !SU
+0.00 !DO2
+0.00 !TR
+0.00 !DIAN
+0.00 !DIAP
+0.00 !GREN
+0.00 !GREP
