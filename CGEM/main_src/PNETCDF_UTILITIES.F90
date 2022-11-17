@@ -199,10 +199,10 @@ CONTAINS
     ERR = NFMPI_DEF_VAR( FILEID, VARNAM, 5, 3, DIM_IDS, VARID )
     CALL CHKERR( ERR, 'create variable ' // VARNAM )
 
-    ERR = NFMPI_PUT_ATT_TEXT(FILEID, VARID, 'coordinates', 18, 'latitude longitude')
+    ERR = NFMPI_PUT_ATT_TEXT(FILEID, VARID, 'coordinates', 18_8, 'latitude longitude')
     CALL CHKERR( ERR, 'create coordinates attribute ' // VARNAM )
 
-    ERR = NFMPI_PUT_ATT_TEXT(FILEID, VARID, 'cell_measures', 10, 'area: Area')
+    ERR = NFMPI_PUT_ATT_TEXT(FILEID, VARID, 'cell_measures', 10_8, 'area: Area')
     CALL CHKERR( ERR, 'create cell measures attribute ' // VARNAM )
 
 
@@ -237,10 +237,10 @@ CONTAINS
     ERR = NFMPI_DEF_VAR( FILEID, VARNAM, 5, 4, DIMIDS, VARID )
     CALL CHKERR( ERR, 'create variable ' // VARNAM )
 
-    ERR = NFMPI_PUT_ATT_TEXT(FILEID, VARID, 'coordinates', 18, 'latitude longitude')
+    ERR = NFMPI_PUT_ATT_TEXT(FILEID, VARID, 'coordinates', 18_8, 'latitude longitude')
     CALL CHKERR( ERR, 'create coordinates attribute ' // VARNAM )
 
-    ERR = NFMPI_PUT_ATT_TEXT(FILEID, VARID, 'cell_measures', 10, 'area: Area')
+    ERR = NFMPI_PUT_ATT_TEXT(FILEID, VARID, 'cell_measures', 10_8, 'area: Area')
     CALL CHKERR( ERR, 'create cell measures attribute ' // VARNAM )
 
 
