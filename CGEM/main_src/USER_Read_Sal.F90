@@ -20,7 +20,7 @@
 
       if(init.eq.1) then
 
-        !Solar Radiation
+        !Salinity
         write(filename,'(A, A)') trim(DATADIR),'/INPUT/Sal.dat'
         open(unit=ifile,file=filename,status="old")
 
