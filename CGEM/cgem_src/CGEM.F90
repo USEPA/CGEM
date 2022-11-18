@@ -675,6 +675,7 @@
                                                    ! (mmol-C/m3/d)
 
       SUM_PrimProd(myi,j,k) = SUM_PrimProd(myi,j,k) + PrimProd/real(print_ave)
+      SUM_PrimProd_out(myi,j,k) = SUM_PrimProd_out(myi,j,k) + PrimProd/real(iout)
 
       ArespC  = ArespC + Aresp*Qc(isp)             ! Phytoplankton respiration 
 						   ! equivalent carbon loss
@@ -1428,7 +1429,7 @@ enddo
 !-----------------------------------------------------------------------------------------------
 ! -- do initialization of first timestep:
       if ( istep .eq. 1 ) then
-          PRINT*, "istep = 1"
+          PRINT*, "istep = ", istep
           CALL WRITE_EXTRA_DATA( myi_start, my_im, 1, jm, 1, km, istep_out, &
                                  PARdepth_ijk(fstart:fend, jstart:jend, :), &
                                  PAR_percent_ijk(fstart:fend, jstart:jend, :), &
@@ -1452,14 +1453,20 @@ enddo
                                  RO2_A_ijk_out(fstart:fend, jstart:jend, :),  &
                                  RO2_Z_ijk_out(fstart:fend, jstart:jend, :),  &
                                  RO2_BC_ijk_out(fstart:fend, jstart:jend, :), &
-                                 RO2_R_ijk_out(fstart:fend, jstart:jend, :) )
+                                 RO2_R_ijk_out(fstart:fend, jstart:jend, :), &
+                                 SUM_PrimProd_out(fstart:fend, jstart:jend, :) )
+
+          ! Reset sum of primary production to zero.
+          SUM_PrimProd_out = 0.0
 
           CALL MPI_BARRIER( MPI_COMM_WORLD, mpierr ) ! Wait until file is updated
+
       endif  !end of EXTRA_DATA initialization 
 
 
 ! --- dump output when istep is a multiple of iout
       if ( mod( istep, iout ) .eq. 0 ) then
+           PRINT*, "istep = ", istep
            CALL WRITE_EXTRA_DATA( myi_start, my_im, 1, jm, 1, km, istep_out+1, &
                                   PARdepth_ijk(fstart:fend, jstart:jend, :), &
                                   PAR_percent_ijk(fstart:fend, jstart:jend, :), &
@@ -1483,11 +1490,16 @@ enddo
                                   RO2_A_ijk_out(fstart:fend, jstart:jend, :),  &
                                   RO2_Z_ijk_out(fstart:fend, jstart:jend, :), &
                                   RO2_BC_ijk_out(fstart:fend, jstart:jend, :), &
-                                  RO2_R_ijk_out(fstart:fend, jstart:jend, :) )
+                                  RO2_R_ijk_out(fstart:fend, jstart:jend, :), &
+                                  SUM_PrimProd_out(fstart:fend, jstart:jend, :) )
+
+          ! Reset sum of primary production to zero.
+          SUM_PrimProd_out = 0.0
 
           CALL MPI_BARRIER( MPI_COMM_WORLD, mpierr ) ! Wait until file is updated
-      endif  !end of "if (mod(istep,iout).eq.0)" block if
 
+      endif  !end of "if (mod(istep,iout).eq.0)" block if
+   
 
    return
    END Subroutine CGEM 

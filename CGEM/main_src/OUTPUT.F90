@@ -16,6 +16,7 @@
         INTEGER,save :: STATE_VARIABLES
 
         REAL, DIMENSION(:,:,:), allocatable :: SUM_PrimProd
+        REAL, DIMENSION(:,:,:), allocatable :: SUM_PrimProd_out
         REAL, DIMENSION(:,:,:), allocatable :: SUM_RESP
         REAL, DIMENSION(:,:), allocatable :: FO2
         REAL, DIMENSION(:,:), allocatable :: FNO3

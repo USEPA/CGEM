@@ -16,11 +16,14 @@ USE OUTPUT
 
 IMPLICIT NONE
 
-         nf = nospA*3+nospZ+17  !CGEM
-        !Calculate EXTRA_VARIABLES for netCDF:
-        !ir,irfrac,uN(nospA),uP(nospA),uE(nospA),uA(nospA),Chla,s_xy(8),uSi(nospA),pH,ChlC(nospA),RN2,RO2
-         STATE_VARIABLES = nf         
-         EXTRA_VARIABLES = 17 + 6*nospA
+         nf = nospA*3 + nospZ + 17  !CGEM
+         STATE_VARIABLES = nf 
+ 
+         ! Calculate EXTRA_VARIABLES for netCDF:
+         ! ir, irfrac, uN(nospA), uP(nospA), uE(nospA), uA(nospA), Chla,s_xy(8), uSi(nospA),
+         ! pH, ChlC(nospA), RN2, RO2,         
+         EXTRA_VARIABLES = 18 + 6*nospA
+
          call CGEM_vars_allocate()
          call INPUT_VARS_CGEM_allocate()
          call TEMP_VARS_allocate()

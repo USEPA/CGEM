@@ -590,7 +590,8 @@ CONTAINS
                                TIMESTEP, IRRADIANCE, IRRADIANCE_FRACTION,    &
                                UN, UP, UE, UA, CHLA_MG_TOT,                  &
                                S_X1A, S_Y1A, S_X2A, S_Y2A,                   &
-                               S_X1FP, S_Y1FP, S_X2FP, S_Y2FP, USI, ChlC, pH, RN2, RO2A, RO2Z,RO2BC,RO2R )
+                               S_X1FP, S_Y1FP, S_X2FP, S_Y2FP, USI, ChlC,    &
+                               pH, RN2, RO2A, RO2Z, RO2BC, RO2R, PrimProd )
 
     USE OUTPUT 
     IMPLICIT NONE
@@ -610,7 +611,7 @@ CONTAINS
     REAL,DIMENSION(IM, JM, KM):: pH
     REAL,DIMENSION(IM, JM, KM):: RN2
     REAL,DIMENSION(IM, JM, KM):: RO2A
-    REAL,DIMENSION(IM, JM, KM):: RO2Z,RO2BC,RO2R 
+    REAL,DIMENSION(IM, JM, KM):: RO2Z,RO2BC,RO2R,PrimProd
     INTEGER,DIMENSION(EXTRA_VARIABLES):: REQUESTS, STATUSES
 
     ! Locals:
@@ -633,12 +634,12 @@ CONTAINS
 
 
     !write(6,*) IMSTART, JMSTART, KMSTART, IM, JM, KM, TIMESTEP
-!write(6,*) "9 RN2_ijk",RN2(28,18,1)
-!write(6,*) "9 PARdepth_ijk",irradiance(28,18,1)
-!write(6,*) "PARpercent",irradiance_fraction(28,18,1)
-!write(6,*) "un",uN(28,18,1,:)
-!write(6,*) "Chla",Chla_mg_tot(28,18,1)
-!write(6,*) "9 s_y1Z",s_y1FP(28,18,1)
+    !write(6,*) "9 RN2_ijk",RN2(28,18,1)
+    !write(6,*) "9 PARdepth_ijk",irradiance(28,18,1)
+    !write(6,*) "PARpercent",irradiance_fraction(28,18,1)
+    !write(6,*) "un",uN(28,18,1,:)
+    !write(6,*) "Chla",Chla_mg_tot(28,18,1)
+    !write(6,*) "9 s_y1Z",s_y1FP(28,18,1)
 
     ! Write each extra variable (if selected to be written):
 
@@ -913,6 +914,18 @@ CONTAINS
       CALL CHKERR( ERR, 'write output variable  ' &
                    // EXTRA_VARIABLE_NAMES( VARIABLE ) )
     END IF
+
+    VARIABLE = VARIABLE + 1 ! Primary_Production:
+
+    IF ( WRITE_EXTRA_VARIABLE( VARIABLE ) ) THEN
+    REQUEST_COUNT = REQUEST_COUNT + 1
+      ERR = ncdf_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
+                                  STARTS, COUNTS, &
+                                   PrimProd( 1, 1, 1 ),REQUESTS(REQUEST_COUNT))
+      CALL CHKERR( ERR, 'write output variable  ' &
+                   // EXTRA_VARIABLE_NAMES( VARIABLE ) )
+    END IF
+
 
 !write(6,*) "19 RN2_ijk",RN2(28,18,1)
 !write(6,*) "19 PARdepth_ijk",irradiance(28,18,1)
@@ -1220,10 +1233,11 @@ Subroutine OUTPUT_NETCDF_CGEM_allocate
     EXTRA_VARIABLE_NAMES(counter+4) = 'RO2Z'
     EXTRA_VARIABLE_NAMES(counter+5) = 'RO2BC'
     EXTRA_VARIABLE_NAMES(counter+6) = 'RO2R'
+    EXTRA_VARIABLE_NAMES(counter+7) = 'Primary_Production'
  
   ALLOCATE(WRITE_EXTRA_VARIABLE(EXTRA_VARIABLES)) 
-  do i=1,EXTRA_VARIABLES
-   WRITE_EXTRA_VARIABLE(i) = .TRUE. !.FALSE. 
+  do i = 1, EXTRA_VARIABLES
+     WRITE_EXTRA_VARIABLE(i) = .TRUE. !.FALSE. 
   enddo
 
   !WRITE_EXTRA_VARIABLE(EXTRA_VARIABLES) = .TRUE.
@@ -1317,6 +1331,7 @@ endif
     EXTRA_VARIABLE_DESCRIPTIONS(counter+4) = 'RO2Z Decay Term       '
     EXTRA_VARIABLE_DESCRIPTIONS(counter+5) = 'RO2BC Decay Term      '
     EXTRA_VARIABLE_DESCRIPTIONS(counter+6) = 'RO2R Decay Term       '
+    EXTRA_VARIABLE_DESCRIPTIONS(counter+7) = 'Primary Production    '
 
   ALLOCATE(EXTRA_VARIABLE_UNITS(EXTRA_VARIABLES))
     EXTRA_VARIABLE_UNITS(1) = 'photons/cm2/s                   '
@@ -1362,6 +1377,7 @@ endif
     EXTRA_VARIABLE_UNITS(counter+4) = 'mmol-O2/m3                       '
     EXTRA_VARIABLE_UNITS(counter+5) = 'mmol-O2/m3                       '
     EXTRA_VARIABLE_UNITS(counter+6) = 'mmol-O2/m3                       '
+    EXTRA_VARIABLE_UNITS(counter+7) = 'mmol-C/m3/d                      '
 
   ALLOCATE(F_VAR(nf)) ! NetCDF IDs for each variable.
   F_VAR = fill(0)
@@ -1371,6 +1387,9 @@ endif
 
   ALLOCATE(SUM_PrimProd(myim,jm,km))
   SUM_PrimProd = 0.0
+
+  ALLOCATE(SUM_PrimProd_out(myim,jm,km))
+  SUM_PrimProd_out = 0.0
 
   ALLOCATE(SUM_RESP(myim,jm,km))
   SUM_RESP = 0.0
