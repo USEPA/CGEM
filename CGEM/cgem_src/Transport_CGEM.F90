@@ -1,11 +1,9 @@
        Subroutine Transport_CGEM(myid,numprocs)
 
        USE Model_dim
-       USE INPUT_VARS_CGEM, ONLY: KH_coeff
        USE INPUT_VARS, ONLY: Which_VMix
        USE State_Vars
        USE CGEM_Vars, ONLY: iQp, iQn, iA, iNO3, iNH4, iPO4, iO2
-       USE Hydro, ONLY: Kh
        USE BoundaryConcentration
 
        IMPLICIT NONE
@@ -32,12 +30,9 @@
        !Advection and Vmixing
 
        !Needs to call advection because that is where sinking is:
-        call Adv3D(myid,numprocs) 
+       call Adv3D(myid,numprocs) 
 
-      !Multiply Kh by KH_coeff for h<30
-        !L3...Fix this so it is only for h<30
-         !!Kh(:,:,1:nz) = Kh(:,:,1:nz)*KH_coeff
-       if(Which_VMix.ne.0) call VMixing()
+       if (Which_VMix .ne. 0) call VMixing()
 
        ! After Advection and VMixing, return to Q's
          do j=1, jm

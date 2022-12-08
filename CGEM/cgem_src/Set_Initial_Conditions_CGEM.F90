@@ -1,7 +1,7 @@
        Subroutine Set_Initial_Conditions_CGEM(init_filename,myid,numprocs) 
 
        USE Model_dim
-       USE INPUT_VARS, ONLY: InitializeHow,icent,jcent 
+       USE INPUT_VARS, ONLY: InitializeHow
        USE CGEM_Vars
        USE Grid 
        USE State_Vars
@@ -72,7 +72,6 @@
        !call InitError_Check_CGEM()
 #ifdef DEBUG
       write(6,*) "In Set Initial Conditions CGEM,myid=",myid
-      write(6,*) "first state var at i,j,k=",f(icent,jcent,1,1),icent,jcent,1
       write(6,*) "first state var at i,j,k=",f(1,1,1,1),1,1,1
       write(6,*)
 #endif

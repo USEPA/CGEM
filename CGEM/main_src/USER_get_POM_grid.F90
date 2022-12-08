@@ -1,16 +1,19 @@
+!*******************************************************************************
+! 12/02/2022 Wilson Melendez: Removed icent and jcent variables, and INPUT_VARS
+!                             module. Removed nzar, ns, and init.
+!*******************************************************************************
+
       subroutine USER_get_POM_grid()
 
       USE Fill_Value
       USE Model_dim
       USE Grid
-      USE INPUT_VARS , ONLY: icent,jcent
 
       IMPLICIT NONE
 
       real, dimension(im,jm) :: dx,dy 
       integer :: i,j,k
       character(200) filename
-      integer :: nzr, ns
 
       write(filename,'(A, A)') trim(DATADIR),'/dxdy.dat'
       open(19,file=filename,status='old')
@@ -73,7 +76,6 @@
       integer :: i,j,k,nz,mpierr
       integer, intent(in) :: myid, numprocs
       integer(kind=8) :: T_8, t_current
-      integer :: init=1
       logical :: broadcast_grid
 
       t_current = T_8
@@ -126,11 +128,8 @@
 #ifdef DEBUG
      write(6,*) "----Calling USER_get_POM_grid-----"
      write(6,*) "  setting dxy, area, zl, zz, dz_k, and h"
-     write(6,*) "  For cell i,j,k=",icent,jcent,km
-     write(6,*) "h,E,d,zz,area,d_sfc,Vol="
-     write(6,*) h(icent,jcent),E(icent,jcent),d(icent,jcent,km)
-     write(6,*) zz(km),area(icent,jcent),d_sfc(icent,jcent,km),Vol(icent,jcent,km)
 #endif
+
       return
       end subroutine USER_update_POM_grid
 

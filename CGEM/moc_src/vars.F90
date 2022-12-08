@@ -201,7 +201,7 @@ SUBROUTINE vars(ph, pco2, fco2, co2, hco3, co3, OmegaA, OmegaC, BetaD, rhoSW, p,
   REAL(kind=r8), DIMENSION(1) :: aKspa, aK1p, aK2p, aK3p, aKsi
   REAL(kind=r8), DIMENSION(1) :: aSt, aFt, aBt
 
-  REAL(kind=r8) :: Patmd, Ptot, Rgas_atm, B, Del, xCO2approx, xc2, fugcoeff
+  REAL(kind=r8) :: Patmd, Ptot
   REAL(kind=r8) :: Phydro_atm
 
   INTEGER :: i, icount
@@ -210,19 +210,11 @@ SUBROUTINE vars(ph, pco2, fco2, co2, hco3, co3, OmegaA, OmegaC, BetaD, rhoSW, p,
   REAL(kind=r8) :: s
   REAL(kind=r8) :: tc, ta
   REAL(kind=r8) :: sit, pt
-  REAL(kind=r8) :: Hinit
-  REAL(kind=r8) :: ah1
-
-  REAL(kind=r8) :: HSO4, HF, HSI, HPO4
-  REAL(kind=r8) :: ab, aw, ac, ah2, erel
-
-  REAL(kind=r8) :: cu, cb, cc
 
   REAL(kind=r8), DIMENSION(2) :: dicdel, pco2del
   REAL(kind=r8) :: dx, Rf
   REAL(kind=r8) :: dph, dpco2, dfco2, dco2, dhco3, dco3, dOmegaA, dOmegaC
 
-  INTEGER :: kcomp
   INTEGER :: j, minusplus
 
 

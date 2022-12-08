@@ -22,16 +22,11 @@ Module Model_Diagenesis
       REAL(kind=8), INTENT(INOUT) :: ppH_ij(NPOINTS)
       REAL(kind=8) :: val1(400), val2(400)
       REAL(kind=8) :: G1(1550), G2(1550), O2(1550), Os(1500), Ob(1500)
-      REAL(kind=8) :: FE2(1550), FE3(1550), SO4(1550), HS(1550)
+      REAL(kind=8) :: FE2(1550), SO4(1550), HS(1550)
       REAL(kind=8) :: FES(1550), TC(1550), ALK(1550), DOM(1550)
-      REAL(kind=8) :: rootG1(400), rootG2(400), rootO2(400),rootNO3(400)
-      REAL(kind=8) :: rootNH4(400), rootMN2(400), rootFE2(400), rootSO4(400)
-      REAL(kind=8) :: rootHS(400), rootFES(400), rootTC(400), rootALK(400)
-      REAL(kind=8) :: rootDOM(400), rootOs(400), rootOb(400)
       REAL(kind=8) :: Ainp(100)
       REAL(kind=8) :: sedO2(400), sedNO3(400), sedNH4(400)
-      REAL(kind=8) :: sedMno(400), sedMN2(400), sedFe3(400), sedFe2(400)
-      REAL(kind=8) :: sedSO4(400), sedHS(400), sedFeS(400), sedDIC(400)
+      REAL(kind=8) :: sedSO4(400), sedDIC(400)
       REAL(kind=8) :: sedALK(400), sedDOC(400), sedOM1(400), sedOM2(400)
       REAL(kind=8) :: pycoO2(400)
 
@@ -85,8 +80,8 @@ Module Model_Diagenesis
 
 !         write(6,*) "after CASES",YY_ij(1),ppH_ij(1)
 
-      CALL FILL_Y(NEQ, np, nss, YY_ij, G1, G2, O2, NO3, NH4, MN2, &
-                  FE3, FE2, SO4, HS, FES, TC, ALK, DOM, Os, Ob)
+      CALL FILL_Y(NEQ, YY_ij, G1, G2, O2, NO3, NH4, MN2, &
+                  FE2, SO4, HS, FES, TC, ALK, DOM, Os, Ob)
 !         write(6,*) "after fill_y",YY_ij(1)
 
 !  SUM up the irrigation O2 flux (*1000)is puts it in

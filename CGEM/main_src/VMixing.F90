@@ -2,6 +2,8 @@
       Subroutine  VMixing ()
 !     Modified by Cody Simmons/EMVL
 !     Originally written by D.S.Ko/NRL
+!     12/02/2022 Wilson Melendez: Removed icent, jcent, Which_VMix and
+!                                 INPUT_VARS.
 ! ----------------------------------------------------------------------
 !***********************************************************************
 !     Solve Conservation Equation for Scalar
@@ -13,7 +15,6 @@
       USE Grid, ONLY: dz,d_sfc
       USE State_Vars
       USE Hydro, ONLY: Kh
-      USE INPUT_VARS, ONLY: icent,jcent,Which_VMix
 
       IMPLICIT NONE
 
@@ -65,11 +66,6 @@
 
 #ifdef DEBUG
 write(6,*) "---VMixing---"
-write(6,*) "  Which_VMix=",Which_VMix
-write(6,*) "  nz=",km
-write(6,*) "  At the cell i,j,k=",icent,jcent,2
-write(6,*) "  dz, d_sfc=", dz(icent,jcent,2),d_sfc(icent,jcent,2)
-write(6,*) "    mixing coeff Kh is:",Kh(icent,jcent,2)
 write(6,*)
 #endif
 

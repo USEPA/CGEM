@@ -6,6 +6,8 @@
 
        integer, intent(in) :: myid,numprocs
 
+       IF (.FALSE.) WRITE(6,*) "myid, numprocs = ", myid, numprocs
+
        CALL CLOSE_FILE()
 
        return

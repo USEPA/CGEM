@@ -241,8 +241,6 @@
 !For tiny
     real x
     integer fill_val
-!For calibration
-    real O2_total
 
    istart = 1
    iend = myi_end - myi_start + 1
@@ -252,6 +250,7 @@
    my_istart = myi_start
    fstart = 1
    fend = iend
+   IF (.FALSE.) write(6,*) myid, numprocs
 
    ! fill(1) is for -9999
    fill_val = fill(1)

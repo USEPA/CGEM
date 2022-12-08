@@ -8,7 +8,7 @@
       SUBROUTINE MATLAB(NEQ1, A1,IC)
 
       USE Sediment_Diagenesis_Routines
-      USE Model_Diagenesis, ONLY: tir_O2,tir_NO,tir_HN,tir_SO,tir_TC,tir_ALK,tir_DOM
+      USE Model_Diagenesis, ONLY: tir_O2,tir_NO,tir_HN,tir_SO,tir_TC
       USE SDM, ONLY: NS, NPOINTS
 
       IMPLICIT NONE

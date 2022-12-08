@@ -16,10 +16,11 @@
 
       integer,intent(in)  :: istep_out !current output counter
       integer,intent(in) :: myid,numprocs
-      integer :: i,j,k,myi,nz
       real :: dumf(myim,jm,km,nf)
 
-       dumf = f(1:myim,:,:,:)
+      IF (.FALSE.) WRITE(6,*) "myid, numprocs = ", myid, numprocs
+
+      dumf = f(1:myim,:,:,:)
 
 !        do j=1,jm
 !         myi = 1

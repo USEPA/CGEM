@@ -1,6 +1,6 @@
-!> \file phsolvers.f90
-!! \BRIEF 
-!> Module with routines needed to solve pH-total alkalinity equation (Munhoven, 2013, GMD)
+! file phsolvers.f90
+!! BRIEF 
+! Module with routines needed to solve pH-total alkalinity equation (Munhoven, 2013, GMD)
 MODULE mphsolvers
 !   Module of fastest solvers from Munhoven (2013, Geosci. Model Dev., 6, 1367-1388)
 !   ! Taken from SolveSAPHE (mod_phsolvers.F90) & adapted very slightly for use with mocsy
@@ -80,7 +80,7 @@ END SUBROUTINE anw_infsup
 FUNCTION equation_at(p_alktot, p_h,       p_dictot, p_bortot,                 &
                      p_po4tot, p_siltot,                                      &
                      p_so4tot, p_flutot,                                      &
-                     K0, K1, K2, Kb, Kw, Ks, Kf, K1p, K2p, K3p, Ksi,          &
+                     K1, K2, Kb, Kw, Ks, Kf, K1p, K2p, K3p, Ksi,              &
                      p_deriveqn)
 
 USE msingledouble
@@ -98,7 +98,7 @@ REAL(KIND=wp), INTENT(IN)            :: p_siltot
 !REAL(KIND=wp), INTENT(IN)            :: p_h2stot
 REAL(KIND=wp), INTENT(IN)            :: p_so4tot
 REAL(KIND=wp), INTENT(IN)            :: p_flutot
-REAL(KIND=wp), INTENT(IN)            :: K0, K1, K2, Kb, Kw, Ks, Kf
+REAL(KIND=wp), INTENT(IN)            :: K1, K2, Kb, Kw, Ks, Kf
 REAL(KIND=wp), INTENT(IN)            :: K1p, K2p, K3p, Ksi
 REAL(KIND=wp), INTENT(OUT), OPTIONAL :: p_deriveqn
 
@@ -108,11 +108,11 @@ REAL(KIND=wp) :: znumer_dic, zdnumer_dic, zdenom_dic, zalk_dic, zdalk_dic
 REAL(KIND=wp) :: znumer_bor, zdnumer_bor, zdenom_bor, zalk_bor, zdalk_bor
 REAL(KIND=wp) :: znumer_po4, zdnumer_po4, zdenom_po4, zalk_po4, zdalk_po4
 REAL(KIND=wp) :: znumer_sil, zdnumer_sil, zdenom_sil, zalk_sil, zdalk_sil
-REAL(KIND=wp) :: znumer_nh4, zdnumer_nh4, zdenom_nh4, zalk_nh4, zdalk_nh4
-REAL(KIND=wp) :: znumer_h2s, zdnumer_h2s, zdenom_h2s, zalk_h2s, zdalk_h2s
+! REAL(KIND=wp) :: znumer_nh4, zdnumer_nh4, zdenom_nh4, zalk_nh4, zdalk_nh4
+! REAL(KIND=wp) :: znumer_h2s, zdnumer_h2s, zdenom_h2s, zalk_h2s, zdalk_h2s
 REAL(KIND=wp) :: znumer_so4, zdnumer_so4, zdenom_so4, zalk_so4, zdalk_so4
 REAL(KIND=wp) :: znumer_flu, zdnumer_flu, zdenom_flu, zalk_flu, zdalk_flu
-REAL(KIND=wp) ::                                      zalk_wat, zdalk_wat
+REAL(KIND=wp) :: zalk_wat
 REAL(KIND=wp) :: aphscale
 
 ! TOTAL H+ scale: conversion factor for Htot = aphscale * Hfree
@@ -281,7 +281,7 @@ END SUBROUTINE ahini_for_at
 FUNCTION solve_at_general(p_alktot, p_dictot, p_bortot,                       &
                           p_po4tot, p_siltot,                                 &
                           p_so4tot, p_flutot,                                 &
-                          K0, K1, K2, Kb, Kw, Ks, Kf, K1p, K2p, K3p, Ksi,     &
+                          K1, K2, Kb, Kw, Ks, Kf, K1p, K2p, K3p, Ksi,         &
                           p_hini,   p_val)
 
 ! Universal pH solver that converges from any given initial value,
@@ -302,7 +302,7 @@ REAL(KIND=wp), INTENT(IN)            :: p_siltot
 !REAL(KIND=wp), INTENT(IN)            :: p_h2stot
 REAL(KIND=wp), INTENT(IN)            :: p_so4tot
 REAL(KIND=wp), INTENT(IN)            :: p_flutot
-REAL(KIND=wp), INTENT(IN)            :: K0, K1, K2, Kb, Kw, Ks, Kf
+REAL(KIND=wp), INTENT(IN)            :: K1, K2, Kb, Kw, Ks, Kf
 REAL(KIND=wp), INTENT(IN)            :: K1p, K2p, K3p, Ksi
 REAL(KIND=wp), INTENT(IN), OPTIONAL  :: p_hini
 REAL(KIND=wp), INTENT(OUT), OPTIONAL :: p_val
@@ -362,7 +362,7 @@ DO
    zeqn = equation_at(p_alktot, zh,       p_dictot, p_bortot,                  &
                       p_po4tot, p_siltot,                                      &
                       p_so4tot, p_flutot,                                      &
-                      K0, K1, K2, Kb, Kw, Ks, Kf, K1p, K2p, K3p, Ksi,          &
+                      K1, K2, Kb, Kw, Ks, Kf, K1p, K2p, K3p, Ksi,              &
                       P_DERIVEQN = zdeqndh)
 
    ! Adapt bracketing interval
@@ -471,7 +471,7 @@ IF(PRESENT(p_val)) THEN
       p_val = equation_at(p_alktot, zh,       p_dictot, p_bortot,              &
                           p_po4tot, p_siltot,                                  &
                           p_so4tot, p_flutot,                                  &
-                          K0, K1, K2, Kb, Kw, Ks, Kf, K1p, K2p, K3p, Ksi)    
+                          K1, K2, Kb, Kw, Ks, Kf, K1p, K2p, K3p, Ksi)    
    ELSE
       p_val = HUGE(1._wp)
    ENDIF
@@ -484,7 +484,7 @@ END FUNCTION solve_at_general
 FUNCTION solve_at_general_sec(p_alktot, p_dictot, p_bortot,                   &
                               p_po4tot, p_siltot,                             &
                               p_so4tot, p_flutot,                             &
-                              K0, K1, K2, Kb, Kw, Ks, Kf, K1p, K2p, K3p, Ksi, &
+                              K1, K2, Kb, Kw, Ks, Kf, K1p, K2p, K3p, Ksi, &
                               p_hini,   p_val) 
 
 ! Universal pH solver that converges from any given initial value,
@@ -505,7 +505,7 @@ REAL(KIND=wp), INTENT(IN)            :: p_siltot
 !REAL(KIND=wp), INTENT(IN)            :: p_h2stot
 REAL(KIND=wp), INTENT(IN)            :: p_so4tot
 REAL(KIND=wp), INTENT(IN)            :: p_flutot
-REAL(KIND=wp), INTENT(IN)            :: K0, K1, K2, Kb, Kw, Ks, Kf
+REAL(KIND=wp), INTENT(IN)            :: K1, K2, Kb, Kw, Ks, Kf
 REAL(KIND=wp), INTENT(IN)            :: K1p, K2p, K3p, Ksi
 REAL(KIND=wp), INTENT(IN), OPTIONAL  :: p_hini
 REAL(KIND=wp), INTENT(OUT), OPTIONAL :: p_val
@@ -565,7 +565,7 @@ zh_2   = zh
 zeqn_2 = equation_at(p_alktot, zh_2,     p_dictot, p_bortot,                 &
                      p_po4tot, p_siltot,                                     &
                      p_so4tot, p_flutot,                                     &
-                     K0, K1, K2, Kb, Kw, Ks, Kf, K1p, K2p, K3p, Ksi)
+                     K1, K2, Kb, Kw, Ks, Kf, K1p, K2p, K3p, Ksi)
 
 zeqn_absmin        = ABS(zeqn_2)
 
@@ -600,7 +600,7 @@ niter_atsec = 1                        ! Update counter of iterations
 zeqn_1 = equation_at(p_alktot, zh_1,       p_dictot, p_bortot,                 &
                      p_po4tot, p_siltot,                                       &
                      p_so4tot, p_flutot,                                       &
-                     K0, K1, K2, Kb, Kw, Ks, Kf, K1p, K2p, K3p, Ksi)
+                     K1, K2, Kb, Kw, Ks, Kf, K1p, K2p, K3p, Ksi)
 
 ! Adapt bracketing interval: we know that zh_1 <= zh <= zh_max (if zeqn_1 > 0)
 ! or zh_min <= zh <= zh_1 (if zeqn_1 < 0), so this can always be done
@@ -653,7 +653,7 @@ DO
    zeqn = equation_at(p_alktot, zh,       p_dictot, p_bortot,                  &
                       p_po4tot, p_siltot,                                      &
                       p_so4tot, p_flutot,                                      &
-                      K0, K1, K2, Kb, Kw, Ks, Kf, K1p, K2p, K3p, Ksi)
+                      K1, K2, Kb, Kw, Ks, Kf, K1p, K2p, K3p, Ksi)
 
    ! Adapt bracketing interval: since initially, zh_min <= zh <= zh_max
    ! we are sure that zh will improve either bracket, depending on the sign
@@ -740,7 +740,7 @@ IF(PRESENT(p_val)) THEN
       p_val = equation_at(p_alktot, zh,       p_dictot, p_bortot,              &
                           p_po4tot, p_siltot,                                  &
                           p_so4tot, p_flutot,                                  &
-                          K0, K1, K2, Kb, Kw, Ks, Kf, K1p, K2p, K3p, Ksi)
+                          K1, K2, Kb, Kw, Ks, Kf, K1p, K2p, K3p, Ksi)
    ELSE
      p_val = HUGE(1._wp)
    ENDIF
@@ -754,7 +754,7 @@ END FUNCTION SOLVE_AT_GENERAL_SEC
 FUNCTION SOLVE_AT_FAST(p_alktot, p_dictot, p_bortot,                          &
                        p_po4tot, p_siltot,                                    &
                        p_so4tot, p_flutot,                                    & 
-                       K0, K1, K2, Kb, Kw, Ks, Kf, K1p, K2p, K3p, Ksi,        &
+                       K1, K2, Kb, Kw, Ks, Kf, K1p, K2p, K3p, Ksi,            &
                        p_hini,   p_val)
 
 ! Fast version of SOLVE_AT_GENERAL, without any bounds checking.
@@ -773,7 +773,7 @@ REAL(KIND=wp), INTENT(IN)            :: p_siltot
 !REAL(KIND=wp), INTENT(IN)            :: p_h2stot
 REAL(KIND=wp), INTENT(IN)            :: p_so4tot
 REAL(KIND=wp), INTENT(IN)            :: p_flutot
-REAL(KIND=wp), INTENT(IN)            :: K0, K1, K2, Kb, Kw, Ks, Kf
+REAL(KIND=wp), INTENT(IN)            :: K1, K2, Kb, Kw, Ks, Kf
 REAL(KIND=wp), INTENT(IN)            :: K1p, K2p, K3p, Ksi
 REAL(KIND=wp), INTENT(IN), OPTIONAL  :: p_hini
 REAL(KIND=wp), INTENT(OUT), OPTIONAL :: p_val
@@ -809,7 +809,7 @@ DO
    zeqn = equation_at(p_alktot, zh,       p_dictot, p_bortot,                  &
                       p_po4tot, p_siltot,                                      &
                       p_so4tot, p_flutot,                                      & 
-                      K0, K1, K2, Kb, Kw, Ks, Kf, K1p, K2p, K3p, Ksi,          &
+                      K1, K2, Kb, Kw, Ks, Kf, K1p, K2p, K3p, Ksi,              &
                       P_DERIVEQN = zdeqndh)
 
    IF(zeqn == 0._wp) EXIT               ! zh is the root
@@ -847,7 +847,7 @@ IF(PRESENT(p_val)) THEN
       p_val = equation_at(p_alktot, zh,       p_dictot, p_bortot,              &
                           p_po4tot, p_siltot,                                  &
                           p_so4tot, p_flutot,                                  &
-                          K0, K1, K2, Kb, Kw, Ks, Kf, K1p, K2p, K3p, Ksi)
+                          K1, K2, Kb, Kw, Ks, Kf, K1p, K2p, K3p, Ksi)
    ELSE
       p_val = HUGE(1._wp)
    ENDIF

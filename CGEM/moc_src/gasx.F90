@@ -200,7 +200,6 @@ SUBROUTINE flxco2(co2flux, co2ex, dpco2,                                        
   REAL(kind=r4), DIMENSION(N) :: depth0, lat0
  
   INTEGER :: i
-  INTEGER :: kcomp
 
 ! Optional arguments: if not present use defaults (defined below)
   CHARACTER(6) :: opCON

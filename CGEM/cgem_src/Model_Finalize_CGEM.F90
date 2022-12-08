@@ -8,9 +8,8 @@
 
        integer, intent(in) :: myid,numprocs
 
-#ifdef DEBUG
-       write(6,*) "myid,numprocs"
-#endif
+       IF (.FALSE.) write(6,*) "myid, numprocs = ", myid, numprocs
+
 !       if(myid.eq.0) then
          CALL CLOSE_FILE()
 !       endif

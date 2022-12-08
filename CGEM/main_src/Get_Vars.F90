@@ -1,8 +1,12 @@
+!*******************************************************************************
+! 12/02/2022 Wilson Melendez: Removed argument .TRUE. from call to interp.
+!                             Removed i, j, k, temp1, and temp2.
+!*******************************************************************************
+
        Subroutine Get_Vars(TC_8,T_8,myid,numprocs,Which_code) 
 
        USE Model_dim
-       USE INPUT_VARS, ONLY: START_SECONDS,&
-     & Read_T, Read_Sal, Read_Solar, Read_Wind
+       USE INPUT_VARS, ONLY: START_SECONDS, Read_T, Read_Sal, Read_Solar, Read_Wind
        USE Grid
        USE DATE_TIME
        USE Hydro
@@ -18,8 +22,7 @@
        integer(kind=8) :: TC_in, T_in
        integer, intent(in) :: myid,numprocs
        integer, save :: init=1
-       integer i,j,k,mpierr
-       integer(kind=8) :: temp1, temp2  !temp time vars so that grid_t1 and grid_t2 are not updated
+       integer :: mpierr
 
        logical :: broadcast_T, broadcast_TC  !logical for whether to broadcast T_8 or TC_8 hydro variables
        logical :: broadcast_river  !logical for whether to broadcast river variables
@@ -30,15 +33,8 @@
        TC_in = TC_8
        T_in = T_8
 
-!       print*,"inside Get_Vars for processor: ",myid
-!       print*,"TC_in = ", TC_in," for p:",myid 
-!       print*,"T_in = ", T_in," for p:",myid
-!       print*,"hydro_tc1 = ", hydro_tc1," for p:", myid 
-!       print*,"hydro_tc2 = ", hydro_tc2," for p:", myid 
-!       print*,"hydro_t1 = ", hydro_t1," for p:", myid 
-!       print*,"hydro_t2 = ", hydro_t2," for p:", myid 
 
-       !set logical broadcasts here
+      !set logical broadcasts here
 
       broadcast_TC = .FALSE.
       broadcast_T = .FALSE.
@@ -96,13 +92,7 @@
 
           ! retrieve bookend values only if necessary
           if (broadcast_TC) then
-!            print*,"reading TC hydro vars on root for time: ", TC_in
             call retrieveBookendVar(hydro_info(eTemp), TC_in, startIndex(eTemp), T1, T2, hydro_tc1, hydro_tc2)
-
-!            print*,"T1(47,94,1)=",T1(47,94,1)
-!            print*,"T1(222,108,1)=",T1(222,108,1)
-!            print*,"T2(47,94,1)=",T2(47,94,1)
-!            print*,"T2(222,108,1)=",T2(222,108,1)
             call retrieveBookendVar(hydro_info(eUx), TC_in, startIndex(eUx), Ux1, Ux2, hydro_tc1, hydro_tc2)
             call retrieveBookendVar(hydro_info(eVx), TC_in, startIndex(eVx), Vx1, Vx2, hydro_tc1, hydro_tc2)
             call retrieveBookendVar(hydro_info(eWx), TC_in, startIndex(eWx), Wx1, Wx2, hydro_tc1, hydro_tc2)
@@ -119,7 +109,6 @@
           end if
 
           if (broadcast_T) then
-!            print*,"reading T hydro vars on root for time: ", TC_in
             call retrieveBookendVar(hydro_info(eE), T_in, startIndex(eE), E1, E2, hydro_t1, hydro_t2)
           endif
             
@@ -282,44 +271,44 @@
       endif
 
       !interpolate
-      call interp(T1, T2, hydro_tc1, hydro_tc2, TC_in, T, .FALSE.)
-      call interp(Ux1, Ux2, hydro_tc1, hydro_tc2, TC_in, Ux, .FALSE.)
-      call interp(Vx1, Vx2, hydro_tc1, hydro_tc2, TC_in, Vx, .FALSE.)
-      call interp(Wx1, Wx2, hydro_tc1, hydro_tc2, TC_in, Wx, .FALSE.)
-      call interp(Kh1, Kh2, hydro_tc1, hydro_tc2, TC_in, Kh, .FALSE.)
+      call interp(T1, T2, hydro_tc1, hydro_tc2, TC_in, T)
+      call interp(Ux1, Ux2, hydro_tc1, hydro_tc2, TC_in, Ux)
+      call interp(Vx1, Vx2, hydro_tc1, hydro_tc2, TC_in, Vx)
+      call interp(Wx1, Wx2, hydro_tc1, hydro_tc2, TC_in, Wx)
+      call interp(Kh1, Kh2, hydro_tc1, hydro_tc2, TC_in, Kh)
       if (Which_gridio.ne.3)then
-        call interp(S1, S2, hydro_tc1, hydro_tc2, TC_in, S, .FALSE.)
+        call interp(S1, S2, hydro_tc1, hydro_tc2, TC_in, S)
       else
-        call interp(Rad1, Rad2, hydro_tc1, hydro_tc2, TC_in, Rad, .FALSE.)
-        call interp(Wind1, Wind2, hydro_tc1, hydro_tc2, TC_in, Wind, .FALSE.)
+        call interp(Rad1, Rad2, hydro_tc1, hydro_tc2, TC_in, Rad)
+        call interp(Wind1, Wind2, hydro_tc1, hydro_tc2, TC_in, Wind)
       endif
 
       if (Which_gridio.eq.1)then
         if (nRiv.gt.0)then
-          call interp(Riv1A, Riv1B, river_tc1, river_tc2, TC_in, Riv1, .FALSE.)
+          call interp(Riv1A, Riv1B, river_tc1, river_tc2, TC_in, Riv1)
         
           if(Which_code.eq."CGEM") then            
-          call interp(Riv2A, Riv2B, river_tc1, river_tc2, TC_in, Riv2, .FALSE.)
-          call interp(Riv3A, Riv3B, river_tc1, river_tc2, TC_in, Riv3, .FALSE.)
-          call interp(Riv4A, Riv4B, river_tc1, river_tc2, TC_in, Riv4, .FALSE.)
-          call interp(Riv5A, Riv5B, river_tc1, river_tc2, TC_in, Riv5, .FALSE.)
-          call interp(Riv6A, Riv6B, river_tc1, river_tc2, TC_in, Riv6, .FALSE.)
-          call interp(Riv7A, Riv7B, river_tc1, river_tc2, TC_in, Riv7, .FALSE.)
-          call interp(Riv8A, Riv8B, river_tc1, river_tc2, TC_in, Riv8, .FALSE.)
-          call interp(Riv9A, Riv9B, river_tc1, river_tc2, TC_in, Riv9, .FALSE.)
+          call interp(Riv2A, Riv2B, river_tc1, river_tc2, TC_in, Riv2)
+          call interp(Riv3A, Riv3B, river_tc1, river_tc2, TC_in, Riv3)
+          call interp(Riv4A, Riv4B, river_tc1, river_tc2, TC_in, Riv4)
+          call interp(Riv5A, Riv5B, river_tc1, river_tc2, TC_in, Riv5)
+          call interp(Riv6A, Riv6B, river_tc1, river_tc2, TC_in, Riv6)
+          call interp(Riv7A, Riv7B, river_tc1, river_tc2, TC_in, Riv7)
+          call interp(Riv8A, Riv8B, river_tc1, river_tc2, TC_in, Riv8)
+          call interp(Riv9A, Riv9B, river_tc1, river_tc2, TC_in, Riv9)
 
           endif
         endif
         if (nBC.gt.0)then
-          call interp(BC1A, BC1B, bc_tc1, bc_tc2, TC_in, BC1, .FALSE.)
-          call interp(BC2A, BC2B, bc_tc1, bc_tc2, TC_in, BC2, .FALSE.)
-          call interp(BC3A, BC3B, bc_tc1, bc_tc2, TC_in, BC3, .FALSE.)
-          call interp(BC4A, BC4B, bc_tc1, bc_tc2, TC_in, BC4, .FALSE.)
-          call interp(BC5A, BC5B, bc_tc1, bc_tc2, TC_in, BC5, .FALSE.)
-          call interp(BC6A, BC6B, bc_tc1, bc_tc2, TC_in, BC6, .FALSE.)
-          call interp(BC7A, BC7B, bc_tc1, bc_tc2, TC_in, BC7, .FALSE.)
-          call interp(BC8A, BC8B, bc_tc1, bc_tc2, TC_in, BC8, .FALSE.)
-          call interp(BC9A, BC9B, bc_tc1, bc_tc2, TC_in, BC9, .FALSE.)
+          call interp(BC1A, BC1B, bc_tc1, bc_tc2, TC_in, BC1)
+          call interp(BC2A, BC2B, bc_tc1, bc_tc2, TC_in, BC2)
+          call interp(BC3A, BC3B, bc_tc1, bc_tc2, TC_in, BC3)
+          call interp(BC4A, BC4B, bc_tc1, bc_tc2, TC_in, BC4)
+          call interp(BC5A, BC5B, bc_tc1, bc_tc2, TC_in, BC5)
+          call interp(BC6A, BC6B, bc_tc1, bc_tc2, TC_in, BC6)
+          call interp(BC7A, BC7B, bc_tc1, bc_tc2, TC_in, BC7)
+          call interp(BC8A, BC8B, bc_tc1, bc_tc2, TC_in, BC8)
+          call interp(BC9A, BC9B, bc_tc1, bc_tc2, TC_in, BC9)
         endif
       endif
 

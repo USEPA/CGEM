@@ -1,8 +1,12 @@
+!*******************************************************************************
+! 12/02/2022 Wilson Melendez: Removed START_SECONDS, and INPUT_VARS
+!                             module.
+!*******************************************************************************
+
       subroutine USER_Read_Sal(TC_8,Var)
 
       USE Model_dim
       USE DATE_TIME
-      USE INPUT_VARS, ONLY:START_SECONDS
       IMPLICIT NONE
 
       integer*8, intent (in) :: TC_8

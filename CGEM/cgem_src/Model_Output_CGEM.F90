@@ -9,24 +9,26 @@
       IMPLICIT NONE
 
       integer,intent(in)  :: istep_out !current output counter
-      integer, intent(in) :: myid,numprocs
+      integer, intent(in) :: myid, numprocs
       real :: dumf(myim,jm,km,nf)
-      integer :: i,j,k,nz,myi
+      integer :: i, j, k, nz, myi
+      
+      IF (.FALSE.) WRITE(6,*) "myid, numprocs = ", myid, numprocs
 
-        dumf = f(1:myim,:,:,:)
+      dumf = f(1:myim,:,:,:)
 
-        do j=1,jm
-        myi = 1
-        do i=myi_start,myi_end
-          nz=nza(i,j)
-          do k=1,nz
-            dumf(myi,j,k,iTr) = f(myi,j,k,iTr) * Vol(i,j,k)
-          enddo
-          myi = myi + 1
-        enddo
-        enddo
+      do j = 1, jm
+         myi = 1
+         do i = myi_start, myi_end
+            nz = nza(i,j)
+            do k = 1, nz
+               dumf(myi,j,k,iTr) = f(myi,j,k,iTr) * Vol(i,j,k)
+            enddo
+            myi = myi + 1
+         enddo
+      enddo
 
-        CALL WRITE_DATA( myi_start,myim, 1,jm, 1, km, istep_out, dumf)
+      CALL WRITE_DATA( myi_start,myim, 1,jm, 1, km, istep_out, dumf)
 
       return
 

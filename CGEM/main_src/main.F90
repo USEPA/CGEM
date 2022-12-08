@@ -123,7 +123,7 @@
       istep_out = 0
 
       if (Which_gridio.eq.1) then
-        call USER_update_EFDC_grid(TC_8,T_8,myid,numprocs)
+        call USER_update_EFDC_grid(T_8,myid,numprocs)
       else if (Which_gridio.eq.2) then
         call USER_update_NCOM_grid(T_8,myid,numprocs)
       else if (Which_gridio.eq.3) then
@@ -159,7 +159,7 @@
       call Get_Vars(TC_8,T_8,myid,numprocs, Which_code) !Hydro, Solar, Wind, Temp, Salinity, and riverloads
 
       if (Which_gridio.eq.1) then
-        call USER_update_EFDC_grid(TC_8,T_8,myid,numprocs)
+        call USER_update_EFDC_grid(T_8,myid,numprocs)
       elseif (Which_gridio.eq.2) then
         call USER_update_NCOM_grid(T_8,myid,numprocs)
       elseif (Which_gridio.eq.3) then

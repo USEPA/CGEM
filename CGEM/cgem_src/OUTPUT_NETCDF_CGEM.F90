@@ -76,7 +76,7 @@ CONTAINS
     INTEGER IM_DIM, JM_DIM, KM_DIM, NSTEPP1_DIM
     INTEGER RLON_VAR, RLAT_VAR, H_VAR, FM_VAR
     INTEGER DZ_VAR
-    INTEGER K, i, J, INFO
+    INTEGER i, J, INFO
     INTEGER ERR, VARIABLE, DIM_IDS( 4 )
 !    INTEGER NF_CLOBBER, NF_64BIT_OFFSET
 !    EXTERNAL NF_CLOBBER, NF_64BIT_OFFSET
@@ -434,17 +434,13 @@ CONTAINS
     INTEGER IYR0 ! Reference year (before start of model run).
     INTEGER IYRS, IMONS, IDAYS, IHRS, IMINS, ISECS ! Run start.
     INTEGER(8) SECONDS_FROM_YEAR0
-    INTEGER BUFFER_SIZE,INFO
+    INTEGER INFO
 
     CALL MPI_INFO_CREATE( INFO, ERR )
     CALL MPI_INFO_SET( INFO, 'ind_wr_buffer_size', '16777216', ERR )
 
-    ! Open existing shared 64-bit NetCDF output file for writing:
-!    ERR = ncdf_OPEN( NAME, 2565, FILE_ID )
     ERR = ncdf_OPEN( MPI_COMM_WORLD, trim(NAME), &
                       IOR( NF_WRITE, NF_64BIT_OFFSET ), INFO, FILE_ID )
-    !BUFFER_SIZE = 256 * 1024
-    !ERR = ncdf_OPEN( NAME, NUM, BUFFER_SIZE, FILE_ID ) ! 1+4+256+2+512 64-bit
     CALL CHKERR( ERR, 'open existing shared writable output file ' // NAME )
     CALL MPI_INFO_FREE( INFO, ERR )
 

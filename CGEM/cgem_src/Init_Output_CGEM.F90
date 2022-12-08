@@ -38,6 +38,7 @@
                             LON, LAT, d, FM, &
                             DZ )
           CALL CLOSE_FILE()
+          IF (.FALSE.) WRITE(6,*) "numprocs = ", numprocs
       endif
       CALL MPI_BARRIER( MPI_COMM_WORLD,mpierr) ! Wait until file is created.
 

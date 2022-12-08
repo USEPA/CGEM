@@ -1,6 +1,6 @@
-!> \file varsolver.f90
-!! \BRIEF 
-!> Module with varsolver subroutine - solve for pH and other carbonate system variables
+! file varsolver.f90
+!! BRIEF 
+! Module with varsolver subroutine - solve for pH and other carbonate system variables
 MODULE mvarsolver
 CONTAINS
 !>    Solve for pH and other carbonate system variables (with input from vars routine)
@@ -136,7 +136,8 @@ SUBROUTINE varsolver(ph, pco2, fco2, co2, hco3, co3, OmegaA, OmegaC,            
   REAL(kind=r8) :: Phydro_atm, Ptot
   REAL(kind=r8) :: Rgas_atm, B, Del, xCO2approx, xc2, fugcoeff
   REAL(kind=r8) :: tk, tk0
-  real(kind=r8) :: temp68, tempot, tempot68
+  real(kind=r8) :: tempot
+!  real(kind=r8) :: temp68, tempot68
   REAL(kind=r8) :: Hinit, H
   REAL(kind=r8) :: HSO4, HF, HSI, HPO4
   REAL(kind=r8) :: ab, aw, ac

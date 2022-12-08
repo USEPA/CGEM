@@ -1,9 +1,14 @@
+!*******************************************************************************
+! 12/02/2022 Wilson Melendez: Removed argument .TRUE. from call to interp.
+!                             Removed icent and jcent variables, INPUT_VARS
+!                             module, TC_8, T_1, T_2, TC_1, and TC_2.
+!*******************************************************************************
+
       subroutine USER_get_EFDC_grid()
 
       USE Fill_Value
       USE Model_dim
       USE Grid
-      USE INPUT_VARS, Only:icent,jcent 
 
       real, dimension(im,jm) :: dx, dy, sdetg
       integer :: i,j
@@ -54,7 +59,7 @@ write(6,*)
       end subroutine USER_get_EFDC_grid
 
 
-      subroutine USER_update_EFDC_grid(TC_8,T_8,myid,numprocs)
+      subroutine USER_update_EFDC_grid(T_8,myid,numprocs)
 
       USE Fill_Value
       USE Model_dim
@@ -65,17 +70,9 @@ write(6,*)
 
       integer :: i,j,k, nz, mpierr
       integer, intent(in) :: myid,numprocs
-      integer(kind=8) :: TC_8,T_8, t_current
-      integer(kind=8) :: T_1,T_2, TC_1,TC_2  !bookend time values
-      real x
+      integer(kind=8) :: T_8, t_current
+      real :: x
       logical :: broadcast_grid  ! logical for whether to broadcast T_8
-
-!      call interpVar(grid_info(eColDepth), TC_8, gridStartIndex(eColDepth), depth)
-!      call interpVar(grid_info(eCellDepth), TC_8, gridStartIndex(eCellDepth), dz)
-!      call interpVar(grid_info(eColDepth), T_8, gridStartIndex(eColDepth), depth)
-!      call interpVar(grid_info(eCellDepth), T_8, gridStartIndex(eCellDepth), dz)
-
-
 
        t_current = T_8
 
@@ -97,9 +94,6 @@ write(6,*)
        end if
 
 
-!       print*,"b4 depth1(175,2)=",depth1(175,2), " for myid:",myid
-!       print*,"b4 depth2(175,2)=",depth2(175,2), " for myid:",myid
-
        if(numprocs.gt.1)then
          call MPI_BCAST(broadcast_grid,1,MPI_LOGICAL,0,MPI_COMM_WORLD,mpierr)
          if(broadcast_grid)then
@@ -112,13 +106,10 @@ write(6,*)
          endif
        endif
 
-!       print*,"depth1(175,2)=",depth1(175,2), " for myid:",myid
-!       print*,"depth2(175,2)=",depth2(175,2), " for myid:",myid
 
-       call interp(depth1, depth2, grid_t1, grid_t2, t_current, depth, .TRUE.)
-       call interp(dz1, dz2, grid_t1, grid_t2, t_current, dz, .TRUE.)
+       call interp(depth1, depth2, grid_t1, grid_t2, t_current, depth)
+       call interp(dz1, dz2, grid_t1, grid_t2, t_current, dz)
                 
-!       print*,"depth(175,2)=",depth(175,2), " for myid:",myid
 
       if (myid .eq. 0)then
         Vol_prev = Vol
@@ -165,14 +156,9 @@ write(6,*)
 
 !stop
 #ifdef debug
-write(6,*) "---USER_update_EFDC grid----"
-write(6,*) "  setting depth, dz, d_sfc, d, Vol"
-write(6,*) "  Time in seconds",TC_8
-nz=nza(icent,jcent)
-write(6,*) "  At i,j,k=",icent,jcent,nz)
-write(6,*) " d, d_sfc, depth, dz, Vol, area="
-write(6,*) d(icent,jcent,nz),d_sfc(icent,jcent,nz),depth(icent,jcent)
-write(6,*) dz(icent,jcent,nz),Vol(icent,jcent,nz),area(icent,jcent)
+  write(6,*) "---USER_update_EFDC grid----"
+  write(6,*) "  setting depth, dz, d_sfc, d, Vol"
+  write(6,*) " d, d_sfc, depth, dz, Vol, area="
 #endif
 
       return

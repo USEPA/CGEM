@@ -6,7 +6,6 @@
       USE State_Vars
       USE Grid
       USE Hydro
-      USE INPUT_VARS, ONLY:icent,jcent
 
       implicit none
  

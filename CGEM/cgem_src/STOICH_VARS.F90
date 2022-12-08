@@ -23,7 +23,6 @@ USE Model_dim
 IMPLICIT NONE
 
 real fill_val
-integer i,j,k
 
 ALLOCATE(s_x1A(myim,jm,km))
 ALLOCATE(s_x2A(myim,jm,km))

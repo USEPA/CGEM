@@ -1,10 +1,14 @@
+!*******************************************************************************
+! 12/02/2022 Wilson Melendez: Removed icent and jcent variables, and INPUT_VARS
+!                             module.
+!*******************************************************************************
+
       subroutine USER_get_masks()
 
-!Sets fm and sdm, updates nza
+     !Sets fm and sdm, updates nza
 
       USE Model_dim
       USE Grid, ONLY: fm,wsm,depth
-      USE INPUT_VARS, ONLY: icent,jcent
 
       IMPLICIT NONE
 
@@ -79,8 +83,6 @@
 
 #ifdef DEBUG
 write(6,*) "---USER_get_masks---"
-write(6,*) "  nza, fm, wsm, and Depth at i,j,k=",icent,jcent,km
-write(6,*) "  =", nza(icent,jcent),fm(icent,jcent,km),wsm(icent,jcent),depth(icent,jcent)
 write(6,*)
 #endif
 

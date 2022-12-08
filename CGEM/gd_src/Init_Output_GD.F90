@@ -19,7 +19,7 @@
 
        character(100) :: BASE_NETCDF_OUTPUT_FILE_NAME
        character(256) :: NETCDF_OUTPUT_FILE_NAME
-       integer ::  tinit=0, i,j,k,nz,myi,myid,numprocs,mpierr
+       integer ::  tinit=0, myid,numprocs,mpierr
        real :: dumf(myim,jm,km,nf)
 
        ! Change True/False parameters for netCDF Write Variables
@@ -40,6 +40,7 @@
                             DZ, AREA )
 
           CALL CLOSE_FILE()
+          IF (.FALSE.) WRITE(6,*) "myid, numprocs = ", myid, numprocs
       endif
       CALL MPI_BARRIER( MPI_COMM_WORLD,mpierr) ! Wait until file is created.
 

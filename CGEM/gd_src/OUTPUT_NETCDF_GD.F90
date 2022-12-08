@@ -86,24 +86,21 @@ CONTAINS
     INTEGER RLON_VAR, RLAT_VAR, H_VAR, FM_VAR
     INTEGER XLON_VAR, YLAT_VAR
     INTEGER DZ_VAR,AREA_VAR
-    INTEGER K,J,I, INFO
+    INTEGER J,I, INFO
     INTEGER ERR, VARIABLE, DIM_IDS( 4 )
     REAL,DIMENSION(IM,JM):: RLON_COPY
     REAL,PARAMETER :: LAT_MIN = 43.1
     REAL,PARAMETER :: LAT_MAX = 44.4
     REAL,PARAMETER :: LON_MIN = -80.0
     REAL,PARAMETER :: LON_MAX = -76.00
-    REAL :: LAT_INCR
-    REAL :: LON_INCR
     CHARACTER(LEN=40):: TIME_UNITS
     FILE_ID = -1
 
-    ! Create/overwrite NetCDF output file:
-!    ERR = NF_CREATE( trim(NAME), 770, FILE_ID) 
-!    CALL CHKERR( ERR, 'create NetCDF output file ' // NAME )
-
     CALL MPI_INFO_CREATE( INFO, ERR )
     CALL MPI_INFO_SET( INFO, 'ind_wr_buffer_size', '16777216', ERR )
+
+    IF (.FALSE.) WRITE(6,*) "Number of extra variables = ", EXTRA_VARIABLES1
+
  ! Create/overwrite NetCDF output file:
     ERR = ncdf_CREATE( MPI_COMM_SELF,trim(NAME), IOR( NF_CLOBBER, NF_64BIT_OFFSET ), INFO, FILE_ID)
     CALL CHKERR( ERR, 'create NetCDF output file ' // NAME )
@@ -590,16 +587,12 @@ write(6,*) "After Extra_Vars"
     INTEGER IYR0 ! Reference year (before start of model run).
     INTEGER IYRS, IMONS, IDAYS, IHRS, IMINS, ISECS ! Run start.
     INTEGER(8) SECONDS_FROM_YEAR0
-    INTEGER BUFFER_SIZE,INFO
+    INTEGER INFO
 
     CALL MPI_INFO_CREATE( INFO, ERR )
     CALL MPI_INFO_SET( INFO, 'ind_wr_buffer_size', '16777216', ERR )
 
-    ! Open existing shared 64-bit NetCDF output file for writing:
-!!!!ERR = NF_OPEN( NAME, 2565, FILE_ID )
-!    BUFFER_SIZE = 256 * 1024
-!    ERR = NF__OPEN( NAME, 775, BUFFER_SIZE, FILE_ID ) ! 1+4+256+2+512 64-bit
-!    CALL CHKERR( ERR, 'open existing shared writable output file ' // NAME )
+    IF (.FALSE.) WRITE(6,*) "Number of extra variables = ", EXTRA_VARIABLES1
 
     ERR = ncdf_OPEN( MPI_COMM_WORLD, trim(NAME), &
                       IOR( NF_WRITE, NF_64BIT_OFFSET ), INFO, FILE_ID )

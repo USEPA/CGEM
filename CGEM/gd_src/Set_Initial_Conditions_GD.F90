@@ -1,7 +1,7 @@
        Subroutine Set_Initial_Conditions_GD(init_filename,myid,numprocs) 
 
        USE Model_dim
-       USE INPUT_VARS, ONLY: InitializeHow, icent, jcent 
+       USE INPUT_VARS, ONLY: InitializeHow
        USE states
        USE Grid
        USE State_Vars
@@ -45,7 +45,6 @@
 
 #ifdef DEBUG
       write(6,*) "In Set Initial Conditions GD,myid=",myid
-      write(6,*) "first state var at i,j,k=",f(icent,jcent,1,1),icent,jcent,1
       write(6,*)
 #endif
 

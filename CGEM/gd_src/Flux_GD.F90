@@ -16,7 +16,7 @@
        integer(kind=8), intent(in) :: TC_8 ! Current time in seconds since Model_dim::iYr0.
        integer, intent(in) :: istep, myid, numprocs
        REAL :: T_sfc, Sal_sfc, O2_sfc, Sc, Op_umole, rhow, Op, OsDOp
-       REAL :: Vtrans, alpha_O2, O2_atF, zs, DIC_sfc, CO2_atF
+       REAL :: Vtrans, alpha_O2, O2_atF
        REAL :: NO3_Ex, NH4_Ex, PO4_Ex
        REAL :: NO3_CMAQ(im,jm),NH4_CMAQ(im,jm)
        REAL :: Si_Ex(im,jm,2) !1==SA 2==SRP
@@ -56,6 +56,8 @@ if(init.eq.1) then
   endif
 
   init=0
+
+  IF (.FALSE.) WRITE(6,*) "myid, istep = ", myid, istep
 
 endif
 

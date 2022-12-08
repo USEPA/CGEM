@@ -99,6 +99,10 @@ contains
       MF = 25
       IWORK(6) = MXSTEP
 
+      ! IFLAG is not being used so set it to itself to turn off 
+      ! the fortran compiler unused variable warning.
+      IFLAG = IFLAG 
+
       !write(6,*) "In CASES, Y1=",Y(1)
 
 !      IF (IFLAG .EQ. 1) THEN
@@ -1334,6 +1338,7 @@ contains
       INTEGER :: I, IERPJ, IERSL, M, MAXCOR = 3, MSBP = 20
 ! -----------------------------------------------------------------------
 
+      IF (.FALSE.) VSAV = VSAV  ! This will turn off the unused variable warning
       IF (JSTART .EQ. 0) NSLP = 0
       IF (NFLAG .EQ. 0) ICF = 0
       IF (NFLAG .EQ. -2) IPUP = MITER
@@ -1761,6 +1766,8 @@ contains
       INTEGER :: IDUM
       REAL(kind=8) :: U, COMP
 
+      IF (.FALSE.) IDUM = IDUM  ! Unused variable
+
       U = 1.0D0
  10   U = U*0.5D0
       COMP = 1.0D0 + U
@@ -1777,6 +1784,8 @@ contains
       REAL(kind=8) :: R1, R2
       CHARACTER(LEN=1) :: MSG(NMES)
       INTEGER :: I, LUNIT, MESFLG
+
+      IF (.FALSE.) NERR = NERR  ! Unused variable
 ! 
 !  Get message print flag and logical unit number. ----------------------
       MESFLG = MFLGSV (0,.FALSE.)
@@ -3482,6 +3491,7 @@ contains
       INTEGER :: MIN1, MIN2, MIN3, MIN4, MIN5, MIN6, MIN7, MIN8
       INTEGER :: MIN9, MIN10, MIN11, MIN12, MIN13, MIN14, MIN15, MIN16, MIN17
 
+      IF (.FALSE.) IPAR = IPAR  ! Unused variable
       X = ZERO
       NPM1 = NPOINTS - 1
 
@@ -4854,8 +4864,8 @@ contains
 
 ! 
 ! 
-! 
-!    JEX	A DUMMY ROUTINE FOR THE JACOBIAN CALLED BY VODE.f
+!  
+!  JEX: A DUMMY ROUTINE FOR THE JACOBIAN CALLED BY VODE.f
 ! 
 ! 
       SUBROUTINE JEX (NEQ1, T, Y, ML, MU, PD, NRPD, RPAR, IPAR)
@@ -4864,6 +4874,13 @@ contains
       INTEGER :: IPAR
       REAL(kind=8) :: T
       REAL(kind=8) :: Y(NEQ1), PD(NRPD,NEQ1), RPAR(NRPD)
+      
+      ! Use a dummy piece of code
+      IF (.FALSE.) THEN
+          Y = Y; PD = PD; RPAR = RPAR; IPAR = IPAR
+          T = T; ML = ML; MU = MU
+      ENDIF
+
       RETURN
       END SUBROUTINE JEX
 
@@ -5398,8 +5415,11 @@ contains
 
       SUBROUTINE TORT2(T2,DT2DX,P,DPDX,X)
       IMPLICIT NONE
-      REAL(kind=8), INTENT(IN) :: P, DPDX, X
+      REAL(kind=8), INTENT(IN) :: P, DPDX
       REAL(kind=8), INTENT(OUT) :: T2, DT2DX
+      REAL(kind=8), INTENT(INOUT) :: X
+
+      IF (.FALSE.) X = X  ! Unused variable
 
       T2 = ONE - TWO*DLOG(P)
       DT2DX = -FOUR/P*DPDX
@@ -5470,16 +5490,15 @@ contains
 !
 !***********************************************************************
 
-      SUBROUTINE FILL_Y(NEQ1,np,nss,Y,G1,G2,O2,rNO3,rNH4,rMN2, &
-                        FE3,FE2,SO4,HS,FES,TC,ALK,DOM,Os,Ob)
+      SUBROUTINE FILL_Y(NEQ1,Y,G1,G2,O2,rNO3,rNH4,rMN2, &
+                        FE2,SO4,HS,FES,TC,ALK,DOM,Os,Ob)
       IMPLICIT NONE
-      INTEGER, INTENT(IN) :: NEQ1, np, nss
+      INTEGER, INTENT(IN) :: NEQ1
       INTEGER, PARAMETER :: MAXNEQ = 27000
       REAL(kind=8), INTENT(IN) :: Y(NEQ1)
       REAL(kind=8), INTENT(OUT) :: G1(:),G2(:),O2(:),rNO3(:),rNH4(:),rMN2(:)
       REAL(kind=8), INTENT(OUT) :: SO4(:),HS(:),FE2(:),FES(:),TC(:),ALK(:)
       REAL(kind=8), INTENT(OUT) :: DOM(:), Os(:), Ob(:)
-      REAL(kind=8) :: FE3(:)
       INTEGER :: NPM1, I, M
       INTEGER :: MID1, MID2, MID3, MID4, MID5, MID6, MID7, MID8
       INTEGER :: MID9, MID10, MID11, MID12, MID13, MID14, MID15, MID16, MID17
@@ -5537,13 +5556,12 @@ contains
 ! 
 !    ROOTINT Integrates and averages results over rootzone
 ! 
-      SUBROUTINE ROOTINT(NPOINTS,G1,G2,O2,rNO3,rNH4, &
+      SUBROUTINE ROOTINT(G1,G2,O2,rNO3,rNH4, &
                          rMN2,FE2,SO4,HS,FES,TC,ALK,DOM,Os,Ob, &
                          tempG1,tempG2,tempO2,tempNO3,tempNH4,tempMN2, &
                          tempFE2,tempSO4,tempHS,tempFES,tempTC,tempALK,tempDOM, &
                          tempOs,tempOb)
       IMPLICIT NONE
-      INTEGER, INTENT(IN) :: NPOINTS
       REAL(kind=8), INTENT(IN) :: G1(:),G2(:),O2(:),rNO3(:),rNH4(:),rMN2(:)
       REAL(kind=8), INTENT(IN) :: FE2(:),SO4(:),HS(:),FES(:),TC(:),ALK(:),DOM(:)
       REAL(kind=8), INTENT(IN) :: Os(:),Ob(:)
@@ -5682,11 +5700,11 @@ contains
 !     -----------------------------------------------------------------
 !     FORMAT FOR MATLAB FILE
 !     -----------------------------------------------------------------
-      SUBROUTINE OUTFLUX(sedO2,sedNO3,sedNH4,sedSO4,sedDIC,sedDOC, &
+      SUBROUTINE OUTFLUX(sedO2,sedNO3,sedNH4,sedSO4,sedDIC, &
                          sedOM1,sedOM2, pycoO2,mm)
       IMPLICIT NONE
       REAL(kind=8), INTENT(IN) :: sedO2(:),sedNO3(:),sedNH4(:)
-      REAL(kind=8), INTENT(IN) :: sedSO4(:),sedDIC(:),sedDOC(:)
+      REAL(kind=8), INTENT(IN) :: sedSO4(:),sedDIC(:)
       REAL(kind=8), INTENT(IN) :: sedOM1(:),sedOM2(:),pycoO2(:)
       INTEGER, INTENT(IN) :: mm
       INTEGER :: i
@@ -5776,7 +5794,6 @@ contains
       REAL(kind=8), DIMENSION(100), INTENT(IN) :: Ainp
       REAL(kind=8), DIMENSION(24) :: DF
       REAL(kind=8), DIMENSION(9) :: rk
-      REAL(kind=8), DIMENSION(2000) :: ppH
 
       REAL(kind=8) :: YEAR = 3.156D+07
       REAL(kind=8) :: yr_sec, rho, V

@@ -1,12 +1,15 @@
+!*******************************************************************************
+! 12/02/2022 Wilson Melendez: Removed icent and jcent variables, and INPUT_VARS
+!                             module. Removed ERR variable.
+!*******************************************************************************
+
       Subroutine USER_Set_Initial_Conditions(filename,myid,numprocs)
 
       USE Model_dim
       USE State_Vars 
       USE Fill_Value
-      use INPUT_VARS, only:icent,jcent
       use serial
       use mpi_interface
-!      USE NETCDF_UTILITIES
       use netcdf_utils
 
       implicit none
@@ -20,8 +23,6 @@
       real init(nf)
       real, dimension(im,jm,km) :: varInitCond
 
-      !eventually put this in NETCDF_UTILITIES?
-      integer ERR
 
    if (index(filename,file_extension) == 0 ) then !NetCDF file
 
@@ -105,7 +106,6 @@ write(6,*) "------USER_Set_Initial_Conditions--"
 write(6,*) "  Read one value for each state variable"
 write(6,*) "  Then set grid constant"
 write(6,*) "  filename=",filename
-write(6,*) "first state var at i,j,k=",f(icent,jcent,1,1),icent,jcent,1
 write(6,*)
 #endif
 

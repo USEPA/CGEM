@@ -1,9 +1,13 @@
+!*******************************************************************************
+! 12/02/2022 Wilson Melendez: Removed icent and jcent variables, and INPUT_VARS
+!                             module.
+!*******************************************************************************
+
       subroutine USER_get_NCOM_grid()
 
       USE Fill_Value
       USE Model_dim
       USE Grid
-      USE INPUT_VARS , ONLY: icent,jcent
 
       IMPLICIT NONE
  
@@ -89,9 +93,6 @@
      write(6,*) "----Calling USER_get_NCOM_grid-----"
      write(6,*) "  setting dxy, area, zl, zz, dz_k, and h"
      write(6,*) "  Not setting depths, because don't have E"
-     write(6,*) "  For cell i,j,k=",icent,jcent,1
-     write(6,*) dxy(jcent),area(icent,jcent),zl(1),zz(1)
-     write(6,*) dz_k(1),h(icent,jcent)
      write(6,*)
 
      write(6,*)
@@ -107,7 +108,6 @@
       USE Model_dim
       USE Grid
       USE Hydro, ONLY: E
-      USE INPUT_VARS, ONLY: icent,jcent
 
       IMPLICIT NONE
 
@@ -160,10 +160,6 @@
 #ifdef DEBUG
      write(6,*) "----Calling USER_update_NCOM_grid-----"
      write(6,*) "  setting depth,d,dz,d_sfc,Vol"
-     write(6,*) "  For cell i,j,k=",icent,jcent,1
-     write(6,*) "depth,d,dz,d_sfc,Vol="
-     write(6,*) depth(icent,jcent),d(icent,jcent,1),dz(icent,jcent,1)
-     write(6,*) d_sfc(icent,jcent,1),d_sfc(icent,jcent,1),Vol(icent,jcent,1)
      write(6,*) 
 #endif
 
