@@ -3,61 +3,59 @@
 
 #Starts a new plot of a 1D time series variable
 timeseries_plot <- function(Var,time,rdata,unit,ilog=FALSE,label=NULL,range=NULL,uselim=TRUE,xrange=NULL,color="black",linetype="solid"){
-
-if(ilog){
-   rdata <- log(rdata) #Might have 'log zero' error, need to add check
-   logtxt<-"log of"
-}else{
-   logtxt<-""
-}
-
-ylimit <- get_ylim(rdata,range)
-xlimit <- get_ylim(time,xrange)
-
-#yaxt="n"
-plot(time,rdata,yaxt="n",type="l",ylab="",xlab="",main=paste(Var,label),ylim=ylimit,xlim=xlimit,col=color,lty=linetype);
-mtext(paste(logtxt,unit),side=3,line=.2,cex=0.8)
-if(uselim){
- axis(2, at=get_lab(ylimit), labels=get_lab(ylimit), las=2)
-}else{
- axis(2, las=2)
-}
-
+  if (ilog) {
+    rdata <- log(rdata) #Might have 'log zero' error, need to add check
+    logtxt <- "log of"
+  }else {
+    logtxt <- ""
+  }
+  
+  ylimit <- get_ylim(rdata,range)
+  xlimit <- get_ylim(time,xrange)
+  
+  plot(time,rdata,yaxt="n",type="l",ylab="",xlab="",main=paste(Var,label),ylim=ylimit,xlim=xlimit,col=color,lty=linetype);
+  mtext(paste(logtxt,unit),side=3,line=.2,cex=0.8)
+  if(uselim){
+    axis(2, at=get_lab(ylimit), labels=get_lab(ylimit), las=2)
+  }else{
+    axis(2, las=2)
+  }
+  
 }
 
 
 #Adds lines to an existing plot, can change color but not labels or ranges (for comparisons)
 timeseries_addlines <- function(Var,time,rdata,color="red",linewidth=1,linetype="solid"){
-lines(time,rdata,col=color,lwd=linewidth,lty=linetype)
+  lines(time,rdata,col=color,lwd=linewidth,lty=linetype)
 }
 
 
 get_ylim <- function(indata,range) {
- ymin <- min(indata,na.rm=TRUE) 
- ymax <- max(indata,na.rm=TRUE)
- if(!is.null(range)){
-  ymin <- range[1]
-  ymax <- range[2]
- }
- c(ymin,ymax)
+  ymin <- min(indata,na.rm=TRUE) 
+  ymax <- max(indata,na.rm=TRUE)
+  if(!is.null(range)){
+    ymin <- range[1]
+    ymax <- range[2]
+  }
+  c(ymin,ymax)
 }
 
 get_ylim_for2 <- function(indata,indata2,range) {
- ymin <- (min( min(indata), min(indata2) ));
- ymax <- (max( max(indata), max(indata2) ));
- if(!is.null(range)){
-  ymin <- range[1]
-  ymax <- range[2]
- }
- c(ymin,ymax)
+  ymin <- (min( min(indata), min(indata2) ));
+  ymax <- (max( max(indata), max(indata2) ));
+  if(!is.null(range)){
+    ymin <- range[1]
+    ymax <- range[2]
+  }
+  c(ymin,ymax)
 }
 
 get_lab <- function(ylimit){
- ymin<-ylimit[1] 
- ymax<-ylimit[2]
- ymid <- ymin + (ymax-ymin)/2.
- ymin <- signif(ymin,digits=4)
- ymax <- signif(ymax,digits=4)
- ymid <- signif(ymid,digits=4)
- c(ymin,ymid,ymax)
+  ymin <- ylimit[1] 
+  ymax <- ylimit[2]
+  ymid <- ymin + (ymax-ymin)/2.
+  ymin <- signif(ymin,digits=4)
+  ymax <- signif(ymax,digits=4)
+  ymid <- signif(ymid,digits=4)
+  c(ymin,ymid,ymax)
 }
