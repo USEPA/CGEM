@@ -529,7 +529,7 @@ CONTAINS
 
     FILE_TIMESTEP = TIMESTEP - FILE_FIRST_TIMESTEP
     !write(6,*) "FILE_TIMESTEP",FILE_TIMESTEP
-
+    
     ! Write time variable as an 8-byte real since NetCDF lacks 8-byte integer:
 
     STARTS1( 1 ) = FILE_TIMESTEP + 1

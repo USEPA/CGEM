@@ -80,7 +80,10 @@
        write(6,*) "Inputfile will be: ",trim(input_filename)
        write(6,*) "Initial Conditions filename will be: ",trim(init_filename)
        write(6,*) "Base Outputfile Name will be: ",trim(BASE_NETCDF_OUTPUT_FILE_NAME)
-       write(6,*) "COMT output filename will be: ", trim(comt_filename)
+ 
+       if(Which_code.eq."CGEM") then
+          write(6,*) "COMT output filename will be: ", trim(comt_filename)
+       endif
 
        return
 
