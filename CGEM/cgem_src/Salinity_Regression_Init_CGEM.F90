@@ -117,12 +117,6 @@ Subroutine Salinity_Regression_Init_CGEM()
     enddo
     enddo
 
-#ifdef DEBUG
- write(6,*) "-Salinity_Regression_Init_CGEM--"
- write(6,*) "CDOM, i,j,k=",f(icent,jcent,1,iCDOM),icent,jcent,1
- write(6,*) 
-#endif
-
 
 END Subroutine Salinity_Regression_Init_CGEM
 

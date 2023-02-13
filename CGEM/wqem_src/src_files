@@ -2,18 +2,18 @@
 # source file changes.
 # Note modules must be compiled in bottom-up dependency order.
 
-GD_OBJ =INPUT_VARS_GD.o\
+WQEM_OBJ =INPUT_VARS_WQEM.o\
 	states.o\
 	eut.o\
 	flags.o\
 	InRemin.o\
-	MASS_BALANCE_GD.o\
-	OUTPUT_NETCDF_GD.o\
-	GoMDOM.o\
-	Write_InputFile_GD.o\
-	Read_InputFile_GD.o\
-	Flux_GD.o\
-	Set_Initial_Conditions_GD.o\
+	MASS_BALANCE_WQEM.o\
+	OUTPUT_NETCDF_WQEM.o\
+	WQEM.o\
+	Write_InputFile_WQEM.o\
+	Read_InputFile_WQEM.o\
+	Flux_WQEM.o\
+	Set_Initial_Conditions_WQEM.o\
 	zoo.o\
 	diatoms.o\
 	diatoms_droop.o\
@@ -28,11 +28,11 @@ GD_OBJ =INPUT_VARS_GD.o\
 	dissolved_oxygen.o\
 	exchange.o\
 	exchange_droop.o\
-	GD_Light_Model.o\
+	WQEM_Light_Model.o\
 	Brad_Light_Model.o\
-	Allocate_Input_GD.o\
-	Init_Output_GD.o\
-	Salinity_Regression_Init_GD.o\
-	Transport_GD.o\
-	Model_Output_GD.o\
-	Model_Finalize_GD.o
+	Allocate_Input_WQEM.o\
+	Init_Output_WQEM.o\
+	Salinity_Regression_Init_WQEM.o\
+	Transport_WQEM.o\
+	Model_Output_WQEM.o\
+	Model_Finalize_WQEM.o

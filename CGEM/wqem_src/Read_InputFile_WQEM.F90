@@ -1,8 +1,8 @@
-Subroutine Read_InputFile_GD(filename,myid,numprocs)
+Subroutine Read_InputFile_WQEM(filename,myid,numprocs)
 
 USE Model_dim
 USE INPUT_VARS
-USE INPUT_VARS_GD
+USE INPUT_VARS_WQEM
 USE STATES
 USE EUT
 USE FLAGS
@@ -12,11 +12,9 @@ use mpi_interface
 
 IMPLICIT NONE
 
-integer icent_jcent_units
 character(120), intent(in) :: filename
 integer, intent(in) :: myid, numprocs
 integer mpierr
-real icent_in, jcent_in
 
 ws = 0.
 
@@ -30,10 +28,6 @@ read(999,*)
 read(999,*) iYrS,iMonS,iDayS,iHrS,iMinS,iSecS
 read(999,*) iYrE,iMonE,iDayE,iHrE,iMinE,iSecE
 read(999,*) dT, dT_out
-read(999,*) icent_jcent_units
-read(999,*) icent_in, jcent_in
-icent = INT(icent_in)
-jcent = INT(jcent_in)
 
 read(999,*)
 !--Switches in GEM---------
@@ -70,7 +64,7 @@ read(999,*) m_OM_init,m_OM_bc,m_OM_sh
 read(999,*) DoDroop
 !---------------------------------------------------
 
-!--GOMDOM params------------------------------------------------
+!--WQEM params------------------------------------------------
 read(999,*)
 read(999,*)             !C
 read(999,*)             !C  FIREAD file
@@ -318,8 +312,6 @@ call MPI_BCAST(iYrS,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
 call MPI_BCAST(dT,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
 call MPI_BCAST(dT_out,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
 call MPI_BCAST(dT_restart,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-call MPI_BCAST(icent,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
-call MPI_BCAST(jcent,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
 
 call MPI_BCAST(Which_Fluxes,9,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
 call MPI_BCAST(Read_Solar,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
@@ -560,4 +552,4 @@ endif
 
       return
 
-END Subroutine Read_InputFile_GD
+END Subroutine Read_InputFile_WQEM

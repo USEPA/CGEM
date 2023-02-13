@@ -166,6 +166,7 @@
           write(6,*) "k,Sw,Chl,CDOM,OM1A,OM1Z,OM1R,OM1BC",k,aSw_mid,aChl490_mid, aCDOM490_mid , aOM1A490_mid , &
             aOM1Z490_mid , aOM1R490_mid,aOM1BC490_mid
           write(6,*) "numdepths,d_sfc(:)",numdepths,d_sfc
+          write(6,*) "totChl(k)(:)", totChl
           stop
       endif
    enddo

@@ -1,6 +1,6 @@
-       Subroutine Model_Finalize_GD(myid,numprocs)
+       Subroutine Model_Finalize_WQEM(myid,numprocs)
 
-       USE OUTPUT_NETCDF_GD
+       USE OUTPUT_NETCDF_WQEM
 
        IMPLICIT NONE
 
@@ -12,4 +12,4 @@
 
        return
 
-       End Subroutine Model_Finalize_GD
+       End Subroutine Model_Finalize_WQEM

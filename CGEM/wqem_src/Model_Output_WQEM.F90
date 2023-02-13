@@ -1,4 +1,4 @@
-      Subroutine Model_Output_GD(istep_out,myid,numprocs)
+      Subroutine Model_Output_WQEM(istep_out,myid,numprocs)
 
       !
       ! 02/21/2020  Wilson Melendez, Commented out loop that was
@@ -7,7 +7,7 @@
 
       USE Model_dim
       USE State_Vars
-      USE OUTPUT_NETCDF_GD
+      USE OUTPUT_NETCDF_WQEM
       USE Grid
       USE states 
       USE OUTPUT

@@ -170,12 +170,6 @@
             enddo
          enddo
 
-#ifdef DEBUG
-write(6,*) "---Adv3D---"
-write(6,*) "  Which_adv=",Which_adv
-if(numprocs.eq.1) write(6,*) "f(1)=",f(icent,jcent,1,1)
-write(6,*)
-#endif
 
       RETURN 
       END 

@@ -28,7 +28,7 @@ USE Model_dim
 USE FLAGS, ONLY: DO_DO2
 USE STATES
 USE EUT
-USE MASS_BALANCE_GD
+USE MASS_BALANCE_WQEM
 
 
 IMPLICIT NONE
@@ -327,7 +327,7 @@ IF (DO_DO2) THEN
 
 ENDIF
 
-!Sediment fluxes in Flux_GoMDOM.F90
+!Sediment fluxes in Flux_WQEM.F90
 
 !
 !------------------------------------------------------------------------------

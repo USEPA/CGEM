@@ -10,9 +10,9 @@
 
          call CGEM( TC_8, istep, istep_out, myid, numprocs )
 
-       else if(Which_code.eq."GOMDOM") then !GOMDOM
+       else if(Which_code.eq."WQEM") then !WQEM
 
-         call GOMDOM( TC_8 )
+         call WQEM( TC_8 )
 
        else
 

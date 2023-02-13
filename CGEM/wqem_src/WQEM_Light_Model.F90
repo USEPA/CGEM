@@ -1,4 +1,4 @@
-SUBROUTINE GD_Light_Model(f,S,Rad,PAR,dz)
+SUBROUTINE WQEM_Light_Model(f,S,Rad,PAR,dz)
 !------------------------------------------------------------------------------
 !
 !Input: Rad in Watts...actually, just convert it to Watts for this one
@@ -33,7 +33,7 @@ endif
 
 if(Read_Solar.eq.2) Rad_Watts = Rad/4.57
 
-!GoMDOM LIGHT MODEL, No Wind Speed
+!WQEM LIGHT MODEL, No Wind Speed
  do j = 1,jm
      myi = 1
      do i = myi_start,myi_end
@@ -90,4 +90,4 @@ if(Read_Solar.eq.2) Rad_Watts = Rad/4.57
 
 RETURN
 
-END SUBROUTINE GD_Light_Model 
+END SUBROUTINE WQEM_Light_Model 

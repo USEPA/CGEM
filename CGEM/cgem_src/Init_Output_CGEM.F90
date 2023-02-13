@@ -1,4 +1,4 @@
-       Subroutine Init_Output_CGEM(BASE_NETCDF_OUTPUT_FILE_NAME,comt_filename,myid,numprocs)
+       Subroutine Init_Output_CGEM(BASE_NETCDF_OUTPUT_FILE_NAME,DIntRates_filename,myid,numprocs)
 
        USE Model_dim
        USE INPUT_VARS, ONLY: nstep,dT_out,IYRS,IMONS,&
@@ -14,7 +14,7 @@
        IMPLICIT NONE
 
        character(100),intent(in) :: BASE_NETCDF_OUTPUT_FILE_NAME
-       character(100),intent(in) :: comt_filename
+       character(100),intent(in) :: DIntRates_filename
        character(256) :: NETCDF_OUTPUT_FILE_NAME
        real :: dumf(myim,jm,km,nf)
        integer :: i,j,k,nz,myi,myid,numprocs,mpierr
@@ -45,11 +45,11 @@
 !For a model inter-comparison study through the Coastal Ocean Modeling Testbed
       if (MC .eq. 1) then
           if(myid .eq. 0) then
-             CALL CREATE_FILE_MC(trim(comt_filename), im, jm, km, iYr0, LON, LAT, FM, code_id)
+             CALL CREATE_FILE_MC(trim(DIntRates_filename), im, jm, km, iYr0, LON, LAT, FM, code_id)
              CALL CLOSE_FILE_MC()
           endif
           CALL MPI_BARRIER( MPI_COMM_WORLD, mpierr ) ! Wait until file is created.
-          CALL OPEN_FILE_MC(trim(comt_filename))
+          CALL OPEN_FILE_MC(trim(DIntRates_filename))
       endif
 
 

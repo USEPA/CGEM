@@ -8,9 +8,9 @@ if(Which_code.eq."CGEM") then !CGEM
 
      call Set_Initial_Conditions_CGEM()
 
-else if(Which_code.eq."GOMDOM") then !GOMDOM
+else if(Which_code.eq."WQEM") then !WQEM
 
-     call Set_Initial_Conditions_GD() 
+     call Set_Initial_Conditions_WQEM() 
 
 else
 

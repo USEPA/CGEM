@@ -1,7 +1,7 @@
-Subroutine Write_InputFile_GD()
+Subroutine Write_InputFile_WQEM()
 
 USE INPUT_VARS
-USE INPUT_VARS_GD
+USE INPUT_VARS_WQEM
 USE STATES
 USE EUT
 USE FLAGS
@@ -9,11 +9,8 @@ USE FLAGS
 IMPLICIT NONE
 
 
-integer icent_jcent_units
-real i_in,j_in
-
 !--Code Identifier--------------
-open(unit=999,file="GD_debug.txt",form='formatted',status='unknown')
+open(unit=999,file="WQEM_debug.txt",form='formatted',status='unknown')
 write(999,*) "code_ID",code_ID
 write(999,*)
 !--Simulation specifics------
@@ -21,8 +18,6 @@ write(999,*)
 write(999,*) "iYrS,iMonS,iDayS,iHrS,iMinS,iSecS",iYrS,iMonS,iDayS,iHrS,iMinS,iSecS
 write(999,*) "iYrE,iMonE,iDayE,iHrE,iMinE,iSecE",iYrE,iMonE,iDayE,iHrE,iMinE,iSecE
 write(999,*) "dT, dT_out",dT, dT_out
-write(999,*) "icent_jcent_units",icent_jcent_units
-write(999,*) "i_in, j_in",i_in, j_in
 write(999,*)
 !--Switches in GEM---------
 write(999,*)
@@ -39,7 +34,7 @@ write(999,*) "m_OM_init,m_OM_bc,m_OM_sh",m_OM_init,m_OM_bc,m_OM_sh
 write(999,*) "DoDroop",DoDroop
 !---------------------------------------------------
 
-!--GOMDOM params------------------------------------------------
+!--WQEM params------------------------------------------------
 write(999,*)             !C
 write(999,*)             !C  FIREAD file
 write(999,*)             !C
@@ -267,4 +262,4 @@ write(999,*) ws(JLOP)  ! VLOP
 write(999,*) ws(JROP)  ! VROP
 write(999,*) ws(JSU)   ! VSU
 
-END Subroutine Write_InputFile_GD
+END Subroutine Write_InputFile_WQEM

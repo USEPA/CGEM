@@ -8,8 +8,8 @@
 
        if(Which_code.eq."CGEM") then !CGEM
          call Flux_CGEM(TC_8, istep, myid, numprocs)
-       else if(Which_code.eq."GOMDOM") then !GOMDOM
-         call Flux_GD(TC_8, istep, myid, numprocs)
+       else if(Which_code.eq."WQEM") then !WQEM
+         call Flux_WQEM(TC_8, istep, myid, numprocs)
        else
          write(6,*) "Model ",Which_code," not found, Exiting."
          stop

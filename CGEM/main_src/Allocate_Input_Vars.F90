@@ -1,7 +1,6 @@
-Subroutine Allocate_Input_Vars(Which_code)
+	Subroutine Allocate_Input_Vars(Which_code)
 
 USE Input_Vars
-USE Model_dim, ONLY: im,jm
 
 IMPLICIT NONE
 
@@ -11,9 +10,9 @@ if(Which_code.eq."CGEM") then !CGEM
 
          call Allocate_Input_CGEM()
 
-else if(Which_code.eq."GOMDOM") then !GOMDOM
+else if(Which_code.eq."WQEM") then !WQEM
 
-         call Allocate_Input_GD()
+         call Allocate_Input_WQEM()
 
 else
 
@@ -22,26 +21,7 @@ else
 
 endif
 
-         call Allocate_Input()
-         if(im*jm.eq.1) then
-             icent=1
-             jcent=1
-         endif
-
-#ifdef debug
-         if(icent.gt.im)then
-           write(6,*) "icent>im"
-           stop
-         endif
-         if(jcent.gt.jm) 
-          write(6,*) "jcent>jm"
-          stop
-         endif
-
-write(6,*) "---Allocate_Input---"
-write(6,*) "   first separate for CGEM and GD, then for shared"
-write(6,*)
-#endif
+call Allocate_Input()
 
 return
 END SUBROUTINE Allocate_INPUT_VARS

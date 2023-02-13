@@ -24,7 +24,7 @@
   real :: OM1_BC(km)  ! Concentration of particulate
                        ! initial and boundary condition
                        ! generated SPM (g/m3)
-  real :: PARsurf(im,jm),PAR_percent(km), PARbot     ! Not used in GD Light Model 
+  real :: PARsurf(im,jm),PAR_percent(km), PARbot     ! Not used in WQEM Light Model 
   integer(kind=8), intent(in) :: TC_8  ! Model time (seconds from beginning of Jan 1, 2002)
 ! Time variables
     real, parameter :: OneD60     = 1.0/60.0  ! Convert 1/min to 1/sec

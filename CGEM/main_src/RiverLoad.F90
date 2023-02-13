@@ -160,7 +160,7 @@
             write(netcdf_riverload_fileNames(eRiv7), '(A, A)') trim(DATADIR), '/INPUT/DOP_RiverLoads.nc'
             write(netcdf_riverload_fileNames(eRiv8), '(A, A)') trim(DATADIR), '/INPUT/BOD1_RiverLoads.nc'
             write(netcdf_riverload_fileNames(eRiv9), '(A, A)') trim(DATADIR), '/INPUT/DO_RiverLoads.nc'
-         else if(Which_code.eq."GOMDOM") then 
+         else if(Which_code.eq."WQEM") then 
             write(netcdf_riverload_fileNames(eRiv1), '(A, A)') trim(DATADIR), '/INPUT/TP_RiverLoads.nc'
          else
            write(6,*) "Model ", Which_code," not found in RiverLoad.f90"
@@ -192,7 +192,7 @@
          fRv = 1
          if(Which_code.eq."CGEM") then
             lRv = 9;
-         else if(Which_code.eq."GOMDOM") then
+         else if(Which_code.eq."WQEM") then
             lRv = 1
          else
             write(6,*) "Model ",Which_code," not found in RiverLoad.f90"

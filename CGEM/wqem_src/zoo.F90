@@ -26,7 +26,7 @@ SUBROUTINE ZOO(f,DTM,TEMP,i,j,k)
 !-                                      on the zooplankton concentration. Added
 !-                                      documentation that explains the
 !-                                      rationale behind this change.
-!- Revised:  06/22/09  W. Melendez : ----> GOMDOM. This application is based
+!- Revised:  06/22/09  W. Melendez : ----> WQEM. This application is based
 !-                                      on LM3-Eutro (LM3 version 3.2.13) and 
 !-                                      its purpose is to serve as a dissolved
 !-                                      oxygen model for the Gulf of Mexico

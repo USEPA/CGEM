@@ -62,9 +62,9 @@
 
        call Set_Initial_Conditions_CGEM(init_filename,myid,numprocs)
 
-      else if(Which_code.eq."GOMDOM") then !GOMDOM
+      else if(Which_code.eq."WQEM") then !WQEM
 
-       call Set_Initial_Conditions_GD(init_filename,myid,numprocs)
+       call Set_Initial_Conditions_WQEM(init_filename,myid,numprocs)
 
       else
 

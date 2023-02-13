@@ -1,4 +1,4 @@
-SUBROUTINE GOMDOM(TC_8)
+SUBROUTINE WQEM(TC_8)
 !------------------------------------------------------------------------------
 !
 
@@ -8,7 +8,7 @@ USE Hydro
 USE State_Vars
 USE STATES
 USE INPUT_VARS, ONLY: Read_Solar,ws,dT
-USE INPUT_VARS_GD, ONLY : Which_Fluxes,Which_irradiance
+USE INPUT_VARS_WQEM, ONLY : Which_Fluxes,Which_irradiance
 USE EUT
 USE Which_Flux
 USE InRemin
@@ -38,7 +38,7 @@ if(Which_irradiance.eq.0) then
     PAR(:,:,1) = PAR(:,:,1) * .47 * 4.57 /2.77e14  
   endif 
 elseif(Which_irradiance.eq.1) then
-  call GD_Light_Model(f,S,Rad,PAR,dz)
+  call WQEM_Light_Model(f,S,Rad,PAR,dz)
 elseif(Which_irradiance.eq.2) then
   call Brad_Light_Model(f,TC_8,lat,lon,Rad,d,d_sfc,PAR)
 else
@@ -185,4 +185,4 @@ endif
 
 RETURN
 
-END SUBROUTINE GOMDOM
+END SUBROUTINE WQEM

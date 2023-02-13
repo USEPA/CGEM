@@ -43,8 +43,8 @@
       T_in_K  = T + 273.15 !Temp. in Kelvin
       Tref_in_K(:) = Tref(:) + 273.15 !Temp. in Kelvin 
       Tadj(:) = exp ( -(Ea(:)/k_b) * ( 1./T_in_K - 1./Tref_in_K(:) ) ) 
-    else if (Which_temperature.eq.4) then !GoMDOM temperature functions
-      call T_GoMDOM(T, Tadj)
+    else if (Which_temperature.eq.4) then !WQEM temperature functions
+      call T_WQEM(T, Tadj)
     else  
       write(6,*) "Error in func_T"
       stop
