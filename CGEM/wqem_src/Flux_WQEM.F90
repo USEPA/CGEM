@@ -1,4 +1,4 @@
-       Subroutine Flux_GD(TC_8, istep, myid, numprocs)
+       Subroutine Flux_WQEM(TC_8, istep, myid, numprocs)
 
        USE Model_dim
        USE Grid
@@ -7,7 +7,7 @@
        USE Which_Flux
        USE STATES
        USE INPUT_VARS
-       USE INPUT_VARS_GD
+       USE INPUT_VARS_WQEM
        USE InRemin
        USE MOD_UTILITIES
 
@@ -124,7 +124,7 @@ endif
 
 
 if(Which_Fluxes(iDICsurf).eq.1) then
-  write(6,*) "DO NOT USE DIC surface flux in GoMDOM, no CO2 flux"
+  write(6,*) "DO NOT USE DIC surface flux in WQEM, no CO2 flux"
   stop
 endif
 
@@ -210,4 +210,4 @@ endif
 
        RETURN
 
-       END Subroutine Flux_GD
+       END Subroutine Flux_WQEM

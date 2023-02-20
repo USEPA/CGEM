@@ -12,8 +12,8 @@ CGEM_OBJ  =  CGEM_Flux.o\
 	Sediment_Diagenesis_Routines.o\
 	Model_Diagenesis.o\
 	MATLAB.o\
-	T_GoMDOM.o\
-	Light_GoMDOM.o\
+	T_WQEM.o\
+	Light_WQEM.o\
 	MASS_BALANCE_CGEM.o\
 	DailyRad.o\
 	Calc_Chla.o \

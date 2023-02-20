@@ -1,4 +1,4 @@
-       Subroutine Set_Initial_Conditions_GD(init_filename,myid,numprocs) 
+       Subroutine Set_Initial_Conditions_WQEM(init_filename,myid,numprocs) 
 
        USE Model_dim
        USE INPUT_VARS, ONLY: InitializeHow
@@ -30,7 +30,7 @@
 
        elseif(InitializeHow.eq.1) then !Salinity Regression Equations
 
-        call Salinity_Regression_Init_GD()
+        call Salinity_Regression_Init_WQEM()
         do j=1,jm
           myi=1
           do i=myi_start,myi_end
@@ -44,10 +44,10 @@
        endif
 
 #ifdef DEBUG
-      write(6,*) "In Set Initial Conditions GD,myid=",myid
+      write(6,*) "In Set Initial Conditions WQEM,myid=",myid
       write(6,*)
 #endif
 
        return
 
-       End Subroutine Set_Initial_Conditions_GD
+       End Subroutine Set_Initial_Conditions_WQEM

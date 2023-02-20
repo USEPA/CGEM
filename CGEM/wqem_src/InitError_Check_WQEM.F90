@@ -1,9 +1,8 @@
-      Subroutine InitError_Check_CGEM()
+      Subroutine InitError_Check_WQEM()
 
       USE Model_dim
-      USE CGEM_VARS
-      USE INPUT_VARS_CGEM, ONLY:QminN,QminP,QmaxN,QmaxP
-      USE State_Vars
+      USE EUT
+      USE STATES
 
       implicit none
  

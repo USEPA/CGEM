@@ -1,10 +1,10 @@
-      Subroutine Command_Line_Args(Which_code,input_filename,init_filename,BASE_NETCDF_OUTPUT_FILE_NAME, comt_filename)
+      Subroutine Command_Line_Args(Which_code,input_filename,init_filename,BASE_NETCDF_OUTPUT_FILE_NAME, DIntRates_filename)
 
       character(120),intent(out) :: input_filename !Input file
       character(120),intent(out) :: init_filename !Initial conditions file
       character(6), intent(out) ::  Which_code     
       character(100), intent(out) :: BASE_NETCDF_OUTPUT_FILE_NAME
-      character(100), intent(out) :: comt_filename
+      character(100), intent(out) :: DIntRates_filename
 
       integer c_count
 
@@ -18,7 +18,7 @@
          input_filename = "GEM_InputFile"
          init_filename = "InitialConditions.txt"
          BASE_NETCDF_OUTPUT_FILE_NAME = './NETCDF/cgem.'
-         comt_filename = './NETCDF/CGEM_for_COMT.nc'
+         DIntRates_filename = './NETCDF/CGEM_DailyIntegrated_Rates.nc'
 
        if (c_count.gt.0) then
          call get_command_argument(1,Which_code)  !User selects which code
@@ -26,12 +26,12 @@
          if(Which_code.eq."CGEM".or.Which_code.eq."cgem") then
            Which_code = "CGEM"
          endif
-         !Some spellings for gomdom
-         if(Which_code.eq."GOMDOM".or.Which_code.eq."GoMDOM".or.Which_code.eq."gomdom") then
-           Which_code = "GOMDOM"
-           input_filename = "GOMDOM_InputFile"
-           init_filename = "InitialConditions_GD.txt"
-           BASE_NETCDF_OUTPUT_FILE_NAME = './NETCDF/gomdom.'
+         !Some spellings for wqem
+         if(Which_code.eq."WQEM" .or. Which_code.eq."wqem") then
+           Which_code = "WQEM"
+           input_filename = "WQEM_InputFile"
+           init_filename = "InitialConditions_WQEM.txt"
+           BASE_NETCDF_OUTPUT_FILE_NAME = './NETCDF/wqem.'
          endif
        endif
 
@@ -39,7 +39,7 @@
          if(Which_code.eq."CGEM") then
           init_filename = "InitialConditions.lt.txt"
          else
-          init_filename = "InitialConditions_GD.lt.txt"
+          init_filename = "InitialConditions_WQEM.lt.txt"
          endif
 
 #endif
@@ -47,7 +47,7 @@
          if(Which_code.eq."CGEM") then
           init_filename = "InitialConditions.lt.txt"
          else
-          init_filename = "InitialConditions_GD.lt.txt"
+          init_filename = "InitialConditions_WQEM.lt.txt"
          endif
 #endif
 
@@ -55,7 +55,7 @@
          if(Which_code.eq."CGEM") then
           init_filename = "InitialConditions.lt.txt"
          else
-          init_filename = "InitialConditions_GD.ltnt.txt"
+          init_filename = "InitialConditions_WQEM.ltnt.txt"
          endif
 #endif
 
@@ -73,7 +73,7 @@
        endif
 
        if (c_count.gt.4) then
-         call get_command_argument(5,comt_filename) !User selects comt file name
+         call get_command_argument(5,DIntRates_filename) !User selects daily-integrated rates file name
        endif
 
        write(6,*) "Biogeochem equations are: ",Which_code
@@ -82,7 +82,7 @@
        write(6,*) "Base Outputfile Name will be: ",trim(BASE_NETCDF_OUTPUT_FILE_NAME)
  
        if(Which_code.eq."CGEM") then
-          write(6,*) "COMT output filename will be: ", trim(comt_filename)
+          write(6,*) "Daily-Integrated Rates output filename will be: ", trim(DIntRates_filename)
        endif
 
        return

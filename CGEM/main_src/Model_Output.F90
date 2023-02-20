@@ -11,9 +11,9 @@
 
          call Model_Output_CGEM( istep_out,myid,numprocs )
 
-       else if(Which_code.eq."GOMDOM") then !GOMDOM
+       else if(Which_code.eq."WQEM") then !WQEM
 
-         call Model_Output_GD( istep_out,myid,numprocs )
+         call Model_Output_WQEM( istep_out,myid,numprocs )
 
        else
 

@@ -20,13 +20,13 @@ if(Which_code.eq."CGEM") then !CGEM
        write(6,*) "DEBUG: Wrote Debug_InputFile"
 #endif
 
-else if(Which_code.eq."GOMDOM") then !GOMDOM
+else if(Which_code.eq."WQEM") then !WQEM
 
- call Read_InputFile_GD(input_filename,myid,numprocs)
+ call Read_InputFile_WQEM(input_filename,myid,numprocs)
 
 #ifdef DEBUG
 !This will check if Read_InputFile is correctly reading
-       if(myid.eq.0) call Write_InputFile_GD()
+       if(myid.eq.0) call Write_InputFile_WQEM()
        write(6,*) "DEBUG: Wrote Debug_InputFile"
 #endif
 

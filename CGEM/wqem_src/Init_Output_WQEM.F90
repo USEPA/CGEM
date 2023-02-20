@@ -1,4 +1,4 @@
-       Subroutine Init_Output_GD(BASE_NETCDF_OUTPUT_FILE_NAME,myid,numprocs)
+       Subroutine Init_Output_WQEM(BASE_NETCDF_OUTPUT_FILE_NAME,myid,numprocs)
 
        !
        ! 02/21/2020  Wilson Melendez, Commented out loop that was
@@ -11,7 +11,7 @@
      & IMINE, ISECE
        USE Grid
        USE State_Vars
-       USE OUTPUT_NETCDF_GD
+       USE OUTPUT_NETCDF_WQEM
        USE states
        USE OUTPUT
 
@@ -23,7 +23,7 @@
        real :: dumf(myim,jm,km,nf)
 
        ! Change True/False parameters for netCDF Write Variables
-       !L3 add Which_Output to GD InputFile
+       !L3 add Which_Output to WQEM InputFile
        !if(Which_Output.eq.2) call OUTPUT_ALL_FALSE() 
 
        WRITE ( NETCDF_OUTPUT_FILE_NAME, '(A, I6.6, A)' )&
@@ -67,4 +67,4 @@
         CALL MPI_BARRIER( MPI_COMM_WORLD,mpierr ) ! Wait until file is updated.
 
        return
-       End Subroutine Init_Output_GD
+       End Subroutine Init_Output_WQEM

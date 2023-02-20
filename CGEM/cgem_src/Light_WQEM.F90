@@ -1,5 +1,5 @@
 !---------------------------------------------------------------------------
-  SUBROUTINE Light_GoMDOM(PARsurf, S, A, Z, OM1A, OM1Z, OM1R, OM1BC, dz, PAR_percent, PARbot, PARdepth, nz  )   
+  SUBROUTINE Light_WQEM(PARsurf, S, A, Z, OM1A, OM1Z, OM1R, OM1BC, dz, PAR_percent, PARbot, PARdepth, nz  )   
 !---------------------------------------------------------------------------
 
   USE Model_dim
@@ -12,7 +12,7 @@
   !   PAR 
   ! 
   ! REFERENCES:
-  !   GoMDOM model code
+  !   WQEM model code
   !------------------------------------------------------------------------
     IMPLICIT NONE
 
@@ -64,4 +64,4 @@
 
     RETURN
 
-  END SUBROUTINE Light_GoMDOM  
+  END SUBROUTINE Light_WQEM  

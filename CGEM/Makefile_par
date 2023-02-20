@@ -31,13 +31,13 @@ include main_src/src_files_par
 include moc_src/src_files
 # include sdm_src/src_files
 include cgem_src/src_files
-include gd_src/src_files
+include wqem_src/src_files
 
 maindir=main_src
 mocdir=moc_src
 # sdmdir=sdm_src
 cgemdir=cgem_src
-gddir=gd_src
+wqemdir=wqem_src
 
 ### These lines should seldom change! ###
 EXE	= CGEM 
@@ -65,8 +65,8 @@ else
 endif
 endif
 
-FishTank: ${PAR_OBJ} ${SER_OBJ} ${MAIN_OBJ} ${MOC_OBJ} ${CGEM_OBJ} ${GD_OBJ}
-	$(F90) -o $(EXE) $(FFLAGS) $(DFLAGS) $(INC) $(PAR_OBJ) $(SER_OBJ) $(MAIN_OBJ) ${MOC_OBJ} ${CGEM_OBJ} ${GD_OBJ} $(LIBS)
+FishTank: ${PAR_OBJ} ${SER_OBJ} ${MAIN_OBJ} ${MOC_OBJ} ${CGEM_OBJ} ${WQEM_OBJ}
+	$(F90) -o $(EXE) $(FFLAGS) $(DFLAGS) $(INC) $(PAR_OBJ) $(SER_OBJ) $(MAIN_OBJ) ${MOC_OBJ} ${CGEM_OBJ} ${WQEM_OBJ} $(LIBS)
 
 
 #
@@ -93,7 +93,7 @@ $(OBJ):%.o: %.F90
 $(CGEM_OBJ):%.o: $(cgemdir)/%.F90
 	$(F90) $(INC) -c $(FFLAGS) $(DFLAGS)   $<
 
-$(GD_OBJ):%.o: $(gddir)/%.F90
+$(WQEM_OBJ):%.o: $(wqemdir)/%.F90
 	$(F90) $(INC) -c $(FFLAGS) $(DFLAGS)  $<
 
 $(PAR_OBJ):%.o: $(maindir)/%.F90

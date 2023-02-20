@@ -1,4 +1,4 @@
-Module MASS_BALANCE_GD 
+Module MASS_BALANCE_WQEM 
 
 IMPLICIT NONE
 
@@ -12,7 +12,7 @@ REAL,ALLOCATABLE :: SUM_DOCZOO(:,:,:)    ! C loss to zooplankton mortality
 
 contains
 
-Subroutine MASS_BALANCE_GD_allocate
+Subroutine MASS_BALANCE_WQEM_allocate
 
 USE Model_dim
 
@@ -34,6 +34,6 @@ SUM_DOCZOO = 0.
 
 return
 
-END Subroutine MASS_BALANCE_GD_allocate
+END Subroutine MASS_BALANCE_WQEM_allocate
 
-END Module MASS_BALANCE_GD
+END Module MASS_BALANCE_WQEM

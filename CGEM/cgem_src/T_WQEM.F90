@@ -1,5 +1,5 @@
 !---------------------------------------------------------------------------
-  SUBROUTINE T_GoMDOM( T, Tadj )   
+  SUBROUTINE T_WQEM( T, Tadj )   
 !---------------------------------------------------------------------------
 
   USE Model_dim
@@ -67,4 +67,4 @@
     enddo
 
     RETURN
-  END SUBROUTINE T_GoMDOM  
+  END SUBROUTINE T_WQEM  

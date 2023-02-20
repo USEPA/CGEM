@@ -19,7 +19,6 @@ character(150) code_ID
 integer iYrS,iMonS,iDayS,iHrS,iMinS,iSecS
 integer iYrE,iMonE,iDayE,iHrE,iMinE,iSecE
 integer dT, dT_out, dT_restart, dT_sed
-integer icent,jcent
 
 !--Switches ---------
 integer Read_Solar,Read_Wind,Read_T,Read_Sal 

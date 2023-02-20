@@ -10,9 +10,9 @@
 
           call Transport_CGEM(myid,numprocs)
 
-       else if(Which_code.eq."GOMDOM") then !GOMDOM
+       else if(Which_code.eq."WQEM") then !WQEM
 
-         call Transport_GD(myid,numprocs)
+         call Transport_WQEM(myid,numprocs)
 
        else
 

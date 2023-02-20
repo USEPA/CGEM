@@ -213,7 +213,7 @@
     real, dimension(nospA+nospZ) :: Tadj ! Temperature adjustment factor
     real :: Q10_T                        ! Temperature adjustment Q10 relation
 !------------------------------------------------------------------    
-! COMT
+! Daily Integrated Rates
     integer, save  ::  i_out, print_file ! Counters for netCDF file
     integer :: istart, iend, jstart, jend, my_im, my_istart, fstart, fend
     real, dimension(myim,jm) :: FPOM_out
@@ -305,6 +305,8 @@
                    do isp = 1, nospA          
                       A_k(isp,k) = f(myi,j,k,isp) ! Phytoplankton in group isp, cells/m3
                    enddo 
+ !                  WRITE(6,*) "myi, j, k, nz, A_k(isp,k) = ", myi, j, k, nz, A_k(1,k)
+ !                  WRITE(6,*) "myi, j, k, nz, f(myi,j,k,isp) = ", myi, j, k, nz, f(myi,j,k,1)
                    CDOM_k(k)  = f(myi,j,k,iCDOM)  ! CDOM is in ppb
                                  ! Convert mmol/m3 to g carbon/m3; CF_SPM is river specific
                                  ! and converts river OM to riverine SPM
@@ -478,6 +480,10 @@
                   enddo
                 enddo
 
+!                IF (nz > 0) THEN
+!                    WRITE(6,*) "f(myi,j,:,iA(1)) = ", f(myi,j,:,iA(1))
+!                    WRITE(6,*) "myi, j, Chla_tot_k(:) = ", myi, j, Chla_tot_k(:) 
+!                ENDIF
                  if(nz.gt.0) call Call_IOP_PAR(                        &
                  & PARsurf    , SunZenithAtm,                          &
                  & CDOM_k     , Chla_tot_k,                            &
@@ -525,10 +531,10 @@
 
 
                  !-------------------------------------------------
-         case (3)! Light Model from GoMDOM, case with no wind speed
+         case (3)! Light Model from WQEM, case with no wind speed
                  !-------------------------------------------------
-                 !GoMDOM's light model, no wind
-                  if(nz.gt.0) call Light_GoMDOM(PARsurf, S_k, A_k, Z_k,    &
+                 !WQEM's light model, no wind
+                  if(nz.gt.0) call Light_WQEM(PARsurf, S_k, A_k, Z_k,    &
      &               OM1A_k, OM1Z_k, OM1SPM_k, OM1BC_k,        &
      &               dz(i,j,:), PAR_percent_k, PARbot, PARdepth_k, nz  )
 
@@ -1314,7 +1320,7 @@ enddo
 ! ----------------------------------------------------------------------
 
 !------------------------------------------------------------------------
-!  COMT
+!  Daily Integrated Rates
 !-----------------------------------------------------------------------
 if (MC .eq. 1) then
 
@@ -1370,14 +1376,17 @@ enddo
             do i = myi_start, myi_end
                 do k = 1, nza(i,j)
                    f(myi,j,k,:) = ff(myi,j,k,:)
+!                   WRITE(6,*) "myi, j, k, f(myi,j,k,iA(1)) = ", myi, j, k, f(myi,j,k,iA(1))
                 enddo
                 myi = myi + 1
             enddo
          enddo
+!         WRITE(6,*) "--------------------------------------------"
+
 !-- End Main GEM Calculations ---------------------------------------------------
 
 !--------------------------------------------------------------------------------
-!-- For inter-model comparison (COMT)
+!-- For inter-model comparison (Daily Integrated Rates)
 !--------------------------------------------------------------------------------
       if ( istep .eq. print_file ) then
          INT_PrimProd_MC = 0.0

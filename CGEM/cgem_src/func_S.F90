@@ -49,8 +49,8 @@
     KHSD = 1.13 !2.50E-05 * 3.6e4        ! KHSD: mean Si half sat (dia)
 
 
-!GoMDOM is 2.50E-05, ours is 1.13         ! KHSD: mean Si half sat (dia)
-!GoMDOM is kg/m3, ours is mmol/m3
+!WQEM is 2.50E-05, ours is 1.13         ! KHSD: mean Si half sat (dia)
+!WQEM is kg/m3, ours is mmol/m3
 ! Conversions:
 ! Si kg/m3 * mmol/28mg * 1e6 mg/kg = 3.6e4 
 ! N  kg/m3 * mmol/14mg * 1e6 mg/kg = 7.1e4
@@ -71,7 +71,7 @@
      &           ( Qn(:) - QminN(:) + KQn(:)*( QmaxN(:) - QminN(:) ) )
         f_P(:) = ( 1. + KQp(:) ) * ( Qp(:) - QminP(:) ) /        &
      &           ( Qp(:) - QminP(:) + KQp(:)*( QmaxP(:) - QminP(:) ) )
-    else if (Which_quota.eq.4) then !GoMDOM
+    else if (Which_quota.eq.4) then !WQEM
         do isp=1,nospA
            if(is_diatom(isp).eq.1) then !Diatoms
              f_N(isp) = N / ( N + KHND(isp) ) !Monod

@@ -23,8 +23,8 @@
       !Right now these just close the output netCDF files
       if(Which_code.eq."CGEM") then !CGEM
         call Model_Finalize_CGEM(myid,numprocs)
-      else if(Which_code.eq."GOMDOM") then !GOMDOM
-        call Model_Finalize_GD(myid,numprocs)
+      else if(Which_code.eq."WQEM") then !WQEM
+        call Model_Finalize_WQEM(myid,numprocs)
       else
         write(6,*) "Model ",Which_code," not found, Exiting."
         stop

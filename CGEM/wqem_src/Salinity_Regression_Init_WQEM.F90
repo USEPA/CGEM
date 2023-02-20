@@ -1,4 +1,4 @@
-      Subroutine Salinity_Regression_Init_GD()
+      Subroutine Salinity_Regression_Init_WQEM()
 
       USE Model_dim
       USE STATES 
@@ -105,13 +105,13 @@
       enddo
 
 #ifdef DEBUG
-write(6,*) "---Salinity_Regression_Init_GD"
+write(6,*) "---Salinity_Regression_Init_WQEM"
 write(6,*) 
 #endif
 
 
 
-      end subroutine Salinity_Regression_Init_GD
+      end subroutine Salinity_Regression_Init_WQEM
 
 
 !Regression y  =  b1*Salinity + b2*Depth + b3*Salinity^2 + b4*Depth^2 + Intercept

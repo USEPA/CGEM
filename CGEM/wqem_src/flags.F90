@@ -30,7 +30,7 @@ MODULE FLAGS
 !-                                   of what is in the model output files.
 !- Revised: 06/10/10  W. Melendez :  Added GENERATE_GEOGRAPHICAL_OUTPUT 
 !-                                   flag.  Added DO_TRACER flag.
-!- Revised: 06/22/09  W. Melendez : ----> GOMDOM. This application is based
+!- Revised: 06/22/09  W. Melendez : ----> WQEM. This application is based
 !-                                   on LM3-Eutro (LM3 version 3.2.13) and 
 !-                                   its purpose is to serve as a dissolved
 !-                                   oxygen model for the Gulf of Mexico

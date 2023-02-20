@@ -5,7 +5,7 @@
 ! HISTORY: 2010/04/26, Todd Plessel, plessel.todd@epa.gov, Created.
 !******************************************************************************
 
-MODULE OUTPUT_NETCDF_GD
+MODULE OUTPUT_NETCDF_WQEM
 
 !  USE netcdf
   USE xnetcdf
@@ -14,7 +14,7 @@ MODULE OUTPUT_NETCDF_GD
 
   USE Model_dim, ONLY: nf 
   USE INPUT_VARS
-  USE INPUT_VARS_GD
+  USE INPUT_VARS_WQEM
   USE STATES 
   USE LIGHT_VARS
   USE Which_Flux
@@ -37,7 +37,7 @@ MODULE OUTPUT_NETCDF_GD
 
 PUBLIC CREATE_FILE, OPEN_FILE, &
        WRITE_DATA, CLOSE_FILE, FLUSH_FILE, &
-       WRITE_EXTRA_DATA, OUTPUT_NETCDF_GD_allocate
+       WRITE_EXTRA_DATA, OUTPUT_NETCDF_WQEM_allocate
 
 PRIVATE
 CONTAINS
@@ -174,7 +174,7 @@ CONTAINS
     ! List Calibration Parameters
     CALL DEFTAT( FILE_ID, 'Calibration0', 'Calibration Parameters used for this run.')
 !Switches in GEM
-    CALL DEFTAT( FILE_ID, 'Calibration1', 'Switches in GoMDOM.')
+    CALL DEFTAT( FILE_ID, 'Calibration1', 'Switches in WQEM.')
     CALL DEFIAT( FILE_ID, 'Which_Fluxes(iO2surf)', Which_Fluxes(iO2surf) )
     CALL DEFIAT( FILE_ID, 'Which_Fluxes(iDICsurf)', Which_Fluxes(iDICsurf) )
     CALL DEFIAT( FILE_ID, 'Which_Fluxes(iSOC)', Which_Fluxes(iSOC) )
@@ -188,14 +188,14 @@ CONTAINS
     CALL DEFIAT( FILE_ID, 'Read_Sal', Read_Sal  )
     CALL DEFIAT( FILE_ID, 'Read_Wind', Read_Wind  )
 !Other Including Boundary Conditions
-    CALL DEFTAT( FILE_ID, 'Calibration8', 'Other Including Boundary Conditions in GoMDOM.')
+    CALL DEFTAT( FILE_ID, 'Calibration8', 'Other Including Boundary Conditions in WQEM.')
     CALL DEFIAT( FILE_ID, 'Which_VMix', Which_VMix  )
     CALL DEFRAT( FILE_ID, 'KH_coeff', KH_coeff )
     CALL DEFIAT( FILE_ID, 'Which_Outer_BC', Which_Outer_BC  )
     CALL DEFRAT( FILE_ID, 'm_OM_init', m_OM_init )
     CALL DEFRAT( FILE_ID, 'm_OM_bc', m_OM_bc )
     CALL DEFRAT( FILE_ID, 'm_OM_sh', m_OM_sh )
-!GoMDOM Parameters
+!WQEM Parameters
     CALL DEFRAT( FILE_ID, 'ALPHA_DIA', ALPHA_DIA  )
     CALL DEFRAT( FILE_ID, 'ALPHA_GRE', ALPHA_GRE  )
     CALL DEFRAT( FILE_ID, 'ANCP',ANCP  )
@@ -745,7 +745,7 @@ write(6,*) Variable, EXTRA_VARIABLE_NAMES( VARIABLE ), EXTRA_VAR( VARIABLE )
   !
   SUBROUTINE WRITE_EXTRA_DATA( IMSTART, IM, JMSTART, JM, KMSTART, KM, EXTRA_VARIABLES1, TIMESTEP) 
     USE OUTPUT 
-    USE MASS_BALANCE_GD
+    USE MASS_BALANCE_WQEM
     USE eut, ONLY:PD_AVG,PG_AVG,NITDO2,DOMETD_ARR,DOMETG_ARR,DOPREDD_ARR, &
 &       DOPREDG_ARR,DOZOO_ARR, DOMNLDOC_ARR, PFD, SFD, NFD, IFD, TFD,     &
 &       PFG, NFG, IFG, TFG, OUTPUT_PAR
@@ -1081,7 +1081,7 @@ write(6,*) Variable, EXTRA_VARIABLE_NAMES( VARIABLE ), EXTRA_VAR( VARIABLE )
 
 
 
-Subroutine OUTPUT_NETCDF_GD_allocate
+Subroutine OUTPUT_NETCDF_WQEM_allocate
 
   USE Model_dim
   USE OUTPUT 
@@ -1259,7 +1259,7 @@ Subroutine OUTPUT_NETCDF_GD_allocate
   ALLOCATE(F_VAR(nf)) ! NetCDF IDs for each variable.
   ALLOCATE(EXTRA_VAR(EXTRA_VARIABLES))  ! NetCDF IDs for extra vars.
 
-END Subroutine OUTPUT_NETCDF_GD_allocate
+END Subroutine OUTPUT_NETCDF_WQEM_allocate
 
-END MODULE OUTPUT_NETCDF_GD
+END MODULE OUTPUT_NETCDF_WQEM
 

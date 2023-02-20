@@ -20,7 +20,6 @@ write(999,*)
 write(999,*) "iYrS,iMonS,iDayS,iHrS,iMinS,iSecS",iYrS,iMonS,iDayS,iHrS,iMinS,iSecS
 write(999,*) "iYrE,iMonE,iDayE,iHrE,iMinE,iSecE",iYrE,iMonE,iDayE,iHrE,iMinE,iSecE
 write(999,*) "dT, dT_out", dT, dT_out
-write(999,*) "icent,jcent",icent,jcent
 write(999,*)
 !--Switches in GEM---------
 write(999,*)
