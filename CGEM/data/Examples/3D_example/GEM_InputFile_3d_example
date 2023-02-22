@@ -4,8 +4,6 @@
 2022     1     2      6     0     0		!- starting time Yr, Mon, Day, Hr, Min, Sec
 2022     1    21     18     0     0		!- ending   time Yr, Mon, Day, Hr, Min, Sec
 10 3600 8640 	        !- dT (timestep, seconds); dT_out (output interval, seconds); dT_sed (sediment diagenesis timestep, seconds)
-1		        !- How cell Location is specified:0==long-lat 1==grid-units
-12 12		!- Cell i,j coord (if grid-units) or longcent,latcent vals (if long-lat)
 
 !Switches in GEM
 1 1 0 0 0 0 0 0 !Which_fluxes: Toggle on(1) off(0): O2surf, DICsurf, Sediment Oxygen Consumption, Microphytobenthos, Sediment Nutrient Fluxes

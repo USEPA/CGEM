@@ -4,8 +4,6 @@
 2022     1     2     18     0     0		!- starting time Yr, Mon, Day, Hr, Min, Sec
 2022     1    21     18     0     0		!- ending   time Yr, Mon, Day, Hr, Min, Sec
 10 86400      	!- dT (timestep, secs); dT_out (output interval, secs); dT_restart (restart interval, secs)
-1		        !- How cell Location is specified:0==long-lat 1==grid-units
-12 12		!- Cell i,j coord (if grid-units) or longcent,latcent vals (if long-lat)
 
 !Switches in GEM
 0 0 0 0 0 0 0 0	0 !Which_Fluxes: Toggle on(1) off(0): O2surf, DICsurf, SOD, MPB, Nutrient Exchange, CMAQ, 
