@@ -128,19 +128,22 @@ endif
 !---------------------------------------------------------------
 ! Add river loads.
 !---------------------------------------------------------------
-do i=1,nriv             ! Loop over the rivers
+do i = 1, nriv             ! Loop over the rivers
   icell = riversIJ(i,1) ! Extract the i index of grid cell where river discharges
   jcell = riversIJ(i,2) ! Extract the j index of grid cell where river discharges
-  do k=1,nsl            ! Loop over the sigma layers
-    rivLoadConvFactor = weights(i,k) / Vol(icell,jcell,k)
-    DTM(icell,jcell,k,JTR) = DTM(icell,jcell,k,JTR) + Riv1(i) * rivLoadConvFactor
-  enddo
+  if ((icell .ge. myi_start) .and. (icell .le. myi_end)) then
+      myi = icell - myi_start + 1
+      do k = 1, nsl            ! Loop over the sigma layers
+         rivLoadConvFactor = weights(i,k) / Vol(icell,jcell,k)
+         DTM(myi,jcell,k,JTR) = DTM(myi,jcell,k,JTR) + Riv1(i) * rivLoadConvFactor
+      enddo
+  endif
 enddo
 
 
- do j = 1,jm
-     myi=1
-     do i = myi_start,myi_end
+ do j = 1, jm
+     myi = 1
+     do i = myi_start, myi_end
          nz = nza(i,j)
       do k = 1, nz
          f(myi,j,k,:) = max(f(myi,j,k,:) + DTM(i,j,k,:) * dTime,0.)

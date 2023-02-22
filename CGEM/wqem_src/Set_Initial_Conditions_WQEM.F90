@@ -5,13 +5,15 @@
        USE states
        USE Grid
        USE State_Vars
+       USE BoundaryConcentration
 
        IMPLICIT NONE
 
        character(200) filename
        character(120), intent(in) :: init_filename
        integer, intent(in) :: myid, numprocs
-       integer :: i,j,k,myi
+       integer :: i, j, k, nz, myi
+       integer :: ibc, jbc    ! Indices of boundary grid cells.
 
        if(InitializeHow.eq.0) then
 
@@ -42,6 +44,19 @@
         enddo
 
        endif
+
+       ! Initialize concentrations of boundary cells
+       do i = 1, nBC            ! Loop over boundary cells
+          ibc = bcIJ(i,1)  ! Extract the i index of grid cell 
+          jbc = bcIJ(i,2)  ! Extract the j index of grid cell 
+          if ((ibc .ge. myi_start) .and. (ibc .le. myi_end)) then
+             myi = ibc - myi_start + 1
+             nz = nza(myi,jbc)
+             do k = 1, nz       ! Loop over the sigma layers
+                f(myi,jbc,k,JTR) = BC1(i) 
+             enddo
+          endif
+       enddo
 
 #ifdef DEBUG
       write(6,*) "In Set Initial Conditions WQEM,myid=",myid

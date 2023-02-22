@@ -133,15 +133,16 @@
 
            if (nBC.gt.0 .AND. broadcast_bc) then
                call retrieveBookendBCVar(boundaryconcentration_info(eBC1), TC_8, startBCIndex(eBC1), BC1A, BC1B, bc_tc1, bc_tc2)
-               call retrieveBookendBCVar(boundaryconcentration_info(eBC2), TC_8, startBCIndex(eBC2), BC2A, BC2B, bc_tc1, bc_tc2)
-               call retrieveBookendBCVar(boundaryconcentration_info(eBC3), TC_8, startBCIndex(eBC3), BC3A, BC3B, bc_tc1, bc_tc2)
-               call retrieveBookendBCVar(boundaryconcentration_info(eBC4), TC_8, startBCIndex(eBC4), BC4A, BC4B, bc_tc1, bc_tc2)
-               call retrieveBookendBCVar(boundaryconcentration_info(eBC5), TC_8, startBCIndex(eBC5), BC5A, BC5B, bc_tc1, bc_tc2)
-               call retrieveBookendBCVar(boundaryconcentration_info(eBC6), TC_8, startBCIndex(eBC6), BC6A, BC6B, bc_tc1, bc_tc2)
-               call retrieveBookendBCVar(boundaryconcentration_info(eBC7), TC_8, startBCIndex(eBC7), BC7A, BC7B, bc_tc1, bc_tc2)
-               call retrieveBookendBCVar(boundaryconcentration_info(eBC8), TC_8, startBCIndex(eBC8), BC8A, BC8B, bc_tc1, bc_tc2)
-               call retrieveBookendBCVar(boundaryconcentration_info(eBC9), TC_8, startBCIndex(eBC9), BC9A, BC9B, bc_tc1, bc_tc2)
-              
+               if(Which_code.eq."CGEM") then
+                   call retrieveBookendBCVar(boundaryconcentration_info(eBC2), TC_8, startBCIndex(eBC2), BC2A, BC2B, bc_tc1, bc_tc2)
+                   call retrieveBookendBCVar(boundaryconcentration_info(eBC3), TC_8, startBCIndex(eBC3), BC3A, BC3B, bc_tc1, bc_tc2)
+                   call retrieveBookendBCVar(boundaryconcentration_info(eBC4), TC_8, startBCIndex(eBC4), BC4A, BC4B, bc_tc1, bc_tc2)
+                   call retrieveBookendBCVar(boundaryconcentration_info(eBC5), TC_8, startBCIndex(eBC5), BC5A, BC5B, bc_tc1, bc_tc2)
+                   call retrieveBookendBCVar(boundaryconcentration_info(eBC6), TC_8, startBCIndex(eBC6), BC6A, BC6B, bc_tc1, bc_tc2)
+                   call retrieveBookendBCVar(boundaryconcentration_info(eBC7), TC_8, startBCIndex(eBC7), BC7A, BC7B, bc_tc1, bc_tc2)
+                   call retrieveBookendBCVar(boundaryconcentration_info(eBC8), TC_8, startBCIndex(eBC8), BC8A, BC8B, bc_tc1, bc_tc2)
+                   call retrieveBookendBCVar(boundaryconcentration_info(eBC9), TC_8, startBCIndex(eBC9), BC9A, BC9B, bc_tc1, bc_tc2)
+               endif
            endif
 
         endif 
@@ -221,10 +222,10 @@
         if (broadcast_river) then
             call MPI_BCAST(river_tc1,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
             call MPI_BCAST(river_tc2,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
-
-            if(Which_code.eq."CGEM") then            
-               call MPI_BCAST(Riv1A,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-               call MPI_BCAST(Riv1B,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+          
+            call MPI_BCAST(Riv1A,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+            call MPI_BCAST(Riv1B,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+            if(Which_code.eq."CGEM") then
                call MPI_BCAST(Riv2A,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
                call MPI_BCAST(Riv2B,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
                call MPI_BCAST(Riv3A,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
@@ -250,23 +251,26 @@
             call MPI_BCAST(bc_tc2,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
 
             call MPI_BCAST(BC1A,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-            call MPI_BCAST(BC2A,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-            call MPI_BCAST(BC3A,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-            call MPI_BCAST(BC4A,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-            call MPI_BCAST(BC5A,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-            call MPI_BCAST(BC6A,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-            call MPI_BCAST(BC7A,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-            call MPI_BCAST(BC8A,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-            call MPI_BCAST(BC9A,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
             call MPI_BCAST(BC1B,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-            call MPI_BCAST(BC2B,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-            call MPI_BCAST(BC3B,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-            call MPI_BCAST(BC4B,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-            call MPI_BCAST(BC5B,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-            call MPI_BCAST(BC6B,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-            call MPI_BCAST(BC7B,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-            call MPI_BCAST(BC8B,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-            call MPI_BCAST(BC9B,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+            if(Which_code.eq."CGEM") then
+                call MPI_BCAST(BC2A,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+                call MPI_BCAST(BC3A,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+                call MPI_BCAST(BC4A,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+                call MPI_BCAST(BC5A,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+                call MPI_BCAST(BC6A,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+                call MPI_BCAST(BC7A,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+                call MPI_BCAST(BC8A,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+                call MPI_BCAST(BC9A,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+
+                call MPI_BCAST(BC2B,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+                call MPI_BCAST(BC3B,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+                call MPI_BCAST(BC4B,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+                call MPI_BCAST(BC5B,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+                call MPI_BCAST(BC6B,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+                call MPI_BCAST(BC7B,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+                call MPI_BCAST(BC8B,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+                call MPI_BCAST(BC9B,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+            endif
         endif
       endif
 
@@ -301,14 +305,17 @@
         endif
         if (nBC.gt.0)then
           call interp(BC1A, BC1B, bc_tc1, bc_tc2, TC_in, BC1)
-          call interp(BC2A, BC2B, bc_tc1, bc_tc2, TC_in, BC2)
-          call interp(BC3A, BC3B, bc_tc1, bc_tc2, TC_in, BC3)
-          call interp(BC4A, BC4B, bc_tc1, bc_tc2, TC_in, BC4)
-          call interp(BC5A, BC5B, bc_tc1, bc_tc2, TC_in, BC5)
-          call interp(BC6A, BC6B, bc_tc1, bc_tc2, TC_in, BC6)
-          call interp(BC7A, BC7B, bc_tc1, bc_tc2, TC_in, BC7)
-          call interp(BC8A, BC8B, bc_tc1, bc_tc2, TC_in, BC8)
-          call interp(BC9A, BC9B, bc_tc1, bc_tc2, TC_in, BC9)
+
+          if(Which_code.eq."CGEM") then 
+              call interp(BC2A, BC2B, bc_tc1, bc_tc2, TC_in, BC2)
+              call interp(BC3A, BC3B, bc_tc1, bc_tc2, TC_in, BC3)
+              call interp(BC4A, BC4B, bc_tc1, bc_tc2, TC_in, BC4)
+              call interp(BC5A, BC5B, bc_tc1, bc_tc2, TC_in, BC5)
+              call interp(BC6A, BC6B, bc_tc1, bc_tc2, TC_in, BC6)
+              call interp(BC7A, BC7B, bc_tc1, bc_tc2, TC_in, BC7)
+              call interp(BC8A, BC8B, bc_tc1, bc_tc2, TC_in, BC8)
+              call interp(BC9A, BC9B, bc_tc1, bc_tc2, TC_in, BC9)
+          endif
         endif
       endif
 

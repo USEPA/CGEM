@@ -30,7 +30,6 @@ write(999,*)
 write(999,*) "Which_Vmix",Which_Vmix   
 write(999,*) "KH_coeff",KH_coeff  
 write(999,*) "Which_Outer_BC",Which_Outer_BC 
-write(999,*) "m_OM_init,m_OM_bc,m_OM_sh",m_OM_init,m_OM_bc,m_OM_sh 
 write(999,*) "DoDroop",DoDroop
 !---------------------------------------------------
 
@@ -160,8 +159,6 @@ write(999,*) PBMAX_GRE     ! PBMAX_GRE: photo rate at opt illum
 write(999,*) PMD           ! PMD: dia prod
 write(999,*) PMG           ! PMG: gre prod
 write(999,*) 
-write(999,*) RSODNTR       ! RSODNTR
-write(999,*)
 write(999,*) SILIM         ! SILIM: Minimum nutrient limits growth
 write(999,*) 
 write(999,*) TMD           ! TMD: opt temp dia
@@ -173,7 +170,6 @@ write(999,*) TRHDR         ! TRHDR: opt hydr temp
 write(999,*) TRMNL         ! TRMNL: opt mineral temp
 write(999,*) TRSUA         ! TRSUA: opt Si diss temp
 write(999,*) TZREF         ! TZREF: opt pred temp
-write(999,*) TREF          ! TREF: SOD reference temp
 write(999,*) ZDTH          ! ZDTH: zoo mort
 write(999,*) ZTHET         ! ZTHET: temp coeff pred
 write(999,*) 
