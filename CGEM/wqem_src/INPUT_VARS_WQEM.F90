@@ -17,6 +17,5 @@ real rcSi
 !----Other including Boundary Conditions------------
 real KH_coeff 
 integer Which_Outer_BC
-real m_OM_init,m_OM_bc,m_OM_sh
 
 END MODULE INPUT_VARS_WQEM

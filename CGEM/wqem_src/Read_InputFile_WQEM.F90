@@ -60,7 +60,6 @@ read(999,*)
 read(999,*) Which_Vmix, Which_Adv   
 read(999,*) KH_coeff  
 read(999,*) Which_Outer_BC 
-read(999,*) m_OM_init,m_OM_bc,m_OM_sh 
 read(999,*) DoDroop
 !---------------------------------------------------
 
@@ -191,8 +190,6 @@ read(999,*) PBMAX_GRE     ! PBMAX_GRE: photo rate at opt illum
 read(999,*) PMD           ! PMD: dia prod
 read(999,*) PMG           ! PMG: gre prod
 read(999,*) 
-read(999,*) RSODNTR       ! RSODNTR
-read(999,*)
 read(999,*) SILIM         ! SILIM: Minimum nutrient limits growth
 read(999,*) 
 read(999,*) TMD           ! TMD: opt temp dia
@@ -204,7 +201,6 @@ read(999,*) TRHDR         ! TRHDR: opt hydr temp
 read(999,*) TRMNL         ! TRMNL: opt mineral temp
 read(999,*) TRSUA         ! TRSUA: opt Si diss temp
 read(999,*) TZREF         ! TZREF: opt pred temp
-read(999,*) TREF          ! TREF: SOD reference temp
 read(999,*) ZDTH          ! ZDTH: zoo mort
 read(999,*) ZTHET         ! ZTHET: temp coeff pred
 read(999,*) 
@@ -329,9 +325,6 @@ call MPI_BCAST(Which_Adv,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
 
 call MPI_BCAST(KH_coeff,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
 call MPI_BCAST(Which_Outer_BC,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
-call MPI_BCAST(m_OM_init,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-call MPI_BCAST(m_OM_bc,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-call MPI_BCAST(m_OM_sh,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
 
 call MPI_BCAST(ALPHA_DIA,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
 call MPI_BCAST(ALPHA_GRE,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
@@ -453,8 +446,6 @@ call MPI_BCAST(PMG,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
 
 call MPI_BCAST(SILIM,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
 
-call MPI_BCAST(RSODNTR,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-
 call MPI_BCAST(TMD,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
 call MPI_BCAST(TMG,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
 call MPI_BCAST(TMNT,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
@@ -463,7 +454,6 @@ call MPI_BCAST(TRG,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
 call MPI_BCAST(TRHDR,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
 call MPI_BCAST(TRMNL,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
 call MPI_BCAST(TRSUA,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-call MPI_BCAST(TREF,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
 call MPI_BCAST(TZREF,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
 call MPI_BCAST(ZDTH,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
 call MPI_BCAST(ZTHET,1,MPI_REAL,0,MPI_COMM_WORLD,mpierr)

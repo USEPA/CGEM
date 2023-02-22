@@ -85,7 +85,7 @@
       call Allocate_Input_Vars(Which_code)
       call Allocate_Hydro
       if (nRiv > 0) call Allocate_RiverLoads(Which_code)
-      if (nBC  > 0) call Allocate_BoundaryConcentrations()
+      if (nBC  > 0) call Allocate_BoundaryConcentrations(Which_code)
 
 ! Read_InputFile must define nstep, iout, dT, START_SECONDS
       call Read_InputFile(input_filename,Which_code,myid,numprocs) 
@@ -108,7 +108,7 @@
       if (Which_gridio .gt. 0.and.myid.eq.0) then
         call Init_Hydro_NetCDF()
         if (nRiv > 0) call Init_RiverLoad_NetCDF(Which_code)
-        if (nBC  > 0) call Init_BoundaryConcentration_NetCDF()
+        if (nBC  > 0) call Init_BoundaryConcentration_NetCDF(Which_code)
       endif
 
       if(numprocs .gt. 1) then
