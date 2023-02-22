@@ -12,7 +12,7 @@
 0		!InitializeHow: 0==Read File, 1==Salinity Regression
 
 !Optics
-1		!Which_irradiance:(Light Model) 0==none, 1==GoMDOM 2==Brad 
+1		!Which_irradiance:(Light Model) 0==none, 1==GoMDOM 2==Inherent Optical Properties 
 0.0375          !astar490: Chla specific absorption at 490 nm
 0.015           !aw490: seawater absorption at 490 nm
 0.0             !astarOMA: REUSE to set constant CDOM(ppb) 
@@ -31,7 +31,6 @@
 1 1		!Which_VMix: 0==No VMixing, Other==Yes VMixing   
 1		!KH_coeff: multiplying factor for KH in VMixing  
 1		!Which_Outer_BC: 0==Salinity, 1==GoMDOM original, 2==GoMDOM Full Grid
-0 0 0 		!Multipliers for OM_bc at initial conditions and for boundary conditions, lateral and shelf
 0               !DoDroop, 1==Droop
 
 C
@@ -159,8 +158,6 @@ C
 2.90E-05         ! PMD: dia prod
 2.60E-05         ! PMG: gre prod
 
-1.00E-3          ! RSODNTR
-
 2                ! SILIM: Minimum nutrient limits growth
 
 18               ! TMD: opt temp dia
@@ -172,7 +169,6 @@ C
 20               ! TRMNL: opt mineral temp
 20               ! TRSUA: opt Si diss temp
 20               ! TZREF: opt pred temp
-20               ! TREF: SOD reference temp
 0.15             ! ZDTH: zoo mort, was 5.0E-07
 1.05             ! ZTHET: temp coeff pred
 
