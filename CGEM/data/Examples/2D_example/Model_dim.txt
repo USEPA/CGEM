@@ -1,0 +1,10 @@
+Model_dim Header
+24  !INTEGER, PARAMETER :: IM
+24  !INTEGER, PARAMETER :: JM
+1  !INTEGER, PARAMETER :: nz_max
+3  !INTEGER, PARAMETER :: nospA = 1
+2  !INTEGER, PARAMETER :: nospZ = 2
+1  !Which_gridio 0==fishtank 1==efdc
+1970 !iYear0
+0    !Number of rivers
+0    !Number of boundary cells
