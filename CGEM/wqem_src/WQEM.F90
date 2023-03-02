@@ -135,7 +135,13 @@ do i = 1, nriv             ! Loop over the rivers
       myi = icell - myi_start + 1
       do k = 1, nsl            ! Loop over the sigma layers
          rivLoadConvFactor = weights(i,k) / Vol(icell,jcell,k)
-         DTM(myi,jcell,k,JTR) = DTM(myi,jcell,k,JTR) + Riv1(i) * rivLoadConvFactor
+         DTM(myi,jcell,k,JNO3) = DTM(myi,jcell,k,JTR) + Riv1(i) * rivLoadConvFactor
+         DTM(myi,jcell,k,JNH4) = DTM(myi,jcell,k,JTR) + Riv2(i) * rivLoadConvFactor
+         DTM(myi,jcell,k,JDON) = DTM(myi,jcell,k,JTR) + Riv3(i) * rivLoadConvFactor
+         DTM(myi,jcell,k,JTR)  = DTM(myi,jcell,k,JTR) + Riv4(i) * rivLoadConvFactor
+         DTM(myi,jcell,k,JSRP) = DTM(myi,jcell,k,JTR) + Riv5(i) * rivLoadConvFactor
+         DTM(myi,jcell,k,JDOP) = DTM(myi,jcell,k,JTR) + Riv6(i) * rivLoadConvFactor
+         DTM(myi,jcell,k,JDO2) = DTM(myi,jcell,k,JTR) + Riv7(i) * rivLoadConvFactor
       enddo
   endif
 enddo

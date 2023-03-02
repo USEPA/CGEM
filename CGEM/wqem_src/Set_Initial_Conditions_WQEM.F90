@@ -53,7 +53,13 @@
              myi = ibc - myi_start + 1
              nz = nza(myi,jbc)
              do k = 1, nz       ! Loop over the sigma layers
-                f(myi,jbc,k,JTR) = BC1(i) 
+                f(myi,jbc,k,JNO3) = BC1(i) * 1.0E-03  ! Convert mg/L to kg/m3
+                f(myi,jbc,k,JNH4) = BC2(i) * 1.0E-03
+                f(myi,jbc,k,JDON) = BC3(i) * 1.0E-03
+                f(myi,jbc,k,JTR)  = BC4(i) * 1.0E-03  
+                f(myi,jbc,k,JSRP) = BC5(i) * 1.0E-03
+                f(myi,jbc,k,JDOP) = BC6(i) * 1.0E-03
+                f(myi,jbc,k,JDO2) = BC7(i) * 1.0E-03
              enddo
           endif
        enddo

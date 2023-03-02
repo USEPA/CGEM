@@ -117,8 +117,8 @@
 
 ! River vars
            if (nRiv .gt. 0 .AND. broadcast_river) then
-               call retrieveBookendRiverVar(riverload_info(eRiv1), TC_8, startRivIndex(eRiv1), Riv1A, Riv1B, river_tc1, river_tc2)
-               if(Which_code.eq."CGEM") then
+               if (Which_code.eq."CGEM") then
+                  call retrieveBookendRiverVar(riverload_info(eRiv1), TC_8, startRivIndex(eRiv1), Riv1A, Riv1B, river_tc1, river_tc2)
                   call retrieveBookendRiverVar(riverload_info(eRiv2), TC_8, startRivIndex(eRiv2), Riv2A, Riv2B, river_tc1, river_tc2)
                   call retrieveBookendRiverVar(riverload_info(eRiv3), TC_8, startRivIndex(eRiv3), Riv3A, Riv3B, river_tc1, river_tc2)
                   call retrieveBookendRiverVar(riverload_info(eRiv4), TC_8, startRivIndex(eRiv4), Riv4A, Riv4B, river_tc1, river_tc2)
@@ -127,13 +127,25 @@
                   call retrieveBookendRiverVar(riverload_info(eRiv7), TC_8, startRivIndex(eRiv7), Riv7A, Riv7B, river_tc1, river_tc2)
                   call retrieveBookendRiverVar(riverload_info(eRiv8), TC_8, startRivIndex(eRiv8), Riv8A, Riv8B, river_tc1, river_tc2)
                   call retrieveBookendRiverVar(riverload_info(eRiv9), TC_8, startRivIndex(eRiv9), Riv9A, Riv9B, river_tc1, river_tc2)
+               else if (Which_code.eq."WQEM") then
+                  call retrieveBookendRiverVar(riverload_info(eRiv1), TC_8, startRivIndex(eRiv1), Riv1A, Riv1B, river_tc1, river_tc2)
+                  call retrieveBookendRiverVar(riverload_info(eRiv2), TC_8, startRivIndex(eRiv2), Riv2A, Riv2B, river_tc1, river_tc2)
+                  call retrieveBookendRiverVar(riverload_info(eRiv3), TC_8, startRivIndex(eRiv3), Riv3A, Riv3B, river_tc1, river_tc2)
+                  call retrieveBookendRiverVar(riverload_info(eRiv4), TC_8, startRivIndex(eRiv4), Riv4A, Riv4B, river_tc1, river_tc2)
+                  call retrieveBookendRiverVar(riverload_info(eRiv5), TC_8, startRivIndex(eRiv5), Riv5A, Riv5B, river_tc1, river_tc2)
+                  call retrieveBookendRiverVar(riverload_info(eRiv6), TC_8, startRivIndex(eRiv6), Riv6A, Riv6B, river_tc1, river_tc2)
+                  call retrieveBookendRiverVar(riverload_info(eRiv7), TC_8, startRivIndex(eRiv7), Riv7A, Riv7B, river_tc1, river_tc2)
+               else
+                  WRITE(6,*) "Model ", Which_code," not found in Get_Vars.F90"
+                  WRITE(6,*) "Exiting."
+                  STOP
                endif
            endif
 
 
            if (nBC.gt.0 .AND. broadcast_bc) then
-               call retrieveBookendBCVar(boundaryconcentration_info(eBC1), TC_8, startBCIndex(eBC1), BC1A, BC1B, bc_tc1, bc_tc2)
-               if(Which_code.eq."CGEM") then
+                if (Which_code.eq."CGEM") then
+                   call retrieveBookendBCVar(boundaryconcentration_info(eBC1), TC_8, startBCIndex(eBC1), BC1A, BC1B, bc_tc1, bc_tc2)
                    call retrieveBookendBCVar(boundaryconcentration_info(eBC2), TC_8, startBCIndex(eBC2), BC2A, BC2B, bc_tc1, bc_tc2)
                    call retrieveBookendBCVar(boundaryconcentration_info(eBC3), TC_8, startBCIndex(eBC3), BC3A, BC3B, bc_tc1, bc_tc2)
                    call retrieveBookendBCVar(boundaryconcentration_info(eBC4), TC_8, startBCIndex(eBC4), BC4A, BC4B, bc_tc1, bc_tc2)
@@ -142,6 +154,18 @@
                    call retrieveBookendBCVar(boundaryconcentration_info(eBC7), TC_8, startBCIndex(eBC7), BC7A, BC7B, bc_tc1, bc_tc2)
                    call retrieveBookendBCVar(boundaryconcentration_info(eBC8), TC_8, startBCIndex(eBC8), BC8A, BC8B, bc_tc1, bc_tc2)
                    call retrieveBookendBCVar(boundaryconcentration_info(eBC9), TC_8, startBCIndex(eBC9), BC9A, BC9B, bc_tc1, bc_tc2)
+               else if (Which_code.eq."WQEM") then
+                   call retrieveBookendBCVar(boundaryconcentration_info(eBC1), TC_8, startBCIndex(eBC1), BC1A, BC1B, bc_tc1, bc_tc2)
+                   call retrieveBookendBCVar(boundaryconcentration_info(eBC2), TC_8, startBCIndex(eBC2), BC2A, BC2B, bc_tc1, bc_tc2)
+                   call retrieveBookendBCVar(boundaryconcentration_info(eBC3), TC_8, startBCIndex(eBC3), BC3A, BC3B, bc_tc1, bc_tc2)
+                   call retrieveBookendBCVar(boundaryconcentration_info(eBC4), TC_8, startBCIndex(eBC4), BC4A, BC4B, bc_tc1, bc_tc2)
+                   call retrieveBookendBCVar(boundaryconcentration_info(eBC5), TC_8, startBCIndex(eBC5), BC5A, BC5B, bc_tc1, bc_tc2)
+                   call retrieveBookendBCVar(boundaryconcentration_info(eBC6), TC_8, startBCIndex(eBC6), BC6A, BC6B, bc_tc1, bc_tc2)
+                   call retrieveBookendBCVar(boundaryconcentration_info(eBC7), TC_8, startBCIndex(eBC7), BC7A, BC7B, bc_tc1, bc_tc2)
+               else
+                  WRITE(6,*) "Model ", Which_code," not found in Get_Vars.F90"
+                  WRITE(6,*) "Exiting."
+                  STOP
                endif
            endif
 
@@ -223,9 +247,9 @@
             call MPI_BCAST(river_tc1,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
             call MPI_BCAST(river_tc2,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
           
-            call MPI_BCAST(Riv1A,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-            call MPI_BCAST(Riv1B,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
             if(Which_code.eq."CGEM") then
+               call MPI_BCAST(Riv1A,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+               call MPI_BCAST(Riv1B,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
                call MPI_BCAST(Riv2A,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
                call MPI_BCAST(Riv2B,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
                call MPI_BCAST(Riv3A,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
@@ -242,6 +266,25 @@
                call MPI_BCAST(Riv8B,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
                call MPI_BCAST(Riv9A,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
                call MPI_BCAST(Riv9B,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+            else if (Which_code.eq."WQEM") then
+               call MPI_BCAST(Riv1A,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+               call MPI_BCAST(Riv1B,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+               call MPI_BCAST(Riv2A,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+               call MPI_BCAST(Riv2B,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+               call MPI_BCAST(Riv3A,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+               call MPI_BCAST(Riv3B,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+               call MPI_BCAST(Riv4A,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+               call MPI_BCAST(Riv4B,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+               call MPI_BCAST(Riv5A,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+               call MPI_BCAST(Riv5B,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+               call MPI_BCAST(Riv6A,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+               call MPI_BCAST(Riv6B,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+               call MPI_BCAST(Riv7A,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+               call MPI_BCAST(Riv7B,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+            else
+                  WRITE(6,*) "Model ", Which_code," not found in Get_Vars.F90"
+                  WRITE(6,*) "Exiting."
+                  STOP
             endif
         endif
         
@@ -250,9 +293,8 @@
             call MPI_BCAST(bc_tc1,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
             call MPI_BCAST(bc_tc2,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
 
-            call MPI_BCAST(BC1A,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-            call MPI_BCAST(BC1B,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
             if(Which_code.eq."CGEM") then
+                call MPI_BCAST(BC1A,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
                 call MPI_BCAST(BC2A,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
                 call MPI_BCAST(BC3A,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
                 call MPI_BCAST(BC4A,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
@@ -262,6 +304,7 @@
                 call MPI_BCAST(BC8A,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
                 call MPI_BCAST(BC9A,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
 
+                call MPI_BCAST(BC1B,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
                 call MPI_BCAST(BC2B,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
                 call MPI_BCAST(BC3B,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
                 call MPI_BCAST(BC4B,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
@@ -270,6 +313,26 @@
                 call MPI_BCAST(BC7B,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
                 call MPI_BCAST(BC8B,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
                 call MPI_BCAST(BC9B,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+            else if (Which_code.eq."WQEM") then
+                call MPI_BCAST(BC1A,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+                call MPI_BCAST(BC2A,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+                call MPI_BCAST(BC3A,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+                call MPI_BCAST(BC4A,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+                call MPI_BCAST(BC5A,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+                call MPI_BCAST(BC6A,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+                call MPI_BCAST(BC7A,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+
+                call MPI_BCAST(BC1B,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+                call MPI_BCAST(BC2B,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+                call MPI_BCAST(BC3B,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+                call MPI_BCAST(BC4B,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+                call MPI_BCAST(BC5B,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+                call MPI_BCAST(BC6B,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+                call MPI_BCAST(BC7B,nBC,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+            else
+                  WRITE(6,*) "Model ", Which_code," not found in Get_Vars.F90"
+                  WRITE(6,*) "Exiting."
+                  STOP
             endif
         endif
       endif
@@ -288,25 +351,35 @@
       endif
 
       if (Which_gridio.eq.1)then
-        if (nRiv.gt.0)then
-          call interp(Riv1A, Riv1B, river_tc1, river_tc2, TC_in, Riv1)
-        
-          if(Which_code.eq."CGEM") then            
-          call interp(Riv2A, Riv2B, river_tc1, river_tc2, TC_in, Riv2)
-          call interp(Riv3A, Riv3B, river_tc1, river_tc2, TC_in, Riv3)
-          call interp(Riv4A, Riv4B, river_tc1, river_tc2, TC_in, Riv4)
-          call interp(Riv5A, Riv5B, river_tc1, river_tc2, TC_in, Riv5)
-          call interp(Riv6A, Riv6B, river_tc1, river_tc2, TC_in, Riv6)
-          call interp(Riv7A, Riv7B, river_tc1, river_tc2, TC_in, Riv7)
-          call interp(Riv8A, Riv8B, river_tc1, river_tc2, TC_in, Riv8)
-          call interp(Riv9A, Riv9B, river_tc1, river_tc2, TC_in, Riv9)
-
+        if (nRiv .gt. 0)then        
+          if(Which_code.eq."CGEM") then    
+              call interp(Riv1A, Riv1B, river_tc1, river_tc2, TC_in, Riv1)        
+              call interp(Riv2A, Riv2B, river_tc1, river_tc2, TC_in, Riv2)
+              call interp(Riv3A, Riv3B, river_tc1, river_tc2, TC_in, Riv3)
+              call interp(Riv4A, Riv4B, river_tc1, river_tc2, TC_in, Riv4)
+              call interp(Riv5A, Riv5B, river_tc1, river_tc2, TC_in, Riv5)
+              call interp(Riv6A, Riv6B, river_tc1, river_tc2, TC_in, Riv6)
+              call interp(Riv7A, Riv7B, river_tc1, river_tc2, TC_in, Riv7)
+              call interp(Riv8A, Riv8B, river_tc1, river_tc2, TC_in, Riv8)
+              call interp(Riv9A, Riv9B, river_tc1, river_tc2, TC_in, Riv9)
+          else if (Which_code.eq."WQEM") then
+              call interp(Riv1A, Riv1B, river_tc1, river_tc2, TC_in, Riv1)        
+              call interp(Riv2A, Riv2B, river_tc1, river_tc2, TC_in, Riv2)
+              call interp(Riv3A, Riv3B, river_tc1, river_tc2, TC_in, Riv3)
+              call interp(Riv4A, Riv4B, river_tc1, river_tc2, TC_in, Riv4)
+              call interp(Riv5A, Riv5B, river_tc1, river_tc2, TC_in, Riv5)
+              call interp(Riv6A, Riv6B, river_tc1, river_tc2, TC_in, Riv6)
+              call interp(Riv7A, Riv7B, river_tc1, river_tc2, TC_in, Riv7)
+          else
+                  WRITE(6,*) "Model ", Which_code," not found in Get_Vars.F90"
+                  WRITE(6,*) "Exiting."
+                  STOP
           endif
         endif
-        if (nBC.gt.0)then
-          call interp(BC1A, BC1B, bc_tc1, bc_tc2, TC_in, BC1)
 
+        if (nBC .gt. 0)then
           if(Which_code.eq."CGEM") then 
+              call interp(BC1A, BC1B, bc_tc1, bc_tc2, TC_in, BC1)
               call interp(BC2A, BC2B, bc_tc1, bc_tc2, TC_in, BC2)
               call interp(BC3A, BC3B, bc_tc1, bc_tc2, TC_in, BC3)
               call interp(BC4A, BC4B, bc_tc1, bc_tc2, TC_in, BC4)
@@ -315,6 +388,18 @@
               call interp(BC7A, BC7B, bc_tc1, bc_tc2, TC_in, BC7)
               call interp(BC8A, BC8B, bc_tc1, bc_tc2, TC_in, BC8)
               call interp(BC9A, BC9B, bc_tc1, bc_tc2, TC_in, BC9)
+          else if (Which_code.eq."WQEM") then
+              call interp(BC1A, BC1B, bc_tc1, bc_tc2, TC_in, BC1)
+              call interp(BC2A, BC2B, bc_tc1, bc_tc2, TC_in, BC2)
+              call interp(BC3A, BC3B, bc_tc1, bc_tc2, TC_in, BC3)
+              call interp(BC4A, BC4B, bc_tc1, bc_tc2, TC_in, BC4)
+              call interp(BC5A, BC5B, bc_tc1, bc_tc2, TC_in, BC5)
+              call interp(BC6A, BC6B, bc_tc1, bc_tc2, TC_in, BC6)
+              call interp(BC7A, BC7B, bc_tc1, bc_tc2, TC_in, BC7)
+          else
+                  WRITE(6,*) "Model ", Which_code," not found in Get_Vars.F90"
+                  WRITE(6,*) "Exiting."
+                  STOP
           endif
         endif
       endif

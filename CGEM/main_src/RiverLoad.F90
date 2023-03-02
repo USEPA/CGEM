@@ -69,10 +69,8 @@
 
       print*,"Allocating riverloads"
 
-      ALLOCATE(Riv1(nRiv))
-      ALLOCATE(Riv1A(nRiv))
-      ALLOCATE(Riv1B(nRiv))
-      if(Which_code.eq."CGEM") then
+      if (Which_code.eq."CGEM") then
+         ALLOCATE(Riv1(nRiv))
          ALLOCATE(Riv2(nRiv))
          ALLOCATE(Riv3(nRiv))
          ALLOCATE(Riv4(nRiv))
@@ -81,6 +79,8 @@
          ALLOCATE(Riv7(nRiv))
          ALLOCATE(Riv8(nRiv))
          ALLOCATE(Riv9(nRiv))
+         ALLOCATE(Riv1A(nRiv))
+         ALLOCATE(Riv1B(nRiv))
          ALLOCATE(Riv2A(nRiv))
          ALLOCATE(Riv2B(nRiv))
          ALLOCATE(Riv3A(nRiv))
@@ -97,16 +97,40 @@
          ALLOCATE(Riv8B(nRiv))
          ALLOCATE(Riv9A(nRiv))
          ALLOCATE(Riv9B(nRiv))
+      else if (Which_code.eq."WQEM") then
+         ALLOCATE(Riv1(nRiv))
+         ALLOCATE(Riv2(nRiv))
+         ALLOCATE(Riv3(nRiv))
+         ALLOCATE(Riv4(nRiv))
+         ALLOCATE(Riv5(nRiv))
+         ALLOCATE(Riv6(nRiv))
+         ALLOCATE(Riv7(nRiv))
+         ALLOCATE(Riv1A(nRiv))
+         ALLOCATE(Riv1B(nRiv))
+         ALLOCATE(Riv2A(nRiv))
+         ALLOCATE(Riv2B(nRiv))
+         ALLOCATE(Riv3A(nRiv))
+         ALLOCATE(Riv3B(nRiv))
+         ALLOCATE(Riv4A(nRiv))
+         ALLOCATE(Riv4B(nRiv))
+         ALLOCATE(Riv5A(nRiv))
+         ALLOCATE(Riv5B(nRiv))
+         ALLOCATE(Riv6A(nRiv))
+         ALLOCATE(Riv6B(nRiv))
+         ALLOCATE(Riv7A(nRiv))
+         ALLOCATE(Riv7B(nRiv)) 
+      else
+           write(6,*) "Model ", Which_code," not found in RiverLoad.f90"
+           write(6,*) "Exiting"
+           stop        
       endif
 
       ALLOCATE(weights(nRiv,NSL))
       ALLOCATE(riversIJ(nRiv,2))
 
       !Fill values for netCDF
-      Riv1 = fill(0)  
-      Riv1A = fill(0)  
-      Riv1B = fill(0)  
       if (Which_code.eq."CGEM") then
+         Riv1 = fill(0)
          Riv2 = fill(0)
          Riv3 = fill(0)
          Riv4 = fill(0)
@@ -115,6 +139,8 @@
          Riv7 = fill(0)
          Riv8 = fill(0)
          Riv9 = fill(0)
+         Riv1A = fill(0)  
+         Riv1B = fill(0) 
          Riv2A = fill(0)  
          Riv2B = fill(0)  
          Riv3A = fill(0)  
@@ -130,7 +156,33 @@
          Riv8A = fill(0)  
          Riv8B = fill(0)  
          Riv9A = fill(0)  
-         Riv9B = fill(0)  
+         Riv9B = fill(0)
+      else if (Which_code.eq."WQEM") then
+         Riv1 = fill(0)
+         Riv2 = fill(0)
+         Riv3 = fill(0)
+         Riv4 = fill(0)
+         Riv5 = fill(0)
+         Riv6 = fill(0)
+         Riv7 = fill(0)
+         Riv1A = fill(0)  
+         Riv1B = fill(0) 
+         Riv2A = fill(0)  
+         Riv2B = fill(0)  
+         Riv3A = fill(0)  
+         Riv3B = fill(0)  
+         Riv4A = fill(0)  
+         Riv4B = fill(0)  
+         Riv5A = fill(0)  
+         Riv5B = fill(0)  
+         Riv6A = fill(0)  
+         Riv6B = fill(0)  
+         Riv7A = fill(0)  
+         Riv7B = fill(0) 
+      else
+           write(6,*) "Model ", Which_code," not found in RiverLoad.f90"
+           write(6,*) "Exiting"
+           stop 
       endif
       return
 
@@ -161,7 +213,13 @@
             write(netcdf_riverload_fileNames(eRiv8), '(A, A)') trim(DATADIR), '/INPUT/BOD1_RiverLoads.nc'
             write(netcdf_riverload_fileNames(eRiv9), '(A, A)') trim(DATADIR), '/INPUT/DO_RiverLoads.nc'
          else if(Which_code.eq."WQEM") then 
-            write(netcdf_riverload_fileNames(eRiv1), '(A, A)') trim(DATADIR), '/INPUT/TP_RiverLoads.nc'
+            write(netcdf_riverload_fileNames(eRiv1), '(A, A)') trim(DATADIR), '/INPUT/NO3_RiverLoads.nc'
+            write(netcdf_riverload_fileNames(eRiv2), '(A, A)') trim(DATADIR), '/INPUT/NH3_RiverLoads.nc'
+            write(netcdf_riverload_fileNames(eRiv3), '(A, A)') trim(DATADIR), '/INPUT/DON_RiverLoads.nc'
+            write(netcdf_riverload_fileNames(eRiv4), '(A, A)') trim(DATADIR), '/INPUT/TP_RiverLoads.nc'
+            write(netcdf_riverload_fileNames(eRiv5), '(A, A)') trim(DATADIR), '/INPUT/DIP_RiverLoads.nc'
+            write(netcdf_riverload_fileNames(eRiv6), '(A, A)') trim(DATADIR), '/INPUT/DOP_RiverLoads.nc'
+            write(netcdf_riverload_fileNames(eRiv7), '(A, A)') trim(DATADIR), '/INPUT/DO_RiverLoads.nc'
          else
            write(6,*) "Model ", Which_code," not found in RiverLoad.f90"
            write(6,*) "Exiting"
@@ -193,7 +251,7 @@
          if(Which_code.eq."CGEM") then
             lRv = 9;
          else if(Which_code.eq."WQEM") then
-            lRv = 1
+            lRv = 7
          else
             write(6,*) "Model ",Which_code," not found in RiverLoad.f90"
             write(6,*) "Exiting"

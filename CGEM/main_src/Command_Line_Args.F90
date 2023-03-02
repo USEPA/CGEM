@@ -20,18 +20,20 @@
          BASE_NETCDF_OUTPUT_FILE_NAME = './NETCDF/cgem.'
          DIntRates_filename = './NETCDF/CGEM_DailyIntegrated_Rates.nc'
 
-       if (c_count.gt.0) then
+       if (c_count > 0) then
          call get_command_argument(1,Which_code)  !User selects which code
          !Some spellings for cgem 
          if(Which_code.eq."CGEM".or.Which_code.eq."cgem") then
-           Which_code = "CGEM"
-         endif
-         !Some spellings for wqem
-         if(Which_code.eq."WQEM" .or. Which_code.eq."wqem") then
-           Which_code = "WQEM"
-           input_filename = "WQEM_InputFile"
-           init_filename = "InitialConditions_WQEM.txt"
-           BASE_NETCDF_OUTPUT_FILE_NAME = './NETCDF/wqem.'
+            Which_code = "CGEM"
+         else if (Which_code.eq."WQEM" .or. Which_code.eq."wqem") then
+            Which_code = "WQEM"
+            input_filename = "WQEM_InputFile"
+            init_filename = "InitialConditions_WQEM.txt"
+            BASE_NETCDF_OUTPUT_FILE_NAME = './NETCDF/wqem.'
+         else
+            WRITE(6,*) "Model ", Which_code, " not found in Command_Line_Args.F90"
+            WRITE(6,*) "Exiting"
+            STOP
          endif
        endif
 
@@ -76,10 +78,10 @@
          call get_command_argument(5,DIntRates_filename) !User selects daily-integrated rates file name
        endif
 
-       write(6,*) "Biogeochem equations are: ",Which_code
-       write(6,*) "Inputfile will be: ",trim(input_filename)
-       write(6,*) "Initial Conditions filename will be: ",trim(init_filename)
-       write(6,*) "Base Outputfile Name will be: ",trim(BASE_NETCDF_OUTPUT_FILE_NAME)
+       write(6,*) "Biogeochem equations are: ", Which_code
+       write(6,*) "Inputfile will be: ", trim(input_filename)
+       write(6,*) "Initial Conditions filename will be: ", trim(init_filename)
+       write(6,*) "Base Outputfile Name will be: ", trim(BASE_NETCDF_OUTPUT_FILE_NAME)
  
        if(Which_code.eq."CGEM") then
           write(6,*) "Daily-Integrated Rates output filename will be: ", trim(DIntRates_filename)

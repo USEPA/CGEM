@@ -66,10 +66,10 @@
 
       character(6), intent(in) :: Which_code
 
-      ALLOCATE(BC1(nBC))
-      ALLOCATE(BC1A(nBC))
-      ALLOCATE(BC1B(nBC))
+      PRINT*,"Allocating boundary concentrations"
+
       if(Which_code.eq."CGEM") then
+          ALLOCATE(BC1(nBC))
           ALLOCATE(BC2(nBC))
           ALLOCATE(BC3(nBC))
           ALLOCATE(BC4(nBC))
@@ -79,6 +79,8 @@
           ALLOCATE(BC8(nBC))
           ALLOCATE(BC9(nBC))
 
+          ALLOCATE(BC1A(nBC))
+          ALLOCATE(BC1B(nBC))
           ALLOCATE(BC2A(nBC))
           ALLOCATE(BC2B(nBC))
           ALLOCATE(BC3A(nBC))
@@ -95,17 +97,41 @@
           ALLOCATE(BC8B(nBC))
           ALLOCATE(BC9A(nBC))
           ALLOCATE(BC9B(nBC))
+      elseif (Which_code.eq."WQEM") then
+          ALLOCATE(BC1(nBC))
+          ALLOCATE(BC2(nBC))
+          ALLOCATE(BC3(nBC))
+          ALLOCATE(BC4(nBC))
+          ALLOCATE(BC5(nBC))
+          ALLOCATE(BC6(nBC))
+          ALLOCATE(BC7(nBC))
+
+          ALLOCATE(BC1A(nBC))
+          ALLOCATE(BC1B(nBC))
+          ALLOCATE(BC2A(nBC))
+          ALLOCATE(BC2B(nBC))
+          ALLOCATE(BC3A(nBC))
+          ALLOCATE(BC3B(nBC))
+          ALLOCATE(BC4A(nBC))
+          ALLOCATE(BC4B(nBC))
+          ALLOCATE(BC5A(nBC))
+          ALLOCATE(BC5B(nBC))
+          ALLOCATE(BC6A(nBC))
+          ALLOCATE(BC6B(nBC))
+          ALLOCATE(BC7A(nBC))
+          ALLOCATE(BC7B(nBC))
+      else
+          WRITE(6,*) "Model ", Which_code," not found in BoundaryConcentration.F90"
+          WRITE(6,*) "Exiting"
+          STOP
       endif
 
       ALLOCATE(bcIJ(nBC,2))
 
       !Fill values for netCDF
       
-      BC1 = fill(0)
-      BC1A = fill(0)
-      BC1B = fill(0)
-
       if(Which_code.eq."CGEM") then  
+          BC1 = fill(0)
           BC2 = fill(0)
           BC3 = fill(0)
           BC4 = fill(0)
@@ -115,6 +141,8 @@
           BC8 = fill(0)
           BC9 = fill(0)
 
+          BC1A = fill(0)
+          BC1B = fill(0)
           BC2A = fill(0)
           BC2B = fill(0)
           BC3A = fill(0)
@@ -131,6 +159,33 @@
           BC8B = fill(0)
           BC9A = fill(0)
           BC9B = fill(0)
+      elseif (Which_code.eq."WQEM") then
+          BC1 = fill(0)
+          BC2 = fill(0)
+          BC3 = fill(0)
+          BC4 = fill(0)
+          BC5 = fill(0)
+          BC6 = fill(0)
+          BC7 = fill(0)
+   
+          BC1A = fill(0)
+          BC1B = fill(0)
+          BC2A = fill(0)
+          BC2B = fill(0)
+          BC3A = fill(0)
+          BC3B = fill(0)
+          BC4A = fill(0)
+          BC4B = fill(0)
+          BC5A = fill(0)
+          BC5B = fill(0)
+          BC6A = fill(0)
+          BC6B = fill(0)
+          BC7A = fill(0)
+          BC7B = fill(0)
+      else
+          WRITE(6,*) "Model ", Which_code," not found in BoundaryConcentration.F90"
+          WRITE(6,*) "Exiting"
+          STOP
       endif
 
       return
@@ -161,7 +216,13 @@
              write(netcdf_boundaryconcentration_fileNames(eBC8), '(A, A)') trim(DATADIR), '/INPUT/BOD_BoundaryConcentrations.nc'
              write(netcdf_boundaryconcentration_fileNames(eBC9), '(A, A)') trim(DATADIR), '/INPUT/DO_BoundaryConcentrations.nc'
          else if(Which_code .eq. "WQEM") then
-            write(netcdf_boundaryconcentration_fileNames(eBC1), '(A, A)') trim(DATADIR), '/INPUT/TP_BoundaryConcentrations.nc'
+            write(netcdf_boundaryconcentration_fileNames(eBC1), '(A, A)') trim(DATADIR), '/INPUT/NO3_BoundaryConcentrations.nc'
+            write(netcdf_boundaryconcentration_fileNames(eBC2), '(A, A)') trim(DATADIR), '/INPUT/NH4_BoundaryConcentrations.nc'
+            write(netcdf_boundaryconcentration_fileNames(eBC3), '(A, A)') trim(DATADIR), '/INPUT/DON_BoundaryConcentrations.nc'
+            write(netcdf_boundaryconcentration_fileNames(eBC4), '(A, A)') trim(DATADIR), '/INPUT/TP_BoundaryConcentrations.nc'
+            write(netcdf_boundaryconcentration_fileNames(eBC5), '(A, A)') trim(DATADIR), '/INPUT/DIP_BoundaryConcentrations.nc'
+            write(netcdf_boundaryconcentration_fileNames(eBC6), '(A, A)') trim(DATADIR), '/INPUT/DOP_BoundaryConcentrations.nc'
+            write(netcdf_boundaryconcentration_fileNames(eBC7), '(A, A)') trim(DATADIR), '/INPUT/DO_BoundaryConcentrations.nc'
          else
             write(6,*) "Model ", Which_code," not found in BoundaryConcentration.F90"
             write(6,*) "Exiting"
@@ -194,7 +255,7 @@
          if(Which_code .eq. "CGEM") then
             lBCv = 9;
          else if(Which_code .eq. "WQEM") then
-            lBCv = 1;
+            lBCv = 7;
          else
             write(6,*) "Model ",Which_code," not found in BoundaryConcentration.F90"
             write(6,*) "Exiting"
