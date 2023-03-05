@@ -21,7 +21,7 @@ nc2<-nc_open(ncfile2)
 nc3<- nc_open(ncfile3)
 nc4<- nc_open(ncfile4)
 
-if(which_eqs=="gomdom"){
+if(which_eqs=="wqem"){
 Var <- c("DOC","DIA","GRE","ZOO","LOC","ROC","SRP","DOP","LOP","ROP","NH4","NO3","DON","LON","RON","SA","SU","DO2","TR","DIAN","DIAP","GREN","GREP")
 }else{
 Var <- names(nc1$var)
@@ -31,17 +31,17 @@ Var <- Var[Var != "Tr"]
 nvars <- length(Var)
 
 #for CGEM, the first 5 variables are not state variables (put those in later...for now, cut out)
-#for GoMDOM, the first 6 variables
+#for WQEM, the first 6 variables
 #for odd files, let user specify:
 if(!exists("firsts")){
-if(which_eqs=="gomdom"){
+if(which_eqs=="wqem"){
 firsts <- 1
 }else{
 firsts <- 6
 }
 }
 
-if(which_eqs=="gomdom"){
+if(which_eqs=="wqem"){
 Var <- Var[firsts:(firsts+19)]
 }else{
 Var <- Var[firsts:(nvars-2)]
@@ -60,7 +60,7 @@ tt <- length(time) #64
 
 if(!exists("pdfname")){
 if(which_eqs=="cgem") pdfname="cgem_1D.pdf"
-if(which_eqs=="gomdom") pdfname="gomdom_1D.pdf"
+if(which_eqs=="wqem") pdfname="wqem_1D.pdf"
 }
 
 pdf(file=pdfname)

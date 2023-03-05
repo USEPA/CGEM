@@ -25,11 +25,11 @@ Var <- names(nc1$var)
 nvars <- length(Var)
 
 #for CGEM, the first 5 variables are not state variables (put those in later...for now, cut out)
-#for GoMDOM, the first 6 variables
+#for WQEM, the first 6 variables
 #for odd files, let user specify:
 if(!exists("firsts")){
 if(which_eqs=="cgem") firsts <- 6
-if(which_eqs=="gomdom") firsts <- 7
+if(which_eqs=="wqem") firsts <- 7
 }
 
 Var <- Var[firsts:nvars]
@@ -45,7 +45,7 @@ nz <- length(depth)
 
 if(!exists("pdfname")){
 if(which_eqs=="cgem") pdfname="cgem_1D.pdf"
-if(which_eqs=="gomdom") pdfname="gomdom_1D.pdf"
+if(which_eqs=="wqem") pdfname="wqem_1D.pdf"
 }
 
 pdf(file=pdfname,paper="a4r")
@@ -72,7 +72,7 @@ par(mfrow=pdf_layout)
           j <- which_times[jj]   
           t_label <- paste(months(time[j]),paste(format(time[j],"%d"),format(time[j],"%Y"),sep=","))
 
-#   if(rdata1[1,j]>1.e30){  #GoMDOM has missing data for first output, shows as 1e30+
+#   if(rdata1[1,j]>1.e30){  #wqem has missing data for first output, shows as 1e30+
 #    xmin <- min(rdata1[,j+1],rdata7[,j+1],na.rm=TRUE) 
 #    xmax <- max(rdata1[,j+1],rdata7[,j+1],na.rm=TRUE)
 #    xrange <- c(xmin,xmax) 

@@ -18,11 +18,11 @@ Var <- names(nc$var)
 nvars <- length(Var)
 
 #for CGEM, the first 5 variables are not state variables (put those in later...for now, cut out)
-#for GoMDOM, the first 6 variables
+#for WQEM, the first 6 variables
 #for odd files, let user specify:
 if (!exists("firsts")) {
   if(which_eqs == "cgem") firsts <- 6
-  if(which_eqs == "gomdom") firsts <- 7
+  if(which_eqs == "wqem") firsts <- 7
 }
 
 Var <- Var[firsts:nvars]
@@ -35,14 +35,14 @@ tt <- length(time)
 
 if (!exists("pdfname")) {
   if(which_eqs == "cgem") pdfname = "cgem_1D.pdf"
-  if(which_eqs == "gomdom") pdfname = "gomdom_1D.pdf"
+  if(which_eqs == "wqem") pdfname = "wqem_1D.pdf"
 }
 
 pdf(file=pdfname)
 
-k_layers <- c(1,2,3,4,5)
+k_layers <- nc$dim$k$vals
 n_layers <- length(k_layers)
-label <- paste("k=1,2,3,4,5")
+label <- paste("k = ", toString(k_layers))
 
 if (!exists("pdf_layout")) {
   pdf_layout <- c(4,4)

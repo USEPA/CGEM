@@ -1,10 +1,11 @@
-#Set output directory
-#setwd("./FishTank_GEM/NETCDF/")
+# Set output directory
+# setwd("./testrun/NETCDF/")
+
 library(ncdf4)
 
 source("timeseries_plot.R")
 
-#enter defaults- if user does not use a run script with these choices
+# Enter defaults- if user does not use a run script with these choices
 if (!exists("which_eqs"))
 {
    which_eqs <- "cgem"
@@ -21,12 +22,12 @@ Var <- names(nc$var)
 nvars <- length(Var)
 
 #for CGEM, the first 5 variables are not state variables (put those in later...for now, cut out)
-#for GoMDOM, the first 6 variables
+#for WQEM, the first 6 variables are not state variables
 #for odd files, let user specify:
 if (!exists("firsts"))
 {
     if(which_eqs == "cgem") firsts <- 6
-    if(which_eqs == "gomdom") firsts <- 7
+    if(which_eqs == "wqem") firsts <- 7
 }
 
 Var <- Var[firsts:nvars]
@@ -40,30 +41,34 @@ tt <- length(time)
 if(!exists("pdfname"))
 {
    if(which_eqs == "cgem") pdfname = "cgem_1D.pdf"
-   if(which_eqs == "gomdom") pdfname = "gomdom_1D.pdf"
+   if(which_eqs == "wqem") pdfname = "wqem_1D.pdf"
 }
 
 pdf(file=pdfname)
 
-k_layers <- c(1,3,5,7)
+# Specify indices of desired location.
+iloc <- 4
+jloc <- 8
+
+k_layers <- nc$dim$k$vals
 n_layers <- length(k_layers)
-label <- paste("k=1,3,5,7")
+label <- paste("k = ", toString(k_layers))
 
 if(!exists("pdf_layout"))
 {
    pdf_layout <- c(4,4)
 }
 
-which_mod <- pdf_layout[1]*pdf_layout[2] 
+which_mod <- pdf_layout[1] * pdf_layout[2] 
 
-par(mfrow=pdf_layout)
+par(mfrow = pdf_layout)
 
 colorlist <- c("black","red","blue","green","purple","orange","yellow","pink","brown")
 
 for(i in 1:nvars)
 {
 
-    rdata <- ncvar_get(nc, Var[i], start=c(22,8,k_layers[1],1),count=c(1,1,1,tt))
+    rdata <- ncvar_get(nc, Var[i], start=c(iloc,jloc,k_layers[1],1), count=c(1,1,1,tt))
     unit <- ncatt_get(nc, Var[i], attname="units")$value
     rdata[is.infinite(rdata)] <- NA
     ymax <- max(rdata, na.rm=TRUE)

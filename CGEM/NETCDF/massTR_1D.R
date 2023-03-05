@@ -2,24 +2,20 @@ library(ncdf4)
 
 args = commandArgs(trailingOnly=TRUE)
 
-cat("This only works for cgem or gomdom efdc\n")
+cat("This only works for cgem or wqem efdc\n")
 
 ncfile <- "cgem.000000.nc"
 pdfname2 <- "efdc"
 Var <- "Tr"
-im <- 1 
-jm <- 1 
-km <- 7
-
 
 if(length(args) == 0){
   ncfile <- "cgem.000000.nc"
   pdfname1 <- "cgem"
   Var <- "Tr"
 } else if (length(args) >= 1) {
-  if (args[1] == "gomdom") {
-    ncfile<-"gomdom.000000.nc"
-    pdfname1<-"gomdom"
+  if (args[1] == "wqem") {
+    ncfile<-"wqem.000000.nc"
+    pdfname1<-"wqem"
     Var<-"TR"
   } else {
     ncfile <- "cgem.000000.nc"
@@ -31,6 +27,9 @@ if(length(args) == 0){
 pdfname <- paste(pdfname1,pdfname2,"pdiffmass.pdf",sep=".")
 
 nc <- nc_open(ncfile)
+# im <- nc$dim$longitude$len
+# jm <- nc$dim$latitude$len
+km <- nc$dim$k$len
 
 rdata <- ncvar_get(nc,Var)
 

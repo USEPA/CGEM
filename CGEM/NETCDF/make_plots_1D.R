@@ -1,4 +1,4 @@
-#type "Rscript make_plots_1D.R cgem" or "Rscript make_plots_1D.R gomdom"
+#type "Rscript make_plots_1D.R cgem" or "Rscript make_plots_1D.R wqem"
 #(or else it does cgem)
 
 args = commandArgs(trailingOnly = TRUE)
@@ -14,15 +14,15 @@ if (length(args) == 0) {
         pdf_layout <- c(4,4)
         
 } else {
-        if(args[1] == "gomdom"){
-                #Default, argument=gomdom
-                which_eqs <- "gomdom"
-                ncfile <- "gomdom.000000.nc"
-                pdfname <- "gomdom_1D.pdf"
-                pdfname2 <- "gomdom_depth.pdf"
+        if(args[1] == "wqem"){
+                #Default, argument=wqem
+                which_eqs <- "wqem"
+                ncfile <- "wqem.000000.nc"
+                pdfname <- "wqem_1D.pdf"
+                pdfname2 <- "wqem_depth.pdf"
                 pdf_layout <- c(4,4) 
         } else {
-                #Default, argument=something other than gomdom
+                #Default, argument=something other than wqem
                 which_eqs <- "cgem"
                 ncfile <- "cgem.000000.nc"
                 pdfname <- "cgem_1D.pdf"
