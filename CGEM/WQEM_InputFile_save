@@ -1,11 +1,9 @@
-"GoMDOM2k input file 9.9.16, Salinity ICBC, no Si flux" 		!Code_ID: Default - Oct 2016 (see spreadsheet)
+"WQEM input file" 		!Code_ID: Default 
 
 !Simulation Specifics
-2013     4     1     2      0     0		!- starting time Yr, Mon, Day, Hr, Min, Sec
-2013     5     1     2      0     0		!- ending   time Yr, Mon, Day, Hr, Min, Sec
-30 3600      	!- dT (timestep, secs); dT_out (output interval, secs); dT_restart (restart interval, secs)
-0		        !- How cell Location is specified:0==long-lat 1==grid-units
--92.39 29.03		!- Cell i,j coord (if grid-units) or longcent,latcent vals (if long-lat)
+2022     1     2     18     0     0		!- starting time Yr, Mon, Day, Hr, Min, Sec
+2022     1    21     18     0     0		!- ending   time Yr, Mon, Day, Hr, Min, Sec
+10 86400      	!- dT (timestep, secs); dT_out (output interval, secs); dT_restart (restart interval, secs)
 
 !Switches in GEM
 0 0 0 0 0 0 0 0	0 !Which_Fluxes: Toggle on(1) off(0): O2surf, DICsurf, SOD, MPB, Nutrient Exchange, CMAQ, 
@@ -14,7 +12,7 @@
 0		!InitializeHow: 0==Read File, 1==Salinity Regression
 
 !Optics
-1		!Which_irradiance:(Light Model) 0==none, 1==GoMDOM 2==Brad 
+1		!Which_irradiance:(Light Model) 0==none, 1==WQEM, 2==Inherent Optical Properties 
 0.0375          !astar490: Chla specific absorption at 490 nm
 0.015           !aw490: seawater absorption at 490 nm
 0.0             !astarOMA: REUSE to set constant CDOM(ppb) 
@@ -30,11 +28,10 @@
 1		!rcSi   - factor multiplying Si river load
 
 !Other including Boundary Conditions
-1 1		!Which_VMix: 0==No VMixingi/Adv, Other==Yes VMixing/Adv   
+1 1		!Which_VMix, Which_Adv: 0==No VMixing,Adv, 1==Yes VMixing,Adv   
 1		!KH_coeff: multiplying factor for KH in VMixing  
-1		!Which_Outer_BC: 0==Salinity, 1==GoMDOM original, 2==GoMDOM Full Grid
-0 0 0 		!Multipliers for OM_bc at initial conditions and for boundary conditions, lateral and shelf
-0               !DoDroop, 1==Droop
+1		!Which_Outer_BC: 0==Salinity, 1==WQEM original, 2==WQEM Full Grid
+0               !DoDroop, 0==No Droop, 1==Yes Droop
 
 C
 C  FIREAD file
@@ -55,7 +52,7 @@ C
 40                ! CCHLD: C:chl ratio for diatoms
 40                ! CCHLG: C:chl ratio for greens
 
-1.16E-05          ! CGZ: zoo grazing rate - Gulf GoMDOM value (different from original LM3 Eutro eq)
+1.16E-05          ! CGZ: zoo grazing rate - Gulf WQEM value (different from original LM3 Eutro eq)
 
 1.07              ! DENIT_CN_RATIO  
 
@@ -117,8 +114,8 @@ C
 0.0              ! KDPALG: DOP alg dependence
 
 0                ! KDWD: Specifies light attenuation eqn, default=0
-0                ! KE: Background light attenuation [m^-1]
-0                ! KECHL: Light attenuation factor for chlorophyll-a [m^2-kg^-1]
+0.15             ! KE: Background light attenuation
+1.7E+04          ! KECHL: Light attenuation factor for chlorophyll-a [m^2-kg^-1]
 
 1.00E-03         ! KHDONT_SED
 2.50E-05         ! KHN: Organic N Decay Half Saturation Constant
@@ -161,8 +158,6 @@ C
 2.90E-05         ! PMD: dia prod
 2.60E-05         ! PMG: gre prod
 
-1.00E-3          ! RSODNTR
-
 2                ! SILIM: Minimum nutrient limits growth
 
 18               ! TMD: opt temp dia
@@ -174,7 +169,6 @@ C
 20               ! TRMNL: opt mineral temp
 20               ! TRSUA: opt Si diss temp
 20               ! TZREF: opt pred temp
-20               ! TREF: SOD reference temp
 0.15             ! ZDTH: zoo mort, was 5.0E-07
 1.05             ! ZTHET: temp coeff pred
 
@@ -263,4 +257,4 @@ C
 2.00E-06		! VLOP
 2.00E-06		! VROP
 8.00E-05		! VSU   different from before
-0.0E0                   ! VST   tracer
+0.00E+00                ! VTR
