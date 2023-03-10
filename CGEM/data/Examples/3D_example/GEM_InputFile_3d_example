@@ -8,14 +8,14 @@
 !Switches in GEM
 1 1 0 0 0 0 0 0 !Which_fluxes: Toggle on(1) off(0): O2surf, DICsurf, Sediment Oxygen Consumption, Microphytobenthos, Sediment Nutrient Fluxes
                 !  Atmospheric Deposition of Nutrients, Instant Remineralization in Bottom Layer, Sediment Diagenesis Model
-1		!Which_temperature: 1==Sigmoidal, 2==Optimum Temp. Thresh., 3==Arrenhius, 4==GoMDOM
+1		!Which_temperature: 1==Sigmoidal, 2==Optimum Temp. Thresh., 3==Arrenhius, 4==WQEM
 1		!Which_uptake: 1==Michaelis-Menten, 2==Geider (needs nfQs), 3==Roelke, Nutrient uptake rate
-1		!Which_quota:  1==Droop, 2==Nyholm, 3==Flynn, Nutrient dependent growth, 4==GoMDOM
-1		!Which_irradiance: 1==IOP (inherent optical properties), 2==AOP (apparent optical properties), 3==GoMDOM
+1		!Which_quota:  1==Droop, 2==Nyholm, 3==Flynn, Nutrient dependent growth, 4==WQEM
+1		!Which_irradiance: 1==IOP (inherent optical properties), 2==AOP (apparent optical properties), 3==WQEM
 1		!Which_chlaC: 1==fixed C:Chl-a, 2==Cloern chl:C
-2		!Which_photosynthesis: 1==photoinhibition, 2==without photoinhibition, 3==nutrient dependent, 4==GoMDOM
+2		!Which_photosynthesis: 1==photoinhibition, 2==without photoinhibition, 3==nutrient dependent, 4==WQEM
 1		!Which_growth: 1==minimum, 2==product formulation, 3==umax is nutrient dependent, Specific growth rate
-0 0 0 0         !ReadVars: Solar=Calculate(0),Read(1); Wind== 5mph(0) or Read(1), Temp== cosine w/params(0) or Read(1), Sal== Read one value(0) or Read(1)
+1 0 0 0         !ReadVars: Solar=Calculate(0),Read(1); Wind== 5mph(0) or Read(1), Temp== cosine w/params(0) or Read(1), Sal== Read one value(0) or Read(1)
 0		!InitializeHow: 0==Read File, 1==Salinity Regression
 
 !Optics
@@ -33,15 +33,15 @@
 0		!sink CDOM: sinking rate
 
 !Temperature
-17 22 26 17 17 	                          !Tref(nospA+nospZ): Optimum temperature for growth(C)
-0.0035 0.0035 0.0035 0.0035 0.0035	!KTg1(nospA+nospZ): Effect of T below Topt(C^2)
-0.001 0.001 0.001 0.001 0.001  	!KTg2(nospA+nospZ): Effect of T above Topt(C^2)
-0.61 0.61 0.61 0.61 0.61        !Ea(nospA+nospZ): Slope of Arrhenius plot(eV)
+17 17 17 17 17 17 22 26 	                        !Tref(nospA+nospZ): Optimum temperature for growth(C)
+0.0035 0.0035 0.0035 0.0035 0.0035 0.0035 0.0035 0.0035	!KTg1(nospA+nospZ): Effect of T below Topt(C^2)
+0.001 0.001 0.001 0.001 0.001 0.001 0.001 0.001 	!KTg2(nospA+nospZ): Effect of T above Topt(C^2)
+0.61 0.61 0.61 0.61 0.61 0.61 0.61 0.61                 !Ea(nospA+nospZ): Slope of Arrhenius plot(eV)
 
 !Phytoplankton, up to 6 types
 .5 .5 .5 .5 .5 .5                        !ediblevector(Z1): edibility vector for Z1
 .5 .5 .5 .5 .5 .5                        !ediblevector(Z2): edibility vector for Z2
-2.24 2.24 2.24 2.24 2.24 2.24             !umax: maximum growth rate
+1.12 1.12 1.12 1.12 1.12 1.12            !umax: maximum growth rate
 181.477 181.477 181.477 181.477 181.477 181.477 !Fixed C:Chla ratio
 3.96e-16 3.96e-16 3.96e-16 3.96e-16 3.96e-16 3.96e-16  !alpha: initial slope of the photosynthesis-irradiance relationship
 1.1e-18 1.1e-18 1.1e-18 1.1e-18 1.1e-18 1.1e-18        !beta: photoinhibition constant
@@ -117,7 +117,7 @@
 1 1 		!Which_VMix, Which_Adv: 0==No VMixing,Adv, 1==Yes VMixing,Adv   
 1		!KH_coeff: multiplying factor for KH in VMixing  
 0		!Which_Outer_BC: 0==Salinity, 1==zero nutrients at lateral bc, 2=zero nutrients lateral and open ocean, 3==small gradient, 
-                !                4==GoMDOM,   5==no flow boundaries, 6==Salinity with Depth attenuation
+                !                4==WQEM,   5==no flow boundaries, 6==Salinity with Depth attenuation
 0 1.            !wt_pl, wt_po: Weights for plankton at the lateral and open ocean, Set 1 for normal salinity bcs
 0.5 0.5         !wt_l, wt_o, weights for small gradient BC's, lateral and open ocean
 0 0 0 		!Multipliers for OM_BC at initial conditions and for boundary conditions, lateral and shelf
@@ -126,5 +126,5 @@
 106 16		!Stoich_x1Z_init, Stoich_y1Z_init: Initial stoichiometry of all OM1_Z
 106 16		!Stoich_x2Z_init, Stoich_y2Z_init: Initial stoichiometry of all OM2_Z
 92000		!KG_bot, turnover rate for k=20 if Instant Remineralization is used (see Which_fluxes above)
-1               !MC, 1==COMT output
+1               !MC, 0==No Daily Integrated Rates output, 1==Yes Daily Integrated Rates output
 0		!Which_Output: 1==NRL, 2==ALL_FALSE

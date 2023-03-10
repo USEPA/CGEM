@@ -6,5 +6,5 @@ Model_dim Header
 2  !INTEGER, PARAMETER :: nospZ = 2
 1  !Which_gridio 0==fishtank 1==efdc
 1970 !iYear0
-0    !Number of rivers
-0    !Number of boundary cells
+8    !Number of rivers
+12    !Number of boundary cells
