@@ -10,7 +10,7 @@ if (!exists("which_eqs")) {
 }
 
 if (!exists("ncfile")) {
-  ncfile<-"output.000000.nc"
+  ncfile <- "output.000000.nc"
 }
 
 nc <- nc_open(ncfile)
@@ -54,9 +54,7 @@ for (i in 1:nvars) {
   rdata <- ncvar_get(nc,Var[i])
   unit <- ncatt_get(nc,Var[i],attname="units")$value
   
-  if(rdata[1] > 1.e30){
-    timeseries_plot(Var[i],time[2:tt],rdata[2:tt],unit)
-  } else {
+  if (!is.na(rdata[1])){
     timeseries_plot(Var[i],time,rdata,unit)
   }
   

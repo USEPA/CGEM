@@ -12,7 +12,7 @@ timeseries_plot <- function(Var,time,rdata,unit,ilog=FALSE,label=NULL,range=NULL
   
   ylimit <- get_ylim(rdata,range)
   xlimit <- get_ylim(time,xrange)
-  
+   
   plot(time,rdata,yaxt="n",type="l",ylab="",xlab="",main=paste(Var,label),ylim=ylimit,xlim=xlimit,col=color,lty=linetype);
   mtext(paste(logtxt,unit),side=3,line=.2,cex=0.8)
   if(uselim){

@@ -1,8 +1,8 @@
 "CGEM 1.0 Manuscript Parameters for phytoplankton group 4" !Code_ID: Identifier for run, appears in netCDF file
 
 !Simulation Specifics
-2013     1     1     2     0     0		!- starting time Yr, Mon, Day, Hr, Min, Sec
-2013     7     1     5     0     0		!- ending   time Yr, Mon, Day, Hr, Min, Sec
+2013     9     25     7     45     0		!- starting time Yr, Mon, Day, Hr, Min, Sec
+2013     9     25     18    55     0		!- ending   time Yr, Mon, Day, Hr, Min, Sec
 30 3600, 30    	        !- dT (timestep, seconds); dT_out (output interval, seconds)
 
 !Switches in GEM
