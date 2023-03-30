@@ -1,4 +1,4 @@
-#type "Rscript make_plots.R cgem" or "Rscript make_plots.R wqem"
+#type "Rscript make_plots_3D_EFDC.R cgem" or "Rscript make_plots_3D_EFDC.R wqem"
 #(or else it does cgem)
 
 args = commandArgs(trailingOnly = TRUE)
