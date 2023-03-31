@@ -40,9 +40,9 @@ if(!exists("pdfname")){
 
 pdf(file=pdfname)
 
-k_layers <- c(1,6,12,20)
+k_layers <- nc$dim$k$vals
 n_layers <- length(k_layers)
-label <- paste("k=1,6,12,20")
+label <- paste("k = ", toString(k_layers))
 
 if (!exists("pdf_layout")) {
   pdf_layout <- c(4,4)
@@ -59,18 +59,14 @@ for (i in 1:nvars) {
   unit <- ncatt_get(nc,Var[i],attname="units")$value
   ymax <- max(rdata,na.rm=TRUE)
   
-  if(rdata[1] > 1.e30){
-    timeseries_plot(Var[i],time[2:tt],rdata[2:tt],unit)
-  } else {
+  if (!is.na(rdata[1])){
     timeseries_plot(Var[i],time,rdata,unit)
   }
   
   if(n_layers >= 2){
     for (j in 2:n_layers) {
       rdata <- ncvar_get(nc,Var[i],start=c(1,1,k_layers[j],1),count=c(1,1,1,tt))
-      if (rdata[1] > 1.e30) {
-        timeseries_addlines(Var[i],time[2:tt],na.omit(rdata[2:tt]),color=colorlist[j])
-      } else {
+      if (!is.na(rdata[1])){
         timeseries_addlines(Var[i],time[1:tt],na.omit(rdata),color=colorlist[j])
       }
     }
