@@ -108,8 +108,8 @@ CONTAINS
 
 
     ! Create dimensions:
-    CALL DEFDIM( FILE_ID, IM_DIM, 'xlon', IM )
-    CALL DEFDIM( FILE_ID, JM_DIM, 'ylat', JM )
+    CALL DEFDIM( FILE_ID, IM_DIM, 'longitude', IM )
+    CALL DEFDIM( FILE_ID, JM_DIM, 'latitude', JM )
     CALL DEFDIM( FILE_ID, KM_DIM, 'k', KM )
 !!  CALL DEFDIM( FILE_ID, NSTEPP1_DIM, 'time', NSTEP )
     CALL DEFDIM( FILE_ID, NSTEPP1_DIM, 'time', 0 ) ! 0 Means UNLIMITED size.
@@ -388,23 +388,23 @@ CONTAINS
 
     ! Define non-time-varying array variables:
 
-    CALL DEFVR1( FILE_ID, IM_DIM, XLON_VAR, 'xlon', &
-                 'x-coordinate in Cartesian system', 'm' )
+!    CALL DEFVR1( FILE_ID, IM_DIM, XLON_VAR, 'longitude', &
+!                 'x-coordinate in Cartesian system', 'm' )
 
-    CALL DEFVR1( FILE_ID, JM_DIM, YLAT_VAR, 'ylat', &
-                 'y-coordinate in Cartesian system', 'm' )
+!    CALL DEFVR1( FILE_ID, JM_DIM, YLAT_VAR, 'latitude', &
+!                 'y-coordinate in Cartesian system', 'm' )
 
-    CALL DEFVR2( FILE_ID, IM_DIM, JM_DIM, RLON_VAR, 'longitude', &
+    CALL DEFVR2( FILE_ID, IM_DIM, JM_DIM, RLON_VAR, 'LONGXY', &
                  'longitude', 'degrees_east' )
 
 !CWS
-    CALL DEFVRTATT( FILE_ID, RLON_VAR, 'axis','X')
+!    CALL DEFVRTATT( FILE_ID, RLON_VAR, 'axis','X')
 #ifdef DEBUG
 write(6,*) "After long"
 #endif
 
 
-    CALL DEFVR2( FILE_ID, IM_DIM, JM_DIM, RLAT_VAR, 'latitude', &
+    CALL DEFVR2( FILE_ID, IM_DIM, JM_DIM, RLAT_VAR, 'LATIXY', &
                  'latitude', 'degrees_north' )
 !CWS
 !    CALL DEFVRTATT( FILE_ID, RLAT_VAR, 'axis','Y')
@@ -518,11 +518,11 @@ write(6,*) "After Extra_Vars"
       YLAT(J) = J
     ENDDO
 
-    ERR = ncdf_PUT_VAR_REAL( FILE_ID, XLON_VAR, XLON )
-    CALL CHKERR( ERR, 'write output variable xlon' )
+!    ERR = ncdf_PUT_VAR_REAL( FILE_ID, XLON_VAR, XLON )
+!    CALL CHKERR( ERR, 'write output variable xlon' )
 
-    ERR = ncdf_PUT_VAR_REAL( FILE_ID, YLAT_VAR, YLAT )
-    CALL CHKERR( ERR, 'write output variable ylat' )
+!    ERR = ncdf_PUT_VAR_REAL( FILE_ID, YLAT_VAR, YLAT )
+!    CALL CHKERR( ERR, 'write output variable ylat' )
 
     RLON_COPY = RLON
 

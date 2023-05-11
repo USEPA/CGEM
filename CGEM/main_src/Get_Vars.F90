@@ -77,7 +77,7 @@
           endif
   
           if(Read_Solar.eq.0) then
-            call getSolar( TC_in, lon, lat, Rad)
+            call getSolar(TC_in, lon, lat, Rad)
           else
             call USER_Read_Solar(TC_in,Rad)
           endif
@@ -97,10 +97,14 @@
             call retrieveBookendVar(hydro_info(eVx), TC_in, startIndex(eVx), Vx1, Vx2, hydro_tc1, hydro_tc2)
             call retrieveBookendVar(hydro_info(eWx), TC_in, startIndex(eWx), Wx1, Wx2, hydro_tc1, hydro_tc2)
             call retrieveBookendVar(hydro_info(eKh), TC_in, startIndex(eKh), Kh1, Kh2, hydro_tc1, hydro_tc2)
-            if (Which_gridio.ne.3) then
-              call retrieveBookendVar(hydro_info(eSal), TC_in, startIndex(eSal), S1, S2, hydro_tc1, hydro_tc2)
-              call getSolar( TC_8, lon, lat, Rad)  !Calculate Solar Radiation for now
-              Wind = 5
+            if (Which_gridio /= 3) then
+                call retrieveBookendVar(hydro_info(eSal), TC_in, startIndex(eSal), S1, S2, hydro_tc1, hydro_tc2)
+                if (Read_Solar == 0) then
+                    call getSolar(TC_8, lon, lat, Rad)  !Calculate Solar Radiation
+                else
+                    call USER_Read_Solar(TC_in, Rad)
+                endif
+                Wind = 5
             else 
               call retrieveBookendVar(hydro_info(eRad), TC_in, startIndex(eRad), Rad1, Rad2, hydro_tc1, hydro_tc2)
               call retrieveBookendVar(hydro_info(eWind), TC_in, startIndex(eWind), Wind1, Wind2, hydro_tc1, hydro_tc2)

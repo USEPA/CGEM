@@ -12,8 +12,8 @@ EXE = CGEM
 F90 = ifort
 INC   = -I. -I/usr/local/apps/netcdf-4.6.3/intel-18.0/include/
 LIBS  = -L/usr/local/apps/netcdf-4.6.3/intel-18.0/lib -lnetcdff -lnetcdf
-FFLAGS = -warn all -traceback -no-diag-error-limit -implicitnone -convert big_endian -ftz
-DFLAGS = 
+FFLAGS = -warn all -traceback -no-diag-error-limit -implicitnone -ftz
+# DFLAGS = -debug -check all -DDEBUG -warn all -traceback -no-diag-error-limit -ftz
 
 ###GNU COMPILER
 #F90 = gfortran

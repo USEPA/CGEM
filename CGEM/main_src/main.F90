@@ -64,7 +64,7 @@
       call MPI_COMM_SIZE(MPI_COMM_WORLD, numprocs, mpierr)
       mpitime1 = MY_WTIME()
 !      mpitime1 = MPI_Wtime()
-      PRINT*,"mpitime1=",mpitime1, " with myid=",myid
+!      PRINT*,"mpitime1=",mpitime1, " with myid=",myid
 
 ! --- Command Line Arguments for file names ---
       if(myid.eq.0) then
@@ -111,7 +111,7 @@
         if (nBC  > 0) call Init_BoundaryConcentration_NetCDF(Which_code)
       endif
 
-      if(numprocs .gt. 1) then
+      if(numprocs .gt. 1 .and. nRiv .gt. 0) then
        call MPI_BCAST(riversIJ,nRiv*2,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
        call MPI_BCAST(weights,nRiv*NSL,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
       endif
@@ -152,9 +152,9 @@
 #ifdef DEBUG
      write(6,*) "TC_8=", TC_8
 #endif
-      if(myid.eq.0)then
-        write(6,*) "istep=",istep, " of ",nstep
-      endif
+!      if(myid.eq.0)then
+!        write(6,*) "istep=",istep, " of ",nstep
+!      endif
 
       call Get_Vars(TC_8,T_8,myid,numprocs, Which_code) !Hydro, Solar, Wind, Temp, Salinity, and riverloads
 
@@ -163,7 +163,7 @@
       elseif (Which_gridio.eq.2) then
         call USER_update_NCOM_grid(T_8,myid,numprocs)
       elseif (Which_gridio.eq.3) then
-        call USER_update_POM_grid()
+        call USER_update_POM_grid(T_8,myid,numprocs)
       endif
 
 
@@ -205,7 +205,7 @@
 
       mpitime2 = MY_WTIME()
 !      mpitime2 = MPI_Wtime()
-      PRINT*,"mpitime2=",mpitime2, " with myid=",myid
+!      PRINT*,"mpitime2=",mpitime2, " with myid=",myid
       if(myid.eq.0) write(6,*) "Code took",mpitime2-mpitime1,"seconds"
 
       call MPI_FINALIZE(mpierr)

@@ -15,41 +15,23 @@
        integer i,j,k,nz,myi
        integer :: ibc, jbc    ! Indices of boundary grid cells.
 
-       if(InitializeHow.eq.0) then 
-
-        write(filename,'(A,A,A)') trim(DATADIR),"/",trim(init_filename)
-
-        call USER_Set_Initial_Conditions(filename,myid,numprocs) 
-        do j=1,jm
-          myi=1
-        do i=myi_start,myi_end
-           do k=1,nza(i,j)
-            f(myi,j,k,iTr) = 1./Vol(i,j,k)
-           enddo
-          myi=myi+1
-        enddo
-        enddo
-
-
-       elseif(InitializeHow.eq.1) then !Salinity Regression Equations
-
-        call Salinity_Regression_Init_CGEM()
-
-        do j=1,jm
-          myi=1
-        do i=myi_start,myi_end
-           do k=1,nza(i,j)
-            f(myi,j,k,iTr) = 1./Vol(i,j,k)
-           enddo
-          myi=myi+1
-        enddo
-        enddo
-
+       if (InitializeHow == 0) then 
+          write(filename,'(A,A,A)') trim(DATADIR),"/",trim(init_filename)
+          call USER_Set_Initial_Conditions(filename,myid,numprocs) 
+       elseif (InitializeHow == 1) then !Salinity Regression Equations
+          call Salinity_Regression_Init_CGEM()
+          do j = 1, jm
+             myi = 1
+             do i = myi_start, myi_end
+                do k = 1, nza(i,j)
+                   f(myi,j,k,iTr) = 1./Vol(i,j,k)
+                enddo
+                myi = myi + 1
+             enddo
+          enddo
        else
-
-          write(6,*) "Unknown, InitializeHow=",InitializeHow," exiting"
+          write(6,*) "Unknown, InitializeHow = ", InitializeHow," exiting"
           stop
-
        endif
 
        ! Initialize concentrations of boundary cells
