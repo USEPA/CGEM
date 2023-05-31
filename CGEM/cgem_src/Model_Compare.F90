@@ -10,13 +10,11 @@
 !******************************************************************************
 
 MODULE Model_Compare 
-!  USE pnetcdf ! For NFMPI_*
   USE xnetcdf
   USE NETCDF_UTILITIES ! For CHKERR, DEFDIM, DEFVI1, CONVERT_LONGITUDES, etc.
   USE DATE_TIME ! For TOTAL_SECONDS
 
   IMPLICIT NONE
-!  INCLUDE 'mpif.h' ! For MPI_*
 
   ! Private
 

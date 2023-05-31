@@ -35,12 +35,6 @@ Module Model_Diagenesis
       INTEGER :: IFLAG, ISTATE
       REAL(kind=8) ::  step_in, step
 
-!
-! --------    Notify user of input mode
-!
-
-!      WRITE(*,600)
- 600  FORMAT(' ','DATA IS ENTERED WITH FILE hypox_inp.csv ')
 
 !
 ! --------     Change some parameters to input variables
@@ -71,18 +65,14 @@ Module Model_Diagenesis
 
       DO IC = 1, n_its
 
-!         write(6,*) "Step:years,days,secs",IC*step,IC*step_in,IC*dT
          val1(IC)= temp
          val2(IC)= temp + step
          temp    = val2(IC)
-!         write(6,*) "before CASES",IC
       CALL CASES(val1(IC), val2(IC), YY_ij, ppH_ij, ISTATE, IFLAG, Ainp)
 
-!         write(6,*) "after CASES",YY_ij(1),ppH_ij(1)
 
       CALL FILL_Y(NEQ, YY_ij, G1, G2, O2, NO3, NH4, MN2, &
                   FE2, SO4, HS, FES, TC, ALK, DOM, Os, Ob)
-!         write(6,*) "after fill_y",YY_ij(1)
 
 !  SUM up the irrigation O2 flux (*1000)is puts it in
 !  the same units as the sed flux.  The matlab routine
@@ -111,7 +101,6 @@ Module Model_Diagenesis
        sedALK(IC) = FLUXES(9) + tir_ALK
        sedDOC(IC) = FLUXES(10) + tir_DOM
 
-!       write(*,'(A6,2X,f12.2)') 'DOflux',sedO2(IC)/365*10   ! check Surface O2 concentrations
 !
 ! ------- Output the sediment geochemical profiles to compare w/ data
 !
@@ -137,11 +126,6 @@ Module Model_Diagenesis
       sedflux_ij(sALK) = sedALK(IC)
       sedflux_ij(sDOC) = sedDOC(IC)
       sedflux_ij = sedflux_ij/365.
-!      write(6,*) "fluxes",FLUXES
-!      write(6,*) "tir",tir_O2,tir_ALK,tir_DOM
-!      write(6,*) "sedO2(IC)years,days",IC,sO2,sedO2(IC),sedflux_ij(sO2)
-!      write(6,*) "NO3,NH4,DIC",sedflux_ij(sNO3),sedflux_ij(sNH4),sedflux_ij(sDIC)
-!       write(6,*) sedflux_ij
 
  260  FORMAT(///' POS # IS A GOOD THING, NEG # IS SUSPECT! ISTATE =',I3)
       END

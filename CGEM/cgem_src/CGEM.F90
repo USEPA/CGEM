@@ -305,8 +305,6 @@
                    do isp = 1, nospA          
                       A_k(isp,k) = f(myi,j,k,isp) ! Phytoplankton in group isp, cells/m3
                    enddo 
- !                  WRITE(6,*) "myi, j, k, nz, A_k(isp,k) = ", myi, j, k, nz, A_k(1,k)
- !                  WRITE(6,*) "myi, j, k, nz, f(myi,j,k,isp) = ", myi, j, k, nz, f(myi,j,k,1)
                    CDOM_k(k)  = f(myi,j,k,iCDOM)  ! CDOM is in ppb
                                  ! Convert mmol/m3 to g carbon/m3; CF_SPM is river specific
                                  ! and converts river OM to riverine SPM
@@ -335,7 +333,6 @@
 
 
        optNP = ZQn/ZQp    ! Optimal nutrient ratio for zooplankton
-!write(6,*) "istep=",istep
 !-----------------------------------------------------------------
 !   Begin main ij loop for the biogeochemistry 
 !   calculations at time-level istep
@@ -480,10 +477,6 @@
                   enddo
                 enddo
 
-!                IF (nz > 0) THEN
-!                    WRITE(6,*) "f(myi,j,:,iA(1)) = ", f(myi,j,:,iA(1))
-!                    WRITE(6,*) "myi, j, Chla_tot_k(:) = ", myi, j, Chla_tot_k(:) 
-!                ENDIF
                  if(nz.gt.0) call Call_IOP_PAR(                        &
                  & PARsurf    , SunZenithAtm,                          &
                  & CDOM_k     , Chla_tot_k,                            &
@@ -967,7 +960,6 @@
         RALK_Z     = RC(9)
         RN2_Z      = RC(10)
 
-!!write(6,*) "2. s_y1Z",myi,j,k,s_y1Z(myi,j,k)
 
 !------------------------------------------------------------
 ! Particulate and Dissolved riverine OM, rate of remineralization 
@@ -1076,10 +1068,8 @@ enddo
 
                                              ! Dissolved
 
- !write(6,*) stoich_x1A
    !This calculates the cumulative stoichiometry ratios for OM1_A
    if(OM1_CA.gt.tiny(x)) then
-!   if(OM1_CA.ne.0) then
     stoich_x1A = (OM1_CA*dTd + OM1_A) / (OM1_PA*dTd + (1/s_x1A(myi,j,k))*OM1_A) ! C/P
     stoich_y1A = (OM1_NA*dTd + (s_y1A(myi,j,k)/s_x1A(myi,j,k))*OM1_A) / (OM1_PA*dTd + (1/s_x1A(myi,j,k))*OM1_A) !N/P
     stoich_z1A = 1.
@@ -1095,7 +1085,6 @@ enddo
 
    !This calculates the cumulative stoichiometry ratios for OM2_A
    if(OM2_CA.gt.tiny(x)) then
-!    if(OM2_CA.ne.0) then
     stoich_x2A = (OM2_CA*dTd + OM2_A) / (OM2_PA*dTd + (1/s_x2A(myi,j,k))*OM2_A) ! C/P
     stoich_y2A = (OM2_NA*dTd + (s_y2A(myi,j,k)/s_x2A(myi,j,k))*OM2_A) / (OM2_PA*dTd + (1/s_x2A(myi,j,k))*OM2_A) !N/P
     stoich_z2A = 1.
@@ -1148,7 +1137,6 @@ enddo
 
    !This calculates the cumulative stoichiometry ratios for OM1_Z
    if(OM1_CZ.gt.tiny(x)) then
-!    if(OM1_CZ.ne.0) then
     stoich_x1Z = (OM1_CZ*dTd + OM1_Z) / (OM1_PZ*dTd + (1./s_x1Z(myi,j,k))*OM1_Z) ! C/P
     stoich_y1Z = (OM1_NZ*dTd + (s_y1Z(myi,j,k)/s_x1Z(myi,j,k))*OM1_Z) / (OM1_PZ*dTd + (1./s_x1Z(myi,j,k))*OM1_Z) !N/P
     stoich_z1Z = 1.
@@ -1164,7 +1152,6 @@ enddo
 
    !This calculates the cumulative stoichiometry ratios for OM2_Z
    if(OM2_CZ.gt.tiny(x)) then
-!    if(OM2_CZ.ne.0) then
     stoich_x2Z = (OM2_CZ*dTd + OM2_Z) / (OM2_PZ*dTd + (1./s_x2Z(myi,j,k))*OM2_Z) !  C/P
     stoich_y2Z = (OM2_NZ*dTd + (s_y2Z(myi,j,k)/s_x2Z(myi,j,k))*OM2_Z) / (OM2_PZ*dTd + (1./s_x2Z(myi,j,k))*OM2_Z) !N/P
     stoich_z2Z = 1.
@@ -1376,12 +1363,10 @@ enddo
             do i = myi_start, myi_end
                 do k = 1, nza(i,j)
                    f(myi,j,k,:) = ff(myi,j,k,:)
-!                   WRITE(6,*) "myi, j, k, f(myi,j,k,iA(1)) = ", myi, j, k, f(myi,j,k,iA(1))
                 enddo
                 myi = myi + 1
             enddo
          enddo
-!         WRITE(6,*) "--------------------------------------------"
 
 !-- End Main GEM Calculations ---------------------------------------------------
 

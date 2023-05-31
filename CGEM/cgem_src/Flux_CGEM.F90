@@ -76,7 +76,6 @@ if (Which_fluxes(iCMAQ) .eq. 1) then !CMAQ
     if(myid .eq. 0) call Read_CMAQ_NO3_SVflux_bin(TC_8, NO3_CMAQ)
     if(numprocs .gt. 1) call MPI_BCAST(NO3_CMAQ, im*jm, MPI_real, 0, MPI_COMM_WORLD, mpierr)
     if(numprocs .gt. 1) call MPI_BCAST(NH4_CMAQ, im*jm, MPI_real, 0, MPI_COMM_WORLD, mpierr)
-!   write(6,*) "CMAQ option not supported, will run without CMAQ flux"
 endif
 
 
