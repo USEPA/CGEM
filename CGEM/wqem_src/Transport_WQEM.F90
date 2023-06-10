@@ -1,5 +1,9 @@
        Subroutine Transport_WQEM(myid,numprocs)
-
+       !
+       ! This subroutine calls the advection and vertical mixing subroutines.
+       ! It also resets the boundary concentrations (if using boundary
+       ! conditions).
+       !
        USE Model_dim
        USE INPUT_VARS, ONLY: Which_VMix
        USE State_Vars

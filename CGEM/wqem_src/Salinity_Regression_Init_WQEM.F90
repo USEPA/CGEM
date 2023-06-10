@@ -1,5 +1,8 @@
       Subroutine Salinity_Regression_Init_WQEM()
-
+      !--------------------------------------------------------------
+      ! This subroutine initializes state variables using linear 
+      ! regression equations based on salinity and water depth.
+      !--------------------------------------------------------------
       USE Model_dim
       USE STATES 
       USE EUT, ONLY:CCHLD,CCHLG
@@ -103,12 +106,6 @@
       myi = myi + 1
       enddo
       enddo
-
-#ifdef DEBUG
-write(6,*) "---Salinity_Regression_Init_WQEM"
-write(6,*) 
-#endif
-
 
 
       end subroutine Salinity_Regression_Init_WQEM

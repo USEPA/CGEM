@@ -1,6 +1,8 @@
 SUBROUTINE WQEM(TC_8)
 !------------------------------------------------------------------------------
-!
+! This subroutine is the main program.
+! It calls the kinetic subroutines.
+!------------------------------------------------------------------------------
 
 USE Model_dim
 USE Grid

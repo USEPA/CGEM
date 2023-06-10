@@ -23,10 +23,6 @@
        INTEGER :: i, j, mpierr
        INTEGER, SAVE :: init=1
        REAL, PARAMETER :: SDay = 86400.0  ! # of sec in 24 hr day
-       !Esed is quanta/cm2/s
-       !Need mol photons/m2/d, N_Av=6.0221413E+23
-       !quanta/cm2/s * 1 mol/N_av quanta * 10,000cm2/m2 * 86400s/d = mol/m2/d
-       ! 1e-23 * 1e4 * 1e4 = 1e-15
        REAL, PARAMETER :: cnvt_O2 = 32.e-6
        REAL, PARAMETER :: cnvt_DIC = 12.e-6
        REAL, PARAMETER :: cnvt_N = 14.e-6
@@ -145,12 +141,12 @@ endif
    END DO      ! end of do j block do loop
 
 !-- BOTTOM FLUXES -------------------------------------------------------------------------
-         do j = 1,jm
-         myi = 1
-         do i = myi_start,myi_end
-                nz = nza(i,j)
-             if(nz.gt.0) then  !water cell
-              if(wsm(i,j).eq.0) then !If we are on the shelf
+do j = 1, jm
+   myi = 1
+   do i = myi_start, myi_end
+          nz = nza(i,j)
+          if(nz.gt.0) then  !water cell
+             if(wsm(i,j).eq.0) then !If we are on the shelf
 
 if(Which_Fluxes(iSOC).eq.1) then
 !Murrell and Lehrter sediment oxygen consumption
@@ -205,7 +201,7 @@ endif
    endif !End of if(nza(i,j) statement
    myi = myi+1
    END DO      ! end of do i block do loop
-   END DO      ! end of do j block do loop
+END DO      ! end of do j block do loop
 
 
        RETURN

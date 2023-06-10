@@ -7,7 +7,6 @@
 
 MODULE OUTPUT_NETCDF_WQEM
 
-!  USE netcdf
   USE xnetcdf
   USE NETCDF_UTILITIES ! For CHKERR, DEFDIM, DEFVI1, CONVERT_LONGITUDES, etc.
   USE DATE_TIME ! For TOTAL_SECONDS
@@ -22,9 +21,6 @@ MODULE OUTPUT_NETCDF_WQEM
 
   IMPLICIT NONE
 
-#ifdef _MPI
-!  include 'mpif.h'
-#endif
 
   ! Private
 
@@ -76,23 +72,12 @@ CONTAINS
     REAL,DIMENSION(IM, JM, KM):: DZ
     REAL,DIMENSION(IM,JM):: AREA
     REAL,DIMENSION(IM,JM,KM):: FM
-    REAL,DIMENSION(IM):: XLON
-    REAL,DIMENSION(JM):: YLAT
-   ! External NetCDF routines:
-!    INTEGER NF_CREATE, NF_ENDDEF, NF_PUT_VAR_INT, NF_PUT_VAR_REAL, NF_SYNC
-!    EXTERNAL NF_CREATE, NF_ENDDEF, NF_PUT_VAR_INT, NF_PUT_VAR_REAL, NF_SYNC
-   ! Locals:
     INTEGER IM_DIM, JM_DIM, KM_DIM, NSTEPP1_DIM
     INTEGER RLON_VAR, RLAT_VAR, H_VAR, FM_VAR
-    INTEGER XLON_VAR, YLAT_VAR
     INTEGER DZ_VAR,AREA_VAR
-    INTEGER J,I, INFO
+    INTEGER J, INFO
     INTEGER ERR, VARIABLE, DIM_IDS( 4 )
     REAL,DIMENSION(IM,JM):: RLON_COPY
-    REAL,PARAMETER :: LAT_MIN = 43.1
-    REAL,PARAMETER :: LAT_MAX = 44.4
-    REAL,PARAMETER :: LON_MIN = -80.0
-    REAL,PARAMETER :: LON_MAX = -76.00
     CHARACTER(LEN=40):: TIME_UNITS
     FILE_ID = -1
 
@@ -111,7 +96,6 @@ CONTAINS
     CALL DEFDIM( FILE_ID, IM_DIM, 'longitude', IM )
     CALL DEFDIM( FILE_ID, JM_DIM, 'latitude', JM )
     CALL DEFDIM( FILE_ID, KM_DIM, 'k', KM )
-!!  CALL DEFDIM( FILE_ID, NSTEPP1_DIM, 'time', NSTEP )
     CALL DEFDIM( FILE_ID, NSTEPP1_DIM, 'time', 0 ) ! 0 Means UNLIMITED size.
     ! Write global scalar attributes:
 
@@ -388,61 +372,28 @@ CONTAINS
 
     ! Define non-time-varying array variables:
 
-!    CALL DEFVR1( FILE_ID, IM_DIM, XLON_VAR, 'longitude', &
-!                 'x-coordinate in Cartesian system', 'm' )
-
-!    CALL DEFVR1( FILE_ID, JM_DIM, YLAT_VAR, 'latitude', &
-!                 'y-coordinate in Cartesian system', 'm' )
-
     CALL DEFVR2( FILE_ID, IM_DIM, JM_DIM, RLON_VAR, 'LONGXY', &
                  'longitude', 'degrees_east' )
 
-!CWS
-!    CALL DEFVRTATT( FILE_ID, RLON_VAR, 'axis','X')
-#ifdef DEBUG
-write(6,*) "After long"
-#endif
-
-
     CALL DEFVR2( FILE_ID, IM_DIM, JM_DIM, RLAT_VAR, 'LATIXY', &
                  'latitude', 'degrees_north' )
-!CWS
-!    CALL DEFVRTATT( FILE_ID, RLAT_VAR, 'axis','Y')
-#ifdef DEBUG
-write(6,*) "After lat"
-#endif
 
     CALL DEFVR3( FILE_ID, IM_DIM, JM_DIM, KM_DIM, H_VAR, 'h', &
                  'Cell bottom depth.', 'm' )
-#ifdef DEBUG
-write(6,*) "After hvar"
-#endif
 
     CALL DEFVR3( FILE_ID, IM_DIM, JM_DIM, KM_DIM, FM_VAR, 'fm', &
                  'Mask: 0 = land, 1 = water.', 'none' )
-#ifdef DEBUG
-write(6,*) "After fm"
-#endif
 
     CALL DEFVR3( FILE_ID, IM_DIM, JM_DIM, KM_DIM, DZ_VAR, 'dz', &
                  'Thickness of cell.', 'none' )
-#ifdef DEBUG
-write(6,*) "After dz"
-#endif
 
     CALL DEFVR2( FILE_ID, IM_DIM, JM_DIM, AREA_VAR, 'Area', &
                  'Area of cell.', 'm2' )
-#ifdef DEBUG
-write(6,*) "After Area"
-#endif
 
     ! Define time array variable as each output data's seconds since IYR0:
 
     WRITE ( TIME_UNITS, '(A,I4.4,A)' ) &
             'Seconds since ', iYr0, '-01-01 00:00:00Z'
-#ifdef DEBUG
-write(6,*) "After t units"
-#endif
 
     ! Note: this is defined as an 8-byte real in the file
     ! because NetCDF does not support 8-byte integers.
@@ -450,9 +401,6 @@ write(6,*) "After t units"
 
     CALL DEFVD1( FILE_ID, NSTEPP1_DIM, TIME_VAR, 'time', &
                  TRIM( TIME_UNITS ), TRIM( TIME_UNITS ) )
-#ifdef DEBUG
-write(6,*) "After time"
-#endif
 
     ! Define time-varying array variables:
 
@@ -477,9 +425,6 @@ write(6,*) VARIABLE,VARIABLE_NAMES(VARIABLE),VARIABLE_DESCRIPTIONS( VARIABLE),VA
       END IF
     END DO
 
-#ifdef DEBUG
-write(6,*) "After Vars"
-#endif
 
     ! Define extra time-varying array variables:
 
@@ -497,9 +442,6 @@ write(6,*) "After Vars"
                    TRIM( EXTRA_VARIABLE_UNITS( VARIABLE ) ),1 )
       END IF
     END DO
-#ifdef DEBUG
-write(6,*) "After Extra_Vars"
-#endif
 
     ! End of NetCDF header:
 
@@ -509,20 +451,6 @@ write(6,*) "After Extra_Vars"
     CALL CHKERR( ERR, 'begin independent data access mode' )
 
     ! Write non-time-varying array variables:
-
-    DO I = 1, IM
-      XLON(I) = I
-    ENDDO
-
-    DO J = 1, JM
-      YLAT(J) = J
-    ENDDO
-
-!    ERR = ncdf_PUT_VAR_REAL( FILE_ID, XLON_VAR, XLON )
-!    CALL CHKERR( ERR, 'write output variable xlon' )
-
-!    ERR = ncdf_PUT_VAR_REAL( FILE_ID, YLAT_VAR, YLAT )
-!    CALL CHKERR( ERR, 'write output variable ylat' )
 
     RLON_COPY = RLON
 
@@ -573,9 +501,6 @@ write(6,*) "After Extra_Vars"
     CHARACTER(LEN=*),INTENT(IN):: NAME
     INTEGER,INTENT(IN):: FIRST_TIMESTEP
     INTEGER,INTENT(IN):: VARIABLES, EXTRA_VARIABLES1
-    ! External NetCDF routines:
-!    INTEGER NF__OPEN, NF_INQ_VARID, NF_GET_ATT_INT, NF_GET_ATT_REAL
-!    EXTERNAL NF__OPEN, NF_INQ_VARID, NF_GET_ATT_INT, NF_GET_ATT_REAL
     ! Locals:
     INTEGER ERR, VARIABLE
     INTEGER DT_OUT
@@ -675,9 +600,6 @@ write(6,*) Variable, EXTRA_VARIABLE_NAMES( VARIABLE ), EXTRA_VAR( VARIABLE )
     INTEGER,INTENT(IN):: IMSTART, JMSTART, KMSTART
     INTEGER,INTENT(IN):: IM, JM, KM, VARIABLES, TIMESTEP ! Model TIMESTEP is 0-based.
     REAL,DIMENSION(IM, JM, KM, VARIABLES):: F
-    ! External NetCDF routines:
-!    INTEGER NF_PUT_VARA_REAL, NF_PUT_VARA_DOUBLE, NF_SYNC
-!    EXTERNAL NF_PUT_VARA_REAL, NF_PUT_VARA_DOUBLE, NF_SYNC
     ! Locals:
     REAL(8):: SECONDS(1) ! TIME_VAR.
     INTEGER ERR, VARIABLE, FILE_TIMESTEP
@@ -693,7 +615,6 @@ write(6,*) Variable, EXTRA_VARIABLE_NAMES( VARIABLE ), EXTRA_VAR( VARIABLE )
     STARTS1( 1 ) = FILE_TIMESTEP + 1
     COUNTS1( 1 ) = 1
     SECONDS( 1 ) = SECONDS0 + FILE_TIMESTEP * SECONDS_PER_TIMESTEP
-!    ERR = NF_PUT_VARA_DOUBLE( FILE_ID, TIME_VAR, STARTS, COUNTS, SECONDS) 
     ERR = ncdf_PUT_VARA_DOUBLE( FILE_ID, TIME_VAR, STARTS1, COUNTS1, SECONDS, REQUESTS(1)) 
     CALL CHKERR( ERR, 'write output variable time' )
 
@@ -747,12 +668,8 @@ write(6,*) Variable, EXTRA_VARIABLE_NAMES( VARIABLE ), EXTRA_VAR( VARIABLE )
     IMPLICIT NONE
     INTEGER,INTENT(IN):: IM, JM, KM, EXTRA_VARIABLES1, TIMESTEP
     INTEGER,INTENT(IN):: IMSTART,JMSTART,KMSTART
-    ! External NetCDF routines:
-!    INTEGER NF_PUT_VARA_REAL, NF_SYNC
-!    EXTERNAL NF_PUT_VARA_REAL, NF_SYNC
-
     INTEGER,DIMENSION(EXTRA_VARIABLES1):: REQUESTS, STATUSES
-!    INTEGER,DIMENSION(1):: REQUESTS, STATUSES
+
     ! Locals:
     INTEGER ERR, FILE_TIMESTEP, VARIABLE
     INTEGER(KIND=MPI_OFFSET_KIND)  STARTS(4),COUNTS(4)
@@ -778,9 +695,6 @@ write(6,*) Variable, EXTRA_VARIABLE_NAMES( VARIABLE ), EXTRA_VAR( VARIABLE )
 
     IF ( WRITE_EXTRA_VARIABLE( VARIABLE ) ) THEN
       REQUEST_COUNT = REQUEST_COUNT + 1
-!      ERR = NF_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
-!                                  STARTS, COUNTS, &
-!                                  SUM_DENITR( 1, 1, 1 ))
       ERR = ncdf_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
                                   STARTS, COUNTS, &
                                   SUM_DENITR( 1, 1, 1 ),REQUESTS(REQUEST_COUNT))
@@ -793,9 +707,6 @@ write(6,*) Variable, EXTRA_VARIABLE_NAMES( VARIABLE ), EXTRA_VAR( VARIABLE )
 
     IF ( WRITE_EXTRA_VARIABLE( VARIABLE ) ) THEN
       REQUEST_COUNT = REQUEST_COUNT + 1
-!      ERR = NF_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
-!                                  STARTS, COUNTS, &
-!                                  SUM_DENITR_C( 1, 1, 1 ))
       ERR = ncdf_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
                                   STARTS, COUNTS, &
                                   SUM_DENITR_C( 1, 1, 1),REQUESTS(REQUEST_COUNT))
@@ -1061,18 +972,12 @@ write(6,*) Variable, EXTRA_VARIABLE_NAMES( VARIABLE ), EXTRA_VAR( VARIABLE )
   !
   SUBROUTINE FLUSH_FILE()
     IMPLICIT NONE
-    ! External NetCDF routines:
-!    INTEGER NF_PUT_VARA_REAL, NF_SYNC
-!    EXTERNAL NF_PUT_VARA_REAL, NF_SYNC
     INTEGER ERR
     ERR = ncdf_SYNC( FILE_ID )
     CALL CHKERR( ERR, 'flush buffers to disk ' )
 
     RETURN
   END SUBROUTINE FLUSH_FILE
-
-
-  ! Private
 
 
 
