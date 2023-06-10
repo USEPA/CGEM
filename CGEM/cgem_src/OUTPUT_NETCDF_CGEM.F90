@@ -17,10 +17,6 @@ MODULE OUTPUT_NETCDF_CGEM
 
   IMPLICIT NONE
 
-#ifdef _MPI
-!  include 'mpif.h'
-#endif
-
   ! Private
 
   INTEGER TIME_VAR ! NetCDF ID for time array variable.
@@ -78,8 +74,6 @@ CONTAINS
     INTEGER DZ_VAR
     INTEGER i, J, INFO
     INTEGER ERR, VARIABLE, DIM_IDS( 4 )
-!    INTEGER NF_CLOBBER, NF_64BIT_OFFSET
-!    EXTERNAL NF_CLOBBER, NF_64BIT_OFFSET
     REAL,DIMENSION(IM,JM):: RLON_COPY
     CHARACTER(LEN=40):: TIME_UNITS
     CHARACTER(LEN=14):: var
@@ -100,7 +94,6 @@ CONTAINS
     CALL DEFDIM( FILE_ID, IM_DIM, 'longitude', IM )
     CALL DEFDIM( FILE_ID, JM_DIM, 'latitude', JM )
     CALL DEFDIM( FILE_ID, KM_DIM, 'k', KM )
-!!  CALL DEFDIM( FILE_ID, NSTEPP1_DIM, 'time', NSTEP )
     CALL DEFDIM( FILE_ID, NSTEPP1_DIM, 'time', 0 ) ! 0 Means UNLIMITED size.
     ! Write global scalar attributes:
 
@@ -366,10 +359,6 @@ CONTAINS
       END IF
     END DO
 
-    !write(6,*) "ev1--------",EXTRA_VAR
-    !write(6,*) EXTRA_VARIABLE_NAMES
-    !write(6,*) EXTRA_VARIABLE_DESCRIPTIONS
-    !write(6,*) EXTRA_VARIABLE_UNITS
     ! End of NetCDF header:
 
     ERR = ncdf_ENDDEF( FILE_ID )
@@ -528,17 +517,14 @@ CONTAINS
     INTEGER,DIMENSION(STATE_VARIABLES+1):: REQUESTS, STATUSES
 
     FILE_TIMESTEP = TIMESTEP - FILE_FIRST_TIMESTEP
-    !write(6,*) "FILE_TIMESTEP",FILE_TIMESTEP
     
     ! Write time variable as an 8-byte real since NetCDF lacks 8-byte integer:
 
     STARTS1( 1 ) = FILE_TIMESTEP + 1
     COUNTS1( 1 ) = 1
     SECONDS( 1 ) = SECONDS0 + FILE_TIMESTEP * SECONDS_PER_TIMESTEP
-    !write(6,*) "seconds",seconds
     ERR = ncdf_PUT_VARA_DOUBLE( FILE_ID, TIME_VAR, STARTS1, COUNTS1, SECONDS, REQUESTS(1)) 
     CALL CHKERR( ERR, 'write output variable time' )
-    !write(6,*) "double",FILE_ID, TIME_VAR, STARTS1, COUNTS1, SECONDS, REQUESTS(1)    
 
     REQUEST_COUNT = 1
 
@@ -629,17 +615,9 @@ CONTAINS
     COUNTS( 4 ) = 1
 
 
-    !write(6,*) IMSTART, JMSTART, KMSTART, IM, JM, KM, TIMESTEP
-    !write(6,*) "9 RN2_ijk",RN2(28,18,1)
-    !write(6,*) "9 PARdepth_ijk",irradiance(28,18,1)
-    !write(6,*) "PARpercent",irradiance_fraction(28,18,1)
-    !write(6,*) "un",uN(28,18,1,:)
-    !write(6,*) "Chla",Chla_mg_tot(28,18,1)
-    !write(6,*) "9 s_y1Z",s_y1FP(28,18,1)
 
     ! Write each extra variable (if selected to be written):
 
-    !write(6,*) "ev", EXTRA_VAR
     REQUEST_COUNT = 0
 
     VARIABLE = 1 ! IRRADIANCE:
@@ -667,7 +645,6 @@ CONTAINS
     DO INDEX = 1, nospA ! UN(:,:,:,SPECIES):
       VARIABLE = VARIABLE + 1
 
-      !write(6,*) "UN before",index,"of",nospA,variable,UN(1,1,1,index)
 
       IF ( WRITE_EXTRA_VARIABLE( VARIABLE ) ) THEN
     REQUEST_COUNT = REQUEST_COUNT + 1
@@ -678,8 +655,6 @@ CONTAINS
                      // EXTRA_VARIABLE_NAMES( VARIABLE ) )
       END IF
     END DO
-      !write(6,*) "UN after",index,variable,UN(1,1,1,index-1)
-      !write(6,*) EXTRA_VAR
     DO INDEX = 1, nospA ! UP(:,:,:,SPECIES):
       VARIABLE = VARIABLE + 1
 
@@ -923,14 +898,6 @@ CONTAINS
     END IF
 
 
-!write(6,*) "19 RN2_ijk",RN2(28,18,1)
-!write(6,*) "19 PARdepth_ijk",irradiance(28,18,1)
-!write(6,*) "PARpercent",irradiance_fraction(28,18,1)
-!write(6,*) "un",uN(28,18,1,:)
-!write(6,*) "Chla",Chla_mg_tot(28,18,1)
-!write(6,*) "19 s_y1Z",s_y1FP(28,18,1)
-
-
     ERR = ncdf_WAIT_ALL( FILE_ID, REQUEST_COUNT, REQUESTS, STATUSES)
     CALL CHKERR( ERR, 'implement non-blocking interface' )
 
@@ -1058,7 +1025,6 @@ Subroutine OUTPUT_NETCDF_CGEM_allocate
   ALLOCATE( WRITE_VARIABLE(nf) ) 
   do i=1,nf
    WRITE_VARIABLE(i) = .TRUE.
-!   WRITE_VARIABLE(i) = .FALSE.
   enddo
 
 
@@ -1235,11 +1201,6 @@ Subroutine OUTPUT_NETCDF_CGEM_allocate
   do i = 1, EXTRA_VARIABLES
      WRITE_EXTRA_VARIABLE(i) = .TRUE. !.FALSE. 
   enddo
-
-  !WRITE_EXTRA_VARIABLE(EXTRA_VARIABLES) = .TRUE.
-  !WRITE_EXTRA_VARIABLE(EXTRA_VARIABLES-1) = .TRUE.
-  !WRITE_EXTRA_VARIABLE(EXTRA_VARIABLES-2) = .TRUE.
-
 
   ALLOCATE(EXTRA_VARIABLE_DESCRIPTIONS(EXTRA_VARIABLES))
     EXTRA_VARIABLE_DESCRIPTIONS(1) = 'Irradiance at depth.  ' 

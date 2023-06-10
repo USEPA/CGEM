@@ -39,7 +39,6 @@
         stop
     endif
 
-     !write(6,*) "fE,alphad,E",f_E,alphad,E
  
     RETURN
   END SUBROUTINE func_E  

@@ -26,13 +26,10 @@
 !Then convert from C to N
       F_POM_A = -SDay*ws(iOM1_A)*f(iOM1_A)*A_N/A_C
       F_POM_Z = -SDay*ws(iOM1_Z)*f(iOM1_Z)*Z_N/Z_C
-!      F_POM_A = -SDay*ws(iOM1_A)*f(iOM1_A)*16./106.
-!      F_POM_Z = -SDay*ws(iOM1_Z)*f(iOM1_Z)*16./106.
       F_POM_R = -SDay*ws(iOM1_R)*f(iOM1_R)*4.5/51.
       F_POM_BC = -SDay*ws(iOM1_BC)*f(iOM1_BC)*16./106.
       F_POM = F_POM_A + F_POM_Z + F_POM_R + F_POM_BC  
 
-      !write(6,*) "F_POM",F_POM
 
 !Rename variables for equation readability
       O2  = f(iO2)
@@ -78,8 +75,6 @@
 !Subtract OM flux, with conversion back to C from N
       f(iOM1_A) = AMAX1(f(iOM1_A)  - (A_C/A_N)*F_POM_A/h*dT/Sday,0.)
       f(iOM1_Z) = AMAX1(f(iOM1_Z)  - (Z_C/Z_N)*F_POM_Z/h*dT/Sday,0.)
-!      f(iOM1_A) = AMAX1(f(iOM1_A)  - (106./16.)*F_POM_A/h*dT/Sday,0.)
-!      f(iOM1_Z) = AMAX1(f(iOM1_Z)  - (106./16.)*F_POM_Z/h*dT/Sday,0.)
       f(iOM1_R) = AMAX1(f(iOM1_R)  - (51./4.5)*F_POM_R/h*dT/Sday,0.)
       f(iOM1_BC) = AMAX1(f(iOM1_BC)  - (106./16.)*F_POM_BC/h*dT/Sday,0.)
 

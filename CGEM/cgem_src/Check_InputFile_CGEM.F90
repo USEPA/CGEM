@@ -10,40 +10,32 @@ IMPLICIT NONE
 integer isp
 real x
 
-!read(999,*) Which_fluxes
 
-!read(999,*) Which_temperature
 if(Which_temperature.ne.1.and.Which_temperature.ne.2.and.Which_temperature.ne.3.and.Which_temperature.ne.4) then
   write(6,*) "Which_temperature is outside of range 1-4"
   stop 
 endif
 
-!read(999,*) Which_uptake
 if(Which_uptake.ne.1.and.Which_uptake.ne.2.and.Which_uptake.ne.3) then
   write(6,*) "Which_uptake is outside of range 1-3"
   stop
 endif
 
-!read(999,*) Which_quota
 if(Which_quota.ne.1.and.Which_quota.ne.2.and.Which_quota.ne.3.and.Which_quota.ne.4) then
   write(6,*) "Which_quota is outside of range 1-4"
   stop
 endif
 
-
-!read(999,*) Which_irradiance 
 if(Which_irradiance.ne.1.and.Which_irradiance.ne.2.and.Which_irradiance.ne.3) then
   write(6,*) "Which_irradiance is outside of range 1-3"
   stop
 endif
 
-!read(999,*) Which_chlaC
 if(Which_chlaC.ne.1.and.Which_chlaC.ne.2) then
   write(6,*) "Which_chlaC is outside of range 1-2"
   stop
 endif
 
-!read(999,*) Which_photosynthesis 
 if(Which_photosynthesis.ne.1.and.Which_photosynthesis.ne.2.and.Which_photosynthesis.ne.3.and.Which_photosynthesis.ne.4) then
   write(6,*) "Which_photosynthesis is outside of range 1-4"
   stop
@@ -54,7 +46,6 @@ if(Which_photosynthesis.eq.3.and.Which_growth.ne.3) then
   stop
 endif
 
-!read(999,*) Which_growth
 if(Which_growth.ne.1.and.Which_growth.ne.2.and.Which_growth.ne.3) then
   write(6,*) "Which_growth is outside of range 1-3"
   stop
@@ -64,12 +55,6 @@ if(Which_growth.eq.3.and.Which_photosynthesis.ne.3) then
   write(6,*) "If Which_growth=3 then Which_photosynthesis should =3"
   stop
 endif
-
-!read(999,*) SolarRad
-!if(SolarRad.ne.0) then
-!  write(6,*) "SolarRad will be calculated, currently the only option"
-!endif
-
 
 !Do a test to make sure Qmax is greater than Qmin:
 do isp=1,nospA

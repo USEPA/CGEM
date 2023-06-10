@@ -90,7 +90,6 @@ Subroutine Salinity_Regression_Init_CGEM()
             temp = -3.97 * S(i,j,k) - 0.01 * d_sfc(i,j,k) + 157.42
             temp_OM1 = AMAX1(temp,0.01)
             f( myi, j, k, iOM1_BC ) = temp_OM1 * m_OM_init
-            !write(6,*) "INIT",temp_OM1 , m_OM_init
 
             !DOC==OM2
             temp = -6.39 * S(i,j,k) - 0.40 * d_sfc(i,j,k) + 338.89
