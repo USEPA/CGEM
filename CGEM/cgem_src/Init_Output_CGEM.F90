@@ -17,7 +17,7 @@
        character(100),intent(in) :: DIntRates_filename
        character(256) :: NETCDF_OUTPUT_FILE_NAME
        real :: dumf(myim,jm,km,nf)
-       integer :: i,j,k,nz,myi,myid,numprocs,mpierr
+       integer :: myid,numprocs,mpierr
 
 
        ! Change True/False parameters for netCDF Write Variables

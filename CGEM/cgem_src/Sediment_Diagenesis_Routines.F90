@@ -103,8 +103,6 @@ contains
       ! the fortran compiler unused variable warning.
       IFLAG = IFLAG 
 
-      !write(6,*) "In CASES, Y1=",Y(1)
-
 !      IF (IFLAG .EQ. 1) THEN
 
 !       This sets some values according to Ainp, so always do this
@@ -117,13 +115,11 @@ contains
 !           Y(I)= YY(I)
 !        ENDDO
 !        IFLAG = 0
-!        write(*,*) 'NPOINTS',NPOINTS
-!        write(*,*) 'NEQ', NEQ
 !      ENDIF
 
 
 !
-! -------- provide new T and tout
+! -------- provide new T and TOUT
 !
 
       T = value1
@@ -139,19 +135,8 @@ contains
            pH(I) = ppH(I)
         ENDDO
 
-!----- Get DATA forthe water-column model
-!      write(*,*) "In CASES,before DVODE, Y1=",Y(1)
-!      write(*,*) "In CASES,before DVODE, pH1=",pH(1)
-!      write(*,*) 'NPOINTS',NPOINTS
-!      write(*,*) 'NEQ', NEQ
-!      write(*,*) "Value1,Value2",value1,value2
-!      write(*,*) "Y1,T,TOUT",Y(1),T,TOUT
-
       CALL DVODE(NEQ, Y, T, TOUT, ITOL, RTOL, ATOL, ITASK, &
                  ISTATE, IOPT, RWORK, LRW, IWORK, LIW, MF, RPAR, IPAR)
-
-!      write(6,*) "In CASES,after DVODE, Y1=",Y(1)
-!      write(6,*) "In CASES,after DVODE, pH1=",pH(1)
 
 !L3 I don't even think that pH gets updated, but in case, then here:
         DO I = 1, NPOINTS
@@ -2196,67 +2181,67 @@ contains
 !       ..
 !
 !
-!> \par Purpose:
+!  par Purpose:
 !  =============
-!>
-!> \verbatim
-!>
-!>    DCOPY copies a vector, x, to a vector, y.
-!>    uses unrolled loops for increments equal to 1.
-!> \endverbatim
+! 
+!  verbatim
+! 
+!     DCOPY copies a vector, x, to a vector, y.
+!     uses unrolled loops for increments equal to 1.
+!  endverbatim
 !
 !  Arguments:
 !  ==========
 !
-!> \param[in] N
-!> \verbatim
-!>          N is INTEGER
-!>         number of elements in input vector(s)
-!> \endverbatim
-!>
-!> \param[in] DX
-!> \verbatim
-!>          DX is REAL(kind=8) array, dimension ( 1 + ( N - 1 )*abs( INCX ) )
-!> \endverbatim
-!>
-!> \param[in] INCX
-!> \verbatim
-!>          INCX is INTEGER
-!>         storage spacing between elements of DX
-!> \endverbatim
-!>
-!> \param[out] DY
-!> \verbatim
-!>          DY is REAL(kind=8) array, dimension ( 1 + ( N - 1 )*abs( INCY ) )
-!> \endverbatim
-!>
-!> \param[in] INCY
-!> \verbatim
-!>          INCY is INTEGER
-!>         storage spacing between elements of DY
-!> \endverbatim
+!  param[in] N
+!  verbatim
+!           N is INTEGER
+!          number of elements in input vector(s)
+!  endverbatim
+! 
+!  param[in] DX
+!  verbatim
+!           DX is REAL(kind=8) array, dimension ( 1 + ( N - 1 )*abs( INCX ) )
+!  endverbatim
+! 
+!  param[in] INCX
+!  verbatim
+!           INCX is INTEGER
+!          storage spacing between elements of DX
+!  endverbatim
+! 
+!  param[out] DY
+!  verbatim
+!           DY is REAL(kind=8) array, dimension ( 1 + ( N - 1 )*abs( INCY ) )
+!  endverbatim
+! 
+!  param[in] INCY
+!  verbatim
+!           INCY is INTEGER
+!          storage spacing between elements of DY
+!  endverbatim
 !
 !  Authors:
 !  ========
 !
-!> \author Univ. of Tennessee
-!> \author Univ. of California Berkeley
-!> \author Univ. of Colorado Denver
-!> \author NAG Ltd.
+!  author Univ. of Tennessee
+!  author Univ. of California Berkeley
+!  author Univ. of Colorado Denver
+!  author NAG Ltd.
 !
-!> \date December 2016
+!  date December 2016
 !
-!> \ingroup double_blas_level1
+!  ingroup double_blas_level1
 !
-!> \par Further Details:
+!  par Further Details:
 !  =====================
-!>
-!> \verbatim
-!>
-!>     jack dongarra, linpack, 3/11/78.
-!>     modified 12/3/93, array(1) declarations changed to array(*)
-!> \endverbatim
-!>
+! 
+!  verbatim
+! 
+!      jack dongarra, linpack, 3/11/78.
+!      modified 12/3/93, array(1) declarations changed to array(*)
+!  endverbatim
+! 
 !  =====================================================================
       SUBROUTINE DCOPY(N,DX,INCX,DY,INCY)
 !
@@ -2346,67 +2331,67 @@ contains
 !        ..
 ! 
 ! 
-! > \par Purpose:
+!  par Purpose:
 !   =============
-! >
-! > \verbatim
-! >
-! >    DDOT forms the dot product of two vectors.
-! >    uses unrolled loops for increments equal to one.
-! > \endverbatim
+! 
+!  verbatim
+! 
+!     DDOT forms the dot product of two vectors.
+!     uses unrolled loops for increments equal to one.
+!  endverbatim
 ! 
 !   Arguments:
 !   ==========
 ! 
-! > \param[in] N
-! > \verbatim
-! >          N is INTEGER
-! >         number of elements in input vector(s)
-! > \endverbatim
-! >
-! > \param[in] DX
-! > \verbatim
-! >          DX is REAL(kind=8) array, dimension ( 1 + ( N - 1 )*abs( INCX ) )
-! > \endverbatim
-! >
-! > \param[in] INCX
-! > \verbatim
-! >          INCX is INTEGER
-! >         storage spacing between elements of DX
-! > \endverbatim
-! >
-! > \param[in] DY
-! > \verbatim
-! >          DY is REAL(kind=8) array, dimension ( 1 + ( N - 1 )*abs( INCY ) )
-! > \endverbatim
-! >
-! > \param[in] INCY
-! > \verbatim
-! >          INCY is INTEGER
-! >         storage spacing between elements of DY
-! > \endverbatim
+!  param[in] N
+!  verbatim
+!           N is INTEGER
+!          number of elements in input vector(s)
+!  endverbatim
+! 
+!  param[in] DX
+!  verbatim
+!           DX is REAL(kind=8) array, dimension ( 1 + ( N - 1 )*abs( INCX ) )
+!  endverbatim
+! 
+!  param[in] INCX
+!  verbatim
+!           INCX is INTEGER
+!          storage spacing between elements of DX
+!  endverbatim
+! 
+!  param[in] DY
+!  verbatim
+!           DY is REAL(kind=8) array, dimension ( 1 + ( N - 1 )*abs( INCY ) )
+!  endverbatim
+! 
+!  param[in] INCY
+!  verbatim
+!           INCY is INTEGER
+!          storage spacing between elements of DY
+!  endverbatim
 ! 
 !   Authors:
 !   ========
 ! 
-! > \author Univ. of Tennessee
-! > \author Univ. of California Berkeley
-! > \author Univ. of Colorado Denver
-! > \author NAG Ltd.
+!  author Univ. of Tennessee
+!  author Univ. of California Berkeley
+!  author Univ. of Colorado Denver
+!  author NAG Ltd.
 ! 
-! > \date December 2016
+!  date December 2016
 ! 
-! > \ingroup double_blas_level1
+!  ingroup double_blas_level1
 ! 
-! > \par Further Details:
+!  par Further Details:
 !   =====================
-! >
-! > \verbatim
-! >
-! >     jack dongarra, linpack, 3/11/78.
-! >     modified 12/3/93, array(1) declarations changed to array(*)
-! > \endverbatim
-! >
+! 
+!  verbatim
+! 
+!      jack dongarra, linpack, 3/11/78.
+!      modified 12/3/93, array(1) declarations changed to array(*)
+!  endverbatim
+! 
 !   =====================================================================
       REAL(kind=8) FUNCTION ddot(N,DX,INCX,DY,INCY)
 ! 
@@ -2631,7 +2616,7 @@ contains
 
 
 !L3 swap updated BLAS 12/3/93
-!> \brief \b DAXPY
+!  brief DAXPY
 !
 !  =========== DOCUMENTATION ===========
 !
@@ -2652,73 +2637,73 @@ contains
 !       ..
 !
 !
-!> \par Purpose:
+!  par Purpose:
 !  =============
-!>
-!> \verbatim
-!>
-!>    DAXPY constant times a vector plus a vector.
-!>    uses unrolled loops for increments equal to one.
-!> \endverbatim
+! 
+!  verbatim
+! 
+!     DAXPY constant times a vector plus a vector.
+!     uses unrolled loops for increments equal to one.
+!  endverbatim
 !
 !  Arguments:
 !  ==========
 !
-!> \param[in] N
-!> \verbatim
-!>          N is INTEGER
-!>         number of elements in input vector(s)
-!> \endverbatim
-!>
-!> \param[in] DA
-!> \verbatim
-!>          DA is REAL(kind=8)
-!>           On entry, DA specifies the scalar alpha.
-!> \endverbatim
-!>
-!> \param[in] DX
-!> \verbatim
-!>          DX is REAL(kind=8) array, dimension ( 1 + ( N - 1 )*abs( INCX ) )
-!> \endverbatim
-!>
-!> \param[in] INCX
-!> \verbatim
-!>          INCX is INTEGER
-!>         storage spacing between elements of DX
-!> \endverbatim
-!>
-!> \param[in,out] DY
-!> \verbatim
-!>          DY is REAL(kind=8) array, dimension ( 1 + ( N - 1 )*abs( INCY ) )
-!> \endverbatim
-!>
-!> \param[in] INCY
-!> \verbatim
-!>          INCY is INTEGER
-!>         storage spacing between elements of DY
-!> \endverbatim
+!  param[in] N
+!  verbatim
+!           N is INTEGER
+!          number of elements in input vector(s)
+!  endverbatim
+! 
+!  param[in] DA
+!  verbatim
+!           DA is REAL(kind=8)
+!            On entry, DA specifies the scalar alpha.
+!  endverbatim
+! 
+!  param[in] DX
+!  verbatim
+!           DX is REAL(kind=8) array, dimension ( 1 + ( N - 1 )*abs( INCX ) )
+!  endverbatim
+! 
+!  param[in] INCX
+!  verbatim
+!           INCX is INTEGER
+!          storage spacing between elements of DX
+!  endverbatim
+! 
+!  param[in,out] DY
+!  verbatim
+!           DY is REAL(kind=8) array, dimension ( 1 + ( N - 1 )*abs( INCY ) )
+!  endverbatim
+! 
+!  param[in] INCY
+!  verbatim
+!           INCY is INTEGER
+!          storage spacing between elements of DY
+!  endverbatim
 !
 !  Authors:
 !  ========
 !
-!> \author Univ. of Tennessee
-!> \author Univ. of California Berkeley
-!> \author Univ. of Colorado Denver
-!> \author NAG Ltd.
+!  author Univ. of Tennessee
+!  author Univ. of California Berkeley
+!  author Univ. of Colorado Denver
+!  author NAG Ltd.
 !
-!> \date December 2016
+!  date December 2016
 !
-!> \ingroup double_blas_level1
+!  ingroup double_blas_level1
 !
-!> \par Further Details:
+!  par Further Details:
 !  =====================
-!>
-!> \verbatim
-!>
-!>     jack dongarra, linpack, 3/11/78.
-!>     modified 12/3/93, array(1) declarations changed to array(*)
-!> \endverbatim
-!>
+! 
+!  verbatim
+! 
+!      jack dongarra, linpack, 3/11/78.
+!      modified 12/3/93, array(1) declarations changed to array(*)
+!  endverbatim
+! 
 !  =====================================================================
        SUBROUTINE DAXPY(N,DA,DX,INCX,DY,INCY)
 !*
@@ -2784,7 +2769,7 @@ contains
 
 
 !L3 swap updated BLAS 12/3/93
-!> \brief \b DSCAL
+!  brief  DSCAL
 !
 !  =========== DOCUMENTATION ===========
 !
@@ -2805,63 +2790,63 @@ contains
 !       ..
 !
 !
-!> \par Purpose:
+!  par Purpose:
 !  =============
-!>
-!> \verbatim
-!>
-!>    DSCAL scales a vector by a constant.
-!>    uses unrolled loops for increment equal to 1.
-!> \endverbatim
+! 
+!  verbatim
+! 
+!     DSCAL scales a vector by a constant.
+!     uses unrolled loops for increment equal to 1.
+!  endverbatim
 !
 !  Arguments:
 !  ==========
 !
-!> \param[in] N
-!> \verbatim
-!>          N is INTEGER
-!>         number of elements in input vector(s)
-!> \endverbatim
-!>
-!> \param[in] DA
-!> \verbatim
-!>          DA is REAL(kind=8)
-!>           On entry, DA specifies the scalar alpha.
-!> \endverbatim
-!>
-!> \param[in,out] DX
-!> \verbatim
-!>          DX is REAL(kind=8) array, dimension ( 1 + ( N - 1 )*abs( INCX ) )
-!> \endverbatim
-!>
-!> \param[in] INCX
-!> \verbatim
-!>          INCX is INTEGER
-!>         storage spacing between elements of DX
-!> \endverbatim
+!  param[in] N
+!  verbatim
+!           N is INTEGER
+!          number of elements in input vector(s)
+!  endverbatim
+! 
+!  param[in] DA
+!  verbatim
+!           DA is REAL(kind=8)
+!            On entry, DA specifies the scalar alpha.
+!  endverbatim
+! 
+!  param[in,out] DX
+!  verbatim
+!           DX is REAL(kind=8) array, dimension ( 1 + ( N - 1 )*abs( INCX ) )
+!  endverbatim
+! 
+!  param[in] INCX
+!  verbatim
+!           INCX is INTEGER
+!          storage spacing between elements of DX
+!  endverbatim
 !
 !  Authors:
 !  ========
 !
-!> \author Univ. of Tennessee
-!> \author Univ. of California Berkeley
-!> \author Univ. of Colorado Denver
-!> \author NAG Ltd.
+!  author Univ. of Tennessee
+!  author Univ. of California Berkeley
+!  author Univ. of Colorado Denver
+!  author NAG Ltd.
 !
-!> \date December 2016
+!  date December 2016
 !
-!> \ingroup double_blas_level1
+!  ingroup double_blas_level1
 !
-!> \par Further Details:
+!  par Further Details:
 !  =====================
-!>
-!> \verbatim
-!>
-!>     jack dongarra, linpack, 3/11/78.
-!>     modified 3/93 to return if incx .le. 0.
-!>     modified 12/3/93, array(1) declarations changed to array(*)
-!> \endverbatim
-!>
+! 
+!  verbatim
+! 
+!      jack dongarra, linpack, 3/11/78.
+!      modified 3/93 to return if incx .le. 0.
+!      modified 12/3/93, array(1) declarations changed to array(*)
+!  endverbatim
+! 
 !  =====================================================================
       SUBROUTINE DSCAL(N,DA,DX,INCX)
 !
@@ -2923,7 +2908,7 @@ contains
 
 
 !L3 swap updated BLAS 12/3/93
-!> \brief \b IDAMAX
+!  brief IDAMAX
 !
 !  =========== DOCUMENTATION ===========
 !
@@ -2943,56 +2928,56 @@ contains
 !       ..
 !
 !
-!> \par Purpose:
+!  par Purpose:
 !  =============
-!>
-!> \verbatim
-!>
-!>    IDAMAX finds the index of the first element having maximum absolute value.
-!> \endverbatim
+! 
+!  verbatim
+! 
+!     IDAMAX finds the index of the first element having maximum absolute value.
+!  endverbatim
 !
 !  Arguments:
 !  ==========
 !
-!> \param[in] N
-!> \verbatim
-!>          N is INTEGER
-!>         number of elements in input vector(s)
-!> \endverbatim
-!>
-!> \param[in] DX
-!> \verbatim
-!>          DX is REAL(kind=8) array, dimension ( 1 + ( N - 1 )*abs( INCX ) )
-!> \endverbatim
-!>
-!> \param[in] INCX
-!> \verbatim
-!>          INCX is INTEGER
-!>         storage spacing between elements of SX
-!> \endverbatim
+!  param[in] N
+!  verbatim
+!           N is INTEGER
+!          number of elements in input vector(s)
+!  endverbatim
+! 
+!  param[in] DX
+!  verbatim
+!           DX is REAL(kind=8) array, dimension ( 1 + ( N - 1 )*abs( INCX ) )
+!  endverbatim
+! 
+!  param[in] INCX
+!  verbatim
+!           INCX is INTEGER
+!          storage spacing between elements of SX
+!  endverbatim
 !
 !  Authors:
 !  ========
 !
-!> \author Univ. of Tennessee
-!> \author Univ. of California Berkeley
-!> \author Univ. of Colorado Denver
-!> \author NAG Ltd.
+!  author Univ. of Tennessee
+!  author Univ. of California Berkeley
+!  author Univ. of Colorado Denver
+!  author NAG Ltd.
 !
-!> \date December 2016
+!  date December 2016
 !
-!> \ingroup aux_blas
+!  ingroup aux_blas
 !
-!> \par Further Details:
+!  par Further Details:
 !  =====================
-!>
-!> \verbatim
-!>
-!>     jack dongarra, linpack, 3/11/78.
-!>     modified 3/93 to return if incx .le. 0.
-!>     modified 12/3/93, array(1) declarations changed to array(*)
-!> \endverbatim
-!>
+! 
+!  verbatim
+! 
+!      jack dongarra, linpack, 3/11/78.
+!      modified 3/93 to return if incx .le. 0.
+!      modified 12/3/93, array(1) declarations changed to array(*)
+!  endverbatim
+! 
 !  =====================================================================
       INTEGER FUNCTION idamax(N,DX,INCX)
 !
@@ -3052,7 +3037,7 @@ contains
 
 
 !L3 swap updated BLAS 12/3/93
-!> \brief \b DSWAP
+!  brief  DSWAP
 !
 !  =========== DOCUMENTATION ===========
 !
@@ -3072,67 +3057,67 @@ contains
 !       ..
 !
 !
-!> \par Purpose:
+!  par Purpose:
 !  =============
-!>
-!> \verbatim
-!>
-!>    DSWAP interchanges two vectors.
-!>    uses unrolled loops for increments equal to 1.
-!> \endverbatim
+! 
+!  verbatim
+! 
+!     DSWAP interchanges two vectors.
+!     uses unrolled loops for increments equal to 1.
+!  endverbatim
 !
 !  Arguments:
 !  ==========
 !
-!> \param[in] N
-!> \verbatim
-!>          N is INTEGER
-!>         number of elements in input vector(s)
-!> \endverbatim
-!>
-!> \param[in,out] DX
-!> \verbatim
-!>          DX is REAL(kind=8) array, dimension ( 1 + ( N - 1 )*abs( INCX ) )
-!> \endverbatim
-!>
-!> \param[in] INCX
-!> \verbatim
-!>          INCX is INTEGER
-!>         storage spacing between elements of DX
-!> \endverbatim
-!>
-!> \param[in,out] DY
-!> \verbatim
-!>          DY is REAL(kind=8) array, dimension ( 1 + ( N - 1 )*abs( INCY ) )
-!> \endverbatim
-!>
-!> \param[in] INCY
-!> \verbatim
-!>          INCY is INTEGER
-!>         storage spacing between elements of DY
-!> \endverbatim
+!  param[in] N
+!  verbatim
+!           N is INTEGER
+!          number of elements in input vector(s)
+!  endverbatim
+! 
+!  param[in,out] DX
+!  verbatim
+!           DX is REAL(kind=8) array, dimension ( 1 + ( N - 1 )*abs( INCX ) )
+!  endverbatim
+! 
+!  param[in] INCX
+!  verbatim
+!           INCX is INTEGER
+!          storage spacing between elements of DX
+!  endverbatim
+! 
+!  param[in,out] DY
+!  verbatim
+!           DY is REAL(kind=8) array, dimension ( 1 + ( N - 1 )*abs( INCY ) )
+!  endverbatim
+! 
+!  param[in] INCY
+!  verbatim
+!           INCY is INTEGER
+!          storage spacing between elements of DY
+!  endverbatim
 !
 !  Authors:
 !  ========
 !
-!> \author Univ. of Tennessee
-!> \author Univ. of California Berkeley
-!> \author Univ. of Colorado Denver
-!> \author NAG Ltd.
+!  author Univ. of Tennessee
+!  author Univ. of California Berkeley
+!  author Univ. of Colorado Denver
+!  author NAG Ltd.
 !
-!> \date December 2016
+!  date December 2016
 !
-!> \ingroup double_blas_level1
+!  ingroup double_blas_level1
 !
-!> \par Further Details:
+!  par Further Details:
 !  =====================
-!>
-!> \verbatim
-!>
-!>     jack dongarra, linpack, 3/11/78.
-!>     modified 12/3/93, array(1) declarations changed to array(*)
-!> \endverbatim
-!>
+! 
+!  verbatim
+! 
+!      jack dongarra, linpack, 3/11/78.
+!      modified 12/3/93, array(1) declarations changed to array(*)
+!  endverbatim
+! 
 !  =====================================================================
       SUBROUTINE dswap(N,DX,INCX,DY,INCY)
 !
@@ -3987,21 +3972,7 @@ contains
        TESTTC    = Y(MID13)
        TESTALK   = Y(MID14)
        TESTDOM   = Y(MID15)
-! 
-!       IF (TESTOM1 .GT. 3.0D+03) write(*,*) ' 1 OM1 ',TESTOM1
-!       IF (TESTOM2 .GT. 3.0D+03) write(*,*) ' 1 OM2 ',TESTOM2
-!       IF (TESTO2  .GT. 3.0D+02) write(*,*) ' 1 O2 ',TESTO2
-!       IF (TESTNIT .GT. 3.0D+02) write(*,*) ' 1 No3 ',TESTNIT
-!       IF (TESTNH3 .GT. 3.0D+02) write(*,*) ' 1 NH3 ',TESTNH3
-!       IF (TESTSO4 .GT. 3.0D+02) write(*,*) ' 1 SO4 ',TESTSO4
-!       IF (TESTTS  .GT. 3.0D+02) write(*,*) ' 1 TS ',TESTTS
-!       IF (TESTFE3 .GT. 3.0D+02) write(*,*) ' 1 FE3 ',TESTFE3
-!       IF (TESTFE2 .GT. 3.0D+02) write(*,*) ' 1 FE2 ',TESTFE2
-!       IF (TESTFES .GT. 3.0D+02) write(*,*) ' 1 FES ',TESTFES
-!       IF (TESTFEC .GT. 3.0D+03) write(*,*) ' 1 FEC ',TESTFEC
-!       IF (TESTTC  .GT. 8.0D+01) write(*,*) ' 1 TC ',TESTTC
-!       IF (TESTALK .GT. 8.0D+01) write(*,*) ' 1 ALK ',TESTALK
-! .......................................................................
+
       CALL REACTION_SDM (TESTOM1,TESTOM2,TESTDOM,TESTO2,TESTNIT,TESTNH3, &
                          TESTSO4,TESTTS,TESTFE3,TESTFE2,TESTMNO,TESTMN2,TESTFES, &
                          TESTTC,TESTALK,Rc,pH(I),F,dtemp)
@@ -4622,20 +4593,8 @@ contains
        TESTDOM   = Y(MID15)
 
 ! 
-!       IF (TESTOM1 .GT. 3.0D+03) write(*,*) ' 1 OM1 ',TESTOM1
-!       IF (TESTOM2 .GT. 3.0D+03) write(*,*) ' 1 OM2 ',TESTOM2
-!       IF (TESTO2  .GT. 3.0D+02) write(*,*) ' 1 O2 ',TESTO2
-!       IF (TESTNIT .GT. 3.0D+02) write(*,*) ' 1 No3 ',TESTNIT
-!       IF (TESTNH3 .GT. 3.0D+02) write(*,*) ' 1 NH3 ',TESTNH3
-!       IF (TESTSO4 .GT. 3.0D+02) write(*,*) ' 1 SO4 ',TESTSO4
-!       IF (TESTTS  .GT. 3.0D+02) write(*,*) ' 1 TS ',TESTTS
-!       IF (TESTFE3 .GT. 3.0D+02) write(*,*) ' 1 FE3 ',TESTFE3
-!       IF (TESTFE2 .GT. 3.0D+02) write(*,*) ' 1 FE2 ',TESTFE2
-!       IF (TESTFES .GT. 3.0D+02) write(*,*) ' 1 FES ',TESTFES
-!       IF (TESTTC .GT. 8.0D+01)  write(*,*) ' 1 TC ',TESTTC
-!       IF (TESTALK .GT. 8.0D+01) write(*,*) ' 1 ALK ',TESTALK
-! 
 ! .......................................................................
+!
        CALL REACTION_SDM(TESTOM1,TESTOM2,TESTDOM,TESTO2,TESTNIT,TESTNH3, &
                          TESTSO4,TESTTS,TESTFE3,TESTFE2,TESTMNO,TESTMN2,TESTFES, &
                          TESTTC,TESTALK,Rc,pH(I),F,dtemp)
@@ -5106,23 +5065,9 @@ contains
       RALK   = F*TMP4-TWO*R8-TWO*R11-TWO*R12
       IF (TESTALK .LE. ZERO) RALK = ZERO
       ENDIF
+!
 !     Set the reaction rates in a vector 
 ! 
-!        Rc(1)=  ZERO
-!        Rc(2)=  ZERO
-!         Rc(3)=  ZERO
-!        Rc(4)=  ZERO
-!        Rc(5)=  ZERO
-!        Rc(6)=  ZERO
-!        Rc(7)=  ZERO
-!        Rc(8)=  ZERO
-!        Rc(9)=  ZERO
-!        Rc(10)= ZERO
-!        Rc(11)= ZERO
-!        Rc(12)= ZERO
-!        Rc(13)= ZERO
-!        Rc(14)= ZERO
-!        Rc(15)= ZERO
         Rc(1)=   RCH2O1
         Rc(2)=   RCH2O2
         Rc(3)=   RDOM
@@ -5262,12 +5207,11 @@ contains
 
       RETURN
       END FUNCTION RNITRATE_SDM
+
 ! 
 !    RMANGANESE    Calculates the Monod type function and feedbacks for
 !    FE+3 as an electron acceptor.
 !  
-! 
-! 
       REAL(KIND=8) FUNCTION RMANGANESE(O20, NO30)
       IMPLICIT NONE
       REAL(kind=8), INTENT(IN) :: O20, NO30
@@ -5283,14 +5227,12 @@ contains
 !
       RETURN
       END FUNCTION RMANGANESE
-!
-!
+
+
 !
 !   RFERRIC    Calculates the Monod type function and feedbacks for
 !   FE+3 as an electron acceptor.
 ! 
-!
-!
       REAL(KIND=8) FUNCTION RFERRIC(O20,NO30,MNO)
       IMPLICIT NONE
       REAL(kind=8), INTENT(IN) :: O20, NO30, MNO
