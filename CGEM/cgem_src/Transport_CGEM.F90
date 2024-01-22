@@ -61,7 +61,7 @@
                  f(myi,jbc,k,iPO4) = BC6(i) * 1.0e3 / 30.97
                  f(myi,jbc,k,iO2) =  BC9(i) * 1.0e3 / 32.0
               enddo
-          endif
+           endif
        enddo
 
 

@@ -10,8 +10,10 @@ EXE = CGEM
 
 ###INTEL COMPILER
 F90 = ifort
-INC   = -I. -I/usr/local/apps/netcdf-4.6.3/intel-18.0/include/
-LIBS  = -L/usr/local/apps/netcdf-4.6.3/intel-18.0/lib -lnetcdff -lnetcdf
+# INC   = -I. -I/usr/local/apps/netcdf-4.6.3/intel-18.0/include/
+# LIBS  = -L/usr/local/apps/netcdf-4.6.3/intel-18.0/lib -lnetcdff -lnetcdf
+INC  = -I. -I/usr/local/apps/netcdf-4.9.2/intel-21.4/include/
+LIBS = -L. -L/usr/local/apps/netcdf-4.9.2/intel-21.4/lib -lnetcdff -lnetcdf
 FFLAGS = -warn all -traceback -no-diag-error-limit -implicitnone -ftz
 # DFLAGS = -debug -check all -DDEBUG -warn all -traceback -no-diag-error-limit -ftz
 

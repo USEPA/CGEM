@@ -226,9 +226,9 @@ elseif(Which_fluxes(iSOC).eq.2.or.Which_fluxes(iSOC).eq.3) then
      & dz(i,j,nz)*dT/SDay,0.)
 !PO4
                f(myi,j,nz,iPO4) = AMAX1(f(myi,j,nz,iPO4)  + PO4Flux/  &
-     & dz(i,j,nz)*dT/SDay,0.)
+                    & dz(i,j,nz)*dT/SDay,0.)
 elseif(Which_fluxes(iSOC).eq.4) then
-!Meta Model
+   !Meta Model
      call Meta_SOC(f(myi,j,nz,:),T(i,j,nz),S(i,j,nz),dz(i,j,nz),s_x1A(myi,j,nz),s_y1A(myi,j,nz),s_x1Z(myi,j,nz),s_y1Z(myi,j,nz))
 endif
 

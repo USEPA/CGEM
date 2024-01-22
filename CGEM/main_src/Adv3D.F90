@@ -124,6 +124,7 @@
      &           +(wfm*f(myi,j,km1,ii)+wfp*f(myi,j,min(k+1,nz),ii))) ) *dT  &
      &      ) /Vol(i,j,k)
 ! -------------------------------------------------------------
+            
        if(f_n(myi,j,k,ii) .lt. 0) then
            write(6,*) "myid,numprocs,myid,start,end = ", myid, numprocs, myid, myi_start, myi_end
            write(6,*) "ii, i, j, k, f_n(myi,j,k,ii) lt zero, myi = ", ii, i, j, k, f_n(myi,j,k,ii), myi

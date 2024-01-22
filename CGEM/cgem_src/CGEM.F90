@@ -541,7 +541,7 @@
 ! Save array values for netCDF
         PAR_percent_ijk(myi,j,1:nz) = PAR_percent_k(1:nz)
         PARdepth_ijk(myi,j,1:nz) = PARdepth_k(1:nz)
-        Esed(myi,j) = Parbot !E in sediments, needed for flux
+        if(nz.gt.0) Esed(myi,j) = Parbot !E in sediments, needed for flux
 
 !---------------------End Underwater Light Model-----------------------------------
 !

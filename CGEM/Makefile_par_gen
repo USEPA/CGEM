@@ -7,9 +7,15 @@
 ### =============== User Modifiable Section =============== ###
 EXE	= CGEM 
 ### Build options for specific platforms. 
+
 ###INTEL COMPILER
-INC   = -I. -I/usr/local/apps/pnetcdf-1.9.0/intel-18.0/include -I/usr/local/apps/netcdf-4.6.3/intel-18.0/include/
-LIBS  = -L. -L/usr/local/apps/pnetcdf-1.9.0/intel-18.0/lib -lpnetcdf -L/usr/local/apps/netcdf-4.6.3/intel-18.0/lib -lnetcdff -lnetcdf
+
+# INC   = -I. -I/usr/local/apps/pnetcdf-1.9.0/intel-18.0/include -I/usr/local/apps/netcdf-4.6.3/intel-18.0/include/
+# LIBS  = -L. -L/usr/local/apps/pnetcdf-1.9.0/intel-18.0/lib -lpnetcdf -L/usr/local/apps/netcdf-4.6.3/intel-18.0/lib -lnetcdff -lnetcdf
+
+INC  = -I. -I/usr/local/apps/pnetcdf-1.12.3/intel-21.4/include/ -I/usr/local/apps/netcdf-4.9.2/intel-21.4/include/
+LIBS = -L. -L/usr/local/apps/pnetcdf-1.12.3/intel-21.4/lib -lpnetcdf -L/usr/local/apps/netcdf-4.9.2/intel-21.4/lib -lnetcdff -lnetcdf
+
 F90 = mpiifort
 FFLAGS = -O2 -fp-model precise -warn all -traceback -no-diag-error-limit -ftz 
 
