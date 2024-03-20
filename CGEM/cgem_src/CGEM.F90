@@ -1223,7 +1223,7 @@ enddo
           FO2_out(myi,j) = FO2(myi,j)
        endif
        ff(myi,j,k,iO2)  = AMAX1(f(myi,j,k,iO2)                             &  
-       &  + ( PrimProd - ArespC + RO2 - ZrespC)*dTd, 0.0)
+            &  + ( PrimProd - ArespC + RO2 - ZrespC)*dTd, 0.0)
 
 !-----------------------------------------
 !-OM1_A: (mmol-C/m3-- Dead Phytoplankton Particulate)

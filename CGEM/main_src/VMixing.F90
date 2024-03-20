@@ -56,7 +56,7 @@
                  
                  ! --- No flux at bottom
                  f(myi,j,nz,ii) = (C(nz)*G(nz-1) - f(myi,j,nz,ii)) / (C(nz) * (1. - E(nz-1)) - 1.)
-                                            
+                 
                  do k = nz-1, 1, -1
                     f(myi,j,k,ii) = E(k) * f(myi,j,k+1,ii) + G(k)
                  end do

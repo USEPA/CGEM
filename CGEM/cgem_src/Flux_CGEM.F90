@@ -134,8 +134,9 @@ if(Which_fluxes(iO2surf).eq.1) then
                                                        ! sea sfc
                                                        ! ((mmol-O2/m2/sec)
                                                        ! negative means into
-               f(myi,j,1,iO2) = AMAX1(f(myi,j,1,iO2) - O2_atF/dz(i,j,1)*dT,0.)
 
+               f(myi,j,1,iO2) = AMAX1(f(myi,j,1,iO2) - O2_atF/dz(i,j,1)*dT,0.)
+            
                !For model comparison (Daily Integrated Rates)
                if (MC .eq. 1) then
                    O2_Flux(myi,j) = -O2_atF * SDay  !Convert to per day

@@ -62,6 +62,8 @@
      ! There is no header line.
      if(myid.eq.0) then
        open(19,file=filename,status='old')
+       PRINT*, "Filename = ", filename
+       PRINT*, "nf = ", nf
        do ii = 1,nf
           read(19,*,IOSTAT=ierr) init(ii)
           isum=isum+1
@@ -89,7 +91,7 @@
             nz=nza(i,j)
             do k = 1, nz
                do ii=1,nf
-               f(myi,j,k,ii) = init(ii)
+                  f(myi,j,k,ii) = init(ii)
                enddo
             enddo
             myi = myi+1
