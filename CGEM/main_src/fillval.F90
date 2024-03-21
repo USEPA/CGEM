@@ -15,11 +15,12 @@ integer, intent(in) :: which  ! What type of fill value?
 
 if (which.eq.1) then
 
-    fv = -9999.
-
+!    fv = -9999.
+    fv = 0.0
 else
 
-    fv = -9999.
+!    fv = -9999.
+    fv = 0.0
 
 endif
 
