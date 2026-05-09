@@ -45,7 +45,7 @@ read(999,*) Which_irradiance
 read(999,*) Which_chlaC
 read(999,*) Which_photosynthesis 
 read(999,*) Which_growth
-read(999,*) Read_Solar,Read_Wind,Read_T,Read_Sal 
+read(999,*) Read_Solar,Read_Wind,Read_T,Read_Sal,Read_Load
 read(999,*) InitializeHow
 read(999,*) 
 !--Optics-----------------------
@@ -206,6 +206,7 @@ call MPI_BCAST(Read_Solar,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
 call MPI_BCAST(Read_Wind,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
 call MPI_BCAST(Read_T,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
 call MPI_BCAST(Read_Sal,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
+call MPI_BCAST(Read_Load,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
 
 call MPI_BCAST(InitializeHow,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
 

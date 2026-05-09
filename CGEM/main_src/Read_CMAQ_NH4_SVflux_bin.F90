@@ -131,7 +131,7 @@ IF(init .eq. 0 ) THEN
          WRITE(6, "('DTC_8 = ',F35.20,' is >= DTC_max_8 = ',F35.20)")    & 
 	 &           DTC_8,                   DTC_max_8
          WRITE(6, "('Abort  ')")
-	 STOP	   
+         STOP  
       ENDIF
 
 ELSE

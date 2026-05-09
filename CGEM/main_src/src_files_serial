@@ -47,6 +47,9 @@ MAIN_OBJ  =  fillval.o\
 	USER_Read_Temp.o\
 	USER_Read_Wind.o\
 	USER_Read_Sal.o\
+	USER_Read_Nutrient_Concs.o\
+	USER_Read_River_Flows.o\
+	USER_Calculates_Loads.o\
         Read_CMAQ_NH4_SVflux_bin.o\
         Read_CMAQ_NO3_SVflux_bin.o\
   	Calc_Sal.o\

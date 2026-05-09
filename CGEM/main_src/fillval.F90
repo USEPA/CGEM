@@ -13,13 +13,13 @@ function fill(which)               RESULT(fv)
 real fv
 integer, intent(in) :: which  ! What type of fill value?
 
-if (which.eq.1) then
+if (which == 1) then
 
     fv = -9999.
 
 else
 
-    fv = -9999.
+    fv = 0.
 
 endif
 

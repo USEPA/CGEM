@@ -40,7 +40,7 @@
       do j=1,jm
        do i=1,im
           dxdy(i,j) = dx(i,j)*dy(i,j)
-          if(depth(i,j).eq.0) depth(i,j)=fill(0)
+          if(depth(i,j).eq.0) depth(i,j)=fill(1)
           nz=nza(i,j)
           do k=1,nz !do loop will not execute if nza=0
            dz(i,j,k) = depth(i,j)/nz !assume equally spaced

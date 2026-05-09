@@ -1,0 +1,25 @@
+subroutine USER_Calculates_Loads()
+  
+  USE Model_dim
+  USE DATE_TIME
+  USE RiverLoad
+
+  IMPLICIT NONE
+
+  REAL, DIMENSION(4) :: NLoad
+
+  ! Calculate nutrient loadings
+  ! Flow is assumed to be in units of m3/s.
+  ! Concentration is assumed to be in units of mg/L.
+  ! The factor of 1.0E-03 converts mg/L to kg/m3.  
+  NLoad = River_InFlow(1) * (River_Conc * 1.0E-03)
+
+  ! Assign nutrient loadings to Riv_*'s arrays.
+  Riv_NO3(1) = NLoad(1)
+  Riv_NH3(1) = NLoad(2)
+  Riv_DIP(1) = NLoad(3)
+  Riv_DO(1) = NLoad(4)
+
+
+  RETURN
+END SUBROUTINE USER_Calculates_Loads

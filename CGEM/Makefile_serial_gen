@@ -9,20 +9,20 @@ EXE = CGEM
 ### Build options for specific platforms. 
 
 ###INTEL COMPILER
-F90 = ifort
+# F90 = ifort
 # INC   = -I. -I/usr/local/apps/netcdf-4.6.3/intel-18.0/include/
 # LIBS  = -L/usr/local/apps/netcdf-4.6.3/intel-18.0/lib -lnetcdff -lnetcdf
-INC  = -I. -I/usr/local/apps/netcdf-4.9.2/intel-21.4/include/
-LIBS = -L. -L/usr/local/apps/netcdf-4.9.2/intel-21.4/lib -lnetcdff -lnetcdf
-FFLAGS = -warn all -traceback -no-diag-error-limit -implicitnone -ftz
+# INC  = -I. -I/usr/local/apps/netcdf-4.9.2/intel-21.4/include/
+# LIBS = -L. -L/usr/local/apps/netcdf-4.9.2/intel-21.4/lib -lnetcdff -lnetcdf
+# FFLAGS = -warn all -traceback -no-diag-error-limit -implicitnone -ftz
 # DFLAGS = -debug -check all -DDEBUG -warn all -traceback -no-diag-error-limit -ftz
 
 ###GNU COMPILER
-#F90 = gfortran
-#INC   = -I. -I/usr/local/apps/netcdf-4.6.3/gcc-6.1.0/include/
-#LIBS  = -L. -L/usr/local/apps/netcdf-4.6.3/gcc-6.1.0/lib  -lnetcdff -lnetcdf
-#FFLAGS = -Wall -Wextra -pedantic -fimplicit-none -fbacktrace -ffree-line-length-none
-#DFLAGS = 
+F90 = gfortran
+INC   = -I. -I/usr/local/apps/netcdf-4.9.2/gcc-9.5/include
+LIBS  = -L. -L/usr/local/apps/netcdf-4.9.2/gcc-9.5/lib  -lnetcdff -lnetcdf
+FFLAGS = -Wall -fcheck=all -pedantic -fimplicit-none -fbacktrace -ffree-line-length-none
+# DFLAGS = -g -O0 -fbacktrace -ffpe-trap=zero,invalid,overflow,underflow -fbounds-check -fcheck=all -ffree-line-length-none
 
 ### =============== End User Modifiable Section  =============== ####
 include main_src/src_files_serial

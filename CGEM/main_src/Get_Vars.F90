@@ -6,7 +6,7 @@
        Subroutine Get_Vars(TC_8,T_8,myid,numprocs,Which_code) 
 
        USE Model_dim
-       USE INPUT_VARS, ONLY: START_SECONDS, Read_T, Read_Sal, Read_Solar, Read_Wind
+       USE INPUT_VARS, ONLY: START_SECONDS, Read_T, Read_Sal, Read_Solar, Read_Wind, Read_Load
        USE Grid
        USE DATE_TIME
        USE Hydro
@@ -41,7 +41,7 @@
       broadcast_river = .FALSE.
       broadcast_bc = .FALSE.
 
-      if(myid.eq.0) then
+      if (myid.eq.0) then
       
        if (Which_gridio.eq.0) then
          broadcast_TC = .TRUE.
@@ -62,31 +62,38 @@
        endif
 
 
-        if (Which_gridio.eq.0) then   !CGEM_0D
+        if (Which_gridio == 0) then   !CGEM_0D
 
-          if(Read_T.eq.0) then
+          if (Read_T == 0) then
             call Calc_Temp(START_SECONDS,TC_in,T)
           else
             call USER_Read_Temp(TC_in,T)
           endif
   
-          if(Read_Sal.eq.0) then
+          if (Read_Sal == 0) then
             if(init.eq.1) call Calc_Sal(S)
           else
             call USER_Read_Sal(TC_in,S)
           endif
   
-          if(Read_Solar.eq.0) then
+          if (Read_Solar == 0) then
             call getSolar(TC_in, lon, lat, Rad)
           else
             call USER_Read_Solar(TC_in,Rad)
           endif
   
-          if(Read_Wind.eq.0) then
-            Wind=5.
+          if (Read_Wind == 0) then
+            Wind = 5.
           else
             call USER_Read_Wind(TC_in,Wind)
           endif
+
+          if (Read_Load == 1) then
+             CALL USER_Read_Nutrient_Concs(TC_in)
+             CALL USER_Read_River_Flows(TC_in)
+             CALL USER_Calculates_Loads()
+          endif
+         
 
         else if (Which_gridio.eq.1 .or. Which_gridio.eq.2 .or. Which_gridio.eq.3) then  !EFDC.or.NCOM.or.POM
 
@@ -122,23 +129,23 @@
 ! River vars
            if (nRiv .gt. 0 .AND. broadcast_river) then
                if (Which_code.eq."CGEM") then
-                  call retrieveBookendRiverVar(riverload_info(eRiv1), TC_8, startRivIndex(eRiv1), Riv1A, Riv1B, river_tc1, river_tc2)
-                  call retrieveBookendRiverVar(riverload_info(eRiv2), TC_8, startRivIndex(eRiv2), Riv2A, Riv2B, river_tc1, river_tc2)
-                  call retrieveBookendRiverVar(riverload_info(eRiv3), TC_8, startRivIndex(eRiv3), Riv3A, Riv3B, river_tc1, river_tc2)
-                  call retrieveBookendRiverVar(riverload_info(eRiv4), TC_8, startRivIndex(eRiv4), Riv4A, Riv4B, river_tc1, river_tc2)
-                  call retrieveBookendRiverVar(riverload_info(eRiv5), TC_8, startRivIndex(eRiv5), Riv5A, Riv5B, river_tc1, river_tc2)
-                  call retrieveBookendRiverVar(riverload_info(eRiv6), TC_8, startRivIndex(eRiv6), Riv6A, Riv6B, river_tc1, river_tc2)
-                  call retrieveBookendRiverVar(riverload_info(eRiv7), TC_8, startRivIndex(eRiv7), Riv7A, Riv7B, river_tc1, river_tc2)
-                  call retrieveBookendRiverVar(riverload_info(eRiv8), TC_8, startRivIndex(eRiv8), Riv8A, Riv8B, river_tc1, river_tc2)
-                  call retrieveBookendRiverVar(riverload_info(eRiv9), TC_8, startRivIndex(eRiv9), Riv9A, Riv9B, river_tc1, river_tc2)
+                  call retrieveBookendRiverVar(riverload_info(eRiv_NO3), TC_8, startRivIndex(eRiv_NO3), Riv_NO3A, Riv_NO3B, river_tc1, river_tc2)
+                  call retrieveBookendRiverVar(riverload_info(eRiv_NH3), TC_8, startRivIndex(eRiv_NH3), Riv_NH3A, Riv_NH3B, river_tc1, river_tc2)
+                  call retrieveBookendRiverVar(riverload_info(eRiv_DON), TC_8, startRivIndex(eRiv_DON), Riv_DONA, Riv_DONB, river_tc1, river_tc2)
+                  call retrieveBookendRiverVar(riverload_info(eRiv_TP), TC_8, startRivIndex(eRiv_TP), Riv_TPA, Riv_TPB, river_tc1, river_tc2)
+                  call retrieveBookendRiverVar(riverload_info(eRiv_DIP), TC_8, startRivIndex(eRiv_DIP), Riv_DIPA, Riv_DIPB, river_tc1, river_tc2)
+                  call retrieveBookendRiverVar(riverload_info(eRiv_DOP), TC_8, startRivIndex(eRiv_DOP), Riv_DOPA, Riv_DOPB, river_tc1, river_tc2)
+                  call retrieveBookendRiverVar(riverload_info(eRiv_DO), TC_8, startRivIndex(eRiv_DO), Riv_DOA, Riv_DOB, river_tc1, river_tc2)
+                  call retrieveBookendRiverVar(riverload_info(eRiv_BOD1), TC_8, startRivIndex(eRiv_BOD1), Riv_BOD1A, Riv_BOD1B, river_tc1, river_tc2)
+                  call retrieveBookendRiverVar(riverload_info(eRiv_TN), TC_8, startRivIndex(eRiv_TN), Riv_TNA, Riv_TNB, river_tc1, river_tc2)
                else if (Which_code.eq."WQEM") then
-                  call retrieveBookendRiverVar(riverload_info(eRiv1), TC_8, startRivIndex(eRiv1), Riv1A, Riv1B, river_tc1, river_tc2)
-                  call retrieveBookendRiverVar(riverload_info(eRiv2), TC_8, startRivIndex(eRiv2), Riv2A, Riv2B, river_tc1, river_tc2)
-                  call retrieveBookendRiverVar(riverload_info(eRiv3), TC_8, startRivIndex(eRiv3), Riv3A, Riv3B, river_tc1, river_tc2)
-                  call retrieveBookendRiverVar(riverload_info(eRiv4), TC_8, startRivIndex(eRiv4), Riv4A, Riv4B, river_tc1, river_tc2)
-                  call retrieveBookendRiverVar(riverload_info(eRiv5), TC_8, startRivIndex(eRiv5), Riv5A, Riv5B, river_tc1, river_tc2)
-                  call retrieveBookendRiverVar(riverload_info(eRiv6), TC_8, startRivIndex(eRiv6), Riv6A, Riv6B, river_tc1, river_tc2)
-                  call retrieveBookendRiverVar(riverload_info(eRiv7), TC_8, startRivIndex(eRiv7), Riv7A, Riv7B, river_tc1, river_tc2)
+                  call retrieveBookendRiverVar(riverload_info(eRiv_NO3), TC_8, startRivIndex(eRiv_NO3), Riv_NO3A, Riv_NO3B, river_tc1, river_tc2)
+                  call retrieveBookendRiverVar(riverload_info(eRiv_NH3), TC_8, startRivIndex(eRiv_NH3), Riv_NH3A, Riv_NH3B, river_tc1, river_tc2)
+                  call retrieveBookendRiverVar(riverload_info(eRiv_DON), TC_8, startRivIndex(eRiv_DON), Riv_DONA, Riv_DONB, river_tc1, river_tc2)
+                  call retrieveBookendRiverVar(riverload_info(eRiv_TP), TC_8, startRivIndex(eRiv_TP), Riv_TPA, Riv_TPB, river_tc1, river_tc2)
+                  call retrieveBookendRiverVar(riverload_info(eRiv_DIP), TC_8, startRivIndex(eRiv_DIP), Riv_DIPA, Riv_DIPB, river_tc1, river_tc2)
+                  call retrieveBookendRiverVar(riverload_info(eRiv_DOP), TC_8, startRivIndex(eRiv_DOP), Riv_DOPA, Riv_DOPB, river_tc1, river_tc2)
+                  call retrieveBookendRiverVar(riverload_info(eRiv_DO), TC_8, startRivIndex(eRiv_DO), Riv_DOA, Riv_DOB, river_tc1, river_tc2)
                else
                   WRITE(6,*) "Model ", Which_code," not found in Get_Vars.F90"
                   WRITE(6,*) "Exiting."
@@ -179,7 +186,7 @@
 ! --- get land/water and shelf masks
 !--------------------------------
 
-        if(im*jm.eq.1) then  !For 1D column, turn off advection
+        if (im*jm.eq.1) then  !For 1D column, turn off advection
          Ux=0.
          Vx=0.
          Wx=0.
@@ -195,7 +202,7 @@
         call MPI_BCAST(broadcast_bc,1,MPI_LOGICAL,0,MPI_COMM_WORLD,mpierr)
 
         if (broadcast_TC) then
-          if(numprocs.gt.1) then
+          if (numprocs.gt.1) then
             call MPI_BCAST(hydro_tc1,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
             call MPI_BCAST(hydro_tc2,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
 
@@ -252,39 +259,39 @@
             call MPI_BCAST(river_tc2,1,MPI_INTEGER,0,MPI_COMM_WORLD,mpierr)
           
             if(Which_code.eq."CGEM") then
-               call MPI_BCAST(Riv1A,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-               call MPI_BCAST(Riv1B,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-               call MPI_BCAST(Riv2A,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-               call MPI_BCAST(Riv2B,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-               call MPI_BCAST(Riv3A,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-               call MPI_BCAST(Riv3B,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-               call MPI_BCAST(Riv4A,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-               call MPI_BCAST(Riv4B,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-               call MPI_BCAST(Riv5A,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-               call MPI_BCAST(Riv5B,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-               call MPI_BCAST(Riv6A,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-               call MPI_BCAST(Riv6B,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-               call MPI_BCAST(Riv7A,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-               call MPI_BCAST(Riv7B,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-               call MPI_BCAST(Riv8A,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-               call MPI_BCAST(Riv8B,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-               call MPI_BCAST(Riv9A,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-               call MPI_BCAST(Riv9B,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+               call MPI_BCAST(Riv_NO3A,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+               call MPI_BCAST(Riv_NO3B,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+               call MPI_BCAST(Riv_NH3A,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+               call MPI_BCAST(Riv_NH3B,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+               call MPI_BCAST(Riv_DONA,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+               call MPI_BCAST(Riv_DONB,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+               call MPI_BCAST(Riv_TPA,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+               call MPI_BCAST(Riv_TPB,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+               call MPI_BCAST(Riv_DIPA,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+               call MPI_BCAST(Riv_DIPB,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+               call MPI_BCAST(Riv_DOPA,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+               call MPI_BCAST(Riv_DOPB,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+               call MPI_BCAST(Riv_DOA,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+               call MPI_BCAST(Riv_DOB,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+               call MPI_BCAST(Riv_BOD1A,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+               call MPI_BCAST(Riv_BOD1B,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+               call MPI_BCAST(Riv_TNA,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+               call MPI_BCAST(Riv_TNB,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
             else if (Which_code.eq."WQEM") then
-               call MPI_BCAST(Riv1A,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-               call MPI_BCAST(Riv1B,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-               call MPI_BCAST(Riv2A,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-               call MPI_BCAST(Riv2B,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-               call MPI_BCAST(Riv3A,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-               call MPI_BCAST(Riv3B,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-               call MPI_BCAST(Riv4A,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-               call MPI_BCAST(Riv4B,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-               call MPI_BCAST(Riv5A,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-               call MPI_BCAST(Riv5B,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-               call MPI_BCAST(Riv6A,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-               call MPI_BCAST(Riv6B,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-               call MPI_BCAST(Riv7A,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
-               call MPI_BCAST(Riv7B,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+               call MPI_BCAST(Riv_NO3A,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+               call MPI_BCAST(Riv_NO3B,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+               call MPI_BCAST(Riv_NH3A,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+               call MPI_BCAST(Riv_NH3B,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+               call MPI_BCAST(Riv_DONA,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+               call MPI_BCAST(Riv_DONB,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+               call MPI_BCAST(Riv_TPA,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+               call MPI_BCAST(Riv_TPB,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+               call MPI_BCAST(Riv_DIPA,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+               call MPI_BCAST(Riv_DIPB,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+               call MPI_BCAST(Riv_DOPA,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+               call MPI_BCAST(Riv_DOPB,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+               call MPI_BCAST(Riv_DOA,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
+               call MPI_BCAST(Riv_DOB,nRiv,MPI_REAL,0,MPI_COMM_WORLD,mpierr)
             else
                   WRITE(6,*) "Model ", Which_code," not found in Get_Vars.F90"
                   WRITE(6,*) "Exiting."
@@ -342,38 +349,41 @@
       endif
 
       !interpolate
-      call interp(T1, T2, hydro_tc1, hydro_tc2, TC_in, T)
-      call interp(Ux1, Ux2, hydro_tc1, hydro_tc2, TC_in, Ux)
-      call interp(Vx1, Vx2, hydro_tc1, hydro_tc2, TC_in, Vx)
-      call interp(Wx1, Wx2, hydro_tc1, hydro_tc2, TC_in, Wx)
-      call interp(Kh1, Kh2, hydro_tc1, hydro_tc2, TC_in, Kh)
-      if (Which_gridio.ne.3)then
-        call interp(S1, S2, hydro_tc1, hydro_tc2, TC_in, S)
-      else
-        call interp(Rad1, Rad2, hydro_tc1, hydro_tc2, TC_in, Rad)
-        call interp(Wind1, Wind2, hydro_tc1, hydro_tc2, TC_in, Wind)
+      if (Which_gridio > 0) then
+         call interp(T1, T2, hydro_tc1, hydro_tc2, TC_in, T)
+         call interp(Ux1, Ux2, hydro_tc1, hydro_tc2, TC_in, Ux)
+         call interp(Vx1, Vx2, hydro_tc1, hydro_tc2, TC_in, Vx)
+         call interp(Wx1, Wx2, hydro_tc1, hydro_tc2, TC_in, Wx)
+         call interp(Kh1, Kh2, hydro_tc1, hydro_tc2, TC_in, Kh)
+         if (Which_gridio .ne. 3) then
+             call interp(S1, S2, hydro_tc1, hydro_tc2, TC_in, S)
+         else
+             call interp(Rad1, Rad2, hydro_tc1, hydro_tc2, TC_in, Rad)
+             call interp(Wind1, Wind2, hydro_tc1, hydro_tc2, TC_in, Wind)
+         endif
       endif
+      
 
-      if (Which_gridio.eq.1)then
-        if (nRiv .gt. 0)then        
-          if(Which_code.eq."CGEM") then    
-              call interp(Riv1A, Riv1B, river_tc1, river_tc2, TC_in, Riv1)        
-              call interp(Riv2A, Riv2B, river_tc1, river_tc2, TC_in, Riv2)
-              call interp(Riv3A, Riv3B, river_tc1, river_tc2, TC_in, Riv3)
-              call interp(Riv4A, Riv4B, river_tc1, river_tc2, TC_in, Riv4)
-              call interp(Riv5A, Riv5B, river_tc1, river_tc2, TC_in, Riv5)
-              call interp(Riv6A, Riv6B, river_tc1, river_tc2, TC_in, Riv6)
-              call interp(Riv7A, Riv7B, river_tc1, river_tc2, TC_in, Riv7)
-              call interp(Riv8A, Riv8B, river_tc1, river_tc2, TC_in, Riv8)
-              call interp(Riv9A, Riv9B, river_tc1, river_tc2, TC_in, Riv9)
+      if (Which_gridio.eq.1) then
+        if (nRiv .gt. 0) then        
+          if (Which_code.eq."CGEM") then    
+              call interp(Riv_NO3A, Riv_NO3B, river_tc1, river_tc2, TC_in, Riv_NO3)        
+              call interp(Riv_NH3A, Riv_NH3B, river_tc1, river_tc2, TC_in, Riv_NH3)
+              call interp(Riv_DONA, Riv_DONB, river_tc1, river_tc2, TC_in, Riv_DON)
+              call interp(Riv_TPA, Riv_TPB, river_tc1, river_tc2, TC_in, Riv_TP)
+              call interp(Riv_DIPA, Riv_DIPB, river_tc1, river_tc2, TC_in, Riv_DIP)
+              call interp(Riv_DOPA, Riv_DOPB, river_tc1, river_tc2, TC_in, Riv_DOP)
+              call interp(Riv_DOA, Riv_DOB, river_tc1, river_tc2, TC_in, Riv_DO)
+              call interp(Riv_BOD1A, Riv_BOD1B, river_tc1, river_tc2, TC_in, Riv_BOD1)
+              call interp(Riv_TNA, Riv_TNB, river_tc1, river_tc2, TC_in, Riv_TN)
           else if (Which_code.eq."WQEM") then
-              call interp(Riv1A, Riv1B, river_tc1, river_tc2, TC_in, Riv1)        
-              call interp(Riv2A, Riv2B, river_tc1, river_tc2, TC_in, Riv2)
-              call interp(Riv3A, Riv3B, river_tc1, river_tc2, TC_in, Riv3)
-              call interp(Riv4A, Riv4B, river_tc1, river_tc2, TC_in, Riv4)
-              call interp(Riv5A, Riv5B, river_tc1, river_tc2, TC_in, Riv5)
-              call interp(Riv6A, Riv6B, river_tc1, river_tc2, TC_in, Riv6)
-              call interp(Riv7A, Riv7B, river_tc1, river_tc2, TC_in, Riv7)
+              call interp(Riv_NO3A, Riv_NO3B, river_tc1, river_tc2, TC_in, Riv_NO3)        
+              call interp(Riv_NH3A, Riv_NH3B, river_tc1, river_tc2, TC_in, Riv_NH3)
+              call interp(Riv_DONA, Riv_DONB, river_tc1, river_tc2, TC_in, Riv_DON)
+              call interp(Riv_TPA, Riv_TPB, river_tc1, river_tc2, TC_in, Riv_TP)
+              call interp(Riv_DIPA, Riv_DIPB, river_tc1, river_tc2, TC_in, Riv_DIP)
+              call interp(Riv_DOPA, Riv_DOPB, river_tc1, river_tc2, TC_in, Riv_DOP)
+              call interp(Riv_DOA, Riv_DOB, river_tc1, river_tc2, TC_in, Riv_DO)
           else
                   WRITE(6,*) "Model ", Which_code," not found in Get_Vars.F90"
                   WRITE(6,*) "Exiting."

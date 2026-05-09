@@ -75,6 +75,7 @@ CONTAINS
     INTEGER i, J, INFO
     INTEGER ERR, VARIABLE, DIM_IDS( 4 )
     REAL,DIMENSION(IM,JM):: RLON_COPY
+    REAL, DIMENSION(nospA) :: Temp_ediblevector
     CHARACTER(LEN=40):: TIME_UNITS
     CHARACTER(LEN=14):: var
     INTEGER(KIND=MPI_OFFSET_KIND) :: nospAZ, nospA_m, nospZ_m
@@ -178,6 +179,7 @@ CONTAINS
     CALL DEFIAT( FILE_ID, 'Read_Wind', Read_Wind  )
     CALL DEFIAT( FILE_ID, 'Read_T', Read_T  )
     CALL DEFIAT( FILE_ID, 'Read_Sal', Read_Sal  )
+    CALL DEFIAT( FILE_ID, 'Read_Load', Read_Load  )
     CALL DEFIAT( FILE_ID, 'InitializeHow', InitializeHow  )
 !Optics
     CALL DEFTAT( FILE_ID, 'Calibration2', 'Optics in GEM.')
@@ -201,9 +203,10 @@ CONTAINS
     CALL DEFRATX( FILE_ID, 'Ea', Ea, nospAZ )
 !Phytoplankton
     CALL DEFTAT( FILE_ID, 'Calibration4', 'Phytoplankton in GEM.')
-    do i=1,nospZ
+    do i = 1, nospZ
        write(var,'(A12,i2)') 'ediblevector',i
-       CALL DEFRATX( FILE_ID, var, ediblevector(i,:), nospA_m )
+       Temp_ediblevector = ediblevector(i,:)
+       CALL DEFRATX( FILE_ID, var, Temp_ediblevector, nospA_m )
     enddo
     CALL DEFRATX( FILE_ID, 'umax', umax, nospA_m )
     CALL DEFRATX( FILE_ID, 'CChla', CChla, nospA_m )

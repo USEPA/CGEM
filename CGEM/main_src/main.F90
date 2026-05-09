@@ -67,10 +67,10 @@
 !      PRINT*,"mpitime1=",mpitime1, " with myid=",myid
 
 ! --- Command Line Arguments for file names ---
-      if(myid.eq.0) then
+      if (myid.eq.0) then
         call Command_Line_Args(Which_code,input_filename,init_filename,BASE_NETCDF_OUTPUT_FILE_NAME, DIntRates_filename)
       endif
-      if(numprocs.gt.1) then 
+      if (numprocs.gt.1) then 
        call MPI_BCAST(Which_code,6,MPI_CHARACTER,0,MPI_COMM_WORLD,mpierr)
        call MPI_BCAST(input_filename,120,MPI_CHARACTER,0,MPI_COMM_WORLD,mpierr)
        call MPI_BCAST(init_filename,120,MPI_CHARACTER,0,MPI_COMM_WORLD,mpierr)
@@ -100,12 +100,12 @@
       T_8 = START_SECONDS 
       TC_8 = START_SECONDS - (dT / 2) ! Subtract half dT to 'center' of timestep.
 
-      if(myid.eq.0)then
+      if (myid.eq.0) then
         print*,"start T_8=",T_8
         print*,"start_TC_8=",TC_8
       endif
 
-      if (Which_gridio .gt. 0.and.myid.eq.0) then
+      if (Which_gridio .gt. 0 .and. myid.eq.0) then
         call Init_Hydro_NetCDF()
         if (nRiv > 0) call Init_RiverLoad_NetCDF(Which_code)
         if (nBC  > 0) call Init_BoundaryConcentration_NetCDF(Which_code)
@@ -184,14 +184,14 @@
 !!      print*,"Main Rad(47,94)=",Rad(47,94)," with myid:",myid
 !!      print*,"Main Rad(222,108)=",Rad(222,108)," with myid:",myid
 
-       call USER_update_masks()
+      call USER_update_masks()
 
-       call WQ_Model(Which_code, TC_8, istep, istep_out, myid, numprocs)
+      call WQ_Model(Which_code, TC_8, istep, istep_out, myid, numprocs)
 
-       call Flux(Which_code, TC_8, istep, myid, numprocs)
+      call Flux(Which_code, TC_8, istep, myid, numprocs)
 
-       call Transport(Which_code, myid, numprocs)
-
+      call Transport(Which_code, myid, numprocs)
+       
       ! -------------- BEGIN OUTPUT DATA
       ! --- dump output when istep is a multiple of iout
        if (  mod( istep, iout ) .eq. 0 ) then

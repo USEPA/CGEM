@@ -21,7 +21,7 @@ integer iYrE,iMonE,iDayE,iHrE,iMinE,iSecE
 integer dT, dT_out, dT_restart, dT_sed
 
 !--Switches ---------
-integer Read_Solar,Read_Wind,Read_T,Read_Sal 
+integer Read_Solar,Read_Wind,Read_T,Read_Sal,Read_Load 
 integer InitializeHow
 integer Which_hydro
 integer Which_Output

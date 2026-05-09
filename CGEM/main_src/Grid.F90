@@ -174,20 +174,20 @@ write(6,*)
          h=fill(0)
       endif
 
-      lat=fill(0)  !Fill values for netCDF
-      lon=fill(0)  
-      depth=fill(0) 
-      depth1=fill(0)
-      depth2=fill(0)
-      d=fill(0)  
-      Vol=fill(0)  
-      area=fill(0)
-      dz=fill(0) 
-      dz1=fill(0)
-      dz2=fill(0)
-      d_sfc=fill(0)  
-      fm=0. !Default land, real zero
-      wsm=0 !Default shelf, integer zero
+      lat = fill(1)  !Fill values for netCDF
+      lon = fill(1)  
+      depth = fill(1) 
+      depth1 = fill(1)
+      depth2 = fill(1)
+      d = fill(1)  
+      Vol = fill(1)  
+      area = fill(1)
+      dz = fill(1) 
+      dz1 = fill(1)
+      dz2 = fill(1)
+      d_sfc = fill(1)  
+      fm = 0. !Default land, real zero
+      wsm = 0 !Default shelf, integer zero
 
 if(myid.eq.0) then
       if (Which_gridio.eq.1) then

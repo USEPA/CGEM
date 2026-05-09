@@ -41,6 +41,8 @@
 !-----------------------------------------------------
     real ::  ff(myim,jm,km,nf)           ! Holds the nf state vectors
     real :: rivLoadConvFactor            ! Conversion factor used to change units of river loads.
+    real :: rivFlowFactor                ! River flow factor used to calculate amount advected
+                                         ! out of grid cell -- 0D case only.
     integer :: myi                       ! Loop index for state variable array f
     integer        ::  i, j, k, isp, isz ! Loop indicies, isp/isz is for phytoplankton/zooplankton species
     integer        ::  icell, jcell      ! Indices of river discharge locations.
@@ -190,9 +192,9 @@
     real    :: PARtopk            ! Irradiance at top of layer k (quanta/cm2/s)
     real    :: PARsurf            ! Irradiance just below the sea surface (quanta/cm2/s) 
     real    :: PARbot             ! Irradiance at sea floor (quanta/cm2/s)
-    real    :: PARdepth_k(km)    ! Irradiance at center of layer k (quanta/cm2/s)
-    real    :: PAR_percent_k(km) ! Percent irradiance at center of layer k (quanta/cm2/s)
-    real       :: aDailyRad_k(km), aRadSum_k(km)
+    real, dimension(km) :: PARdepth_k    ! Irradiance at center of layer k (quanta/cm2/s)
+    real, dimension(km) :: PAR_percent_k ! Percent irradiance at center of layer k (quanta/cm2/s)
+    real, dimension(km) :: aDailyRad_k, aRadSum_k
     real, parameter :: RADCONV = 1./6.0221413*1.e-19 ! Convert quanta/cm2/s to mol/m2/s:
                                                !  = quanta/cm2/s * 1 mol/Avogadro# * 10,000cm2/m2
                                                !  = (1/6.022e23) * 1.0e4 = (1./6.022)e-23 * 1.0e4
@@ -281,6 +283,8 @@
    FNH4_out = fill_val
    FPO4_out = fill_val
    pH = fill_val
+
+   aRadSum_k = 0.0
 
    if (init .eq. 1) then  
 
@@ -475,8 +479,8 @@
                     write(6,*) "A_k le 0,Chla,A_k",k,Chla_tot_k(k),A_k(isp,k)
                   endif
                   enddo
-                enddo
-
+               enddo
+                
                  if(nz.gt.0) call Call_IOP_PAR(                        &
                  & PARsurf    , SunZenithAtm,                          &
                  & CDOM_k     , Chla_tot_k,                            &
@@ -538,15 +542,15 @@
 
         endif
 
-! Save array values for netCDF
+        ! Save array values for netCDF
         PAR_percent_ijk(myi,j,1:nz) = PAR_percent_k(1:nz)
         PARdepth_ijk(myi,j,1:nz) = PARdepth_k(1:nz)
-        if(nz.gt.0) Esed(myi,j) = Parbot !E in sediments, needed for flux
+        if (nz.gt.0) Esed(myi,j) = Parbot !E in sediments, needed for flux
 
 !---------------------End Underwater Light Model-----------------------------------
 !
-! Update running total of current day's irradiance
-         aRadSum_k(:) = aRadSum_k(:) + PARdepth_k(:)
+        ! Update running total of current day's irradiance
+        aRadSum_k(:) = aRadSum_k(:) + PARdepth_k(:)
          if (MOD(istep, StepsPerDay) .eq. 0) then ! If last time step of day
             ! Convert summed irradiance from quanta/cm2/s to mol quanta/m2/s
             ! and store for next day's processing
@@ -1345,16 +1349,35 @@ do i = 1, nriv            ! Loop over the rivers
        do k = 1, nsl          ! Loop over the sigma layers
           rivLoadConvFactor = 1.0e6 * weights(i,k) * dT / Vol(icell,jcell,k)
           ff(myi,jcell,k,iNO3) = ff(myi,jcell,k,iNO3) +  &
-                                & Riv2(i) * rivLoadConvFactor / 14.01
+                                & Riv_NO3(i) * rivLoadConvFactor / 14.01
           ff(myi,jcell,k,iNH4) = ff(myi,jcell,k,iNH4) +  &
-                                & Riv3(i) * rivLoadConvFactor / 14.01
+                                & Riv_NH3(i) * rivLoadConvFactor / 14.01
           ff(myi,jcell,k,iPO4) = ff(myi,jcell,k,iPO4) +  &
-                                & Riv6(i) * rivLoadConvFactor / 30.97
+                                & Riv_DIP(i) * rivLoadConvFactor / 30.97
           ff(myi,jcell,k,iO2) = ff(myi,jcell,k,iO2) +  &
-                                & Riv9(i) * rivLoadConvFactor / 32.0
+                                & Riv_DO(i) * rivLoadConvFactor / 32.0
        enddo
    endif
 enddo
+
+! ----------------------------------------------------------------------
+! Calculate amount of concentration advected out of grid cell using
+! user-supplied outflows.  This only applies to the 0D case.
+! River_Flow is assumed to be in units of m3/s.
+! ----------------------------------------------------------------------
+if (Which_gridio == 0) then
+   do i = 1, nriv
+      icell = riversIJ(i,1)
+      jcell = riversIJ(i,2)
+      if ((icell .ge. myi_start) .and. (icell .le. myi_end)) then
+         myi = icell - myi_start + 1
+         do k = 1, nsl          ! Loop over the sigma layers
+            rivFlowFactor = weights(i,k) * River_OutFlow(i) * dT / Vol(icell,jcell,k)
+            ff(myi,jcell,k,:) = ff(myi,jcell,k,:) - (ff(myi,jcell,k,:) * rivFlowFactor)
+         enddo
+      endif
+   enddo
+endif
 
 
 !update f for the current timestep

@@ -31,7 +31,7 @@ write(999,*) "Which_irradiance",Which_irradiance
 write(999,*) "Which_chlaC",Which_chlaC
 write(999,*) "Which_photosynthesis",Which_photosynthesis
 write(999,*) "Which_growth",Which_growth
-write(999,*) "Solar,Wind,T,Sal",Read_Solar,Read_Wind,Read_T,Read_Sal
+write(999,*) "Solar,Wind,T,Sal,Load",Read_Solar,Read_Wind,Read_T,Read_Sal,Read_Load
 write(999,*) "InitializeHow",InitializeHow
 write(999,*) 
 !--Optics-----------------------
