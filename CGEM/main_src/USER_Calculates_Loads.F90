@@ -3,7 +3,9 @@ subroutine USER_Calculates_Loads()
   USE Model_dim
   USE DATE_TIME
   USE RiverLoad
-
+  USE Grid
+  USE INPUT_VARS
+  
   IMPLICIT NONE
 
   REAL, DIMENSION(4) :: NLoad
@@ -20,6 +22,8 @@ subroutine USER_Calculates_Loads()
   Riv_DIP(1) = NLoad(3)
   Riv_DO(1) = NLoad(4)
 
+  ! Update volume of grid cell
+  Vol(1,1,1) = Vol(1,1,1) + (River_InFlow(1) - River_OutFlow(1)) * dT
 
   RETURN
 END SUBROUTINE USER_Calculates_Loads
