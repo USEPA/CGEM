@@ -28,6 +28,7 @@ subroutine USER_Read_Nutrient_Concs(TC_8)
       OPEN(unit=ifile, file=filename, status="old")
 
       !First line
+      READ(ifile,*)
       READ(ifile,*) iYr, iMon, iDay, iHour, iMin, iSec, Conc1(1), Conc1(2), Conc1(3), Conc1(4)
       t1 = TOTAL_SECONDS( iYr0, iYr, iMon, iDay, iHour, iMin, iSec )
 
