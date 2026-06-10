@@ -1,0 +1,243 @@
+# Compile this program on MINGW64 Windows platform.
+# Run this script with the command:
+# C:\Users\tplessel\MinGW/msys/1.0/bin/sh makeit.mingw
+
+PATH="/c/Users/tplessel/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin:/c/Users/tplessel/MinGW/msys/1.0/bin:/c/Users/tplessel/MinGW/bin:/c/WINDOWS/System32:/c/WINDOWS"
+
+cls
+echo "PATH = $PATH"
+
+# Verify MinGW versions of the following commands are used:
+
+which gfortran
+gfortran -m64 -v
+
+F90=gfortran
+FFLAGS='-m64 -g -Wall -fsecond-underscore -ffpe-summary=none -fcheck=all -pedantic -fimplicit-none -fbacktrace -ffree-line-length-none'
+IFLAGS='-I. -Ilib/Win64'
+LFLAGS='-L. -Llib/Win64 -static'
+LIBS='lib/Win64/libnetcdf.a'
+
+
+MAIN_SRC=\
+" fillval.F90 "\
+" s_mpi.F90 "\
+" mpi_interface.F90 "\
+" serial.F90 "\
+" s_netcdf.F90 "\
+" MPI_dummy.F90 "\
+" error.F90 "\
+" Model_dim.F90 "\
+" netcdf_utils.F90 "\
+" Interp_utils.F90 "\
+" Grid.F90 "\
+" State_Vars.F90 "\
+" Hydro.F90 "\
+" RiverLoad.F90 "\
+" BoundaryConcentration.F90 "\
+" OUTPUT.F90 "\
+" INPUT_VARS.F90 "\
+" LIGHT_VARS.F90 "\
+" Which_Flux.F90 "\
+" TEMP_VARS.F90 "\
+" DATE_TIME.F90 "\
+" NETCDF_UTILITIES.F90 "\
+" main.F90 "\
+" MOD_UTILITIES.F90 "\
+" Conversions.F90 "\
+" JY.F90 "\
+" getSolar.F90 "\
+" reaction.F90 "\
+" calc_solar_zenith.F90 "\
+" rnitrate.F90 "\
+" Read_InputFile.F90 "\
+" Flux.F90 "\
+" Nitrification.F90 "\
+" Q10_T.F90 "\
+" USER_get_basic_grid.F90 "\
+" USER_get_EFDC_grid.F90 "\
+" USER_get_NCOM_grid.F90 "\
+" USER_get_POM_grid.F90 "\
+" USER_getLonLat.F90 "\
+" USER_get_masks.F90 "\
+" USER_Set_Initial_Conditions.F90 "\
+" USER_Read_Solar.F90 "\
+" USER_Read_Temp.F90 "\
+" USER_Read_Wind.F90 "\
+" USER_Read_Sal.F90 "\
+" USER_Read_Nutrient_Concs.F90 "\
+" USER_Read_River_Flows.F90 "\
+" USER_Calculates_Loads.F90 "\
+" Read_CMAQ_NH4_SVflux_bin.F90 "\
+" Read_CMAQ_NO3_SVflux_bin.F90 "\
+" Calc_Sal.F90 "\
+" Calc_Temp.F90 "\
+" OUTPUT_ALL_FALSE.F90 "\
+" Command_Line_Args.F90 "\
+" Allocate_Input_Vars.F90 "\
+" Initialize_Output.F90 "\
+" Get_Vars.F90 "\
+" WQ_Model.F90 "\
+" Transport.F90 "\
+" AdvNeighborsOrdered_fake.F90 "\
+" Adv3D.F90 "\
+" VMixing.F90 "\
+" Model_Output.F90 "\
+" Model_Finalize.F90 "\
+" Decomp1D.F90 "\
+" Ave_istep_Offset.F90 "\
+""
+
+
+MOC_SRC=\
+" singledouble.F90 "\
+" sw_adtg.F90 "\
+" sw_ptmp.F90 "\
+" sw_temp.F90 "\
+" p80.F90 "\
+" constants.F90 "\
+" phsolvers.F90 "\
+" varsolver.F90 "\
+" depth2press.F90 "\
+" rho.F90 "\
+" rhoinsitu.F90 "\
+" vars.F90 "\
+" p2fCO2.F90 "\
+" gasx.F90 "\
+""
+
+
+CGEM_SRC=\
+" CGEM_Flux.F90 "\
+" CGEM_vars.F90 "\
+" STOICH_VARS.F90 "\
+" INPUT_VARS_CGEM.F90 "\
+" OUTPUT_NETCDF_CGEM.F90 "\
+" Model_Compare.F90 "\
+" SDM.F90 "\
+" Sediment_Diagenesis_Routines.F90 "\
+" Model_Diagenesis.F90 "\
+" MATLAB.F90 "\
+" T_WQEM.F90 "\
+" Light_WQEM.F90 "\
+" MASS_BALANCE_CGEM.F90 "\
+" DailyRad.F90 "\
+" Calc_Chla.F90 "\
+" calc_Agrow.F90 "\
+" Set_Initial_Conditions_CGEM.F90 "\
+" Read_InputFile_CGEM.F90 "\
+" Write_InputFile_CGEM.F90 "\
+" Check_InputFile_CGEM.F90 "\
+" Call_IOP_PAR.F90 "\
+" Flux_CGEM.F90 "\
+" JWMod.F90 "\
+" func_T.F90 "\
+" func_E.F90 "\
+" func_S.F90 "\
+" func_Qs.F90 "\
+" DailyRad_init.F90 "\
+" Sediment_Diagenesis_Flux.F90 "\
+" changeA.F90 "\
+" CGEM.F90 "\
+" JW_SOC.F90 "\
+" Meta_SOC.F90 "\
+" OUTPUT_NRL.F90 "\
+" OUTPUT_NOTCLOERN.F90 "\
+" Allocate_Input_CGEM.F90 "\
+" Model_Output_CGEM.F90 "\
+" Model_Finalize_CGEM.F90 "\
+" Salinity_Regression_Init_CGEM.F90 "\
+" InitError_Check_CGEM.F90 "\
+" Transport_CGEM.F90 "\
+" Init_Output_CGEM.F90 "\
+" MC_Flux.F90 "\
+" MC_GEM.F90 "\
+""
+
+
+WQEM_SRC=\
+" INPUT_VARS_WQEM.F90 "\
+" states.F90 "\
+" eut.F90 "\
+" flags.F90 "\
+" InRemin.F90 "\
+" MASS_BALANCE_WQEM.F90 "\
+" OUTPUT_NETCDF_WQEM.F90 "\
+" WQEM.F90 "\
+" Write_InputFile_WQEM.F90 "\
+" Read_InputFile_WQEM.F90 "\
+" Flux_WQEM.F90 "\
+" Set_Initial_Conditions_WQEM.F90 "\
+" zoo.F90 "\
+" diatoms.F90 "\
+" diatoms_droop.F90 "\
+" greens.F90 "\
+" greens_droop.F90 "\
+" carbon.F90 "\
+" phosph.F90 "\
+" phosph_droop.F90 "\
+" nitrog.F90 "\
+" nitrog_droop.F90 "\
+" silica.F90 "\
+" dissolved_oxygen.F90 "\
+" exchange.F90 "\
+" exchange_droop.F90 "\
+" WQEM_Light_Model.F90 "\
+" Brad_Light_Model.F90 "\
+" Allocate_Input_WQEM.F90 "\
+" Init_Output_WQEM.F90 "\
+" Salinity_Regression_Init_WQEM.F90 "\
+" Transport_WQEM.F90 "\
+" Model_Output_WQEM.F90 "\
+" Model_Finalize_WQEM.F90 "\
+""
+
+
+for SOURCE_FILE in $MAIN_SRC
+do
+  echo \
+ "$F90 $FFLAGS $IFLAGS -c main_src/$SOURCE_FILE"
+  $F90 $FFLAGS $IFLAGS -c main_src/$SOURCE_FILE
+  if [ $? != 0 ]; then exit $?; fi
+done
+
+
+for SOURCE_FILE in $MOC_SRC
+do
+  echo \
+ "$F90 $FFLAGS $IFLAGS -c moc_src/$SOURCE_FILE"
+  $F90 $FFLAGS $IFLAGS -c moc_src/$SOURCE_FILE
+  if [ $? != 0 ]; then exit $?; fi
+done
+
+
+for SOURCE_FILE in $CGEM_SRC
+do
+  echo \
+ "$F90 $FFLAGS $IFLAGS -c cgem_src/$SOURCE_FILE"
+  $F90 $FFLAGS $IFLAGS -c cgem_src/$SOURCE_FILE
+  if [ $? != 0 ]; then exit $?; fi
+done
+
+
+for SOURCE_FILE in $WQEM_SRC
+do
+  echo \
+ "$F90 $FFLAGS $IFLAGS -c wqem_src/$SOURCE_FILE"
+  $F90 $FFLAGS $IFLAGS -c wqem_src/$SOURCE_FILE
+  if [ $? != 0 ]; then exit $?; fi
+done
+
+
+echo \
+"$F90 $FFLAGS $LFLAGS -o CGEM.exe *.o $LIBS"
+ $F90 $FFLAGS $LFLAGS -o CGEM.exe *.o $LIBS
+if [ $? != 0 ]; then exit $?; fi
+
+rm *.o
+rm *.mod
+ls -l CGEM.exe
+file CGEM.exe
+objdump -p CGEM.exe | grep "DLL Name:"
+exit 0
+
