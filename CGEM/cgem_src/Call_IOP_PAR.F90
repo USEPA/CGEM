@@ -160,6 +160,7 @@
       call IOP_PARattenuation(a490_mid, bb490_mid, PARsurf, sun_zenith, d_sfc(k), PARdepth(k)) 
       PAR_percent(k) = 100.*PARdepth(k)/PARsurf
 
+
       if(PARdepth(k).ne.PARdepth(k)) then
           write(6,*) "k,d,Par,a,b,Rad,zenith",k,d_sfc(k),PARdepth(k),a490_mid, bb490_mid, PARsurf, sun_zenith
           write(6,*) "Chla_tot,CDOM_tot",Chla_tot(k),CDOM_tot(k)

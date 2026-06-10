@@ -1,10 +1,11 @@
-      Subroutine Command_Line_Args(Which_code,input_filename,init_filename,BASE_NETCDF_OUTPUT_FILE_NAME, DIntRates_filename)
+      Subroutine Command_Line_Args(Which_code,input_filename,init_filename,BASE_NETCDF_OUTPUT_FILE_NAME, DIntRates_filename, datadir_arg)
 
       character(120),intent(out) :: input_filename !Input file
       character(120),intent(out) :: init_filename !Initial conditions file
       character(6), intent(out) ::  Which_code     
       character(100), intent(out) :: BASE_NETCDF_OUTPUT_FILE_NAME
       character(100), intent(out) :: DIntRates_filename
+      character(200), intent(out) :: datadir_arg
 
       integer c_count
 
@@ -19,6 +20,7 @@
          init_filename = "InitialConditions.txt"
          BASE_NETCDF_OUTPUT_FILE_NAME = './NETCDF/cgem.'
          DIntRates_filename = './NETCDF/CGEM_DailyIntegrated_Rates.nc'
+         datadir_arg = ''
 
        if (c_count > 0) then
          call get_command_argument(1,Which_code)  !User selects which code
@@ -78,11 +80,16 @@
          call get_command_argument(5,DIntRates_filename) !User selects daily-integrated rates file name
        endif
 
+       if (c_count.gt.5) then
+         call get_command_argument(6,datadir_arg) ! Specified data directory.
+       endif
+
        write(6,*) "Biogeochem equations are: ", Which_code
        write(6,*) "Inputfile will be: ", trim(input_filename)
        write(6,*) "Initial Conditions filename will be: ", trim(init_filename)
        write(6,*) "Base Outputfile Name will be: ", trim(BASE_NETCDF_OUTPUT_FILE_NAME)
- 
+       write(6,*) "datadir_arg: ", trim(datadir_arg)
+
        if(Which_code.eq."CGEM") then
           write(6,*) "Daily-Integrated Rates output filename will be: ", trim(DIntRates_filename)
        endif

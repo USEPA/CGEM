@@ -48,7 +48,8 @@
       character(6) Which_code
       character(100) :: BASE_NETCDF_OUTPUT_FILE_NAME
       character(100) :: DIntRates_filename  ! Daily-Integrated Rates file
-!------------------------------------------------ 
+      character(200) :: datadir_arg  ! Optional command-line argument.
+!------------------------------------------------
 !---------------------
 ! MPI variables
 !---------------------
@@ -68,19 +69,20 @@
 
 ! --- Command Line Arguments for file names ---
       if (myid.eq.0) then
-        call Command_Line_Args(Which_code,input_filename,init_filename,BASE_NETCDF_OUTPUT_FILE_NAME, DIntRates_filename)
+        call Command_Line_Args(Which_code,input_filename,init_filename,BASE_NETCDF_OUTPUT_FILE_NAME, DIntRates_filename, datadir_arg)
       endif
       if (numprocs.gt.1) then 
        call MPI_BCAST(Which_code,6,MPI_CHARACTER,0,MPI_COMM_WORLD,mpierr)
        call MPI_BCAST(input_filename,120,MPI_CHARACTER,0,MPI_COMM_WORLD,mpierr)
        call MPI_BCAST(init_filename,120,MPI_CHARACTER,0,MPI_COMM_WORLD,mpierr)
        call MPI_BCAST(BASE_NETCDF_OUTPUT_FILE_NAME,100,MPI_CHARACTER,0,MPI_COMM_WORLD,mpierr)
+       call MPI_BCAST(datadir_arg,200,MPI_CHARACTER,0,MPI_COMM_WORLD,mpierr)
        if(Which_code.eq."CGEM")then
          call MPI_BCAST(DIntRates_filename,100,MPI_CHARACTER,0,MPI_COMM_WORLD,mpierr)
        endif
       endif
 
-      call Set_Model_dim(myid,numprocs)
+      call Set_Model_dim(myid,numprocs, datadir_arg)
       call Set_Grid(myid,numprocs)
       call Allocate_Input_Vars(Which_code)
       call Allocate_Hydro

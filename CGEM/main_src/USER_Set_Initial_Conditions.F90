@@ -68,6 +68,7 @@
 #ifdef DEBUG 
           write(6,*) "ierr,init",ierr,init(ii)
 #endif
+
           if(ierr>0) then
             write(6,*) "Invalid input at line",isum,"of",filename
             stop
@@ -97,8 +98,6 @@
         enddo
 
    endif !index(filename.....)
-
-
 
 
 #ifdef DEBUG 

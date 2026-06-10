@@ -284,13 +284,23 @@ CONTAINS
     integer :: timeLength
     integer :: i
     integer(kind=8), dimension(:), allocatable :: timeVals
+    real(kind=8), dimension(:), allocatable :: rtimeVals
     
     ! get time var values 
     call nf_inq_dimlen(ncid, tDim_index, timeLength)
 
     allocate(timeVals(timeLength))
-    call nf_get_var_int64(ncid,tVar_index,timeVals)
-!    call nf_get_var_double(ncid,tVar_index,timeVals)
+! HACK: int64 type is not available in simple old NetCDF 3.6
+! so read a real*8 then copy to integer*8:
+!    call nf_get_var_int64(ncid,tVar_index,timeVals)
+    allocate(rtimeVals(timeLength))
+    call nf_get_var_double(ncid,tVar_index,rtimeVals)
+
+    do i=start_index, timeLength
+      timeVals(i) = rtimeVals(i)
+    enddo
+
+    deallocate(rtimeVals)
 
     ! check if requested timeVal is inside dataset
     if (t_current.lt.timeVals(1) .OR. (t_current.gt.timeVals(timeLength))) then

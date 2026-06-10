@@ -1445,7 +1445,7 @@ endif
 !-----------------------------------------------------------------------------------------------
 ! -- do initialization of first timestep:
       if ( istep .eq. 1 ) then
-          PRINT*, "istep = ", istep
+          !PRINT*, "istep = ", istep
           CALL WRITE_EXTRA_DATA( myi_start, my_im, 1, jm, 1, km, istep_out, &
                                  PARdepth_ijk(fstart:fend, jstart:jend, :), &
                                  PAR_percent_ijk(fstart:fend, jstart:jend, :), &
@@ -1482,7 +1482,7 @@ endif
 
 ! --- dump output when istep is a multiple of iout
       if ( mod( istep, iout ) .eq. 0 ) then
-           PRINT*, "istep = ", istep
+           !PRINT*, "istep = ", istep
            CALL WRITE_EXTRA_DATA( myi_start, my_im, 1, jm, 1, km, istep_out+1, &
                                   PARdepth_ijk(fstart:fend, jstart:jend, :), &
                                   PAR_percent_ijk(fstart:fend, jstart:jend, :), &

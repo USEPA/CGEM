@@ -193,7 +193,7 @@ CONTAINS
     CALL DEFRAT( FILE_ID, 'astarOMZ', astarOMZ  )
     CALL DEFRAT( FILE_ID, 'astarOMR', astarOMR  )
     CALL DEFRAT( FILE_ID, 'astarOMBC', astarOMBC  )
-    CALL DEFRAT( FILE_ID, 'sink CDOM', ws(iCDOM)  )
+    CALL DEFRAT( FILE_ID, 'sink_CDOM', ws(iCDOM)  )
     CALL DEFRAT( FILE_ID, 'PARfac', PARfac  )
 !Temperature
     CALL DEFTAT( FILE_ID, 'Calibration3', 'Temperature in GEM.')
@@ -204,7 +204,7 @@ CONTAINS
 !Phytoplankton
     CALL DEFTAT( FILE_ID, 'Calibration4', 'Phytoplankton in GEM.')
     do i = 1, nospZ
-       write(var,'(A12,i2)') 'ediblevector',i
+       write(var,'(A12,i2.2)') 'ediblevector',i
        Temp_ediblevector = ediblevector(i,:)
        CALL DEFRATX( FILE_ID, var, Temp_ediblevector, nospA_m )
     enddo
@@ -231,7 +231,7 @@ CONTAINS
     CALL DEFRATX( FILE_ID, 'volcell', volcell, nospA_m  )
     CALL DEFRATX( FILE_ID, 'Qc', Qc, nospA_m  )
     CALL DEFRATX( FILE_ID, 'Athresh', Athresh, nospA_m )
-    CALL DEFRATX( FILE_ID, 'sink A', ws(iA(1):iA(nospA)), nospA_m  )
+    CALL DEFRATX( FILE_ID, 'sink_A', ws(iA(1):iA(nospA)), nospA_m  )
     CALL DEFRATX( FILE_ID, 'mA', mA, nospA_m )
     CALL DEFRATX( FILE_ID, 'A_wt', A_wt, nospA_m )
 
@@ -271,14 +271,14 @@ CONTAINS
     CALL DEFRAT( FILE_ID, 'stoich_y1BC', stoich_y1BC  )
     CALL DEFRAT( FILE_ID, 'stoich_x2BC', stoich_x2BC  )
     CALL DEFRAT( FILE_ID, 'stoich_y2BC', stoich_y2BC )
-    CALL DEFRAT( FILE_ID, 'sink OM1_A', ws(iOM1_A) )
-    CALL DEFRAT( FILE_ID, 'sink OM2_A', ws(iOM2_A)  )
-    CALL DEFRAT( FILE_ID, 'sink OM1_Z', ws(iOM1_Z)  )
-    CALL DEFRAT( FILE_ID, 'sink OM2_Z', ws(iOM2_Z)  )
-    CALL DEFRAT( FILE_ID, 'sink OM1_R', ws(iOM1_R) )
-    CALL DEFRAT( FILE_ID, 'sink OM2_R', ws(iOM2_R) )
-    CALL DEFRAT( FILE_ID, 'sink OM1_BC', ws(iOM1_BC) )
-    CALL DEFRAT( FILE_ID, 'sink OM2_BC', ws(iOM2_BC) )
+    CALL DEFRAT( FILE_ID, 'sink_OM1_A', ws(iOM1_A) )
+    CALL DEFRAT( FILE_ID, 'sink_OM2_A', ws(iOM2_A)  )
+    CALL DEFRAT( FILE_ID, 'sink_OM1_Z', ws(iOM1_Z)  )
+    CALL DEFRAT( FILE_ID, 'sink_OM2_Z', ws(iOM2_Z)  )
+    CALL DEFRAT( FILE_ID, 'sink_OM1_R', ws(iOM1_R) )
+    CALL DEFRAT( FILE_ID, 'sink_OM2_R', ws(iOM2_R) )
+    CALL DEFRAT( FILE_ID, 'sink_OM1_BC', ws(iOM1_BC) )
+    CALL DEFRAT( FILE_ID, 'sink_OM2_BC', ws(iOM2_BC) )
     CALL DEFRAT( FILE_ID, 'KGcdom', KGcdom  )
     CALL DEFRAT( FILE_ID, 'CF_SPM',CF_SPM )
 !Other Including Boundary Conditions
@@ -314,9 +314,9 @@ CONTAINS
     CALL DEFVR3( FILE_ID, IM_DIM, JM_DIM, KM_DIM, H_VAR, 'h', &
                  'Depth.', 'm' )
     CALL DEFVR3( FILE_ID, IM_DIM, JM_DIM, KM_DIM, FM_VAR, 'fm', &
-                 'Mask: 0 = land, 1 = water.',"" )
+                 'Mask: 0 = land, 1 = water.', '-' )
     CALL DEFVR3( FILE_ID, IM_DIM, JM_DIM, KM_DIM, DZ_VAR, 'dz', &
-                 'Thickness of cell.', '' )
+                 'Thickness of cell.', 'm' )
     ! Define time array variable as each output data's seconds since IYR0:
 
     WRITE ( TIME_UNITS, '(A,I4.4,A)' ) &
@@ -973,17 +973,17 @@ Subroutine OUTPUT_NETCDF_CGEM_allocate
  elseif(nospA.le.99) then
   do i=1,nospA
     counter = counter + 1
-    write(var,'(A1,i2)') 'A',i
+    write(var,'(A1,i2.2)') 'A',i
     VARIABLE_NAMES(counter) = var
   enddo
   do i=1,nospA
     counter = counter + 1
-    write(var,'(A2,i2)') 'Qn',i
+    write(var,'(A2,i2.2)') 'Qn',i
     VARIABLE_NAMES(counter) = var
   enddo
   do i=1,nospA
     counter = counter + 1
-    write(var,'(A2,i2)') 'Qp',i
+    write(var,'(A2,i2.2)') 'Qp',i
     VARIABLE_NAMES(counter) = var
   enddo
  else
@@ -999,7 +999,7 @@ Subroutine OUTPUT_NETCDF_CGEM_allocate
  elseif(nospZ.le.99) then
   do i=1,nospZ
     counter = counter + 1
-    write(var,'(A1,i2)') 'Z',i
+    write(var,'(A1,i2.2)') 'Z',i
     VARIABLE_NAMES(counter) = var
   enddo
  else

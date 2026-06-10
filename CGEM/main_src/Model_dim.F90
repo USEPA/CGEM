@@ -29,25 +29,29 @@ IMPLICIT NONE
 
 CONTAINS
 
-Subroutine Set_Model_dim(myid,numprocs)
+Subroutine Set_Model_dim(myid,numprocs,datadir_arg)
 
 
 IMPLICIT NONE
 
 
       integer, intent(in) :: myid,numprocs
+      character(200), intent(in) :: datadir_arg ! From optional command-line arg
       character(200) filename
       integer mpierr
 
 if(myid.eq.0) then
 
+  if (len(trim(datadir_arg)) .gt. 0) then
+      DATADIR = trim(datadir_arg)
+  else
 ! --- Read in location of data:
       open(unit=19,file="./data/MyFiles.inp", form="formatted", status="old")
       read(19,'(a)') DATADIR
       close(19)
+  endif
 !"
       write(filename,'(A, A)') trim(DATADIR),'/Model_dim.txt'
-
 
 ! --- Read in Model_dim parameters
       open(unit=19,file=filename, form="formatted", status="old")

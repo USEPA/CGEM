@@ -19,11 +19,7 @@
        integer :: ibc, jbc    ! Indices of boundary grid cells.
 
        if(InitializeHow.eq.0) then
-
-        write(filename,'(A,A,A)') trim(DATADIR),"/",trim(init_filename)
-
-        call USER_Set_Initial_Conditions(filename,myid,numprocs) 
-
+        call USER_Set_Initial_Conditions(init_filename,myid,numprocs) 
        elseif(InitializeHow.eq.1) then !Salinity Regression Equations
 
         call Salinity_Regression_Init_WQEM()
