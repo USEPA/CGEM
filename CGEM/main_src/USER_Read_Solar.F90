@@ -12,7 +12,7 @@
       real :: fac
       character(100) :: filename
       integer :: ifile
-!    Specify variables for dates and times
+      ! Specify variables for dates and times
       integer iYr, iMon, iDay, iHour, iMin, iSec
       integer, save :: init=1
       real, parameter :: cv        = 2.77e14 ! multiplicative factor used
@@ -22,7 +22,7 @@
                                                  ! Morel and Smith
                                                  ! (1974)
 
-      ifile = 2001 
+      ifile = 2004
 
       if(init.eq.1) then
 
@@ -30,7 +30,10 @@
         write(filename,'(A, A)') trim(DATADIR),'/INPUT/Solar.dat'
         open(unit=ifile,file=filename,status="old")
 
-        !First line
+        !First line: header comment
+        READ(ifile,*)
+
+        !First data line
         read(ifile,*) iYr,iMon,iDay,iHour,iMin,iSec,Var1
         t1 = TOTAL_SECONDS( iYr0, iYr, iMon, iDay, iHour, iMin, iSec )
 
@@ -43,7 +46,6 @@
 
         if(t1.gt.TC_8) then
            write(6,*) "Solar data does not start early enough, exiting"
-!"
            stop
         endif
 
@@ -78,7 +80,6 @@
       init=0
 
       endif
-
 
       if(t2.le.TC_8) then
         t1=t2

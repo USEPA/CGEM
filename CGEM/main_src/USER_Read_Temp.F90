@@ -15,11 +15,11 @@
       real :: fac
       character(100) :: filename
       integer :: ifile
-!    Specify variables for dates and times
+      ! Specify variables for dates and times
       integer iYr, iMon, iDay, iHour, iMin, iSec
       integer, save :: init=1
 
-      ifile = 2002 
+      ifile = 2005
 
       if(init.eq.1) then
 
@@ -36,7 +36,10 @@
 #endif
         open(unit=ifile,file=filename,status="old")
 
-        !First line
+        !First line: header comment
+        READ(ifile,*)
+
+        !First data line
         read(ifile,*) iYr,iMon,iDay,iHour,iMin,iSec,Var1
         t1 = TOTAL_SECONDS( iYr0, iYr, iMon, iDay, iHour, iMin, iSec )
 
@@ -49,7 +52,6 @@
 
         if(t1.gt.TC_8) then
            write(6,*) "Temperature Data does not start early enough, exiting"
-!"
            stop
         endif
 
@@ -79,7 +81,6 @@
       init=0
 
       endif
-
 
       if(t2.le.TC_8) then
         t1=t2

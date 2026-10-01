@@ -22,7 +22,7 @@ IMPLICIT NONE
          ! Calculate EXTRA_VARIABLES for netCDF:
          ! ir, irfrac, uN(nospA), uP(nospA), uE(nospA), uA(nospA), Chla,s_xy(8), uSi(nospA),
          ! pH, ChlC(nospA), RN2, RO2,         
-         EXTRA_VARIABLES = 18 + 6*nospA
+         EXTRA_VARIABLES = 20 + 6*nospA
 
          call CGEM_vars_allocate()
          call INPUT_VARS_CGEM_allocate()

@@ -28,8 +28,10 @@ subroutine USER_Read_River_Flows(TC_8)
       filename = trim(DATADIR) // '/INPUT/' // trim(FlowFile) // trim(strFNum) // '.dat'
       OPEN(unit=ifile, file=filename, status="old")
 
-      !First line
+      !First line: header comment
       READ(ifile,*)
+
+      !First data line
       READ(ifile,*) iYr, iMon, iDay, iHour, iMin, iSec, River_InFlow1, River_OutFlow1
       t1 = TOTAL_SECONDS( iYr0, iYr, iMon, iDay, iHour, iMin, iSec )
 

@@ -25,5 +25,12 @@ subroutine USER_Calculates_Loads()
   ! Update volume of grid cell
   Vol(1,1,1) = Vol(1,1,1) + (River_InFlow(1) - River_OutFlow(1)) * dT
 
+  ! Check if volume is negative
+  IF (Vol(1,1,1) <= 0.0) THEN
+     WRITE(6,*) "Volume of grid cell is less than or equal to zero: ", Vol(1,1,1) 
+     WRITE(6,*) "Exiting"
+     STOP
+  ENDIF
+  
   RETURN
 END SUBROUTINE USER_Calculates_Loads

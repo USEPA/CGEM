@@ -27,8 +27,10 @@ subroutine USER_Read_Nutrient_Concs(TC_8)
       filename = trim(DATADIR) // '/INPUT/' // trim(ConcFile) // trim(strFNum) // '.dat'
       OPEN(unit=ifile, file=filename, status="old")
 
-      !First line
+      !First line: header comment
       READ(ifile,*)
+
+      !First data line
       READ(ifile,*) iYr, iMon, iDay, iHour, iMin, iSec, Conc1(1), Conc1(2), Conc1(3), Conc1(4)
       t1 = TOTAL_SECONDS( iYr0, iYr, iMon, iDay, iHour, iMin, iSec )
 

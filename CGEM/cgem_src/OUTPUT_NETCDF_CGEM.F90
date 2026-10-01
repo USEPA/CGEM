@@ -14,6 +14,8 @@ MODULE OUTPUT_NETCDF_CGEM
   USE OUTPUT
   USE INPUT_VARS
   USE Model_dim, ONLY:nospA,nospZ
+  USE HYDRO, ONLY: T
+  USE GRID, ONLY: Vol
 
   IMPLICIT NONE
 
@@ -578,7 +580,10 @@ CONTAINS
                                S_X1FP, S_Y1FP, S_X2FP, S_Y2FP, USI, ChlC,    &
                                pH, RN2, RO2A, RO2Z, RO2BC, RO2R, PrimProd )
 
-    USE OUTPUT 
+    USE OUTPUT
+    USE HYDRO, ONLY: T
+    USE GRID, ONLY: Vol
+    
     IMPLICIT NONE
     INTEGER,INTENT(IN):: IMSTART, JMSTART, KMSTART
     INTEGER,INTENT(IN):: IM, JM, KM, TIMESTEP
@@ -900,7 +905,28 @@ CONTAINS
                    // EXTRA_VARIABLE_NAMES( VARIABLE ) )
     END IF
 
+    VARIABLE = VARIABLE + 1  ! Temperature
 
+    IF ( WRITE_EXTRA_VARIABLE( VARIABLE ) ) THEN
+    REQUEST_COUNT = REQUEST_COUNT + 1
+      ERR = ncdf_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
+                                  STARTS, COUNTS, &
+                                   T( 1, 1, 1), REQUESTS(REQUEST_COUNT))
+      CALL CHKERR( ERR, 'write output variable ' &
+                   // EXTRA_VARIABLE_NAMES( VARIABLE ) )
+    END IF
+
+    VARIABLE = VARIABLE + 1  ! Volume
+
+    IF ( WRITE_EXTRA_VARIABLE( VARIABLE ) ) THEN
+    REQUEST_COUNT = REQUEST_COUNT + 1
+      ERR = ncdf_PUT_VARA_REAL( FILE_ID, EXTRA_VAR( VARIABLE ), &
+                                  STARTS, COUNTS, &
+                                   Vol( 1, 1, 1), REQUESTS(REQUEST_COUNT))
+      CALL CHKERR( ERR, 'write output variable ' &
+                   // EXTRA_VARIABLE_NAMES( VARIABLE ) )
+    END IF  
+    
     ERR = ncdf_WAIT_ALL( FILE_ID, REQUEST_COUNT, REQUESTS, STATUSES)
     CALL CHKERR( ERR, 'implement non-blocking interface' )
 
@@ -1199,6 +1225,8 @@ Subroutine OUTPUT_NETCDF_CGEM_allocate
     EXTRA_VARIABLE_NAMES(counter+5) = 'RO2BC'
     EXTRA_VARIABLE_NAMES(counter+6) = 'RO2R'
     EXTRA_VARIABLE_NAMES(counter+7) = 'Primary_Production'
+    EXTRA_VARIABLE_NAMES(counter+8) = 'Temperature'
+    EXTRA_VARIABLE_NAMES(counter+9) = 'Volume'
  
   ALLOCATE(WRITE_EXTRA_VARIABLE(EXTRA_VARIABLES)) 
   do i = 1, EXTRA_VARIABLES
@@ -1292,7 +1320,9 @@ endif
     EXTRA_VARIABLE_DESCRIPTIONS(counter+5) = 'RO2BC Decay Term      '
     EXTRA_VARIABLE_DESCRIPTIONS(counter+6) = 'RO2R Decay Term       '
     EXTRA_VARIABLE_DESCRIPTIONS(counter+7) = 'Primary Production    '
-
+    EXTRA_VARIABLE_DESCRIPTIONS(counter+8) = 'Water temperature     '
+    EXTRA_VARIABLE_DESCRIPTIONS(counter+9) = 'Grid cell volume      '
+    
   ALLOCATE(EXTRA_VARIABLE_UNITS(EXTRA_VARIABLES))
     EXTRA_VARIABLE_UNITS(1) = 'photons/cm2/s                   '
     EXTRA_VARIABLE_UNITS(2) = '%                               '
@@ -1338,6 +1368,8 @@ endif
     EXTRA_VARIABLE_UNITS(counter+5) = 'mmol-O2/m3                       '
     EXTRA_VARIABLE_UNITS(counter+6) = 'mmol-O2/m3                       '
     EXTRA_VARIABLE_UNITS(counter+7) = 'mmol-C/m3/d                      '
+    EXTRA_VARIABLE_UNITS(counter+8) = 'Celsius                          '
+    EXTRA_VARIABLE_UNITS(counter+9) = 'm3                               '
 
   ALLOCATE(F_VAR(nf)) ! NetCDF IDs for each variable.
   F_VAR = fill(0)
