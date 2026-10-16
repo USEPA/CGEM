@@ -39,7 +39,7 @@
 
       real, allocatable, save :: River_InFlow(:)     ! River inflow used in the 0D case.
       real, allocatable, save :: River_OutFlow(:)    ! River outflow used in the 0D case.
-      real, allocatable, save :: River_Conc(:)      ! River nutrient concentration
+      real, allocatable, save :: River_Conc(:,:)     ! River nutrient concentration
       
       type(netCDF_file) :: riverload_info(9)  !indices refer to order declared below in enum, 
       character(len=200) :: netcdf_riverload_fileNames(9)  !holds filenames of hydro netcdf data files
@@ -137,7 +137,7 @@
 
       ALLOCATE(River_InFlow(nRiv))
       ALLOCATE(River_OutFlow(nRiv))
-      ALLOCATE(River_Conc(4))
+      ALLOCATE(River_Conc(nRiv,4))
 
       !Fill values for netCDF
       if (Which_code.eq."CGEM") then

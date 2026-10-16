@@ -18,10 +18,10 @@
 
        IMPLICIT NONE
 
-       integer(kind=8), intent(in) :: TC_8,T_8 ! Current time in seconds since Model_dim::iYr0.
+       integer(kind=8), intent(in) :: TC_8, T_8 ! Current time in seconds since Model_dim::iYr0.
        integer(kind=8) :: TC_in, T_in
-       integer, intent(in) :: myid,numprocs
-       integer, save :: init=1
+       integer, intent(in) :: myid, numprocs
+       integer, save :: init = 1
        integer :: mpierr
 
        logical :: broadcast_T, broadcast_TC  !logical for whether to broadcast T_8 or TC_8 hydro variables
